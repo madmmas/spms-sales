@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -8,11 +8,12 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../services/HRService';
+import { HRService } from '../../../services/HRService';
+import { PACKAGE_MODEL } from '../../../constants/models';
 
-const EmpProfileList = () => {
+const List = () => {
 
-    const modelName = 'emp_profile';
+    const modelName = PACKAGE_MODEL;
 
     let navigate = useNavigate();
 
@@ -32,11 +33,11 @@ const EmpProfileList = () => {
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [empProfiles, setEmpProfiles] = useState(null);
-    const [deleteEmpProfileDialog, setDeleteEmpProfileDialog] = useState(false);
-    const [deleteEmpProfilesDialog, setDeleteEmpProfilesDialog] = useState(false);
-    const [empProfile, setEmpProfile] = useState({});
-    const [selectedEmpProfiles, setSelectedEmpProfiles] = useState(null);
+    const [dtProfiles, setProfiles] = useState(null);
+    const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
+    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
+    const [dtProfile, setProfile] = useState({});
+    const [selectedProfiles, setSelectedProfiles] = useState(null);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -71,7 +72,7 @@ const EmpProfileList = () => {
             hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
-                setEmpProfiles(data.rows);
+                setProfiles(data.rows);
                 setLoading(false);
             });
         }, Math.random() * 1000 + 250);
@@ -97,39 +98,53 @@ const EmpProfileList = () => {
         setLazyParams(_lazyParams);
     }
 
-    const editEmpProfile = (empProfile) => {
-        navigate("/empinfo/" + empProfile._id);
+    const openNew = () => {
+        navigate("/packages/new", { replace: true });
     };
 
-    const confirmDeleteEmpProfile = (empProfile) => {
-        setEmpProfile(empProfile);
-        setDeleteEmpProfileDialog(true);
+    const editProfile = (dtProfile) => {
+        navigate("/packages/" + dtProfile._id, { replace: true });
     };
 
-    const hideDeleteEmpProfileDialog = () => {
-        setDeleteEmpProfileDialog(false);
+    const confirmDeleteProfile = (dtProfile) => {
+        setProfile(dtProfile);
+        setDeleteProfileDialog(true);
     };
 
-    const hideDeleteEmpProfilesDialog = () => {
-        setDeleteEmpProfilesDialog(false);
+    const hideDeleteProfileDialog = () => {
+        setDeleteProfileDialog(false);
     };
 
-    const deleteSelectedEmpProfiles = () => {
-        let _empProfiles = empProfiles.filter((val) => !selectedEmpProfiles.includes(val));
-        setEmpProfiles(_empProfiles);
-        setDeleteEmpProfilesDialog(false);
-        setSelectedEmpProfiles(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmpProfiles Deleted', life: 3000 });
+    const hideDeleteProfilesDialog = () => {
+        setDeleteProfilesDialog(false);
     };
 
-    const deleteEmpProfile = () => {
-        hrManagementService.delete(modelName, empProfile._id).then(data => {
+    const deleteSelectedProfiles = () => {
+        let _dtProfiles = dtProfiles.filter((val) => !selectedProfiles.includes(val));
+        setProfiles(_dtProfiles);
+        setDeleteProfilesDialog(false);
+        setSelectedProfiles(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Deleted', life: 3000 });
+    };
+
+    const deleteProfile = () => {
+        hrManagementService.delete(modelName, dtProfile._id).then(data => {
             console.log(data);
             loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Profile Deleted', life: 3000 });
         });
-        setDeleteEmpProfileDialog(false);
-        setEmpProfile(null);
+        setDeleteProfileDialog(false);
+        setProfile(null);
+    };
+
+    const leftToolbarTemplate = () => {
+        return (
+            <React.Fragment>
+                <div className="flex justify-content-between">
+                    <Button label="New" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                </div>
+            </React.Fragment>
+        );
     };
 
     const rightToolbarTemplate = () => {
@@ -143,17 +158,8 @@ const EmpProfileList = () => {
     const idBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Employee ID</span>
-                {rowData.empId}
-            </>
-        );
-    };
-
-    const punchIdBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Punch ID</span>
-                {rowData.punchId}
+                <span className="p-column-title">Package ID</span>
+                {rowData.packageId}
             </>
         );
     };
@@ -162,7 +168,7 @@ const EmpProfileList = () => {
         return (
             <>
                 <span className="p-column-title">Name</span>
-                {rowData.empName}
+                {rowData.packageName}
             </>
         );
     };
@@ -170,7 +176,7 @@ const EmpProfileList = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Deparment</h5>
+                <h5 className="m-0">Manage Packages</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -179,22 +185,22 @@ const EmpProfileList = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editEmpProfile(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteEmpProfile(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
             </>
         );
     };
 
-    const deleteEmpProfileDialogFooter = (
+    const deleteProfileDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteEmpProfileDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteEmpProfile} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfileDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProfile} />
         </>
     );
-    const deleteEmpProfilesDialogFooter = (
+    const deleteProfilesDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteEmpProfilesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedEmpProfiles} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiles} />
         </>
     );
 
@@ -203,10 +209,10 @@ const EmpProfileList = () => {
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" right={rightToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -219,27 +225,26 @@ const EmpProfileList = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="empId" header="Employee ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="punchId" header="Punch ID" filter filterPlaceholder="Search by punchId" sortable body={punchIdBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="empName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="packageId" header="Package ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="packageName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={deleteEmpProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmpProfileDialogFooter} onHide={hideDeleteEmpProfileDialog}>
+                    <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {empProfile && (
+                            {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{empProfile.empId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.packageId}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteEmpProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmpProfilesDialogFooter} onHide={hideDeleteEmpProfilesDialog}>
+                    <Dialog visible={deleteProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDeleteProfilesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {empProfile && <span>Are you sure you want to delete the selected items?</span>}
+                            {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
 
@@ -249,4 +254,4 @@ const EmpProfileList = () => {
     );
 };
 
-export default EmpProfileList;
+export default List;

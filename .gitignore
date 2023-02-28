@@ -63,7 +63,9 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
+# .env
+# .env.test
+public/env.js
 
 .DS_Store
+.vscode/settings.json
