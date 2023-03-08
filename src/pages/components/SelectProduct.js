@@ -1,58 +1,124 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
-import { ProductService } from '../../services/ProductService';
+import { MasterDataService } from '../../services/MasterDataService';
+import { SUPPLIER_MODEL } from '../../constants/models';
 
 export default function SelectProduct({ field, className }) {
-    const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [supplierDialog, setSupplierDialog] = useState(false);
 
-    const productService = new ProductService();
+    const modelName = SUPPLIER_MODEL;
 
-    useEffect(() => {
-        // if field.value is not null, then fetch product by id and set the selectedProduct
-        productService.getProductsSmall().then((data) => setProducts(data));
-    }, []);
-
-    const hideDialog = () => {
-        setSupplierDialog(false);
+    const dt = useRef(null);
+    
+    let defaultFilters = {
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        }
     };
 
-    const selectAndHideDialog = () => {
-        setSupplierDialog(false);
+    const [loading, setLoading] = useState(false);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [tmpData, setTmpData] = useState([]);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const [tableDialog, setTableDialog] = useState(false);
+
+    const masterDataService = new MasterDataService();
+
+    let loadLazyTimeout = null;
+
+    useEffect(() => {
+        masterDataService.getById(modelName, field.value).then(data => {
+            setSelectedRow(data.supplierName);
+        });
+    }, []);
+    
+    const loadLazyData = () => {
+        setLoading(true);
+
+        if (loadLazyTimeout) {
+            clearTimeout(loadLazyTimeout);
+        }
+        
+        loadLazyTimeout = setTimeout(() => {
+            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+                // console.log(data)
+                setTotalRecords(data.total);
+                setTmpData(data.rows);
+                setLoading(false);
+            });
+        }, Math.random() * 1000 + 250);
+    }
+
+    const hideDialog = () => {
+        setTableDialog(false);
     };
 
     const showDialog = () => {
-        setSupplierDialog(true);
+        setLazyParams(defaultFilters);
+        loadLazyData();
+        setTableDialog(true);
     };
 
-    const deleteProfilesDialogFooter = (
-        <>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Ok" icon="pi pi-check" className="p-button-text" onClick={selectAndHideDialog} />
-        </>
-    );
+    const onPage = (event) => {
+        let _lazyParams = { ...lazyParams, ...event };
+        setLazyParams(_lazyParams);
+    }
+
+    const onSort = (event) => {
+        let _lazyParams = { ...lazyParams, ...event };
+        setLazyParams(_lazyParams);
+    }
+
+    const onFilter = (event) => {
+        let _lazyParams = { ...lazyParams, ...event };
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+    }
+
+    const onSelection = (e) => {
+        field.onChange(e.value._id);
+        setSelectedRow(e.value.supplierName);
+        setTableDialog(false);
+    }
 
     return (
         <>
             <div className="p-inputgroup">
-                <InputText disabled value={selectedProduct?selectedProduct.name:null}  className={className} />
+                <InputText disabled value={selectedRow}  className={className} />
                 <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
                 <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
             </div>
-            <Dialog visible={supplierDialog} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDialog}>
-                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} 
-                    onSelectionChange={(e) => {field.onChange(e.value.id); setSelectedProduct(e.value)}} 
-                        dataKey="id" tableStyle={{ minWidth: '50rem' }}>
+            <Dialog visible={tableDialog} header="Select" modal onHide={hideDialog}>
+                <DataTable
+                    ref={dt} value={tmpData} dataKey="_id"
+                    className="datatable-responsive" responsiveLayout="scroll"
+                    lazy loading={loading} rows={lazyParams.rows}
+                    onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
+                    onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
+
+                    paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
+                    rowsPerPageOptions={[5,10, 15]}
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+
+                    selectionMode="single" selection={selectedRow}
+                    onSelectionChange={(e) => {onSelection(e)}} 
+
+                    emptyMessage="No data found."
+                >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                    <Column field="code" header="Code"></Column>
-                    <Column field="name" header="Name"></Column>
-                    <Column field="category" header="Category"></Column>
-                    <Column field="quantity" header="Quantity"></Column>
+                    <Column field="supplierId" header="ID" filter filterPlaceholder="Search by ID" sortable></Column>
+                    <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable></Column>
                 </DataTable>
             </Dialog>
         </>
