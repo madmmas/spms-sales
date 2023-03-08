@@ -6,11 +6,11 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { MasterDataService } from '../../services/MasterDataService';
-import { PRODUCT_MODEL } from '../../constants/models';
+import { SUPPLIER_MODEL } from '../../constants/models';
 
-export default function SelectProduct({ field, className }) {
+export default function SelectSupplier({ field, className }) {
 
-    const modelName = PRODUCT_MODEL;
+    const modelName = SUPPLIER_MODEL;
 
     const dt = useRef(null);
     
@@ -116,8 +116,8 @@ export default function SelectProduct({ field, className }) {
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                    <Column field="productId" header="ID" filter filterPlaceholder="Search by ID" sortable></Column>
-                    <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable></Column>
+                    <Column field="supplierId" header="ID" filter filterPlaceholder="Search by ID" sortable></Column>
+                    <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable></Column>
                 </DataTable>
             </Dialog>
         </>

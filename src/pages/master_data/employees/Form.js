@@ -5,17 +5,20 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
+import SelectConstData from '../../components/SelectConstData';
+import SelectLookupData from '../../components/SelectLookupData';
+
+import SelectSupplier from '../../components/SelectSupplier';
 
 import { HRService } from '../../../services/HRService';
-import { EMPLOYEE_MODEL } from '../../../constants/models';
+import { EMPLOYEE_MODEL, SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
+import { CITIES } from '../../../constants/lookupData';
 
 const Form = ({empProfile}) => {
 
     const modelName = EMPLOYEE_MODEL;
 
     let navigate = useNavigate();
-
-    const [selectedField, setSelectedField] = useState(null);
 
     const toast = useRef(null);
     const hrManagementService = new HRService();
@@ -94,6 +97,48 @@ const Form = ({empProfile}) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Punch ID*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="city"
+                            control={control}
+                            rules={{ required: 'City is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>City*</label>
+                                <SelectConstData field={field} data={CITIES}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="supplierCategory"
+                            control={control}
+                            rules={{ required: 'Supplier Category is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>City*</label>
+                                <SelectLookupData field={field} model={SUPPLIER_CATEGORY_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="dtSupplier_supplierId"
+                            control={control}
+                            rules={{ required: 'Supplier is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                <SelectSupplier field={field} modelName={SUPPLIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
