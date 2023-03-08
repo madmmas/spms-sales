@@ -41,11 +41,11 @@ export default function SelectProduct({ field, className, value }) {
     return (
         <>
             <div className="p-inputgroup">
-                <InputText disabled inputId={field.name} value={field.value} inputRef={field.ref}  className={className} onChange={(e) => field.onChange(e.target.value)} />
+                <InputText disabled inputId={field.name} value={field.value} inputRef={field.ref}  className={className} />
                 <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
             </div>
             <Dialog visible={supplierDialog} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDialog}>
-                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} onSelectionChange={(e) => setSelectedProduct(e.value)} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
+                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} onSelectionChange={(e) => {field.onChange(e.value.name); setSelectedProduct(e.value)}} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
                     <Column field="code" header="Code"></Column>
                     <Column field="name" header="Name"></Column>
