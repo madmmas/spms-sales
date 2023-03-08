@@ -1,47 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputSwitch } from 'primereact/inputswitch';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { ProductService } from '../../services/ProductService';
 
-export default function SelectProduct() {
+export default function SelectProduct({ field, className, value }) {
     const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(value);
     const [rowClick, setRowClick] = useState(true);
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
+    const [supplierDialog, setSupplierDialog] = useState(false);
+
+    const productService = new ProductService();
 
     useEffect(() => {
-        // ProductService.getProductsMini().then((data) => setProducts(data));
+        productService.getProductsSmall().then((data) => setProducts(data));
     }, []);
+
+    const hideDialog = () => {
+        setSupplierDialog(false);
+    };
+
+    const selectAndHideDialog = () => {
+        setSupplierDialog(false);
+    };
+
+    const showDialog = () => {
+        setSupplierDialog(true);
+    };
 
     const deleteProfilesDialogFooter = (
         <>
-            {/* <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiles} /> */}
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
+            <Button label="Ok" icon="pi pi-check" className="p-button-text" onClick={selectAndHideDialog} />
         </>
     );
 
     return (
-        <Dialog visible={deleteProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesDialogFooter} 
-        // onHide={hideDeleteProfilesDialog}
-        >
-            {/* <div className="flex align-items-center justify-content-center"> */}
-            {/* <div className="flex justify-content-center align-items-center mb-4 gap-2">
-                <InputSwitch inputId="input-rowclick" checked={rowClick} onChange={(e) => setRowClick(e.value)} />
-                <label htmlFor="input-rowclick">Row Click</label>
-            </div> */}
-            <DataTable value={products} selectionMode={rowClick ? null : 'radiobutton'} selection={selectedProduct} onSelectionChange={(e) => setSelectedProduct(e.value)} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
-                <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                <Column field="code" header="Code"></Column>
-                <Column field="name" header="Name"></Column>
-                <Column field="category" header="Category"></Column>
-                <Column field="quantity" header="Quantity"></Column>
-            </DataTable>
-                {/* <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                {dtProfile && <span>Are you sure you want to delete the selected items?</span>} */}
-            {/* </div> */}
-        </Dialog>
-    
+        <>
+            <div className="p-inputgroup">
+                <InputText disabled inputId={field.name} value={field.value} inputRef={field.ref}  className={className} onChange={(e) => field.onChange(e.target.value)} />
+                <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
+            </div>
+            <Dialog visible={supplierDialog} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDialog}>
+                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} onSelectionChange={(e) => setSelectedProduct(e.value)} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
+                    <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
+                    <Column field="code" header="Code"></Column>
+                    <Column field="name" header="Name"></Column>
+                    <Column field="category" header="Category"></Column>
+                    <Column field="quantity" header="Quantity"></Column>
+                </DataTable>
+            </Dialog>
+        </>
     );
 }

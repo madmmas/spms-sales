@@ -8,8 +8,6 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import SelectProduct from '../../components/SelectProduct';
-
 import { HRService } from '../../../services/HRService';
 import { PRODUCT_MODEL } from '../../../constants/models';
 
@@ -249,8 +247,6 @@ const List = () => {
                             {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
-
-                    <SelectProduct />
                 </div>
             </div>
         </div>

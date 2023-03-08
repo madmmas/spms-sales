@@ -6,6 +6,8 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 
+import SelectProduct from '../../components/SelectProduct';
+
 import { HRService } from '../../../services/HRService';
 import { PRODUCT_MODEL } from '../../../constants/models';
 
@@ -18,6 +20,8 @@ const Form = ({productProfile}) => {
     const toast = useRef(null);
     const hrManagementService = new HRService();
     
+    const [supplierDialog, setSupplierDialog] = useState(false);
+
     const {
         register,
         control,
@@ -47,6 +51,16 @@ const Form = ({productProfile}) => {
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+
+    const selectAndHideDialog = (id, name) => {
+        // resetField(selectedField);
+        setSupplierDialog(false);
+    };
+
+    const hideDialog = () => {
+        // resetField(selectedField);
+        setSupplierDialog(false);
     };
 
     return (
@@ -83,12 +97,28 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="dtSupplier_supplierId"
+                            control={control}
+                            // rules={{ required: 'Supplier is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                <SelectProduct className={classNames({ 'p-invalid': fieldState.error })}  
+                                    field={field}/> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
                 </div>
                 <>
                     <Button type="submit" label="Submit" className="mt-2" />
                 </>
                 </form>
             </div>
+            
+            {/* visible={supplierDialog}  onHide={hideDialog} /> */}
         </div>
     );
 }
