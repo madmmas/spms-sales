@@ -6,16 +6,15 @@ import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { ProductService } from '../../services/ProductService';
 
-export default function SelectProduct({ field, className, value }) {
+export default function SelectProduct({ field, className }) {
     const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(value);
-    const [rowClick, setRowClick] = useState(true);
-    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [supplierDialog, setSupplierDialog] = useState(false);
 
     const productService = new ProductService();
 
     useEffect(() => {
+        // if field.value is not null, then fetch product by id and set the selectedProduct
         productService.getProductsSmall().then((data) => setProducts(data));
     }, []);
 
@@ -41,11 +40,14 @@ export default function SelectProduct({ field, className, value }) {
     return (
         <>
             <div className="p-inputgroup">
-                <InputText disabled inputId={field.name} value={field.value} inputRef={field.ref}  className={className} />
+                <InputText disabled value={selectedProduct?selectedProduct.name:null}  className={className} />
+                <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
                 <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
             </div>
             <Dialog visible={supplierDialog} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDialog}>
-                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} onSelectionChange={(e) => {field.onChange(e.value.name); setSelectedProduct(e.value)}} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
+                <DataTable value={products} selectionMode="radiobutton" selection={selectedProduct} 
+                    onSelectionChange={(e) => {field.onChange(e.value.id); setSelectedProduct(e.value)}} 
+                        dataKey="id" tableStyle={{ minWidth: '50rem' }}>
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
                     <Column field="code" header="Code"></Column>
                     <Column field="name" header="Name"></Column>
