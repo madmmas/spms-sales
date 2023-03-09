@@ -14,6 +14,14 @@ export class ConfigurationService {
         return axiosInstance.get(`/data/${modelName}?` + queryParams).then(res => res.data);
     }
 
+    async getAllWithoutParams(modelName) {
+        // const params = {"first":0,"rows":10,"page":1,"sortField":null,"sortOrder":null,"filters":{"name":{"operator":"or","constraints":[{"value":null,"matchMode":"startsWith"}]}}}
+        const params = { params: JSON.stringify({"rows":100})};
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+
+        return axiosInstance.get(`/data/${modelName}?` + queryParams).then(res => res.data.rows);
+    }
+
     async create(modelName, data) {
         const resp = await axiosInstance.post(`/data/${modelName}`, data);
         console.log(resp.data);

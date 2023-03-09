@@ -6,11 +6,14 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { MasterDataService } from '../../services/MasterDataService';
+import { SUPPLIER_MODEL } from '../../constants/models';
 
-export default function SelectProduct({ field, modelName, className }) {
+export default function SelectSupplier({ field, className }) {
+
+    const modelName = SUPPLIER_MODEL;
 
     const dt = useRef(null);
-
+    
     let defaultFilters = {
         first: 0,
         rows: 10,
@@ -38,7 +41,7 @@ export default function SelectProduct({ field, modelName, className }) {
             setSelectedRow(data.supplierName);
         });
     }, []);
-    
+
     const loadLazyData = () => {
         setLoading(true);
 
@@ -48,7 +51,6 @@ export default function SelectProduct({ field, modelName, className }) {
         
         loadLazyTimeout = setTimeout(() => {
             masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
                 setTotalRecords(data.total);
                 setTmpData(data.rows);
                 setLoading(false);
@@ -114,6 +116,7 @@ export default function SelectProduct({ field, modelName, className }) {
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
+                    <Column field="supplierId" header="ID" filter filterPlaceholder="Search by ID" sortable></Column>
                     <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable></Column>
                 </DataTable>
             </Dialog>
