@@ -119,7 +119,7 @@ export default function SelectMasterData({ field, modelName, className, columns 
 
                     selectionMode="single" selection={selectedRow}
                     onSelectionChange={(e) => {onSelection(e)}} 
-                    // stateStorage="session" stateKey={"dt-state-" + modelName}
+
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
