@@ -1,7 +1,7 @@
 export const CITIES = [
-    { name: 'New York', id: 'NY' },
-    { name: 'Rome', id: 'RM' },
-    { name: 'London', id: 'LDN' },
-    { name: 'Istanbul', id: 'IST' },
-    { name: 'Paris', id: 'PRS' }
+    { id: 1, name: 'Dhaka' },
+    { id: 2, name: 'Rajshahi' },
+    { id: 3, name: 'Chitagong' },
+    { id: 4, name: 'Sylhet' },
+    { id: 5, name: 'Khulna' }
 ];
