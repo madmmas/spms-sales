@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 
-import SelectProduct from '../../components/SelectProduct';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
 import { PRODUCT_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
@@ -53,6 +53,16 @@ const Form = ({productProfile}) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
+    const selectAndHideDialog = (id, name) => {
+        // resetField(selectedField);
+        setSupplierDialog(false);
+    };
+
+    const hideDialog = () => {
+        // resetField(selectedField);
+        setSupplierDialog(false);
+    };
+
     return (
         <div className="form-demo">
             <Toast ref={toast} />
@@ -91,12 +101,16 @@ const Form = ({productProfile}) => {
                         <Controller
                             name="dtSupplier_supplierId"
                             control={control}
-                            rules={{ required: 'Supplier is required.' }}
+                            // rules={{ required: 'Supplier is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
-                                <SelectProduct field={field} modelName={SUPPLIER_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
+                                        {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                    ]} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

@@ -5,10 +5,10 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
+
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
-
-import SelectSupplier from '../../components/SelectSupplier';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
 import { EMPLOYEE_MODEL, SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
@@ -137,8 +137,12 @@ const Form = ({empProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
-                                <SelectSupplier field={field} modelName={SUPPLIER_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
+                                        {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                    ]} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

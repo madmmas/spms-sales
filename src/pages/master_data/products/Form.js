@@ -6,10 +6,10 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 
-import SelectProduct from '../../components/SelectProduct';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
-import { PRODUCT_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
 
 const Form = ({productProfile}) => {
 
@@ -105,8 +105,12 @@ const Form = ({productProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
-                                <SelectProduct className={classNames({ 'p-invalid': fieldState.error })}  
-                                    field={field}/> 
+                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
+                                        {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                    ]} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -117,8 +121,6 @@ const Form = ({productProfile}) => {
                 </>
                 </form>
             </div>
-            
-            {/* visible={supplierDialog}  onHide={hideDialog} /> */}
         </div>
     );
 }

@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterData({ field, modelName, className }) {
+export default function SelectMasterData({ field, modelName, className, columns }) {
 
     const dt = useRef(null);
 
@@ -114,7 +114,11 @@ export default function SelectMasterData({ field, modelName, className }) {
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                    <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable></Column>
+                    {columns.map((col, index) => {
+                        return (
+                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
+                        )
+                    })}
                 </DataTable>
             </Dialog>
         </>
