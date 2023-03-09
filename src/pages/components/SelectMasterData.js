@@ -88,6 +88,12 @@ export default function SelectMasterData({ field, modelName, className, columns 
         setTableDialog(false);
     }
 
+    const isSelectable = (data) => data._id !== field.value;
+
+    const isRowSelectable = (event) => (event.data ? isSelectable(event.data) : true);
+
+    const rowClassName = (data) => (isSelectable(data) ? '' : 'p-disabled');
+
     return (
         <>
             <div className="p-inputgroup">
@@ -95,14 +101,17 @@ export default function SelectMasterData({ field, modelName, className, columns 
                 <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
                 <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
             </div>
-            <Dialog visible={tableDialog} header="Select" modal onHide={hideDialog}>
+            <Dialog visible={tableDialog} header="Select" modal 
+            style={{ width: '75vw' }} maximizable contentStyle={{ height: '300px' }}
+            onHide={hideDialog}>
                 <DataTable
                     ref={dt} value={tmpData} dataKey="_id"
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                     onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
-
+                    isDataSelectable={isRowSelectable} rowClassName={rowClassName}
+                    scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
                     paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                     rowsPerPageOptions={[5,10, 15]}
@@ -110,7 +119,7 @@ export default function SelectMasterData({ field, modelName, className, columns 
 
                     selectionMode="single" selection={selectedRow}
                     onSelectionChange={(e) => {onSelection(e)}} 
-
+                    // stateStorage="session" stateKey={"dt-state-" + modelName}
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
