@@ -41,7 +41,7 @@ const Detail = () => {
     }, []);
 
     const gotoList = () => {
-        navigate("/sales", { replace: true });
+        navigate("/sales");
     };
 
     const renderSaleForm = () => {

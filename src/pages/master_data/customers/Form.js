@@ -32,7 +32,7 @@ const Form = ({customerProfile}) => {
         if(customerProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Created', life: 3000 });
-                navigate("/customers/" + data.ID, { replace: true });
+                navigate("/customers/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -42,7 +42,7 @@ const Form = ({customerProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/customers", { replace: true });
+        navigate("/customers");
     };
 
     const getFormErrorMessage = (name) => {

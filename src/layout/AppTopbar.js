@@ -25,7 +25,7 @@ const AppTopbar = forwardRef((props, ref) => {
 
             <Link to="/">
                 <a className="layout-topbar-logo">
-                    <span>HRIS-APP</span>
+                    <span>SPMS-APP</span>
                 </a>
             </Link>
 

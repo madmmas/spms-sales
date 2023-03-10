@@ -44,7 +44,7 @@ const Detail = () => {
     }, []);
 
     const gotoList = () => {
-        navigate("/employees", { replace: true });
+        navigate("/employees");
     };
 
     const renderEmpForm = () => {

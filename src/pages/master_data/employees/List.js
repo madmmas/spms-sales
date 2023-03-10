@@ -99,11 +99,11 @@ const List = () => {
     }
 
     const openNew = () => {
-        navigate("/employees/new", { replace: true });
+        navigate("/employees/new");
     };
 
     const editEmpProfile = (empProfile) => {
-        navigate("/employees/" + empProfile._id, { replace: true });
+        navigate("/employees/" + empProfile._id);
     };
 
     const confirmDeleteEmpProfile = (empProfile) => {

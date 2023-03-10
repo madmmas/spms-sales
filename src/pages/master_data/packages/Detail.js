@@ -41,7 +41,7 @@ const Detail = () => {
     }, []);
 
     const gotoList = () => {
-        navigate("/packages", { replace: true });
+        navigate("/packages");
     };
 
     const renderPackageForm = () => {

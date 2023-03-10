@@ -37,7 +37,7 @@ const Form = ({empProfile}) => {
         if(empProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Created', life: 3000 });
-                navigate("/employees/" + data.ID, { replace: true });
+                navigate("/employees/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -47,7 +47,7 @@ const Form = ({empProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/employees", { replace: true });
+        navigate("/employees");
     };
 
     const getFormErrorMessage = (name) => {

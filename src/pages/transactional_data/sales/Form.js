@@ -37,7 +37,7 @@ const Form = ({saleProfile}) => {
         if(saleProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Created', life: 3000 });
-                navigate("/sales/" + data.ID, { replace: true });
+                navigate("/sales/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -47,7 +47,7 @@ const Form = ({saleProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/sales", { replace: true });
+        navigate("/sales");
     };
 
     const getFormErrorMessage = (name) => {

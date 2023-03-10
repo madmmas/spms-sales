@@ -99,11 +99,11 @@ const List = () => {
     }
 
     const openNew = () => {
-        navigate("/purchases/new", { replace: true });
+        navigate("/purchases/new");
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/purchases/" + dtProfile._id, { replace: true });
+        navigate("/purchases/" + dtProfile._id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
