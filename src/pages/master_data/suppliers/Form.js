@@ -8,7 +8,7 @@ import { classNames } from 'primereact/utils';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { HRService } from '../../../services/HRService';
 import { SUPPLIER_MODEL } from '../../../constants/models';
-import { Dropdown } from 'primereact/dropdown';
+import { RadioButton } from "primereact/radiobutton";
 const Form = ({supplierProfile}) => {
 
     const modelName = SUPPLIER_MODEL;
@@ -18,13 +18,8 @@ const Form = ({supplierProfile}) => {
     const toast = useRef(null);
     const hrManagementService = new HRService();
 
-    const [selectedCity, setSelectedCity] = useState(null);
-    const cities = [
-        { name: 'ACTIVE', code: '0' },
-        { name: 'INACTIVE', code: '1' }
-
-    ];
-    
+    const [status, setStatus] = useState('');
+ 
     const {
         register,
         control,
@@ -105,19 +100,6 @@ const Form = ({supplierProfile}) => {
                         )}/>
                     </div>
 
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="supplierAddress"
-                            control={control}
-                            // rules={{ required: 'Supplier Address is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Address*</label>
-                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
 
                     <div className="field col-12 md:col-6">
                         <Controller
@@ -189,25 +171,34 @@ const Form = ({supplierProfile}) => {
                         )}/>
                     </div>
 
-                    {/* <div className="field col-12 md:col-6">
+
+                    <div className="field col-12 md:col-6">
                         <Controller
-                            name="supplierStatus"
+                            name="supplierAddress"
                             control={control}
-                            // rules={{ required: 'Supplier Contact PersonName is required.' }}
+                            // rules={{ required: 'Supplier Address is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Status</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Address*</label>
+                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                        </div> */}
-                                    
-                        <div className="field col-12 md:col-6">
-                        <label  className={classNames({ 'p-error': errors.value })}>Status</label>
-                        <Dropdown value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={cities} optionLabel="name" 
-                        placeholder="Select Status" className="w-full md:w-32rem" />
-                        </div>
+                    </div>
+                   
+                 <div className="field col-12 md:col-6 ">
+                 <label  className={classNames({ 'p-error': errors.value })}>Status</label>
+                <div className="flex flex-wrap gap-6 card ">  
+                <div className="flex align-items-center">
+                    <RadioButton inputId="ingredient1" name="active" value="Cheese" onChange={(e) => setStatus(e.value)} checked={status === 'Cheese'} />
+                    <label htmlFor="ingredient1" className="ml-2">Active</label>
+                </div>
+                <div className="flex align-items-center">
+                    <RadioButton inputId="ingredient2" name="inactive" value="Mushroom" onChange={(e) => setStatus(e.value)} checked={status === 'Mushroom'} />
+                    <label htmlFor="ingredient2" className="ml-2">Inactive</label>
+                </div>
+                </div>
+            </div>
                 
 
                 </div>
