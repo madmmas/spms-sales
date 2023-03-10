@@ -173,6 +173,42 @@ const List = () => {
         );
     };
 
+    const brandNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Brand Name</span>
+                {rowData.brandName}
+            </>
+        );
+    };
+
+    const modelNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Model Name</span>
+                {rowData.modelName}
+            </>
+        );
+    };
+
+    const reorderQuantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Model Name</span>
+                {rowData.reorderQuantity}
+            </>
+        );
+    };
+
+    const minimumQuantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Model Name</span>
+                {rowData.minimumQuantity}
+            </>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -225,9 +261,13 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate}></Column>
-                        <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate}></Column>
-                        <Column body={actionBodyTemplate}></Column>
+                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by name" sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="modelName" header="Model Name" filter filterPlaceholder="Search by name" sortable body={modelNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="reorderQuantity" header="Reorder Qty" filter filterPlaceholder="Search by name" sortable body={reorderQuantityBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="minimumQuantity" header="Min Qty" filter filterPlaceholder="Search by name" sortable body={minimumQuantityBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
