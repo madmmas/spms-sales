@@ -36,7 +36,7 @@ const Form = ({productProfile}) => {
         if(productProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                navigate("/products/" + data.ID, { replace: true });
+                navigate("/products/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -46,7 +46,7 @@ const Form = ({productProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/products", { replace: true });
+        navigate("/products");
     };
 
     const getFormErrorMessage = (name) => {

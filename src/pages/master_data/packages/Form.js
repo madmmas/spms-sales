@@ -32,7 +32,7 @@ const Form = ({packageProfile}) => {
         if(packageProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Created', life: 3000 });
-                navigate("/packages/" + data.ID, { replace: true });
+                navigate("/packages/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -42,7 +42,7 @@ const Form = ({packageProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/packages", { replace: true });
+        navigate("/packages");
     };
 
     const getFormErrorMessage = (name) => {

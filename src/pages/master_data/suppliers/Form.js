@@ -36,7 +36,7 @@ const Form = ({supplierProfile}) => {
         if(supplierProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
-                navigate("/suppliers/" + data.ID, { replace: true });
+                navigate("/suppliers/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -46,7 +46,7 @@ const Form = ({supplierProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/suppliers", { replace: true });
+        navigate("/suppliers");
     };
 
     const getFormErrorMessage = (name) => {

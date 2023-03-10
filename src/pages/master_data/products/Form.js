@@ -37,7 +37,7 @@ const Form = ({productProfile}) => {
         if(productProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                navigate("/products/" + data.ID, { replace: true });
+                navigate("/products/" + data.ID);
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
@@ -47,7 +47,7 @@ const Form = ({productProfile}) => {
     };
 
     const gotoList = () => {
-        navigate("/products", { replace: true });
+        navigate("/products");
     };
 
     const getFormErrorMessage = (name) => {
@@ -78,7 +78,7 @@ const Form = ({productProfile}) => {
                 <h5>{productProfile==null?"New":"Edit"} Product</h5>
                 <form onSubmit={handleSubmit(onSubmit)} >
                 <div className="p-fluid formgrid grid">
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="productId"
                             control={control}
@@ -91,7 +91,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="productName"
                             control={control}
@@ -104,7 +104,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="dtSupplier_supplierId"
                             control={control}
@@ -122,7 +122,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="barCode"
                             control={control}
@@ -135,7 +135,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="itemName"
                             control={control}
@@ -148,7 +148,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="partNumber"
                             control={control}
@@ -161,7 +161,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="brandName"
                             control={control}
@@ -174,7 +174,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="modelNumber"
                             control={control}
@@ -187,7 +187,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="measurementUnit"
                             control={control}
@@ -200,7 +200,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="reorderQuantity"
                             control={control}
@@ -213,7 +213,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="minimumQuantity"
                             control={control}
@@ -226,7 +226,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="remarks"
                             control={control}
@@ -239,7 +239,7 @@ const Form = ({productProfile}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="status"
                             control={control}

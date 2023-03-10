@@ -35,7 +35,6 @@ function App() {
   const PackageList = React.lazy(() => import("./pages/master_data/packages/List"));
   const PackageDetail = React.lazy(() => import("./pages/master_data/packages/Detail"));
   const PackageForm = React.lazy(() => import("./pages/master_data/packages/Form"));
-  const Cash = React.lazy(() => import("./pages/master_data/Cash"));
   const Banks = React.lazy(() => import("./pages/master_data/Banks"));
   const Warehouses = React.lazy(() => import("./pages/master_data/Warehouses"));
 
@@ -101,7 +100,6 @@ function App() {
           <Route path=":id" element={<RouteAuth pageComponent={<PackageDetail />} />} />
         </Route>
         <Route path="/banks" element={<RouteAuth pageComponent={<Banks />} />} />
-        <Route path="/cash" element={<RouteAuth pageComponent={<Cash />} />} />
         <Route path="/warehouses" element={<RouteAuth pageComponent={<Warehouses />} />} />
 
         <Route path="/sales">
