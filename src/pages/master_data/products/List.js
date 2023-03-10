@@ -225,9 +225,9 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate}></Column>
+                        <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate}></Column>
+                        <Column body={actionBodyTemplate}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
