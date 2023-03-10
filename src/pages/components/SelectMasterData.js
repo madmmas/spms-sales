@@ -1,135 +1,41 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
+import React, { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { Dialog } from 'primereact/dialog';
+import SelectMasterDataTable from './SelectMasterDataTable';
+
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterData({ field, modelName, className, columns }) {
-
-    const dt = useRef(null);
-
-    let defaultFilters = {
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-        filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        }
-    };
-
-    const [loading, setLoading] = useState(false);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const [tmpData, setTmpData] = useState([]);
-    const [selectedRow, setSelectedRow] = useState(null);
-    const [tableDialog, setTableDialog] = useState(false);
+export default function SelectMasterData({ field, displayField, modelName, className, columns, caption="Select" }) {
 
     const masterDataService = new MasterDataService();
 
-    let loadLazyTimeout = null;
+    const [selectedRow, setSelectedRow] = useState('');
 
     useEffect(() => {
         masterDataService.getById(modelName, field.value).then(data => {
-            setSelectedRow(data.supplierName);
+            setSelectedRow(data[displayField]);
         });
     }, []);
-    
-    const loadLazyData = () => {
-        setLoading(true);
-
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-        
-        loadLazyTimeout = setTimeout(() => {
-            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setTmpData(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 1000 + 250);
-    }
-
-    const hideDialog = () => {
-        setTableDialog(false);
-    };
-
-    const showDialog = () => {
-        setLazyParams(defaultFilters);
-        loadLazyData();
-        setTableDialog(true);
-    };
-
-    const onPage = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        setLazyParams(_lazyParams);
-    }
-
-    const onSort = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        setLazyParams(_lazyParams);
-    }
-
-    const onFilter = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        _lazyParams['first'] = 0;
-        setLazyParams(_lazyParams);
-    }
 
     const onSelection = (e) => {
+        setSelectedRow(e.value[displayField]);
         field.onChange(e.value._id);
-        setSelectedRow(e.value.supplierName);
-        setTableDialog(false);
     }
-
-    const isSelectable = (data) => data._id !== field.value;
-
-    const isRowSelectable = (event) => (event.data ? isSelectable(event.data) : true);
-
-    const rowClassName = (data) => (isSelectable(data) ? '' : 'p-disabled');
 
     return (
         <>
             <div className="p-inputgroup">
-                <InputText disabled value={selectedRow}  className={className} />
+                <InputText readonly="true" value={selectedRow} placeholder={caption}  
+                    className={className} 
+                    // onClick={()=>setShowDialog(true)}
+                    />
                 <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
-                <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
+                <SelectMasterDataTable displayField={displayField}
+                    fieldName={field.name} fieldValue={field.value} fieldRef={field.ref}
+                    modelName={modelName} caption={caption}
+                    className={className} columns={columns} 
+                    onSelect={onSelection}/>
             </div>
-            <Dialog visible={tableDialog} header="Select" modal 
-            style={{ width: '75vw' }} maximizable contentStyle={{ height: '300px' }}
-            onHide={hideDialog}>
-                <DataTable
-                    ref={dt} value={tmpData} dataKey="_id"
-                    className="datatable-responsive" responsiveLayout="scroll"
-                    lazy loading={loading} rows={lazyParams.rows}
-                    onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                    onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
-                    isDataSelectable={isRowSelectable} rowClassName={rowClassName}
-                    scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
-                    paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
-                    rowsPerPageOptions={[5,10, 15]}
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
-                    selectionMode="single" selection={selectedRow}
-                    onSelectionChange={(e) => {onSelection(e)}} 
-
-                    emptyMessage="No data found."
-                >
-                    <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                    {columns.map((col, index) => {
-                        return (
-                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
-                        )
-                    })}
-                </DataTable>
-            </Dialog>
+            
         </>
     );
 }

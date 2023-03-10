@@ -138,7 +138,8 @@ const Form = ({empProfile}) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
                                 <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    className={classNames({ 'p-invalid': fieldState.error })}
+                                    displayField="supplierName"
                                     columns={[
                                         {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
                                         {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}

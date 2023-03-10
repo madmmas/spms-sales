@@ -56,112 +56,111 @@ const Form = ({saleProfile}) => {
 
     return (
         <div className="grid h-screen">        
-      
-      <div className="col h-screen"  style={{ backgroundColor: "blue" }}>
-      <div class="card">
+            <div className="col h-screen"  style={{ backgroundColor: "blue" }}>
+            <div class="card">
+                <div className="p-fluid formgrid grid">
+                    <div className="field col">
+                        <Controller
+                            name="saleId"
+                            control={control}
+                            rules={{ required: 'Sale ID is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale ID*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col">
+                        <Controller
+                            name="saleName"
+                            control={control}
+                            rules={{ required: 'Sale Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col">
+                        <Controller
+                            name="saleName"
+                            control={control}
+                            rules={{ required: 'Sale Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col">
+                        <Controller
+                            name="saleName"
+                            control={control}
+                            rules={{ required: 'Sale Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
             <div className="p-fluid formgrid grid">
-                <div className="field col">
-                    <Controller
-                        name="saleId"
-                        control={control}
-                        rules={{ required: 'Sale ID is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale ID*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="saleId"
+                            control={control}
+                            rules={{ required: 'Sale ID is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale ID*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="saleName"
+                            control={control}
+                            rules={{ required: 'Sale Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
                 </div>
-                <div className="field col">
-                    <Controller
-                        name="saleName"
-                        control={control}
-                        rules={{ required: 'Sale Name is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-                <div className="field col">
-                    <Controller
-                        name="saleName"
-                        control={control}
-                        rules={{ required: 'Sale Name is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-                <div className="field col">
-                    <Controller
-                        name="saleName"
-                        control={control}
-                        rules={{ required: 'Sale Name is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-            </div>
-      </div>
-      <div class="card">
-      <div className="p-fluid formgrid grid">
-                <div className="field col-12 md:col-6">
-                    <Controller
-                        name="saleId"
-                        control={control}
-                        rules={{ required: 'Sale ID is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale ID*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-                <div className="field col-12 md:col-6">
-                    <Controller
-                        name="saleName"
-                        control={control}
-                        rules={{ required: 'Sale Name is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Sale Name*</label>
-                            <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-            </div>
 
-        <DataTable value={customers} resizableColumns stripedRows showGridlines scrollable scrollHeight="400px" 
-        style={{ minHeight: "60%" }}>
-          <Column field="name" header="Name"></Column>
-          <Column field="country.name" header="Country"></Column>
-          <Column field="representative.name" header="Representative"></Column>
-          <Column field="company" header="Company"></Column>
-        </DataTable>
-        
+            <DataTable value={customers} resizableColumns 
+                stripedRows showGridlines scrollable scrollHeight="400px" 
+                style={{ minHeight: "60%" }}>
+                <Column field="name" header="Name"></Column>
+                <Column field="country.name" header="Country"></Column>
+                <Column field="representative.name" header="Representative"></Column>
+                <Column field="company" header="Company"></Column>
+            </DataTable>
+            
+            </div>
+            <div class="flex align-content-end justify-content-around flex-wrap card-container indigo-container">
+                <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">1</div>
+                <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">2</div>
+                <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">3</div>
+                <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">4</div>
+                <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">5</div>
+            </div>
         </div>
-        <div class="flex align-content-end justify-content-around flex-wrap card-container indigo-container"
-        >
-            <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">1</div>
-            <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">2</div>
-            <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">3</div>
-            <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">4</div>
-            <div class="flex align-items-center justify-content-center w-4rem h-4rem bg-indigo-500 font-bold text-white border-round m-2">5</div>
-        </div>
-      </div>
 
       
     </div>

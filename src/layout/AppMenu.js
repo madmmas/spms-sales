@@ -50,15 +50,15 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Customer Category', icon: 'pi pi-fw pi-list', to: '/customer_category' },
-                        { label: 'Supplier Category', icon: 'pi pi-fw pi-list', to: '/supplier_category' },
-                        { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
-                        { label: 'Designation', icon: 'pi pi-fw pi-list', to: '/designation' },
-                        { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Department', icon: 'pi pi-fw pi-list', to: '/department' },
-                        { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
+                        { label: 'Designation', icon: 'pi pi-fw pi-list', to: '/designation' },
+                        { label: 'Expense Type', icon: 'pi pi-fw pi-list', to: '/expense_type' },
                         { label: 'Grade', icon: 'pi pi-fw pi-list', to: '/grade' },
                         { label: 'Group', icon: 'pi pi-fw pi-list', to: '/group' },
-                        { label: 'Expense Type', icon: 'pi pi-fw pi-list', to: '/expense_type' },
+                        { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
+                        { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
+                        { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
+                        { label: 'Supplier Category', icon: 'pi pi-fw pi-list', to: '/supplier_category' },
                     ]
                 }
             ]

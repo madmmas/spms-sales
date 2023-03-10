@@ -113,6 +113,7 @@ const Form = ({productProfile}) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
                                 <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                    displayField="supplierName"
                                     className={classNames({ 'p-invalid': fieldState.error })} 
                                     columns={[
                                         {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
