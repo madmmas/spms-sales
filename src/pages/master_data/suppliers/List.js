@@ -173,6 +173,77 @@ const List = () => {
         );
     };
 
+    const categoryBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Supplier Category</span>
+                {rowData.supplierCategory}
+            </>
+        );
+    };
+
+    const addressBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Supplier Address</span>
+                {rowData.supplierAddress}
+            </>
+        );
+    };
+    const phoneBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Phone</span>
+                {rowData.supplierPhone}
+            </>
+        );
+    };
+
+    const contactBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Contact Person Name</span>
+                {rowData.supplierContactPersonName}
+            </>
+        );
+    };
+
+    const desigBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Contact Person Designation</span>
+                {rowData.supplierContactPersonDesignation}
+            </>
+        );
+    };
+
+    const mobileBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Contact Person Mobile Number</span>
+                {rowData.supplierContactPersonPhone}
+            </>
+        );
+    };
+
+    const currencyBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Currency</span>
+                {rowData.supplierCurrency}
+            </>
+        );
+    };
+
+    const statusBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Currency</span>
+                {rowData.supplierStatus}
+            </>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -223,10 +294,20 @@ const List = () => {
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
 
-                        emptyMessage="No data found." header={renderHeader} 
-                    >
+                        emptyMessage="No data found." header={renderHeader} >
+
                         <Column field="supplierId" header="Supplier ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierCategory" header="Supplier Category" filter filterPlaceholder="Search by name" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierName" header="Supplier Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierPhone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierContactPersonName" header="Contact Person Name" filter filterPlaceholder="Search by name" sortable body={contactBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierContactPersonDesignation" header="Contact Person Designation" filter filterPlaceholder="Search by name" sortable body={desigBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierContactPersonPhone" header="Contact Person Mobile Number" filter filterPlaceholder="Search by name" sortable body={mobileBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierCurrency" header="Currency" filter filterPlaceholder="Search by name" sortable body={currencyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierStatus" header="Status" filter filterPlaceholder="Search by name" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+
+
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
