@@ -15,3 +15,16 @@ export const CURRENCY = [
     { id: 'AUD', name: 'AUD' },
     { id: 'CAD', name: 'CAD' },
 ];
+
+export const PRODUCT_STATUS = [
+    { id: 1, name: 'Active' },
+    { id: 2, name: 'Inactive' },
+    { id: 3, name: 'Draft' }
+];
+
+export const MEASUREMENT_UNITS = [
+    { id: 'piece', name: 'Piece' },
+    { id: 'pack', name: 'Pack' },
+    { id: 'set', name: 'Set' },
+    { id: 'dozen', name: 'Dozen' }
+];

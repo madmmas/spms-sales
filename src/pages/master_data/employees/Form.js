@@ -11,7 +11,7 @@ import SelectLookupData from '../../components/SelectLookupData';
 import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
-import { EMPLOYEE_MODEL, SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
+import { EMPLOYEE_MODEL, SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL, DESIGNATION_MODEL } from '../../../constants/models';
 import { CITIES } from '../../../constants/lookupData';
 
 const Form = ({empProfile}) => {
@@ -117,14 +117,36 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <Controller
+                            name="dtDesignation_designationId"
+                            control={control}
+                            rules={{ required: 'Designation is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Designation*</label>
+                                <SelectMasterData field={field} model={DESIGNATION_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'designationId', header: 'Designation ID', filterPlaceholder: 'Filter by Designation ID'}, 
+                                        {field: 'designationName', header: 'Designation Name', filterPlaceholder: 'Filter by Designation Name'}
+                                    ]} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6">
+                        <Controller
                             name="supplierCategory"
                             control={control}
                             rules={{ required: 'Supplier Category is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>City*</label>
-                                <SelectLookupData field={field} model={SUPPLIER_CATEGORY_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Category*</label>
+                                <SelectMasterData field={field} model={SUPPLIER_CATEGORY_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'supplierCategoryId', header: 'Supplier Category ID', filterPlaceholder: 'Filter by Supplier Category ID'}, 
+                                        {field: 'supplierCategoryName', header: 'Supplier Category Name', filterPlaceholder: 'Filter by Supplier Category Name'}
+                                    ]} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

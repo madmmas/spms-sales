@@ -168,7 +168,52 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Name</span>
-                {rowData.productName}
+                {rowData.name}
+            </>
+        );
+    };
+
+    const productCategoryBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Product Category</span>
+                {rowData.productCategory}
+            </>
+        );
+    };
+
+    const supplierNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Supplier Name</span>
+                {rowData.supplierName}
+            </>
+        );
+    };
+
+    const barCodeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Bar Code</span>
+                {rowData.barCode}
+            </>
+        );
+    };
+    
+    const itemNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Item Name</span>
+                {rowData.itemName}
+            </>
+        );
+    };
+
+    const partNumberBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Part Number</span>
+                {rowData.partNumber}
             </>
         );
     };
@@ -182,11 +227,20 @@ const List = () => {
         );
     };
 
-    const modelNameBodyTemplate = (rowData) => {
+    const modelNumberBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Model Name</span>
-                {rowData.modelName}
+                <span className="p-column-title">Model Number</span>
+                {rowData.modelNumber}
+            </>
+        );
+    };
+
+    const measurementUnitBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Measurement Unit</span>
+                {rowData.measurementUnit}
             </>
         );
     };
@@ -194,17 +248,17 @@ const List = () => {
     const reorderQuantityBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Model Name</span>
+                <span className="p-column-title">Reorder Quantity</span>
                 {rowData.reorderQuantity}
             </>
         );
     };
 
-    const minimumQuantityBodyTemplate = (rowData) => {
+    const productStatusBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Model Name</span>
-                {rowData.minimumQuantity}
+                <span className="p-column-title">Active Status</span>
+                {rowData.productStatus}
             </>
         );
     };
@@ -221,8 +275,8 @@ const List = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning mr-2" onClick={() => confirmDeleteProfile(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success" onClick={() => editProfile(rowData)} />                
             </>
         );
     };
@@ -261,13 +315,19 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="productName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by name" sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="modelName" header="Model Name" filter filterPlaceholder="Search by name" sortable body={modelNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="reorderQuantity" header="Reorder Qty" filter filterPlaceholder="Search by name" sortable body={reorderQuantityBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="minimumQuantity" header="Min Qty" filter filterPlaceholder="Search by name" sortable body={minimumQuantityBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="productCategory" header="Product Category" filter filterPlaceholder="Search by name" sortable body={productCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierName" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={supplierNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="barCode" header="bar Code" filter filterPlaceholder="Search by name" sortable body={barCodeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
+                        <Column field="itemName" header="Item Name" filter filterPlaceholder="Search by name" sortable body={itemNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>                        
+                        <Column field="partNumber" header="Part Number" filter filterPlaceholder="Search by name" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by name" sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="modelNumber" header="Model Name" filter filterPlaceholder="Search by name" sortable body={modelNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="measurementUnit" header="Measurement Unit" filter filterPlaceholder="Search by name" sortable body={measurementUnitBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="reorderQuantity" header="Reorder Quantity" filter filterPlaceholder="Search by name" sortable body={reorderQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="productStatus" header="Product Status" filter filterPlaceholder="Search by name" sortable body={productStatusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
