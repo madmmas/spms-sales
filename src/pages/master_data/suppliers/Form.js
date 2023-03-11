@@ -19,7 +19,9 @@ const Form = ({supplierProfile}) => {
     const hrManagementService = new HRService();
 
     const [status, setStatus] = useState('');
- 
+    console.log(status);
+
+    
     const {
         register,
         control,
@@ -190,11 +192,11 @@ const Form = ({supplierProfile}) => {
                  <label  className={classNames({ 'p-error': errors.value })}>Status</label>
                 <div className="flex flex-wrap gap-6 card ">  
                 <div className="flex align-items-center">
-                    <RadioButton inputId="ingredient1" name="active" value="Cheese" onChange={(e) => setStatus(e.value)} checked={status === 'Cheese'} />
+                    <RadioButton inputId="ingredient1" name="supplierStatus" value="True" onChange={(e) => setStatus(e.value)} checked={status === 'True'} />
                     <label htmlFor="ingredient1" className="ml-2">Active</label>
                 </div>
                 <div className="flex align-items-center">
-                    <RadioButton inputId="ingredient2" name="inactive" value="Mushroom" onChange={(e) => setStatus(e.value)} checked={status === 'Mushroom'} />
+                    <RadioButton inputId="ingredient2" name="supplierStatus" value="False" onChange={(e) => setStatus(e.value)} checked={status === 'False'} />
                     <label htmlFor="ingredient2" className="ml-2">Inactive</label>
                 </div>
                 </div>
