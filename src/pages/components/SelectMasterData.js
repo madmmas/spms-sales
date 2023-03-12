@@ -9,6 +9,7 @@ export default function SelectMasterData({ field, displayField, modelName, class
     const masterDataService = new MasterDataService();
 
     const [selectedRow, setSelectedRow] = useState('');
+    const [trigger, setTrigger] = useState(0);
 
     useEffect(() => {
         masterDataService.getById(modelName, field.value).then(data => {
@@ -26,10 +27,10 @@ export default function SelectMasterData({ field, displayField, modelName, class
             <div className="p-inputgroup">
                 <InputText readonly="true" value={selectedRow} placeholder={caption}  
                     className={className} 
-                    // onClick={()=>setShowDialog(true)}
+                    onClick={() => setTrigger((trigger) => trigger + 1)} 
                     />
                 <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
-                <SelectMasterDataTable displayField={displayField}
+                <SelectMasterDataTable displayField={displayField} trigger={trigger}
                     fieldName={field.name} fieldValue={field.value} fieldRef={field.ref}
                     modelName={modelName} caption={caption}
                     className={className} columns={columns} 
