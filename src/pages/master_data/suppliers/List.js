@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { classNames } from 'primereact/utils';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
+import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
@@ -27,7 +29,16 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierId': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierAddress': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierContactPersonName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierContactPersonDesignation': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierContactPersonPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierCurrency': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'supplierStatus': { value: null, matchMode: FilterMatchMode.EQUALS }
         }
     };
 
@@ -38,9 +49,7 @@ const List = () => {
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
-
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-
     const hrManagementService = new HRService();
 
     let loadLazyTimeout = null;
@@ -81,12 +90,10 @@ const List = () => {
     const exportCSV = () => {
         dt.current.exportCSV();
     };
-
     const onPage = (event) => {
         let _lazyParams = { ...lazyParams, ...event };
         setLazyParams(_lazyParams);
     }
-
     const onSort = (event) => {
         let _lazyParams = { ...lazyParams, ...event };
         setLazyParams(_lazyParams);
@@ -158,7 +165,6 @@ const List = () => {
     const idBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Supplier ID</span>
                 {rowData.supplierId}
             </>
         );
@@ -167,7 +173,6 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
                 {rowData.supplierName}
             </>
         );
@@ -176,7 +181,6 @@ const List = () => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Supplier Category</span>
                 {rowData.supplierCategory}
             </>
         );
@@ -185,7 +189,6 @@ const List = () => {
     const addressBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Supplier Address</span>
                 {rowData.supplierAddress}
             </>
         );
@@ -193,7 +196,6 @@ const List = () => {
     const phoneBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Phone</span>
                 {rowData.supplierPhone}
             </>
         );
@@ -202,7 +204,6 @@ const List = () => {
     const contactBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Contact Person Name</span>
                 {rowData.supplierContactPersonName}
             </>
         );
@@ -211,7 +212,6 @@ const List = () => {
     const desigBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Contact Person Designation</span>
                 {rowData.supplierContactPersonDesignation}
             </>
         );
@@ -220,7 +220,6 @@ const List = () => {
     const mobileBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Contact Person Mobile Number</span>
                 {rowData.supplierContactPersonPhone}
             </>
         );
@@ -229,21 +228,26 @@ const List = () => {
     const currencyBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Currency</span>
                 {rowData.supplierCurrency}
             </>
         );
     };
 
     const statusBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Currency</span>
-                {rowData.supplierStatus}
-            </>
-        );
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.supplierStatus, 'text-red-500 pi-times-circle': !rowData.supplierStatus })}></i>;
     };
 
+    
+    const supplierStatusFilterTemplate = (options) => {
+        return (
+            <div className="flex align-items-center gap-2">
+                <label htmlFor="supplierStatus-filter" className="font-bold">
+                    Supplier Status
+                </label>
+                <TriStateCheckbox inputId="supplierStatus-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+            </div>
+        );
+    };
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -293,22 +297,18 @@ const List = () => {
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
                         emptyMessage="No data found." header={renderHeader} >
-
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="supplierId" header="Supplier ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierCategory" header="Supplier Category" filter filterPlaceholder="Search by name" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierName" header="Supplier Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="supplierAddress" header="Supplier Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierPhone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierContactPersonName" header="Contact Person Name" filter filterPlaceholder="Search by name" sortable body={contactBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierContactPersonDesignation" header="Contact Person Designation" filter filterPlaceholder="Search by name" sortable body={desigBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierContactPersonPhone" header="Contact Person Mobile Number" filter filterPlaceholder="Search by name" sortable body={mobileBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="supplierCurrency" header="Currency" filter filterPlaceholder="Search by name" sortable body={currencyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierStatus" header="Status" filter filterPlaceholder="Search by name" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-
-
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="supplierStatus" header="Status" filter filterElement={supplierStatusFilterTemplate} filterPlaceholder="Search by name" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

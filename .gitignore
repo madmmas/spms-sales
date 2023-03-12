@@ -66,6 +66,7 @@ typings/
 # .env
 # .env.test
 public/env.js
+public/index.html
 
 .DS_Store
 .vscode/settings.json

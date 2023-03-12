@@ -7,27 +7,23 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
-
+import { Fieldset } from 'primereact/fieldset';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 
 import { HRService } from '../../../services/HRService';
+
 import { SUPPLIER_MODEL, SUPPLIER_CATEGORY_MODEL } from '../../../constants/models';
 import { CURRENCY } from '../../../constants/lookupData';
 
 const Form = ({supplierProfile}) => {
 
     const modelName = SUPPLIER_MODEL;
-
     let navigate = useNavigate();
-
     const toast = useRef(null);
     const hrManagementService = new HRService();
-
     const [status, setStatus] = useState('');
-    console.log(status);
 
-    
     const {
         register,
         control,
@@ -35,13 +31,14 @@ const Form = ({supplierProfile}) => {
         resetField,
         handleSubmit
     } = useForm({
-        defaultValues: supplierProfile //async () =>  hrManagementService.getById(modelName, SupplierProfile)
+        defaultValues: supplierProfile
       });
 
     const onSubmit = (formData) => {
         if(supplierProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
+                navigate("/suppliers/" + data.ID);
                 navigate("/suppliers/" + data.ID);
             });
         }else{
@@ -52,6 +49,7 @@ const Form = ({supplierProfile}) => {
     };
 
     const gotoList = () => {
+        navigate("/suppliers");
         navigate("/suppliers");
     };
 
@@ -113,10 +111,9 @@ const Form = ({supplierProfile}) => {
                         <Controller
                             name="supplierAddress"
                             control={control}
-                            // rules={{ required: 'Supplier Address is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Address*</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Address</label>
                                 <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -129,53 +126,56 @@ const Form = ({supplierProfile}) => {
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Phone</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Phone</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+8801453656754" onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
 
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="supplierContactPersonName"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Name</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
+                    <div className=" col-12 md:col-12">
+                        <Fieldset legend="Contact Person">
+                        <div className="p-fluid formgrid grid">
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="supplierContactPersonName"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Name</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="supplierContactPersonDesignation"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Designation</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="supplierContactPersonPhone"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Mobile Number</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref} placeholder="+8801453656754" className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                        </div>
+                        </Fieldset>
                     </div>
-
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="supplierContactPersonDesignation"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Designation</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="supplierContactPersonPhone"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Mobile Number</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-6 mt-2">
                         <Controller
                             name="supplierCurrency"
                             control={control}
@@ -189,10 +189,10 @@ const Form = ({supplierProfile}) => {
                         )}/>
                     </div>
 
-                    <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-6 mt-2">
                         <div className='field'>Status</div>
                         <Controller
-                            name="supplierAddress"
+                            name="supplierStatus"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>
