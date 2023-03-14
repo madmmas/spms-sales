@@ -6,14 +6,17 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
+import { Fieldset } from 'primereact/fieldset';
 import { Column } from 'primereact/column';
+import { Calendar } from 'primereact/calendar';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 
 import SelectMasterDataTable from '../../components/SelectMasterDataTable';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
-import { PURCHASE_MODEL, PRODUCT_MODEL } from '../../../constants/models';
+import { PURCHASE_MODEL, PRODUCT_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
 
 const Form = ({purchaseProfile}) => {
 
@@ -52,6 +55,10 @@ const Form = ({purchaseProfile}) => {
     const [purchasePrice, setPurchasePrice] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
+    const [supplierDialog, setSupplierDialog] = useState(false);
+    const [date, setDate] = useState(null);
+
+
 
     const [trigger, setTrigger] = useState(0);
 
@@ -87,7 +94,7 @@ const Form = ({purchaseProfile}) => {
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
-
+    
     const resetItemSelection = () => {
         setPurchaseItem({_id: null, productName: ""});
         setPurchaseQuantity(1);
@@ -299,6 +306,67 @@ const Form = ({purchaseProfile}) => {
                         )}/>
                     </div>
                 </div>
+                <div className=" col-12 md:col-12">
+                        <Fieldset legend="Supplier Information">
+                        <div className="p-fluid formgrid grid">
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="dtSupplier_supplierId"
+                                    control={control}
+                                    rules={{ required: 'Supplier is required.' }}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                        <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                            displayField="supplierName"
+                                            className={classNames({ 'p-invalid': fieldState.error })} 
+                                            columns={[
+                                                {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
+                                                {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                            ]} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="fldCnF"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="fldBENo"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="fldLCNo"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No.</label>
+                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                        </div>
+                        </Fieldset>
+                    </div>
                 <DataTable value={purchases} 
                     stripedRows showGridlines scrollable scrollHeight="400px" 
                     header={header} footer={footer} 
