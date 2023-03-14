@@ -17,9 +17,9 @@ export const CURRENCY = [
 ];
 
 export const PRODUCT_STATUS = [
-    { id: 1, name: 'Active' },
-    { id: 2, name: 'Inactive' },
-    { id: 3, name: 'Draft' }
+    { id: 'Active', name: 'Active' },
+    { id: 'Inactive', name: 'Inactive' },
+    { id: 'Draft', name: 'Draft' }
 ];
 
 export const MEASUREMENT_UNITS = [
