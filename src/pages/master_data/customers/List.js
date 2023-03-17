@@ -27,7 +27,15 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'customerCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'customerName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'shopName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'phoneNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'customerAddress': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'district': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'route': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+    
         }
     };
 
@@ -155,11 +163,11 @@ const List = () => {
         );
     };
 
-    const idBodyTemplate = (rowData) => {
+    const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Customer ID</span>
-                {rowData.customerId}
+                <span className="p-column-title">Customer Category</span>
+                {rowData.customerCategory}
             </>
         );
     };
@@ -173,6 +181,58 @@ const List = () => {
         );
     };
 
+    const shopBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Shop Name</span>
+                {rowData.shopName}
+            </>
+        );
+    };
+
+    const phonenumbrBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Phone No.</span>
+                {rowData.phoneNumber}
+            </>
+        );
+    };
+
+    const addressBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Address</span>
+                {rowData.customerAddress}
+            </>
+        );
+    };
+
+    const districtBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">District</span>
+                {rowData.district}
+            </>
+        );
+    };
+    
+    const routeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Route</span>
+                {rowData.route}
+            </>
+        );
+    };
+    const statusBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Status</span>
+                {rowData.status}
+            </>
+        );
+    };
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -181,7 +241,6 @@ const List = () => {
             </div>
         )
     }
-
     const actionBodyTemplate = (rowData) => {
         return (
             <>
@@ -225,9 +284,15 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="customerId" header="Customer ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customerName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="customerCategory" header="Customer Category" filter filterPlaceholder="Search by Category" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customerName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="phoneNumber" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumbrBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customerAddress" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="district" header="District" filter filterPlaceholder="Search by District" sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="route" header="route" filter filterPlaceholder="Search by Route" sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="status" header="status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
