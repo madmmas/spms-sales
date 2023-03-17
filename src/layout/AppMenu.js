@@ -36,6 +36,7 @@ const AppMenu = () => {
                         { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },
                         { label: 'Payroll', icon: 'pi pi-fw pi-list', to: '/payroll' },
                         { label: 'Purchases', icon: 'pi pi-fw pi-list', to: '/purchases' },
+                        { label: 'Purchase-Packages', icon: 'pi pi-fw pi-list', to: '/purchase_packages' },
                         { label: 'Sales', icon: 'pi pi-fw pi-list', to: '/sales' },
                         { label: 'Stock', icon: 'pi pi-fw pi-list', to: '/stocks' },
                     ]

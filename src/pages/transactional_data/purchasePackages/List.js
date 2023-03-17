@@ -9,11 +9,11 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
-import { PRODUCT_MODEL } from '../../../constants/models';
+import { PURCHASE_PACKAGES_MODEL } from '../../../constants/models';
 
 const List = () => {
 
-    const modelName = PRODUCT_MODEL;
+    const modelName = PURCHASE_PACKAGES_MODEL;
 
     let navigate = useNavigate();
 
@@ -27,18 +27,7 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'productId': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'productCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'itemName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'barCode': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'partNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'modelNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'measurementUnit': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'reorderQuantity': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'productStatus': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
         }
     };
 
@@ -86,7 +75,7 @@ const List = () => {
                 setProfiles(data.rows);
                 setLoading(false);
             });
-        }, Math.random() * 100);
+        }, Math.random() * 1000 + 250);
     }
 
     const exportCSV = () => {
@@ -110,11 +99,11 @@ const List = () => {
     }
 
     const openNew = () => {
-        navigate("/products/new");
+        navigate("/purchase_packages/new");
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/products/" + dtProfile._id);
+        navigate("/purchase_packages/" + dtProfile._id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -142,7 +131,7 @@ const List = () => {
         hrManagementService.delete(modelName, dtProfile._id).then(data => {
             console.log(data);
             loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Profile Deleted', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'PuchasePackage Profile Deleted', life: 3000 });
         });
         setDeleteProfileDialog(false);
         setProfile(null);
@@ -169,8 +158,8 @@ const List = () => {
     const idBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Product ID</span>
-                {rowData.productId}
+                <span className="p-column-title">Puchase Package ID</span>
+                {rowData.puchasePackageId}
             </>
         );
     };
@@ -178,98 +167,8 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.name}
-            </>
-        );
-    };
-
-    const productCategoryBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Product Category</span>
-                {rowData.productCategory}
-            </>
-        );
-    };
-
-    const supplierNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Supplier Name</span>
-                {rowData.supplierName}
-            </>
-        );
-    };
-
-    const barCodeBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Bar Code</span>
-                {rowData.barCode}
-            </>
-        );
-    };
-    
-    const itemNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Item Name</span>
-                {rowData.itemName}
-            </>
-        );
-    };
-
-    const partNumberBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Part Number</span>
-                {rowData.partNumber}
-            </>
-        );
-    };
-
-    const brandNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Brand Name</span>
-                {rowData.brandName}
-            </>
-        );
-    };
-
-    const modelNumberBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Model Number</span>
-                {rowData.modelNumber}
-            </>
-        );
-    };
-
-    const measurementUnitBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Measurement Unit</span>
-                {rowData.measurementUnit}
-            </>
-        );
-    };
-
-    const reorderQuantityBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Reorder Quantity</span>
-                {rowData.reorderQuantity}
-            </>
-        );
-    };
-
-    const productStatusBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Active Status</span>
-                {rowData.productStatus}
+                <span className="p-column-title">Package Name</span>
+                {rowData.puchasePackageName}
             </>
         );
     };
@@ -277,7 +176,7 @@ const List = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Products</h5>
+                <h5 className="m-0">Manage Puchase Packages</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -286,8 +185,8 @@ const List = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />                
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />                
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
             </>
         );
     };
@@ -326,19 +225,9 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
+                        <Column field="puchasePackageId" header="Puchase Package ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="puchasePackageName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="productId" header="Product ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="productCategory" header="Product Category" filter filterPlaceholder="Search by name" sortable body={productCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierName" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={supplierNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="barCode" header="bar Code" filter filterPlaceholder="Search by name" sortable body={barCodeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
-                        <Column field="itemName" header="Item Name" filter filterPlaceholder="Search by name" sortable body={itemNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>                        
-                        <Column field="partNumber" header="Part Number" filter filterPlaceholder="Search by name" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by name" sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
-                        <Column field="modelNumber" header="Model Name" filter filterPlaceholder="Search by name" sortable body={modelNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
-                        <Column field="measurementUnit" header="Measurement Unit" filter filterPlaceholder="Search by name" sortable body={measurementUnitBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
-                        <Column field="reorderQuantity" header="Reorder Quantity" filter filterPlaceholder="Search by name" sortable body={reorderQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="productStatus" header="Product Status" filter filterPlaceholder="Search by name" sortable body={productStatusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
@@ -346,7 +235,7 @@ const List = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.productId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.puchasePackageId}</b>?
                                 </span>
                             )}
                         </div>
@@ -358,6 +247,7 @@ const List = () => {
                             {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
+
                 </div>
             </div>
         </div>
