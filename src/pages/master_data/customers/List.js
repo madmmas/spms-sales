@@ -3,42 +3,54 @@ import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
+import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
+import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-
+import { Dropdown } from 'primereact/dropdown';
 import { HRService } from '../../../services/HRService';
-import { CUSTOMER_MODEL } from '../../../constants/models';
+import { CITIES,DISTRICT } from '../../../constants/lookupData';
 
+import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { ConfigurationService } from '../../../services/ConfigurationService';
 const List = () => {
 
     const modelName = CUSTOMER_MODEL;
+    const [customerCategory, setCustomerCategory] = useState([]);
+    const [District, setDistrict] = useState([]);
+    console.log(District)
+    const [route, setRoute] = useState([]);
+
+
+    
 
     let navigate = useNavigate();
-
+    const configurationService = new ConfigurationService();
     const toast = useRef(null);
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','route'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'customerCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'customerName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtCustomerCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'shopName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'phoneNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'customerAddress': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'district': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'route': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-    
+            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'email': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+
         }
     };
-
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
     const [dtProfiles, setProfiles] = useState(null);
@@ -55,8 +67,26 @@ const List = () => {
 
     useEffect(() => {
         initFilters();
+        configurationService.getAllWithoutParams(CUSTOMER_CATEGORY_MODEL).then(data => {
+            setCustomerCategory(data);
+        });
     }, []);
     
+    useEffect(() => {
+        initFilters();
+        configurationService.getAllWithoutParams(DISTRICT).then(data => {
+            setDistrict(data);
+        });
+    }, []);
+    
+    useEffect(() => {
+        initFilters();
+        configurationService.getAllWithoutParams(CITIES).then(data => {
+            setRoute(data);
+        });
+    }, []);
+
+
     const clearFilter = () => {
         initFilters();
     }
@@ -154,7 +184,6 @@ const List = () => {
             </React.Fragment>
         );
     };
-
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -162,39 +191,42 @@ const List = () => {
             </React.Fragment>
         );
     };
+    const customerCategoryFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={customerCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
 
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Customer Category</span>
-                {rowData.customerCategory}
+                {rowData.dtCustomerCategory_id_shortname}
             </>
         );
     };
-
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.customerName}
+                {rowData.name}
             </>
         );
     };
-
-    const shopBodyTemplate = (rowData) => {
+    const shopnameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Shop Name</span>
                 {rowData.shopName}
             </>
         );
     };
-
-    const phonenumbrBodyTemplate = (rowData) => {
+    const emailBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Phone No.</span>
-                {rowData.phoneNumber}
+                {rowData.email}
+            </>
+        );
+    };
+    const phonenumberBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.phone}
             </>
         );
     };
@@ -202,35 +234,45 @@ const List = () => {
     const addressBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Address</span>
-                {rowData.customerAddress}
+                {rowData.address}
             </>
         );
+    };
+
+    const districtFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={DISTRICT} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const districtBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">District</span>
                 {rowData.district}
             </>
         );
     };
-    
+  
+    const routeFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CITIES} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
     const routeBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Route</span>
                 {rowData.route}
             </>
         );
     };
+
     const statusBodyTemplate = (rowData) => {
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
+    };
+    const statusFilterTemplate = (options) => {
         return (
-            <>
-                <span className="p-column-title">Status</span>
-                {rowData.status}
-            </>
+            <div className="flex align-items-center gap-2">
+                <label htmlFor="status-filter" className="font-bold">
+                    Status
+                </label>
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+            </div>
         );
     };
     const renderHeader = () => {
@@ -276,23 +318,23 @@ const List = () => {
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
+                        scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="customerCategory" header="Customer Category" filter filterPlaceholder="Search by Category" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customerName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="phoneNumber" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumbrBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customerAddress" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="district" header="District" filter filterPlaceholder="Search by District" sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="route" header="route" filter filterPlaceholder="Search by Route" sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="status" header="status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtCustomerCategory_id" header="Customer Category" filter filterElement={customerCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="phone" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="district" header="District" filter filterElement={districtFilterTemplate} sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="route" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

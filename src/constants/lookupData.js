@@ -1,9 +1,15 @@
 export const CITIES = [
-    { id: 1, name: 'Dhaka' },
-    { id: 2, name: 'Rajshahi' },
-    { id: 3, name: 'Chitagong' },
-    { id: 4, name: 'Sylhet' },
-    { id: 5, name: 'Khulna' }
+    { id: 'Dhaka', name: 'Dhaka' },
+    { id: 'Rajshahi', name: 'Rajshahi' },
+    { id: 'Chitagong', name: 'Chitagong' },
+    { id: 'Sylhet', name: 'Sylhet' },
+    { id: 'Khulna', name: 'Khulna' }
+];
+
+export const DISTRICT = [
+    { id: 'DHAKA', name: 'DHAKA' },
+    { id: 'CUMILLA', name: 'CUMILLA' },
+    { id: 'KHULNA', name: 'KHULNA' }
 ];
 
 export const CURRENCY = [
@@ -39,3 +45,10 @@ export const BANK_CASH = [
     { id: 'BANK', name: 'BANK' },
     { id: 'CASH', name: 'CASH' }
 ];
+
+export const CUSTOMER_CATEGORY = [
+    { id: 1, name: 'Permanent' },
+    { id: 2, name: 'Regular' }
+
+];
+
