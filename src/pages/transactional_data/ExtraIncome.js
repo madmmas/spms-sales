@@ -7,11 +7,15 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
+import SelectConstData from '../components/SelectConstData';
+
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { EXTRA_INCOME_MODEL } from '../../constants/models';
+import { COLLECTION_TYPES } from '../../constants/lookupData';
 
 const ExtraIncome = () => {
 
@@ -20,6 +24,8 @@ const ExtraIncome = () => {
     const toast = useRef(null);
     const dt = useRef(null);
     const contextPath = '~';
+
+    const [date, setDate] = useState(null);
 
     let emptyExtraIncome = {
         _id: null,
@@ -224,6 +230,42 @@ const ExtraIncome = () => {
         );
     };
 
+    const dateBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Description</span>
+                {rowData.date}
+            </>
+        );
+    };
+
+    const amountBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Description</span>
+                {rowData.amount}
+            </>
+        );
+    };
+
+    const collectionTypeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Description</span>
+                {rowData.collectionType}
+            </>
+        );
+    };
+
+    const collectionDetailsBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Description</span>
+                {rowData.collectionDetails}
+            </>
+        );
+    };
+
     const actionBodyTemplate = (rowData) => {
         return (
             <>
@@ -282,9 +324,13 @@ const ExtraIncome = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="date" header="Date" body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="amount" header="Amount" body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="collectionType" header="Collection Type" body={collectionTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="collectionDetails" header="Collection Details" body={collectionDetailsBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Extra Income`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>
@@ -297,6 +343,23 @@ const ExtraIncome = () => {
                         <div className="field">
                             <label htmlFor="description">Description</label>
                             <InputTextarea id="description" value={extraIncome.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="date">Date</label>
+                            <Calendar id="date" value={extraIncome.date} onChange={(e) => setDate(e, 'date')} required rows={3} cols={20} showIcon />
+                            {/* <InputText id="date" value={extraIncome.date} onChange={(e) => onInputChange(e, 'date')} required rows={3} cols={20} /> */}
+                        </div>
+                        <div className="field">
+                            <label htmlFor="amount">Amount</label>
+                            <InputText id="amount" value={extraIncome.amount} onChange={(e) => onInputChange(e, 'amount')} required rows={3} cols={20} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="collectionType">Collection Type</label>
+                            <SelectConstData id="collectionType" data={COLLECTION_TYPES} value={extraIncome.collectionType} onChange={(e) => onInputChange(e, 'collectionType')} required rows={3} cols={20} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="collectionDetails">Collection Details</label>
+                            <InputTextarea id="collectionDetails" value={extraIncome.collectionDetails} onChange={(e) => onInputChange(e, 'collectionDetails')} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 

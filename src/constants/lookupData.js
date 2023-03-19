@@ -23,8 +23,14 @@ export const PRODUCT_STATUS = [
 ];
 
 export const MEASUREMENT_UNITS = [
-    { id: 'piece', name: 'Piece' },
-    { id: 'pack', name: 'Pack' },
-    { id: 'set', name: 'Set' },
-    { id: 'dozen', name: 'Dozen' }
+    { id: 'Piece', name: 'Piece' },
+    { id: 'Pack', name: 'Pack' },
+    { id: 'Set', name: 'Set' },
+    { id: 'Dozen', name: 'Dozen' }
+];
+
+export const COLLECTION_TYPES = [
+    { id: 'Cash', name: 'Cash' },
+    { id: 'MFS', name: 'MFS' },
+    { id: 'Bank Deposit', name: 'Bank Deposit' }    
 ];
