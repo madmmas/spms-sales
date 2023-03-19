@@ -7,7 +7,9 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
+import { Dropdown } from 'primereact/dropdown'
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
@@ -16,6 +18,16 @@ import { EXPENSES_MODEL } from '../../constants/models';
 const Expenses = () => {
 
     const modelName = EXPENSES_MODEL;
+    const [date, setDate] = useState(null);
+    const [expensetype, setExpensetype] = useState(null);
+    const type = [
+        { name: 'New York', code: 'NY' },
+        { name: 'Rome', code: 'RM' },
+        { name: 'London', code: 'LDN' },
+        { name: 'Istanbul', code: 'IST' },
+        { name: 'Paris', code: 'PRS' }
+    ];
+
 
     const toast = useRef(null);
     const dt = useRef(null);
@@ -205,14 +217,42 @@ const Expenses = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData) => {
+    const expenseBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.name}
+                <span className="p-column-title">Expense Type</span>
+                {rowData.expenseType}
             </>
         );
     };
+
+    const expensePeriodBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Expense Period</span>
+                {rowData.expensePeriod}
+            </>
+        );
+    };
+
+    const dateBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Date</span>
+                {rowData.date}
+            </>
+        );
+    };
+
+    const amountBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Amount</span>
+                {rowData.amount}
+            </>
+        );
+    };
+
 
     const descriptionBodyTemplate = (rowData) => {
         return (
@@ -281,22 +321,45 @@ const Expenses = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="expenseType" header="Expense Type" filter filterPlaceholder="Search by Expense Type" sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" filter filterPlaceholder="Search by Description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+
+
+                        ]<Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Expenses`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         {expenses.image && <img src={`${contextPath}/demo/images/expenses/${expenses.image}`} alt={expenses.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                     
                         <div className="field">
-                            <label htmlFor="name">Name</label>
-                            <InputText id="name" value={expenses.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !expenses.name })} />
-                            {submitted && !expenses.name && <small className="p-invalid">Name is required.</small>}
+                        <label htmlFor="expenseType">Expense Type</label>
+                            <Dropdown value={expensetype} onChange={(e) => setExpensetype(e.value)} options={type} optionLabel="expenseType" 
+                               className="w-full " />
                         </div>
                         <div className="field">
-                            <label htmlFor="description">Description</label>
+                            <label htmlFor="expensePeriod">Expense Period</label>
+                            <InputText id="expensePeriod" value={expenses.expensePeriod} onChange={(e) => onInputChange(e, 'expensePeriod')} required autoFocus className={classNames({ 'p-invalid': submitted && !expenses.expensePeriod })} />
+                        </div>
+
+
+                        <div className="field">
+                            <label htmlFor="date">Date</label>
+                            <Calendar value={date} onChange={(e) => setDate(e.value)} showIcon />
+                            </div>
+                        <div className="field">
+                            <label htmlFor="name">Amount</label>
+                            <InputText id="amount" value={expenses.amount} onChange={(e) => onInputChange(e, 'amount')} required autoFocus className={classNames({ 'p-invalid': submitted && !expenses.amount })} />
+                            {submitted && !expenses.amount && <small className="p-invalid">Amount is required.</small>}
+                        </div>
+                        <div className="field">
+                            <label htmlFor="description">Description/Details</label>
                             <InputTextarea id="description" value={expenses.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
                         </div>
+
+                        
                     </Dialog>
 
                     <Dialog visible={deleteExpensesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExpensesDialogFooter} onHide={hideDeleteExpensesDialog}>
