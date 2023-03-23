@@ -67,20 +67,7 @@ const Form = ({supplierProfile}) => {
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="supplierId"
-                            control={control}
-                            rules={{ required: 'Supplier ID is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier ID*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="supplierName"
+                            name="name"
                             control={control}
                             rules={{ required: 'Supplier Name is required.' }}
                             render={({ field, fieldState }) => (
@@ -94,7 +81,7 @@ const Form = ({supplierProfile}) => {
 
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="supplierCategory"
+                            name="dtSupplierCategory_id"
                             control={control}
                             rules={{ required: 'Supplier Category is required.' }}
                             render={({ field, fieldState }) => (
@@ -109,7 +96,7 @@ const Form = ({supplierProfile}) => {
 
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="supplierAddress"
+                            name="address"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -122,7 +109,7 @@ const Form = ({supplierProfile}) => {
 
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="supplierPhone"
+                            name="phone"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -138,7 +125,7 @@ const Form = ({supplierProfile}) => {
                         <div className="p-fluid formgrid grid">
                             <div className="field col-12 md:col-6">
                                 <Controller
-                                    name="supplierContactPersonName"
+                                    name="contactPersonName"
                                     control={control}
                                     render={({ field, fieldState }) => (
                                     <>
@@ -150,7 +137,7 @@ const Form = ({supplierProfile}) => {
                             </div>
                             <div className="field col-12 md:col-6">
                                 <Controller
-                                    name="supplierContactPersonDesignation"
+                                    name="contactPersonDesignation"
                                     control={control}
                                     render={({ field, fieldState }) => (
                                     <>
@@ -162,7 +149,7 @@ const Form = ({supplierProfile}) => {
                             </div>
                             <div className="field col-12 md:col-6">
                                 <Controller
-                                    name="supplierContactPersonPhone"
+                                    name="contactPersonPhone"
                                     control={control}
                                     render={({ field, fieldState }) => (
                                     <>
@@ -177,7 +164,7 @@ const Form = ({supplierProfile}) => {
                     </div>
                     <div className="field col-12 md:col-6 mt-2">
                         <Controller
-                            name="supplierCurrency"
+                            name="currency"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -192,7 +179,7 @@ const Form = ({supplierProfile}) => {
                     <div className="field col-12 md:col-6 mt-2">
                         <div className='field'>Status</div>
                         <Controller
-                            name="supplierStatus"
+                            name="status"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>

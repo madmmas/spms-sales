@@ -23,11 +23,12 @@ const SupplierCategory = () => {
 
     let emptySupplierCategory = {
         _id: null,
-        empID: '',
+        description: '',
         name: ''
     };
 
     let defaultFilters = {
+        fields: ['name', 'description'],
         first: 0,
         rows: 10,
         page: 1,

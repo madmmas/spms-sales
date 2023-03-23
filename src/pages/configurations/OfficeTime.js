@@ -24,11 +24,14 @@ const OfficeTime = () => {
 
     let emptyOfficeTime = {
         _id: null,
-        empID: '',
+        start_time: '',
+        end_time: '',
+        description: '',
         name: ''
     };
 
     let defaultFilters = {
+        fields: ['name', 'description', 'startTime', 'endTime'],
         first: 0,
         rows: 10,
         page: 1,
@@ -36,8 +39,8 @@ const OfficeTime = () => {
         sortOrder: null,
         filters: {
             'name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'start_time': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'end_time': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'startTime': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'endTime': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 

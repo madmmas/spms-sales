@@ -7,11 +7,14 @@ import { Column } from 'primereact/column';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
+import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
-import { SUPPLIER_MODEL } from '../../../constants/models';
+import { ConfigurationService } from '../../../services/ConfigurationService';
+import { SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
+import { CURRENCY } from '../../../constants/lookupData';
 
 const List = () => {
 
@@ -23,22 +26,22 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ["name", "description", "phone", "dtSupplierCategory_id", "status", "contactPersonName", "contactPersonPhone", "contactPersonDesignation", "currency", "address"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'supplierId': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierAddress': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierContactPersonName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierContactPersonDesignation': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierContactPersonPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierCurrency': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierStatus': { value: null, matchMode: FilterMatchMode.EQUALS }
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtSupplierCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'contactPersonName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'contactPersonDesignation': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'contactPersonPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'currency': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 
@@ -54,8 +57,15 @@ const List = () => {
 
     let loadLazyTimeout = null;
 
+    const [dtSupplierCategory, setDtSupplierCategory] = useState([]);
+
+    const configurationService = new ConfigurationService();
+
     useEffect(() => {
         initFilters();
+        configurationService.getAllWithoutParams(SUPPLIER_CATEGORY_MODEL).then(data => {
+            setDtSupplierCategory(data);
+        });
     }, []);
     
     const clearFilter = () => {
@@ -84,7 +94,7 @@ const List = () => {
                 setProfiles(data.rows);
                 setLoading(false);
             });
-        }, Math.random() * 1000 + 250);
+        }, Math.random() * 500 );
     }
 
     const exportCSV = () => {
@@ -162,18 +172,10 @@ const List = () => {
         );
     };
 
-    const idBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.supplierId}
-            </>
-        );
-    };
-
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierName}
+                {rowData.name}
             </>
         );
     };
@@ -181,22 +183,26 @@ const List = () => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierCategory}
+                {rowData.dtSupplierCategory_id_shortname}
             </>
         );
+    };
+
+    const supplierCategoryFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const addressBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierAddress}
+                {rowData.address}
             </>
         );
     };
     const phoneBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierPhone}
+                {rowData.phone}
             </>
         );
     };
@@ -204,7 +210,7 @@ const List = () => {
     const contactBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierContactPersonName}
+                {rowData.contactPersonName}
             </>
         );
     };
@@ -212,7 +218,7 @@ const List = () => {
     const desigBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierContactPersonDesignation}
+                {rowData.contactPersonDesignation}
             </>
         );
     };
@@ -220,7 +226,7 @@ const List = () => {
     const mobileBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierContactPersonPhone}
+                {rowData.contactPersonPhone}
             </>
         );
     };
@@ -228,23 +234,27 @@ const List = () => {
     const currencyBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.supplierCurrency}
+                {rowData.currency}
             </>
         );
     };
 
+    const currencyFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CURRENCY} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.supplierStatus, 'text-red-500 pi-times-circle': !rowData.supplierStatus })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
     };
 
     
-    const supplierStatusFilterTemplate = (options) => {
+    const statusFilterTemplate = (options) => {
         return (
             <div className="flex align-items-center gap-2">
-                <label htmlFor="supplierStatus-filter" className="font-bold">
+                <label htmlFor="status-filter" className="font-bold">
                     Supplier Status
                 </label>
-                <TriStateCheckbox inputId="supplierStatus-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
             </div>
         );
     };
@@ -292,23 +302,22 @@ const List = () => {
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
+                        scrollable
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} >
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="supplierId" header="Supplier ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierCategory" header="Supplier Category" filter filterPlaceholder="Search by name" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierAddress" header="Supplier Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierPhone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierContactPersonName" header="Contact Person Name" filter filterPlaceholder="Search by name" sortable body={contactBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierContactPersonDesignation" header="Contact Person Designation" filter filterPlaceholder="Search by name" sortable body={desigBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierContactPersonPhone" header="Contact Person Mobile Number" filter filterPlaceholder="Search by name" sortable body={mobileBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierCurrency" header="Currency" filter filterPlaceholder="Search by name" sortable body={currencyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="supplierStatus" header="Status" filter filterElement={supplierStatusFilterTemplate} filterPlaceholder="Search by name" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '8rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtSupplierCategory_id" header="Supplier Category" filter filterElement={supplierCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="address" header="Supplier Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="phone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="contactPersonName" header="Contact Person Name" filter filterPlaceholder="Search by name" sortable body={contactBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="contactPersonDesignation" header="Contact Person Designation" filter filterPlaceholder="Search by name" sortable body={desigBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="contactPersonPhone" header="Contact Person Mobile Number" filter filterPlaceholder="Search by name" sortable body={mobileBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="currency" header="Currency" filter filterPlaceholder="Search by name" filterElement={currencyFilterTemplate} sortable body={currencyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

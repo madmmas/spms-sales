@@ -86,7 +86,7 @@ const List = () => {
                 setProfiles(data.rows);
                 setLoading(false);
             });
-        }, Math.random() * 1000 + 250);
+        }, Math.random() * 100);
     }
 
     const exportCSV = () => {
