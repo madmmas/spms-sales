@@ -36,9 +36,9 @@ const Group = () => {
         sortOrder: null,
         filters: {
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
-
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
     const [empProfiles, setGroups] = useState(null);
@@ -282,15 +282,15 @@ const Group = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Group`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         {group.image && <img src={`${contextPath}/demo/images/group/${group.image}`} alt={group.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
-                            <label htmlFor="name">Name</label>
+                            <label htmlFor="name">Name*</label>
                             <InputText id="name" value={group.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !group.name })} />
                             {submitted && !group.name && <small className="p-invalid">Name is required.</small>}
                         </div>

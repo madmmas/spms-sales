@@ -31,7 +31,7 @@ const OfficeTime = () => {
     };
 
     let defaultFilters = {
-        fields: ['name', 'description', 'startTime', 'endTime'],
+        fields: ['name', 'description', 'start_time', 'end_time'],
         first: 0,
         rows: 10,
         page: 1,
@@ -39,8 +39,9 @@ const OfficeTime = () => {
         sortOrder: null,
         filters: {
             'name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'startTime': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'endTime': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'start_time': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'end_time': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'description': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 
@@ -306,31 +307,31 @@ const OfficeTime = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="start_time" header="Start Time" filter filterPlaceholder="Search by Start Time" 
                             sortable body={startTimeBodyTemplate} filterElement={startTimeFilterTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="end_time" header="End Time" filter filterPlaceholder="Search by End Time" 
                             sortable body={endTimeBodyTemplate} filterElement={endTimeFilterTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Office Time`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                                                                
                         {office_time.image && <img src={`${contextPath}/demo/images/office_time/${office_time.image}`} alt={office_time.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
-                            <label htmlFor="name">Name</label>
+                            <label htmlFor="name">Name*</label>
                             <InputText id="name" value={office_time.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !office_time.name })} />
                             {submitted && !office_time.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
-                            <label htmlFor="start_time">Start Time</label>
+                            <label htmlFor="start_time">Start Time*</label>
                             <InputMask id="start_time" value={office_time.start_time} onChange={(e) => onInputChange(e, 'start_time')}
                                 required autoFocus className={classNames({ 'p-invalid': submitted && !office_time.start_time })} 
                                 mask="99:99" placeholder="23:59"/>        
                             {submitted && !office_time.start_time && <small className="p-invalid">Start Time is required.</small>}
                         </div>
                         <div className="field">
-                            <label htmlFor="end_time">End Time</label>
+                            <label htmlFor="end_time">End Time*</label>
                             <InputMask id="end_time" value={office_time.end_time} onChange={(e) => onInputChange(e, 'end_time')}
                                 required autoFocus className={classNames({ 'p-invalid': submitted && !office_time.end_time })} 
                                 mask="99:99" placeholder="23:59"/>        

@@ -36,6 +36,8 @@ const PaymentType = () => {
         sortOrder: null,
         filters: {
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+
         }
     };
 
@@ -283,21 +285,21 @@ const PaymentType = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Payment Type`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>
                         {paymentType.image && <img src={`${contextPath}/demo/images/paymentType/${paymentType.image}`} alt={paymentType.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
-                            <label htmlFor="name">Name</label>
+                            <label htmlFor="name">Name*</label>
                             <InputText id="name" value={paymentType.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !paymentType.name })} />
                             {submitted && !paymentType.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={paymentType.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={paymentType.description} onChange={(e) => onInputChange(e, 'description')}  rows={3} cols={20} />
                         </div>
                     </Dialog>
 
