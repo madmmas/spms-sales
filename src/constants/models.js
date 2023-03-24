@@ -1,4 +1,5 @@
 export const BANKS_MODEL = 'dtBank';
+export const BANK_ACCOUNT_MODEL = 'dtBankAccount';
 export const CASH_MODEL = 'dtCash';
 export const CUSTOMER_MODEL = 'dtCustomer';
 export const EMPLOYEE_MODEL = 'dtEmployee';

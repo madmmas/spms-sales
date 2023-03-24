@@ -20,6 +20,9 @@ function App() {
   const DemoData = React.lazy(() => import("./pages/Demo"));
   const Form1 = React.lazy(() => import("./pages/Form1"));
 
+  const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
+  const BankAccountDetail = React.lazy(() => import("./pages/master_data/bank_accounts/Detail"));
+  const BankAccountForm = React.lazy(() => import("./pages/master_data/bank_accounts/Form"));
   const EmpList = React.lazy(() => import("./pages/master_data/employees/List"));
   const EmpDetail = React.lazy(() => import("./pages/master_data/employees/Detail"));
   const EmpForm = React.lazy(() => import("./pages/master_data/employees/Form"));
@@ -78,6 +81,12 @@ function App() {
         <Route path="/crud" element={<RouteAuth pageComponent={<Crud />} />} />
         <Route path="/demodata" element={<RouteAuth pageComponent={<DemoData />} />} />
         <Route path="/form" element={<RouteAuth pageComponent={<Form1 />} />} />
+
+        <Route path="/bank_accounts">
+          <Route index element={<RouteAuth pageComponent={<BankAccountList />} />} />
+          <Route path="new" element={<RouteAuth pageComponent={<BankAccountForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<BankAccountDetail />} />} />
+        </Route>
 
         <Route path="/employees">
           <Route index element={<RouteAuth pageComponent={<EmpList />} />} />

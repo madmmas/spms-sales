@@ -17,6 +17,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Banks', icon: 'pi pi-fw pi-list', to: '/banks' },
+                        { label: 'Bank Accounts', icon: 'pi pi-fw pi-list', to: '/bank_accounts' },
                         { label: 'Customers', icon: 'pi pi-fw pi-list', to: '/customers' },
                         { label: 'Employees', icon: 'pi pi-fw pi-list', to: '/employees' },
                         { label: 'Package-Products', icon: 'pi pi-fw pi-list', to: '/packages' },
