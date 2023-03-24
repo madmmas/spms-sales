@@ -8,6 +8,7 @@ import { classNames } from 'primereact/utils';
 import { InputSwitch } from 'primereact/inputswitch';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
@@ -136,33 +137,20 @@ const Form = ({empProfile}) => {
                             rules={{ required: 'Punch ID is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Punch</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Punch ID*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="dtGrade_id"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Grade</label>
-                                <SelectLookupData field={field} model={GRADE_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-4">
+                    <div className="field col-12 md:col-6">
                         <Controller
                             name="dtDepartment_id"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Department</label>
-                                <SelectLookupData field={field} model={DEPARTMENT_MODEL}
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>City*</label>
+                                <SelectConstData field={field} data={CITIES}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -174,9 +162,13 @@ const Form = ({empProfile}) => {
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Designation</label>
-                                <SelectLookupData field={field} model={DESIGNATION_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Designation*</label>
+                                <SelectMasterData field={field} model={DESIGNATION_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'designationId', header: 'Designation ID', filterPlaceholder: 'Filter by Designation ID'}, 
+                                        {field: 'designationName', header: 'Designation Name', filterPlaceholder: 'Filter by Designation Name'}
+                                    ]} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -187,9 +179,13 @@ const Form = ({empProfile}) => {
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Office Time</label>
-                                <SelectLookupData field={field} model={OFFICE_TIME_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier Category*</label>
+                                <SelectMasterData field={field} model={SUPPLIER_CATEGORY_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'supplierCategoryId', header: 'Supplier Category ID', filterPlaceholder: 'Filter by Supplier Category ID'}, 
+                                        {field: 'supplierCategoryName', header: 'Supplier Category Name', filterPlaceholder: 'Filter by Supplier Category Name'}
+                                    ]} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -201,9 +197,14 @@ const Form = ({empProfile}) => {
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Group</label>
-                                <SelectLookupData field={field} model={GROUP_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })}
+                                    displayField="supplierName"
+                                    columns={[
+                                        {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
+                                        {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                    ]} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
