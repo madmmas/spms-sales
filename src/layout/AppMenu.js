@@ -53,11 +53,13 @@ const AppMenu = () => {
                         { label: 'Department', icon: 'pi pi-fw pi-list', to: '/department' },
                         { label: 'Designation', icon: 'pi pi-fw pi-list', to: '/designation' },
                         { label: 'Expense Type', icon: 'pi pi-fw pi-list', to: '/expense_type' },
+                        { label: 'Extra Income Type', icon: 'pi pi-fw pi-list', to: '/extra_income_type' },
                         { label: 'Grade', icon: 'pi pi-fw pi-list', to: '/grade' },
                         { label: 'Group', icon: 'pi pi-fw pi-list', to: '/group' },
                         { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
                         { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
+                        { label: 'Route', icon: 'pi pi-fw pi-list', to: '/route' },
                         { label: 'Supplier Category', icon: 'pi pi-fw pi-list', to: '/supplier_category' },
                     ]
                 }

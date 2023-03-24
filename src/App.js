@@ -53,6 +53,7 @@ function App() {
   const CustomerCategory = React.lazy(() => import("./pages/configurations/CustomerCategory"));
   const SupplierCategory = React.lazy(() => import("./pages/configurations/SupplierCategory"));
   const ProductCategory = React.lazy(() => import("./pages/configurations/ProductCategory"));
+  const ExtraIncomeType = React.lazy(() => import("./pages/configurations/ExtraIncomeType"));
   const ExpenseType = React.lazy(() => import("./pages/configurations/ExpenseType"));
   const PaymentType = React.lazy(() => import("./pages/configurations/PaymentType"));
   const Department = React.lazy(() => import("./pages/configurations/Department"));
@@ -60,6 +61,7 @@ function App() {
   const Grade = React.lazy(() => import("./pages/configurations/Grade"));
   const Group = React.lazy(() => import("./pages/configurations/Group"));
   const OfficeTime = React.lazy(() => import("./pages/configurations/OfficeTime"));
+  const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
 
   return (
     <Routes>
@@ -119,15 +121,17 @@ function App() {
         <Route path="/bank_transation" element={<RouteAuth pageComponent={<BankTransaction />} />} />
 
         <Route path="/customer_category" element={<RouteAuth pageComponent={<CustomerCategory />} />} />
-        <Route path="/supplier_category" element={<RouteAuth pageComponent={<SupplierCategory />} />} />
-        <Route path="/product_category" element={<RouteAuth pageComponent={<ProductCategory />} />} />
-        <Route path="/office_time" element={<RouteAuth pageComponent={<OfficeTime />} />} />
         <Route path="/designation" element={<RouteAuth pageComponent={<Designation />} />} />
         <Route path="/department" element={<RouteAuth pageComponent={<Department />} />} />
+        <Route path="/expense_type" element={<RouteAuth pageComponent={<ExpenseType />} />} />
+        <Route path="/extra_income_type" element={<RouteAuth pageComponent={<ExtraIncomeType />} />} />
         <Route path="/grade" element={<RouteAuth pageComponent={<Grade />} />} />
         <Route path="/group" element={<RouteAuth pageComponent={<Group />} />} />
-        <Route path="/expense_type" element={<RouteAuth pageComponent={<ExpenseType />} />} />
+        <Route path="/office_time" element={<RouteAuth pageComponent={<OfficeTime />} />} />
         <Route path="/payment_type" element={<RouteAuth pageComponent={<PaymentType />} />} />
+        <Route path="/product_category" element={<RouteAuth pageComponent={<ProductCategory />} />} />
+        <Route path="/route" element={<RouteAuth pageComponent={<BusinessRoute />} />} />
+        <Route path="/supplier_category" element={<RouteAuth pageComponent={<SupplierCategory />} />} />
 
       </Route>
     </Routes>

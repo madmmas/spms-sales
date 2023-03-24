@@ -26,7 +26,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["name", "description", "phone", "dtSupplierCategory_id", "status", "contactPersonName", "contactPersonPhone", "contactPersonDesignation", "currency", "address"],
+        fields: ["name", "dtSupplierCategory_id", "status", "contactPersonName", "contactPersonPhone", "contactPersonDesignation", "currency", "address"],
         first: 0,
         rows: 10,
         page: 1,
@@ -302,7 +302,7 @@ const List = () => {
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-                        scrollable
+                        scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
