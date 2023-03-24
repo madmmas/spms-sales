@@ -303,9 +303,9 @@ const List = () => {
                         <Column field="last_name" header="Last Name" filter filterPlaceholder="Search by last_name" sortable body={last_nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="phone" header="Phone" filter filterPlaceholder="Search by Phone" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtGrade_id" header="Grade" filter filterPlaceholder="Search by punchID" sortable body={gradeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtDepartment_id" header="Department" filter filterPlaceholder="Search by Department ID" sortable body={departmentBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtDesignation_id" header="Designation" filter filterPlaceholder="Search by Designation ID" sortable body={designationBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtGrade_id" header="Grade ID" filter filterPlaceholder="Search by punchID" sortable body={gradeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtDepartment_id" header="Department ID" filter filterPlaceholder="Search by Department ID" sortable body={departmentBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtDesignation_id" header="Designation ID" filter filterPlaceholder="Search by Designation ID" sortable body={designationBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtOfficeTime_id" header="Office Time" filter filterPlaceholder="Search by Office time" sortable body={officetimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtGroup_id" header="Group ID" filter filterPlaceholder="Search by Group" sortable body={grouptimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
 

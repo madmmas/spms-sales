@@ -117,13 +117,13 @@ const ExtraIncomeType = () => {
                 configurationManagementService.update(modelName, task_type._id, task_type).then(data => {
                     console.log(data);
                     loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expense Type Updated', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Type Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, task_type).then(data => {
                     console.log(data);
                     loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expense Type Created', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Type Created', life: 3000 });
                 });
             }
 
@@ -237,7 +237,7 @@ const ExtraIncomeType = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Expense Type</h5>
+                <h5 className="m-0">Manage Extra Income Type</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -283,12 +283,12 @@ const ExtraIncomeType = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Expense Type`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Extra Income Type`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         {task_type.image && <img src={`${contextPath}/demo/images/task_type/${task_type.image}`} alt={task_type.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
