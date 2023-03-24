@@ -7,14 +7,16 @@ import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { ConfigurationService } from '../../../services/ConfigurationService';
 
 import { HRService } from '../../../services/HRService';
-import { EMPLOYEE_MODEL } from '../../../constants/models';
-
+import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 const List = () => {
 
     const modelName = EMPLOYEE_MODEL;
+    const [dtDepartment_id, setdtDepartment_id] = useState([]);
 
+    const configurationService = new ConfigurationService();
     let navigate = useNavigate();
 
     const toast = useRef(null);
@@ -44,6 +46,13 @@ const List = () => {
     const hrManagementService = new HRService();
 
     let loadLazyTimeout = null;
+
+    useEffect(() => {
+        initFilters();
+        configurationService.getAllWithoutParams(DEPARTMENT_MODEL).then(data => {
+            setdtDepartment_id(data);
+        });
+    }, []);
 
     useEffect(() => {
         initFilters();
@@ -154,30 +163,84 @@ const List = () => {
             </React.Fragment>
         );
     };
-
     const idBodyTemplate = (rowData) => {
         return (
             <>
                 <span className="p-column-title">Employee ID</span>
-                {rowData.empId}
+                {rowData.empID}
+            </>
+        );
+    };
+    const first_nameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">First Name</span>
+                {rowData.first_name}
+            </>
+        );
+    };
+    const last_nameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Last Name</span>
+                {rowData.last_name}
+            </>
+        );
+    };
+    const phoneBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Phone</span>
+                {rowData.phone}
+            </>
+        );
+    };
+    const emailBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Email</span>
+                {rowData.email}
             </>
         );
     };
 
-    const punchIdBodyTemplate = (rowData) => {
+    const gradeBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Punch ID</span>
-                {rowData.punchId}
+                <span className="p-column-title">Grade ID</span>
+                {rowData.dtGrade_id}
             </>
         );
     };
-
-    const nameBodyTemplate = (rowData) => {
+    const departmentBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.empName}
+                <span className="p-column-title">Department ID</span>
+                {rowData.dtDepartment_id}
+            </>
+        );
+    };
+    const designationBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Designation ID</span>
+                {rowData.dtDesignation_id}
+            </>
+        );
+    };
+    const officetimeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Office Time</span>
+                {rowData.dtOfficeTime_id}
+            </>
+        );
+    };
+    const grouptimeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Group ID</span>
+                {rowData.dtGroup_id}
             </>
         );
     };
@@ -234,10 +297,18 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="empId" header="Employee ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="punchId" header="Punch ID" filter filterPlaceholder="Search by punchId" sortable body={punchIdBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="empName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="empID" header="Employee ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="first_name" header="First Name" filter filterPlaceholder="Search by First Name" sortable body={first_nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="last_name" header="Last Name" filter filterPlaceholder="Search by last_name" sortable body={last_nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="phone" header="Phone" filter filterPlaceholder="Search by Phone" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtGrade_id" header="Grade" filter filterPlaceholder="Search by punchID" sortable body={gradeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtDepartment_id" header="Department" filter filterPlaceholder="Search by Department ID" sortable body={departmentBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtDesignation_id" header="Designation" filter filterPlaceholder="Search by Designation ID" sortable body={designationBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtOfficeTime_id" header="Office Time" filter filterPlaceholder="Search by Office time" sortable body={officetimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtGroup_id" header="Group ID" filter filterPlaceholder="Search by Group" sortable body={grouptimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+
                     </DataTable>
 
                     <Dialog visible={deleteEmpProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmpProfileDialogFooter} onHide={hideDeleteEmpProfileDialog}>

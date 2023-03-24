@@ -24,7 +24,6 @@ const Form = ({supplierProfile}) => {
     const hrManagementService = new HRService();
     const [status, setStatus] = useState('');
     const [submitted, setSubmitted] = useState(false);
-
     const {
         register,
         control,
