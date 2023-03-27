@@ -63,7 +63,8 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+.env*
+
 # .env.test
 public/env.js
 public/index.html
