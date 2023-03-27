@@ -192,7 +192,7 @@ const List = () => {
     const accNumberBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.contaaccNumberctPersonName}
+                {rowData.accNumber}
             </>
         );
     };
@@ -302,10 +302,9 @@ const List = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '8rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="branch" header="Branch" filter filterPlaceholder="Search by name" sortable body={branchBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by name" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="accName" header="Account Name" filter filterPlaceholder="Search by name" sortable body={accNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by name" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="branch" header="Branch" filter filterPlaceholder="Search by name" sortable body={branchBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="initBalance" header="Initial Balance" filter filterPlaceholder="Search by name" sortable body={initBalanceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="address" header="Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="phone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

@@ -46,7 +46,7 @@ const Form = ({bankAccountProfile}) => {
             hrManagementService.update(modelName, formData._id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Updated', life: 3000 });
                 setSubmitted(false);
-                // navigate("/bank_accounts/" + data.ID);
+                navigate("/bank_accounts/" + data.ID);
             });
         }
     };
@@ -67,9 +67,24 @@ const Form = ({bankAccountProfile}) => {
                 <h5>{bankAccountProfile==null?"New":"Edit"} Bank Account</h5>
                 <form onSubmit={handleSubmit(onSubmit)} >
                 <div className="p-fluid formgrid grid">
+
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="dtBankAccountCategory_id"
+                            name="accName"
+                            control={control}
+                            rules={{ required: 'Account Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Name*</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="dtBank_id"
                             control={control}
                             rules={{ required: 'Bank Account is required.' }}
                             render={({ field, fieldState }) => (
@@ -104,20 +119,6 @@ const Form = ({bankAccountProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Number*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-6">
-                        <Controller
-                            name="accName"
-                            control={control}
-                            rules={{ required: 'Account Name is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Name*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -191,7 +192,7 @@ const Form = ({bankAccountProfile}) => {
                     </div>
                 </div>
                 <>
-                    <Button type="submit" label="Submit" className="mt-2" />
+                    <Button type="submit" label="Submit" className="mt-2" disabled={submitted}/>
                 </>
                 </form>
             </div>
