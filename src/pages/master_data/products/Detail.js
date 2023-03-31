@@ -7,18 +7,35 @@ import { lazyRetry } from '../../components/LazyWithRetry';
 import { HRService } from '../../../services/HRService';
 import { PRODUCT_MODEL } from '../../../constants/models';
 
-const ProductForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "productProfile" */ './Form'), "productProfile"));
+const ProductForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "productForm" */ './Form'), "productForm"));
 
 const Detail = () => {
     
     let { id } = useParams();
+
+        // name, dtProductCategory_id, code, barCode, brandName, partNumber, unitOfMeasurement, 
+    // lowStockQty, reorderQty, lastPurchasePrice, status, remarks
+    let emptyProductData = {
+        name: "",
+        dtProductCategory_id: "",
+        code: "",
+        barCode: "",
+        brandName: "",
+        partNumber: "",
+        unitOfMeasurement: "",
+        lowStockQty: 0,
+        reorderQty: 0,
+        lastPurchasePrice: 0.00,
+        status: true,
+        remarks: "",
+    };
 
     let navigate = useNavigate();
 
     const modelName = PRODUCT_MODEL;
 
     const hrManagementService = new HRService();
-    const [empData, setProductData] = useState(null);
+    const [productData, setProductData] = useState(null);
 
     const tabs = [
         { component: ProductForm },
@@ -27,6 +44,9 @@ const Detail = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
+        {label: 'Suppliers', icon: 'pi pi-fw pi-home'},
+        {label: 'Purchase History', icon: 'pi pi-fw pi-home'},
+        {label: 'Sales History', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {
@@ -50,7 +70,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel productProfile={empData}/>;
+        return <TabPanel productData={productData}/>;
     };
 
     return (
@@ -60,7 +80,7 @@ const Detail = () => {
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
                     {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderProductForm():(empData && renderTabPanel())}
+                        {id=="new"?renderProductForm():(productData && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

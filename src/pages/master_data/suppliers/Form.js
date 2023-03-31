@@ -18,6 +18,8 @@ import { CURRENCY } from '../../../constants/lookupData';
 
 const Form = ({supplierProfile}) => {
 
+    console.log("supplier Profile::", supplierProfile);
+
     const modelName = SUPPLIER_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);

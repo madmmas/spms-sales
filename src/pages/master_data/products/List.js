@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { classNames } from 'primereact/utils';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -21,34 +22,25 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ['name', 'dtProductCategory_id', 'code', 'barCode', 'brandName', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'status'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'productId': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'productCategory': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'supplierName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'itemName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'barCode': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'partNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'modelNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'measurementUnit': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'reorderQuantity': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'productStatus': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
+            // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [dtProfiles, setProfiles] = useState(null);
-    const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
-    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
-    const [dtProfile, setProfile] = useState({});
-    const [selectedProfiles, setSelectedProfiles] = useState(null);
+    const [dtProducts, setProducts] = useState(null);
+    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
+    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
+    const [dtProduct, setProduct] = useState({});
+    const [selectedProducts, setSelectedProducts] = useState(null);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -83,7 +75,7 @@ const List = () => {
             hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
-                setProfiles(data.rows);
+                setProducts(data.rows);
                 setLoading(false);
             });
         }, Math.random() * 100);
@@ -113,39 +105,39 @@ const List = () => {
         navigate("/products/new");
     };
 
-    const editProfile = (dtProfile) => {
-        navigate("/products/" + dtProfile._id);
+    const editProduct = (dtProduct) => {
+        navigate("/products/" + dtProduct._id);
     };
 
-    const confirmDeleteProfile = (dtProfile) => {
-        setProfile(dtProfile);
-        setDeleteProfileDialog(true);
+    const confirmDeleteProduct = (dtProduct) => {
+        setProduct(dtProduct);
+        setDeleteProductDialog(true);
     };
 
-    const hideDeleteProfileDialog = () => {
-        setDeleteProfileDialog(false);
+    const hideDeleteProductDialog = () => {
+        setDeleteProductDialog(false);
     };
 
-    const hideDeleteProfilesDialog = () => {
-        setDeleteProfilesDialog(false);
+    const hideDeleteProductsDialog = () => {
+        setDeleteProductsDialog(false);
     };
 
-    const deleteSelectedProfiles = () => {
-        let _dtProfiles = dtProfiles.filter((val) => !selectedProfiles.includes(val));
-        setProfiles(_dtProfiles);
-        setDeleteProfilesDialog(false);
-        setSelectedProfiles(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Deleted', life: 3000 });
+    const deleteSelectedProducts = () => {
+        let _dtProducts = dtProducts.filter((val) => !selectedProducts.includes(val));
+        setProducts(_dtProducts);
+        setDeleteProductsDialog(false);
+        setSelectedProducts(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     };
 
-    const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
+    const deleteProduct = () => {
+        hrManagementService.delete(modelName, dtProduct._id).then(data => {
             console.log(data);
             loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Profile Deleted', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Product Deleted', life: 3000 });
         });
-        setDeleteProfileDialog(false);
-        setProfile(null);
+        setDeleteProductDialog(false);
+        setProduct(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -180,14 +172,16 @@ const List = () => {
             </>
         );
     };
-    const productCategoryBodyTemplate = (rowData) => {
+
+    const dtProductCategory_idBodyTemplate = (rowData) => {
         return (
             <>
                 <span className="p-column-title">Product Category</span>
-                {rowData.dtProductCategory_id}
+                {rowData.dtProductCategory_id_shortname}
             </>
         );
     };
+
     const brandNameBodyTemplate = (rowData) => {
         return (
             <>
@@ -196,6 +190,7 @@ const List = () => {
             </>
         );
     };
+
     const partNumberBodyTemplate = (rowData) => {
         return (
             <>
@@ -204,22 +199,16 @@ const List = () => {
             </>
         );
     };
-    const unitPriceBodyTemplate = (rowData) => {
+
+    const lowStockQtyBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Unit Price</span>
-                {rowData.unitPrice}
+                <span className="p-column-title">Low Stock Qty</span>
+                {rowData.lowStockQty}
             </>
         );
     };
-    const minimumQtyBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Minimum Qty</span>
-                {rowData.minimumQty}
-            </>
-        );
-    };
+
     const reorderQtyBodyTemplate = (rowData) => {
         return (
             <>
@@ -229,13 +218,17 @@ const List = () => {
         );
     };
 
-    const statusBodyTemplate = (rowData) => {
+    const lastPurchasePriceBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Status</span>
-                {rowData.status}
+                <span className="p-column-title">Last Purchase Price</span>
+                {rowData.lastPurchasePrice}
             </>
         );
+    };
+
+    const statusBodyTemplate = (rowData) => {
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
     };
 
     const renderHeader = () => {
@@ -250,22 +243,22 @@ const List = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />                
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />                
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />                
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />                
             </>
         );
     };
 
-    const deleteProfileDialogFooter = (
+    const deleteProductDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfileDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProfile} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
         </>
     );
-    const deleteProfilesDialogFooter = (
+    const deleteProductsDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiles} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
         </>
     );
 
@@ -277,12 +270,12 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProducts} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
+                        scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
@@ -290,33 +283,33 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="dtProductCategory_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={productCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductCategory_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="partNumber" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
-                        <Column field="unitPrice" header="Unit Price" filter filterPlaceholder="Search by Price" sortable body={unitPriceBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>                        
-                        <Column field="minimumQty" header="Minimum Qty" filter filterPlaceholder="Search by Qty" sortable body={minimumQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
+                        <Column field="lowStockQty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
                         <Column field="reorderQty" header="Reorder Qty" filter filterPlaceholder="Search by Reorder Qty" sortable body={reorderQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="lastPurchasePrice" header="Last Purchase Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastPurchasePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 
-                    <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
+                    <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {dtProfile && (
+                            {dtProduct && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.productId}</b>?
+                                    Are you sure you want to delete <b>{dtProduct.productId}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDeleteProfilesDialog}>
+                    <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
+                            {dtProduct && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>

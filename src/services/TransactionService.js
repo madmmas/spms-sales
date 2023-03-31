@@ -14,21 +14,10 @@ export class TransactionService {
         return axiosInstance.get(`/data/${modelName}?` + queryParams).then(res => res.data);
     }
 
-    async create(modelName, data) {
-        const resp = await axiosInstance.post(`/data/${modelName}`, data);
+    async processTransaction(trxName, data) {
+        const resp = await axiosInstance.post(`/transaction/${trxName}`, data);
         console.log(resp.data);
         return resp.data;
     }
-
-    async update(modelName, id, data) {
-        const resp = await axiosInstance.put(`/data/${modelName}/` + id, data);
-        console.log(resp.data);
-        return resp.data;
-    }
-
-    async delete(modelName, id) {
-        const resp = await axiosInstance.delete(`/data/${modelName}/` + id);
-        console.log(resp.data);
-        return resp.data;
-    }
+    
 }
