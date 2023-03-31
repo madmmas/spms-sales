@@ -16,7 +16,8 @@ export const EXTRA_INCOME_MODEL = 'dtExtraIncome';
 export const INVOICE_MODEL = 'trxInvoice';
 export const PURCHASE_MODEL = 'trxPurchase';
 export const SALE_MODEL = 'trxSales';
-export const STOCK_INOUT_MODEL = 'trxStockInOut';
+export const STOCK_IN_MODEL = 'trxStockIn';
+export const STOCK_OUT_MODEL = 'trxStockOut';
 
 export const ACC_RECIEVABLE_REGISTER = 'trxACRecievable';
 export const ACC_PAYABLE_REGISTER = 'trxACPayable';

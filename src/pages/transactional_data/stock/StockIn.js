@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
@@ -9,11 +10,13 @@ import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
-import { STOCK_MODEL } from '../../../constants/models';
+import { STOCK_IN_MODEL } from '../../../constants/models';
+
+
 
 const StockIn = () => {
 
-    const modelName = STOCK_MODEL;
+    const modelName = STOCK_IN_MODEL;
 
     const toast = useRef(null);
     const dt = useRef(null);
@@ -67,7 +70,7 @@ const StockIn = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
                 setStockIn(data.rows);
@@ -94,11 +97,32 @@ const StockIn = () => {
         setLazyParams(_lazyParams);
     }
 
+    const getDate = (date) => {
+        return moment(parseInt(date)).format('DD/MM/YYYY');
+        // let d = new Date(parseInt(date));
+        // return d.toDateString();
+    }
+
+    const dateBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getDate(rowData.date)}
+            </>
+        );
+    };
 
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.name}
+                {rowData.dtProduct_id_shortname}
+            </>
+        );
+    };
+
+    const quantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.quantity}
             </>
         );
     };
@@ -140,7 +164,9 @@ const StockIn = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="accName" header="Account Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>

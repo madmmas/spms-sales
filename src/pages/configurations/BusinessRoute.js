@@ -249,12 +249,14 @@ const BusinessRoute = () => {
             <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveBusinessRoute} />
         </>
     );
+
     const deleteBusinessRouteDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteBusinessRouteDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteBusinessRoute} />
         </>
     );
+
     const deleteBusinessRoutesDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteBusinessRoutesDialog} />

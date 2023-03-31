@@ -4,7 +4,7 @@ import SelectMasterDataTable from './SelectMasterDataTable';
 
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterData({ field, displayField, modelName, className, columns, caption="Select" }) {
+export default function SelectMasterData({ field, displayField, modelName, className, columns, caption="Select", onSelect }) {
 
     const masterDataService = new MasterDataService();
 
@@ -20,6 +20,7 @@ export default function SelectMasterData({ field, displayField, modelName, class
     const onSelection = (e) => {
         setSelectedRow(e.value[displayField]);
         field.onChange(e.value._id);
+        onSelect(e.value)
     }
 
     return (

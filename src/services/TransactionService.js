@@ -11,7 +11,7 @@ export class TransactionService {
     async getAll(modelName, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
 
-        return axiosInstance.get(`/data/${modelName}?` + queryParams).then(res => res.data);
+        return axiosInstance.get(`/trxdata/${modelName}?` + queryParams).then(res => res.data);
     }
 
     async processTransaction(trxName, data) {

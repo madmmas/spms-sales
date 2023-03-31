@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
 import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
@@ -12,11 +13,12 @@ import { Calendar } from 'primereact/calendar';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 
+import ModalPurchaseForm from '../../components/ModalPurchaseForm';
 import SelectMasterDataTable from '../../components/SelectMasterDataTable';
 import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
-import { PURCHASE_MODEL, PRODUCT_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
+import { PURCHASE_MODEL, PRODUCT_MODEL, SUPPLIER_MODEL, WAREHOUSES_MODEL } from '../../../constants/models';
 
 const Form = ({purchaseProfile}) => {
 
@@ -24,43 +26,72 @@ const Form = ({purchaseProfile}) => {
 
     let navigate = useNavigate();
 
-    let defaultValue = {
-        _id: null,
-        voucherNo: null,
-        voucherDate: null,
-        supplierId: null,
-        items: [
-            {
-                itemId: null,
-                itemName: null,
-                quantity: null,
-                unitPrice: null,
-                amount: null,
-                discount: null,
-                netAmount: null,
-                // tax: null,
-                // taxAmount: null,
-                totalAmount: null,
-            }
-        ],
+    let defaultPurchaseProduct = {
+        dtProduct_id: null, // select product
+        barCode: null, // fetch from selected product
+        lastPurchasePrice: 0.00, // fetch from selected product
+
+        quantity: 1,  // input, onBlur update: netPrice, totalPrice
+        unitCostF: 0.00,    // input, onBlur update: netPrice, profit, tradePrice
+        totalCostF: 0.00, // calculated, onBlur update: netPrice, profit, tr
+        conversionRate: 1, // input, onBlur update: unitPrice, unitPriceBDT, netUnitPrice, netUnitPriceBDT, tradeUnitPrice, tradeUnitPriceBDT
+        unitCostBDT: 0.00, // calculated, onBlur update: netPrice, profit, tradePrice
+        totalCostBDT: 0.00, // calculated, onBlur update: netPrice, profit, tradePrice
+
+        transport: 0.00,    // optional, onBlur update: netPrice
+        duty: 0.00,     // optional, onBlur update: netPrice
+
+        netUnitCostBDT: 0.00, // onBlur update: profit, tradePrice
+        netCostBDT: 0.00, // onBlur update: profit, tradePrice
+
+        profit: 0.00,  // input/calculated, onBlur update: tradePrice
+
+        tradeUnitPriceBDT: 0.00, // input/calculated, onBlur update: profit
+
+        minimumTradePrice: 0.00, // input
     };
 
+    let defaultValue = {
+        _id: null,
+        date: Date.now(),
+        dtSupplier_id: null,
+        currency: null,  // fetch the currency on supplier selection, enable: conversionRate, CnF, BENo, LCNo, totalAmount
+        dtWarehouse_id: null, // default warehouse
+        CnF: null,
+        BENo: null,
+        LCNo: null,
+        notes: null,
+        items: [],
+        totalAmountF: 0.00, // auto calculate: items.netPrice * items.quantity
+        totalAmountBDT: 0.00, // auto calculate: totalAmount * conversionRate
+        totalQuantity: 0, // auto calculate: items.quantity
+        totalTransport: 0.00, // auto calculate: items.transport
+        totalDuty: 0.00,  // auto calculate: items.duty
+        netAmountBDT: 0.00, // auto calculate: totalAmount + totalTransport + totalDuty
+    };
+
+    const [totalAmountF, setTotalAmountF] = useState(0.00);
+    const [totalAmountBDT, setTotalAmountBDT] = useState(0.00);
+    const [totalQuantity, setTotalQuantity] = useState(0);
+    const [totalTransport, setTotalTransport] = useState(0.00);
+    const [totalDuty, setTotalDuty] = useState(0.00);
+    const [netAmountBDT, setNetAmountBDT] = useState(0.00);
+
+    const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
+
+
     const toast = useRef(null);
-    const hrManagementService = new HRService();
     
-    const [ifAdd, setIfAdd] = useState(true);
     const [purchases, setPurchases] = useState([]);
     const [purchaseItem, setPurchaseItem] = useState({});
     const [purchaseQuantity, setPurchaseQuantity] = useState(1);
     const [purchasePrice, setPurchasePrice] = useState(0);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
     const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
-    const [supplierDialog, setSupplierDialog] = useState(false);
-    const [date, setDate] = useState(null);
-
-
 
     const [trigger, setTrigger] = useState(0);
+    const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
 
     const {
         register,
@@ -73,18 +104,14 @@ const Form = ({purchaseProfile}) => {
       });
 
     const onSubmit = (formData) => {
-        console.log(formData);
         formData.items = purchases;
-        // if(purchaseProfile==null){
-        //     hrManagementService.create(modelName, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Created', life: 3000 });
-        //         navigate("/purchases/" + data.ID);
-        //     });
-        // }else{
-        //     hrManagementService.update(modelName, formData._id, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Updated', life: 3000 });
-        //     });
-        // }
+        formData.totalAmountF = totalAmountF;
+        formData.totalAmountBDT = totalAmountBDT;
+        formData.totalQuantity = totalQuantity;
+        formData.totalTransport = totalTransport;
+        formData.totalDuty = totalDuty;
+        formData.netAmountBDT = netAmountBDT;
+        console.log("FORMDATA::", formData);
     };
 
     const gotoList = () => {
@@ -95,42 +122,13 @@ const Form = ({purchaseProfile}) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
     
-    const resetItemSelection = () => {
-        setPurchaseItem({_id: null, productName: ""});
-        setPurchaseQuantity(1);
-        setPurchasePrice(0);
-    };
-
-    const addItem = () => {
-        if(purchaseItem==null || purchaseItem._id == null) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please select an item', life: 3000 });
-            return;
-        }
-        if(purchaseQuantity==null || purchaseQuantity <= 0) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please enter a valid quantity', life: 3000 });
-            return;
-        }
-        if(purchasePrice==null || purchasePrice <= 0) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please enter a valid price', life: 3000 });
-            return;
-        }
-
+    const addToPurchaseList = (addedItem) => {
         let newPurchases = [...purchases];
-        newPurchases.push({
-            index: purchases.length,
-            itemId: purchaseItem._id,
-            itemName: purchaseItem.productName,
-            quantity: parseFloat(purchaseQuantity),
-            purchasePrice: parseFloat(purchasePrice),
-            amount: parseFloat(purchasePrice) * parseFloat(purchaseQuantity),
-            // discount: null,
-            // netAmount: null,
-            // tax: null,
-            // taxAmount: null,
-            // totalAmount: null,
-        });
+        addedItem['index'] = purchases.length;
+        newPurchases.push(addedItem);
+        console.log("NEWPURCHASE::", newPurchases);
         setPurchases(newPurchases);
-        resetItemSelection();
+        calculateTotals();
     };
 
     const removeItem = () => {
@@ -140,60 +138,54 @@ const Form = ({purchaseProfile}) => {
         setDeleteProfileDialog(false);
     };
 
-    const updateItem = () => {
-        let newPurchases = [...purchases];
-        newPurchases[selectedProduct.index] = {
-            index: selectedProduct.index,
-            itemId: purchaseItem._id,
-            itemName: purchaseItem.productName,
-            quantity: parseFloat(purchaseQuantity),
-            purchasePrice: parseFloat(purchasePrice),
-            amount: parseFloat(purchasePrice) * parseFloat(purchaseQuantity),
-            // discount: null,
-            // netAmount: null,
-            // tax: null,
-            // taxAmount: null,
-            // totalAmount: null,
-        };
-        setPurchases(newPurchases);
-        setIfAdd(true);
-        resetItemSelection();
-    };
+    const calculateTotals = () => {
+        let totalAmountF = 0;
+        let totalAmountBDT = 0;
+        let totalTransport = 0;
+        let totalDuty = 0;
+        let netAmountBDT = 0;
 
-    const cancelUpdateItem = () => {
-        setIfAdd(true);
-        resetItemSelection();
-    };
-
-    const getTotalPrice = () => {
-        let total = 0;
         if(purchases && purchases.length > 0) {
             for(let i=0; i<purchases.length; i++) {
-                total += purchases[i].amount;
+                totalAmountF += purchases[i].totalAmountF;
+                totalAmountBDT += purchases[i].totalAmountBDT;
+                totalTransport += purchases[i].transport;
+                totalDuty += purchases[i].duty;
+                netAmountBDT += purchases[i].netAmountBDT;
             }
         }
-        return total;
-    };
-
-    const onItemSelect = (e) => {
-        setPurchaseItem(e.value);
+        setTotalQuantity(purchases.length);
+        setTotalAmountBDT(totalAmountBDT);
+        setTotalAmountF(totalAmountF);
+        setTotalTransport(totalTransport);
+        setTotalDuty(totalDuty);
+        setNetAmountBDT(netAmountBDT);
     };
 
     const editProfile = (dtProfile) => {
+        setTrigger((trigger) => trigger + 1)
+        console.log("EDIT::", dtProfile);
         setSelectedProduct(dtProfile);
-        setPurchaseItem({_id: dtProfile.itemId, productName: dtProfile.itemName});
-        setPurchaseQuantity(dtProfile.quantity);
-        setPurchasePrice(dtProfile.purchasePrice);
-        setIfAdd(false);
+        console.log("SET SELECTED PRODUCT::", selectedProduct);
+        openPurchaseProductDialog();
     };
 
     const confirmDeleteProfile = (dtProfile) => {
-        setSelectedProduct(dtProfile);
+        // setSelectedProduct(dtProfile);
         setDeleteProfileDialog(true);
     };
 
     const hideDeleteProfileDialog = () => {
         setDeleteProfileDialog(false);
+    };
+
+    const openPurchaseProductDialog = () => {
+        
+        setShowPurchaseDialog(true);
+    };
+
+    const hidePurchaseProductDialog = () => {
+        setShowPurchaseDialog(false);
     };
 
     const deleteProfileDialogFooter = (
@@ -206,58 +198,22 @@ const Form = ({purchaseProfile}) => {
     const header = (
         <div className="table-header">
             <h6 className="p-m-0">Purchase Items</h6>
-            <div className="formgroup-inline">
-                <div className="field">
-                    <div className="p-inputgroup">
-                        <InputText readonly="true" value={purchaseItem.productName} placeholder="Select a Product" 
-                            onClick={() => setTrigger((trigger) => trigger + 1)} />
-                        <SelectMasterDataTable trigger={trigger} fieldName="itemName" fieldValue={purchaseItem._id} modelName={PRODUCT_MODEL}
-                            onSelect={(e) => {onItemSelect(e)}} selRow={purchaseItem}
-                            caption="Select a Product" displayField="productName"
-                            columns={[
-                                {field: 'productId', header: 'Product ID', filterPlaceholder: 'Filter by Supplier ID'}, 
-                                {field: 'productName', header: 'Product Name', filterPlaceholder: 'Filter by Supplier Name'}
-                            ]} />
-                    </div>
-                </div>
-                <div className="field">
-                    <label htmlFor="qunatity" className="p-sr-only">
-                        Quantity
-                    </label>
-                    <InputNumber id="qunatity" value={purchaseQuantity} type="text" placeholder="Quantity" onValueChange={(e) => setPurchaseQuantity(e.value)} />
-                </div>
-                <div className="field">
-                    <label htmlFor="purchasePrice" className="p-sr-only">
-                        Purchase Price
-                    </label>
-                    <InputNumber id="purchasePrice" value={purchasePrice} type="text" placeholder="Purchase Price" onValueChange={(e) => setPurchasePrice(e.value)}/>
-                </div>
-                {ifAdd ?
-                <Button  label="Add" className="p-button-success" onClick={() => addItem()}></Button>
-                :
-                <>
-                    <Button label="Update" className="p-button-primary mr-2" onClick={() => updateItem()}></Button>
-                    <Button label="Cancel" className="p-button-warning" onClick={() => cancelUpdateItem()}></Button>
-                </>}
-            </div>
+            <Button onClick={() => openPurchaseProductDialog()} className="p-button-outlined" label="Add Product" />
         </div>
     );
 
     const footer = (
         <table><tbody>
             <tr>
-                <td>
-                    <b>Total:</b>
-                </td>
-                <td>
-                    {purchases ? purchases.length : 0} products.
-                </td>
-                <td>
-                    <b>Total Price:</b>
-                </td>
-                <td>
-                    ${getTotalPrice()}
-                </td>
+                <td><b>Total Quantity:</b></td><td>{purchases ? purchases.length : 0} products.</td>
+            </tr><tr>
+                <td><b>Total Cost ({selectedSupplier_currency}):</b></td><td>{totalAmountF}</td>
+                <td><b>Total Cost (BDT):</b></td><td>{totalAmountBDT}</td>
+            </tr><tr>
+                <td><b>Total Transport Cost (BDT):</b></td><td>{totalTransport}</td>
+                <td><b>Total Duty (BDT):</b></td><td>{totalDuty}</td>
+            </tr><tr>
+                <td><b>Total Net Cost (BDT):</b></td><td>{netAmountBDT}</td>
             </tr>
         </tbody></table>
     );
@@ -271,117 +227,156 @@ const Form = ({purchaseProfile}) => {
         );
     };
 
+    const onSupplierSelect = (selectedRow) => {
+        console.log("SELECTED SUPPLIER::", selectedRow);
+        setSelectedSupplier(selectedRow);
+        setSelectedSupplier_currency(selectedRow.currency);
+    };
+
     return (
         <div className="form-demo">
             <Toast ref={toast} />
             <div className="card col-12">
                 {purchaseProfile==null && <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />}
                 <h5>{purchaseProfile==null?"New":"Edit"} Purchase</h5>
-
-                <div className="p-fluid formgrid grid">
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="purchaseId"
-                            control={control}
-                            rules={{ required: 'Purchase ID is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Purchase ID*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="purchaseName"
-                            control={control}
-                            rules={{ required: 'Purchase Name is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Purchase Name*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
+                <div className=" col-12 md:col-12">
+                    <div className="p-fluid formgrid grid">
+                        <div className="field col-12 md:col-3">
+                            <Controller
+                                name="dtSupplier_id"
+                                control={control}
+                                rules={{ required: 'Supplier is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                    <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
+                                        displayField="name"
+                                        onSelect={onSupplierSelect}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-3">
+                            <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
+                            <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
+                        </div>
+                        <div className="field col-12 md:col-3">
+                            <Controller
+                                name="dtWarehouse_id"
+                                control={control}
+                                rules={{ required: 'Warehouse is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
+                                    <SelectMasterData field={field} modelName={WAREHOUSES_MODEL}
+                                        displayField="name"
+                                        onSelect={onSupplierSelect}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-3">
+                            <Controller
+                                name="CnF"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
+                                    <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-3">
+                            <Controller
+                                name="BENo"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
+                                    <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-3">
+                            <Controller
+                                name="LCNo"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No.</label>
+                                    <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-6">
+                            <Controller
+                                name="notes"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
                     </div>
                 </div>
-                <div className=" col-12 md:col-12">
-                        <Fieldset legend="Supplier Information">
-                        <div className="p-fluid formgrid grid">
-                            <div className="field col-12 md:col-6">
-                                <Controller
-                                    name="dtSupplier_supplierId"
-                                    control={control}
-                                    rules={{ required: 'Supplier is required.' }}
-                                    render={({ field, fieldState }) => (
-                                    <>
-                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
-                                        <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
-                                            displayField="supplierName"
-                                            className={classNames({ 'p-invalid': fieldState.error })} 
-                                            columns={[
-                                                {field: 'supplierId', header: 'Supplier ID', filterPlaceholder: 'Filter by Supplier ID'}, 
-                                                {field: 'supplierName', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
-                                            ]} />
-                                        {getFormErrorMessage(field.name)}
-                                    </>
-                                )}/>
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <Controller
-                                    name="fldCnF"
-                                    control={control}
-                                    render={({ field, fieldState }) => (
-                                    <>
-                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
-                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                        {getFormErrorMessage(field.name)}
-                                    </>
-                                )}/>
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <Controller
-                                    name="fldBENo"
-                                    control={control}
-                                    render={({ field, fieldState }) => (
-                                    <>
-                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
-                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                        {getFormErrorMessage(field.name)}
-                                    </>
-                                )}/>
-                            </div>
-                            <div className="field col-12 md:col-6">
-                                <Controller
-                                    name="fldLCNo"
-                                    control={control}
-                                    render={({ field, fieldState }) => (
-                                    <>
-                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No.</label>
-                                        <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                        {getFormErrorMessage(field.name)}
-                                    </>
-                                )}/>
-                            </div>
-                        </div>
-                        </Fieldset>
-                    </div>
+
+                <ModalPurchaseForm visible={showPurchaseDialog} currency="INR" 
+                    onHideDialog={hidePurchaseProductDialog} 
+                    onAdd={addToPurchaseList}
+                    defaultPurchaseProduct={defaultPurchaseProduct}
+                    selectedProduct={selectedProduct}
+                    trigger={trigger}
+                ></ModalPurchaseForm>
+
                 <DataTable value={purchases} 
                     stripedRows showGridlines scrollable scrollHeight="400px" 
                     header={header} footer={footer} 
                 >
                     <Column body={actionBodyTemplate} headerStyle={{ width: '6.4rem' }}></Column>
-                    <Column field="itemName" header="Item Name"></Column>
-                    <Column field="quantity" header="Quantity"></Column>
-                    <Column field="purchasePrice" header="Purchase Price"></Column>
-                    <Column field="amount" header="Total Price"></Column>
+                    <Column field="productName" header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="barCode" header="barcode" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="lastPurchasePrice" header="Last Purchase Price" headerStyle={{ minWidth: '10rem' }}></Column>
+
+                    <Column field="quantity" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="unitCostF" header={`Unit Cost (${selectedSupplier_currency})`} headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="totalCostF" header={`Total Cost (${selectedSupplier_currency})`} headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="conversionRate" header="Conversion Rate" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="unitCostBDT" header="UnitCost (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="totalCostBDT" header="Total Cost (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+
+                    <Column field="transport" header="Transport (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="duty" header="Duty  (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+
+                    <Column field="netUnitCostBDT" header="Net Unit Cost (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="netCostBDT" header="Net Cost (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+
+                    <Column field="profit" header="Profit (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+
+                    <Column field="tradeUnitPriceBDT" header="Unit Trade Price (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
+                    <Column field="minimumTradePrice" header="Minimum Trade Price (BDT)" headerStyle={{ minWidth: '10rem' }}></Column>
                 </DataTable>
                 <>
                     <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
                 </>
             </div>
-            <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
+            
+            <Dialog visible={deleteProfileDialog}
+                style={{ width: '450px' }} header="Confirm" modal 
+                footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                     <span>
