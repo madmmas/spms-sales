@@ -50,11 +50,10 @@ function App() {
   // const PurchasePackageList = React.lazy(() => import("./pages/transactional_data/purchasePackages/List"));
   // const PurchasePackageDetail = React.lazy(() => import("./pages/transactional_data/purchasePackages/Detail"));
   // const PurchasePackageForm = React.lazy(() => import("./pages/transactional_data/purchasePackages/Form"));
-  const Stocks = React.lazy(() => import("./pages/transactional_data/stock/Stocks"));
-  const DamagedGoods = React.lazy(() => import("./pages/transactional_data/stock/DamagedGoods"));
+  const StockStatus = React.lazy(() => import("./pages/transactional_data/stock/Detail"));
   const Expenses = React.lazy(() => import("./pages/transactional_data/Expenses"));
   const ExtraIncome = React.lazy(() => import("./pages/transactional_data/ExtraIncome"));
-  const BankTransaction = React.lazy(() => import("./pages/transactional_data/BankTransaction"));
+  const CashBank = React.lazy(() => import("./pages/transactional_data/cash_bank/Detail"));
 
   const CustomerCategory = React.lazy(() => import("./pages/configurations/CustomerCategory"));
   const SupplierCategory = React.lazy(() => import("./pages/configurations/SupplierCategory"));
@@ -131,11 +130,10 @@ function App() {
           <Route path="new" element={<RouteAuth pageComponent={<PurchasePackageForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<PurchasePackageDetail />} />} />
         </Route> */}
-        <Route path="/stocks" element={<RouteAuth pageComponent={<Stocks />} />} />
-        <Route path="/damaged_goods" element={<RouteAuth pageComponent={<DamagedGoods />} />} />
+        <Route path="/stocks" element={<RouteAuth pageComponent={<StockStatus />} />} />
         <Route path="/expenses" element={<RouteAuth pageComponent={<Expenses />} />} />
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
-        <Route path="/bank_transation" element={<RouteAuth pageComponent={<BankTransaction />} />} />
+        <Route path="/cash_bank" element={<RouteAuth pageComponent={<CashBank />} />} />
 
         <Route path="/customer_category" element={<RouteAuth pageComponent={<CustomerCategory />} />} />
         <Route path="/designation" element={<RouteAuth pageComponent={<Designation />} />} />

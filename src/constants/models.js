@@ -1,4 +1,4 @@
-export const BANKS_MODEL = 'dtBank';
+export const BANK_MODEL = 'dtBank';
 export const BANK_ACCOUNT_MODEL = 'dtBankAccount';
 export const CASH_MODEL = 'dtCash';
 export const CUSTOMER_MODEL = 'dtCustomer';
@@ -7,7 +7,7 @@ export const PACKAGE_MODEL = 'dtPackageProduct';
 export const PRODUCT_MODEL = 'dtProduct';
 export const SUPPLIER_MODEL = 'dtSupplier';
 export const WAREHOUSES_MODEL = 'dtWarehouse';
-export const STOCKS_MODEL = 'dtStock';
+export const STOCK_MODEL = 'dtStock';
 
 export const ATTENDANCE_MODEL = 'trxAttendance';
 export const DAMAGED_GOODS_MODEL = 'trxDamagedGood';

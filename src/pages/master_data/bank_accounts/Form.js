@@ -13,7 +13,7 @@ import SelectLookupData from '../../components/SelectLookupData';
 
 import { HRService } from '../../../services/HRService';
 
-import { BANKS_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 import { CURRENCY } from '../../../constants/lookupData';
 
 const Form = ({bankAccountProfile}) => {
@@ -90,7 +90,7 @@ const Form = ({bankAccountProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
-                                <SelectLookupData field={field} model={BANKS_MODEL}
+                                <SelectLookupData field={field} model={BANK_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>

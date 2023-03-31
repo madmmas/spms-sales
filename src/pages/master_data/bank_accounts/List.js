@@ -13,7 +13,7 @@ import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
-import { BANKS_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 import { CURRENCY } from '../../../constants/lookupData';
 
 const List = () => {
@@ -64,7 +64,7 @@ const List = () => {
 
     useEffect(() => {
         initFilters();
-        configurationService.getAllWithoutParams(BANKS_MODEL).then(data => {
+        configurationService.getAllWithoutParams(BANK_MODEL).then(data => {
             setDtBankAccountCategory(data);
         });
     }, []);

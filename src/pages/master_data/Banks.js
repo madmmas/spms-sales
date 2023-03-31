@@ -11,11 +11,11 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
-import { BANKS_MODEL } from '../../constants/models';
+import { BANK_MODEL } from '../../constants/models';
 
 const Banks = () => {
 
-    const modelName = BANKS_MODEL;
+    const modelName = BANK_MODEL;
 
     const toast = useRef(null);
     const dt = useRef(null);

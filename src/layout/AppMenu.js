@@ -16,7 +16,6 @@ const AppMenu = () => {
                     label: 'Master Data',
                     icon: 'pi pi-fw pi-list',
                     items: [
-                        { label: 'Banks', icon: 'pi pi-fw pi-list', to: '/banks' },
                         { label: 'Bank Accounts', icon: 'pi pi-fw pi-list', to: '/bank_accounts' },
                         { label: 'Customers', icon: 'pi pi-fw pi-list', to: '/customers' },
                         { label: 'Employees', icon: 'pi pi-fw pi-list', to: '/employees' },
@@ -31,8 +30,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Attendance', icon: 'pi pi-fw pi-list', to: '/attendance' },
-                        { label: 'Bank/Cash', icon: 'pi pi-fw pi-list', to: '/bank_transation' },
-                        { label: 'Damaged Goods', icon: 'pi pi-fw pi-list', to: '/damaged_goods' },
+                        { label: 'Bank/Cash', icon: 'pi pi-fw pi-list', to: '/cash_bank' },
                         { label: 'Expenses', icon: 'pi pi-fw pi-list', to: '/expenses' },
                         { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },
                         { label: 'Payroll', icon: 'pi pi-fw pi-list', to: '/payroll' },
@@ -51,6 +49,7 @@ const AppMenu = () => {
                     label: 'Configurations',
                     icon: 'pi pi-fw pi-list',
                     items: [
+                        { label: 'Banks', icon: 'pi pi-fw pi-list', to: '/banks' },
                         { label: 'Customer Category', icon: 'pi pi-fw pi-list', to: '/customer_category' },
                         { label: 'Department', icon: 'pi pi-fw pi-list', to: '/department' },
                         { label: 'Designation', icon: 'pi pi-fw pi-list', to: '/designation' },
