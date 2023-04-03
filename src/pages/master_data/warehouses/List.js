@@ -24,7 +24,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["name", "description", "address", "status"],
+        fields: ["name", "description", "address", "status", "_default"],
         first: 0,
         rows: 10,
         page: 1,
@@ -35,7 +35,7 @@ const List = () => {
             'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'default': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            '_default': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 
@@ -199,7 +199,7 @@ const List = () => {
     };
 
     const defaultBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.default, 'text-red-500 pi-times-circle': !rowData.default })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default, 'text-red-500 pi-times-circle': !rowData._default })}></i>;
     };
 
     const defaultFilterTemplate = (options) => {
@@ -268,7 +268,7 @@ const List = () => {
                         <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="address" header="Warehouse Address" filter filterPlaceholder="Search by address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="default" header="Default" filter filterElement={defaultFilterTemplate} sortable body={defaultBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="_default" header="Default" filter filterElement={defaultFilterTemplate} sortable body={defaultBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

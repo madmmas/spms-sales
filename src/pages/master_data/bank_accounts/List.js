@@ -54,12 +54,13 @@ const List = () => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
+
 
     let loadLazyTimeout = null;
 
     const [dtBank, setDtBank] = useState([]);
 
+    const hrManagementService = new HRService();
     const configurationService = new ConfigurationService();
 
     useEffect(() => {
@@ -239,7 +240,7 @@ const List = () => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
     };
 
     
@@ -312,7 +313,7 @@ const List = () => {
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} >
-                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6rem' }}></Column>
                         <Column field="dtBank_id" header="Bank Name" filter filterElement={bankFilterTemplate} sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="branch" header="Branch" filter filterPlaceholder="Search by branch" sortable body={branchBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by accNumber" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

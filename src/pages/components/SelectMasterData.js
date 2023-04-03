@@ -4,7 +4,7 @@ import SelectMasterDataTable from './SelectMasterDataTable';
 
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterData({ field, displayField, modelName, className, columns, caption="Select", onSelect }) {
+export default function SelectMasterData({ field, displayField, showFields=[], modelName, className, columns, caption="Select", onSelect }) {
 
     const masterDataService = new MasterDataService();
 
@@ -12,6 +12,7 @@ export default function SelectMasterData({ field, displayField, modelName, class
     const [trigger, setTrigger] = useState(0);
 
     useEffect(() => {
+        if(field.value==null || field.value=="") return;
         masterDataService.getById(modelName, field.value).then(data => {
             setSelectedRow(data[displayField]);
         });
@@ -34,7 +35,7 @@ export default function SelectMasterData({ field, displayField, modelName, class
                 <SelectMasterDataTable displayField={displayField} trigger={trigger}
                     fieldName={field.name} fieldValue={field.value} fieldRef={field.ref}
                     modelName={modelName} caption={caption}
-                    className={className} columns={columns} 
+                    className={className} columns={columns} showFields={showFields}
                     onSelect={onSelection}/>
             </div>
             

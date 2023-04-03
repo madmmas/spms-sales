@@ -121,11 +121,11 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
     };
 
     return (
-        <Dialog visible={visible} style={{ width: '80rem' }} header={`Add Product`} modal 
+        <Dialog visible={visible} position='top' style={{ width: '80rem' }} header={`Add Product`} modal 
             className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog} >                    
             {/* {purchaseProduct.image && <img src={`${contextPath}/demo/images/purchaseProduct/${purchaseProduct.image}`} alt={purchaseProduct.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />} */}
             <div className="p-fluid formgrid grid">
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
             <Controller
                 name="dtProduct_id"
                 control={control}
@@ -145,70 +145,70 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
                     </>
                 )}/>
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Barcode</label>
                 <InputText id="barCode" value={purchaseProduct.barCode} disabled={true} />
             </div>
-            <div className="field col-12 md:col-3">
-                <label htmlFor="name">Last Purchase Price (BDT)</label>
+            <div className="field col-12 md:col-2">
+                <label htmlFor="name">Last Purchase Price</label>
                 <InputNumber id="lastPurchasePrice" value={purchaseProduct.lastPurchasePrice} disabled={true} />
             </div>            
 
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Quantity</label>
                 <InputNumber id="quantity" value={purchaseProduct.quantity} onValueChange={(e) => onInputChange(e, 'quantity')} min={1} max={10000000} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Unit Cost ({currency})</label>
                 <InputNumber id="unitCostF" value={purchaseProduct.unitCostF} onValueChange={(e) => onInputChange(e, 'unitCostF')}  maxFractionDigits={2} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Total Cost ({currency})</label>
                 <InputNumber id="totalCostF" value={purchaseProduct.totalCostF} disabled={true} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Conversion Rate</label>
                 <InputNumber id="conversionRate" value={purchaseProduct.conversionRate} onValueChange={(e) => onInputChange(e, 'conversionRate')}  maxFractionDigits={2} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Unit Cost (BDT)</label>
                 <InputNumber id="unitCostBDT" value={purchaseProduct.unitCostBDT} disabled={true} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Total Cost (BDT)</label>
                 <InputNumber id="totalCostBDT" value={purchaseProduct.totalCostBDT} disabled={true} />
             </div>
 
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Transport (BDT)</label>
                 <InputNumber id="transport" value={purchaseProduct.transport} onValueChange={(e) => onInputChange(e, 'transport')}  maxFractionDigits={2} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Duty (BDT)</label>
                 <InputNumber id="duty" value={purchaseProduct.duty} onValueChange={(e) => onInputChange(e, 'duty')}  maxFractionDigits={2} />
             </div>
     
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Net Unit Cost (BDT)</label>
                 <InputNumber id="netUnitCostBDT" value={purchaseProduct.netUnitCostBDT} disabled={true} />
             </div>
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Net Cost (BDT)</label>
                 <InputNumber id="netCostBDT" value={purchaseProduct.netCostBDT} disabled={true} />
             </div>
 
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Unit Profit (BDT)</label>
                 <InputNumber id="profit" value={purchaseProduct.profit} onValueChange={(e) => onProfitChange(e.value)}  maxFractionDigits={2} />
             </div>
 
-            <div className="field col-12 md:col-3">
+            <div className="field col-12 md:col-2">
                 <label htmlFor="name">Unit Trade Price (BDT)</label>
                 <InputNumber id="tradeUnitPriceBDT" value={purchaseProduct.tradeUnitPriceBDT} onValueChange={(e) => onTradePriceChange(e.value)}  maxFractionDigits={2} />
             </div>
 
-            <div className="field col-12 md:col-3">
-                <label htmlFor="name">Minimum Unit Trade Price (BDT)</label>
+            <div className="field col-12 md:col-2">
+                <label htmlFor="name">Min Trade Price (U)</label>
                 <InputNumber id="minimumTradePrice" value={purchaseProduct.minimumTradePrice} onValueChange={(e) => onInputChange(e, 'minimumTradePrice')}  maxFractionDigits={2} />
             </div>
             </div>

@@ -122,7 +122,7 @@ const Form = ({warehouseProfile}) => {
                     <div className="field col-12 md:col-6 mt-2">
                         <div className='field'>Default*</div>
                         <Controller
-                            name="default*"
+                            name="_default"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>

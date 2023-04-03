@@ -28,6 +28,7 @@ const Form = ({bankAccountProfile}) => {
         register,
         control,
         formState: { errors },
+        setValue,
         resetField,
         handleSubmit
     } = useForm({
@@ -35,8 +36,11 @@ const Form = ({bankAccountProfile}) => {
       });
 
     const onSubmit = (formData) => {
+        try{
+
         setSubmitted(true);
-        if(isEdit){
+        if(!isEdit){
+            formData.balance = formData.initBalance;
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Created', life: 3000 });
                 navigate("/bank_accounts/" + data.ID);
@@ -48,6 +52,13 @@ const Form = ({bankAccountProfile}) => {
                 navigate("/bank_accounts/" + data.ID);
             });
         }
+        }
+        catch (err){
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
+            navigate("/bank_accounts");
+        }
+
     };
 
     const gotoList = () => {
@@ -131,11 +142,26 @@ const Form = ({bankAccountProfile}) => {
                         <Controller
                             name="initBalance"
                             control={control}
-                            rules={{ required: 'Initial Balance is required.'}}
+                            rules={{
+                                validate: (value) => (value!==null) || 'Initial Balance is required.'
+                            }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>
-                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e)} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
+                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="balance"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Current Balance*</label>
+                                <InputNumber disabled={true} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e)} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

@@ -34,3 +34,8 @@ export const COLLECTION_TYPES = [
     { id: 'MFS', name: 'MFS' },
     { id: 'Bank Deposit', name: 'Bank Deposit' }    
 ];
+
+export const BANK_CASH = [
+    { id: 'BANK', name: 'BANK' },
+    { id: 'CASH', name: 'CASH' }
+];

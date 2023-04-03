@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -7,68 +8,92 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { useForm, Controller } from 'react-hook-form';
+import { InputNumber } from 'primereact/inputnumber';
+import SelectConstData from '../components/SelectConstData';
+import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
-import { Dropdown } from 'primereact/dropdown'
+import SelectLookupData from '../components/SelectLookupData';
+import SelectMasterData from '../components/SelectMasterData';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
-import { EXPENSES_MODEL } from '../../constants/models';
+import { TransactionService } from '../../services/TransactionService';
+import { BANK_CASH } from '../../constants/lookupData';
+import { ON_EXPENSE_FROM_CASH, ON_EXPENSE_FROM_BANK } from '../../constants/transactions';
+import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
 
 const Expenses = () => {
 
-    const modelName = EXPENSES_MODEL;
-    const [date, setDate] = useState(null);
-    const [expensetype, setExpensetype] = useState(null);
-    const type = [
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
-    ];
-
-
-    const toast = useRef(null);
-    const dt = useRef(null);
-    const contextPath = '~';
+    const modelName = EXPENSE_MODEL;
 
     let emptyExpenses = {
         _id: null,
-        empID: '',
-        name: ''
+        dtBankAccount_id: null,
+        dtExpenseType_id: null,
+        expensePeriod: null,
+        date: null,
+        amount: 0,
+        remarks: '',
+        bankOrCash: 'CASH',
     };
+    
+    const {
+        register,
+        control,
+        formState: { errors },
+        reset,
+        handleSubmit
+    } = useForm({
+        defaultValues: emptyExpenses
+    });
+    
+    const getFormErrorMessage = (name) => {
+        return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+    const toast = useRef(null);
+    const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ["dtBankAccount_id","dtExpenseType_id","expensePeriod","date","amount","remarks","bankOrCash"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtExpenseType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'expensePeriod': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'bankOrCash': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [empProfiles, setExpensess] = useState(null);
+    const [expenseData, setExpenseData] = useState(null);
     const [empProfileDialog, setExpensesDialog] = useState(false);
-    const [deleteExpensesDialog, setDeleteExpensesDialog] = useState(false);
-    const [deleteExpensessDialog, setDeleteExpensessDialog] = useState(false);
-    const [expenses, setExpenses] = useState(emptyExpenses);
-    const [selectedExpensess, setSelectedExpensess] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
 
+    const [expenseType, setExpenseType] = useState([]);
+    const [bankCash, setBankCash] = useState("CASH");
+
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const configurationManagementService = new ConfigurationService();
-
+    const transactionService = new TransactionService();
+    const configurationService = new ConfigurationService();
     let loadLazyTimeout = null;
 
     useEffect(() => {
         initFilters();
+        configurationService.getAllWithoutParams(EXPENSE_TYPE_MODEL).then(data => {
+            setExpenseType(data);
+        });
     }, []);
     
     const clearFilter = () => {
@@ -91,10 +116,10 @@ const Expenses = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
-                setExpensess(data.rows);
+                setExpenseData(data.rows);
                 setLoading(false);
             });
         }, Math.random() * 1000 + 250);
@@ -102,7 +127,8 @@ const Expenses = () => {
 
     const openNew = () => {
         setCreateEdit(true);
-        setExpenses(emptyExpenses);
+        reset({ ...emptyExpenses });
+        setBankCash("CASH");
         setSubmitted(false);
         setExpensesDialog(true);
     };
@@ -112,75 +138,29 @@ const Expenses = () => {
         setExpensesDialog(false);
     };
 
-    const hideDeleteExpensesDialog = () => {
-        setDeleteExpensesDialog(false);
-    };
-
-    const hideDeleteExpensessDialog = () => {
-        setDeleteExpensessDialog(false);
-    };
-
-    const saveExpenses = () => {
+    const saveExpenses = (formData) => {
         setSubmitted(true);
-
-        if (expenses.name.trim()) {
-            if (expenses._id) {
-                configurationManagementService.update(modelName, expenses._id, expenses).then(data => {
-                    console.log(data);
-                    loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Updated', life: 3000 });
-                });
-            } else {
-                configurationManagementService.create(modelName, expenses).then(data => {
-                    console.log(data);
-                    loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
-                });
-            }
-
-            setExpensesDialog(false);
-            setExpenses(emptyExpenses);
+        console.debug(formData);
+        if (formData.bankOrCash == 'BANK') {
+            transactionService.processTransaction(ON_EXPENSE_FROM_BANK, formData).then(data => {
+                console.log(data);
+                loadLazyData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Updated', life: 3000 });
+            });
+        } else if (formData.bankOrCash == 'CASH') {
+            transactionService.processTransaction(ON_EXPENSE_FROM_CASH, formData).then(data => {
+                console.log(data);
+                loadLazyData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
+            });
         }
-    };
 
-    const editExpenses = (expenses) => {
-        setCreateEdit(false);
-        setExpenses({ ...expenses });
-        setExpensesDialog(true);
-    };
-
-    const confirmDeleteExpenses = (expenses) => {
-        setExpenses(expenses);
-        setDeleteExpensesDialog(true);
-    };
-
-    const deleteExpenses = () => {
-        configurationManagementService.delete(modelName, expenses._id).then(data => {
-            console.log(data);
-            loadLazyData();
-        });
-        setDeleteExpensesDialog(false);
-        setExpenses(emptyExpenses);
+        setExpensesDialog(false);
+        reset(emptyExpenses)
     };
 
     const exportCSV = () => {
         dt.current.exportCSV();
-    };
-
-    const deleteSelectedExpensess = () => {
-        let _empProfiles = empProfiles.filter((val) => !selectedExpensess.includes(val));
-        setExpensess(_empProfiles);
-        setDeleteExpensessDialog(false);
-        setSelectedExpensess(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Deleted', life: 3000 });
-    };
-
-    const onInputChange = (e, name) => {
-        const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...expenses };
-        _empProfile[`${name}`] = val;
-
-        setExpenses(_empProfile);
     };
 
     const onPage = (event) => {
@@ -217,11 +197,26 @@ const Expenses = () => {
         );
     };
 
+    const expenseTypeFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
+    const bankAccountFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
     const expenseBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Expense Type</span>
-                {rowData.expenseType}
+                {rowData.dtExpenseType_id_shortname}
+            </>
+        );
+    };
+
+    const bankAccountBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtBankAccount_id_shortname}
             </>
         );
     };
@@ -229,7 +224,6 @@ const Expenses = () => {
     const expensePeriodBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Expense Period</span>
                 {rowData.expensePeriod}
             </>
         );
@@ -238,8 +232,7 @@ const Expenses = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Date</span>
-                {rowData.date}
+                {moment(rowData.date).format('DD/MM/YYYY')}
             </>
         );
     };
@@ -247,27 +240,27 @@ const Expenses = () => {
     const amountBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Amount</span>
                 {rowData.amount}
             </>
         );
     };
 
+    const bankorcashFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={BANK_CASH} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
 
-    const descriptionBodyTemplate = (rowData) => {
+    const bankorcashBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
-                {rowData.description}
+                {rowData.bankOrCash}
             </>
         );
     };
 
-    const actionBodyTemplate = (rowData) => {
+    const remarksBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editExpenses(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteExpenses(rowData)} />
+                {rowData.remarks}
             </>
         );
     };
@@ -284,19 +277,7 @@ const Expenses = () => {
     const empProfileDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveExpenses} />
-        </>
-    );
-    const deleteExpensesDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteExpensesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteExpenses} />
-        </>
-    );
-    const deleteExpensessDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteExpensessDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedExpensess} />
+            <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => saveExpenses(d))} />
         </>
     );
 
@@ -308,75 +289,139 @@ const Expenses = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={expenseData} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
+                        scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="expenseType" header="Expense Type" filter filterPlaceholder="Search by Expense Type" sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtExpenseType_id" header="Expense Type" filter filterElement={expenseTypeFilterTemplate} sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" filter filterPlaceholder="Search by Description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-
-
-                        ]<Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="bankOrCash" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Expenses`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
-                        {expenses.image && <img src={`${contextPath}/demo/images/expenses/${expenses.image}`} alt={expenses.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
-                     
-                        <div className="field">
-                        <label htmlFor="expenseType">Expense Type</label>
-                            <Dropdown value={expensetype} onChange={(e) => setExpensetype(e.value)} options={type} optionLabel="expenseType" 
-                               className="w-full " />
-                        </div>
-                        <div className="field">
-                            <label htmlFor="expensePeriod">Expense Period</label>
-                            <InputText id="expensePeriod" value={expenses.expensePeriod} onChange={(e) => onInputChange(e, 'expensePeriod')} required autoFocus className={classNames({ 'p-invalid': submitted && !expenses.expensePeriod })} />
-                        </div>
-
-
-                        <div className="field">
-                            <label htmlFor="date">Date</label>
-                            <Calendar value={date} onChange={(e) => setDate(e.value)} showIcon />
+                        <div className="p-fluid formgrid grid">
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="dtExpenseType_id"
+                                    control={control}
+                                    rules={{ required: 'Expense Type_id is required.' }}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Expense Type*</label>
+                                        <SelectLookupData field={field} model={EXPENSE_TYPE_MODEL}
+                                            className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
                             </div>
-                        <div className="field">
-                            <label htmlFor="name">Amount</label>
-                            <InputText id="amount" value={expenses.amount} onChange={(e) => onInputChange(e, 'amount')} required autoFocus className={classNames({ 'p-invalid': submitted && !expenses.amount })} />
-                            {submitted && !expenses.amount && <small className="p-invalid">Amount is required.</small>}
-                        </div>
-                        <div className="field">
-                            <label htmlFor="description">Description/Details</label>
-                            <InputTextarea id="description" value={expenses.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
-                        </div>
-
-                        
-                    </Dialog>
-
-                    <Dialog visible={deleteExpensesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExpensesDialogFooter} onHide={hideDeleteExpensesDialog}>
-                        <div className="flex align-items-center justify-content-center">
-                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {expenses && (
-                                <span>
-                                    Are you sure you want to delete <b>{expenses.empID}</b>?
-                                </span>
-                            )}
-                        </div>
-                    </Dialog>
-
-                    <Dialog visible={deleteExpensessDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExpensessDialogFooter} onHide={hideDeleteExpensessDialog}>
-                        <div className="flex align-items-center justify-content-center">
-                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {expenses && <span>Are you sure you want to delete the selected items?</span>}
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="expensePeriod"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor="expensePeriod">Expense Period</label>
+                                        <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
+                                            onChange={(e) => field.onChange(e.target.value)} 
+                                            className={classNames({ 'p-invalid': fieldState.error })} />
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="date"
+                                control={control}
+                                rules={{ required: 'Date is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name}>Date*</label>
+                                    <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
+                                        dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
+                                    {getFormErrorMessage(field.name)}
+                                </>                                
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="amount"
+                                control={control}
+                                rules={{
+                                    validate: (value) => (value > 0) || 'Enter a valid amount.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="amount">Amount</label>
+                                    <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                        onValueChange={(e) => field.onChange(e)} 
+                                        className={classNames({ 'p-invalid': fieldState.error })} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="bankOrCash"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Or Cash</label>
+                                    <SelectConstData field={field} data={BANK_CASH}
+                                        onSelectChange={(value) => {console.log(value); setBankCash(value)}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div hidden={bankCash !== "BANK"} className="field col-12 md:col-6">
+                            <Controller
+                                name="dtBankAccount_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                                    <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        onSelect={(e) => {console.log(e);}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-12">
+                            <Controller
+                                name="remarks"
+                                control={control}
+                                rules={{ required: 'Remarks is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="remarks">Remarks*</label>
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
                         </div>
                     </Dialog>
                 </div>

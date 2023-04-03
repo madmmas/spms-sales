@@ -6,11 +6,12 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, caption="Select"}) {
+export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select"}) {
 
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: showFields,
         first: 0,
         rows: 10,
         page: 1,
