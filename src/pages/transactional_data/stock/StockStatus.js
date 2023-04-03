@@ -19,7 +19,6 @@ const StockStatus = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['dtProduct_id', 'currentStock', 'lowStockQty', 'totalStockIn', 'totalStockOut', 'totalDamagedStock', 'totalAdjustedStock'],
         first: 0,
         rows: 10,
         page: 1,
@@ -142,6 +141,22 @@ const StockStatus = () => {
         );
     };
 
+    const totalPurchaseCostBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalPurchaseCost}
+            </>
+        );
+    };
+
+    const totalTradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalTradePrice}
+            </>
+        );
+    };
+
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -185,6 +200,8 @@ const StockStatus = () => {
                         <Column field="totalStockIn" header="totalStockIn" filter filterPlaceholder="Search by totalStockIn" sortable body={totalStockInBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="totalStockOut" header="totalStockOut" filter filterPlaceholder="Search by totalStockOut" sortable body={totalStockOutBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="totalDamagedStock" header="totalDamagedStock" filter filterPlaceholder="Search by totalDamagedStock" sortable body={totalDamagedStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>

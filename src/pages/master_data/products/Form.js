@@ -24,6 +24,7 @@ const Form = ({productData}) => {
 
     const toast = useRef(null);
     const transactionService = new TransactionService();
+    const [submitted, setSubmitted] = useState(false);
 
     const {
         register,
@@ -36,15 +37,24 @@ const Form = ({productData}) => {
       });
 
     const onSubmit = (formData) => {
-        if(productData==null){
-            transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                navigate("/products/" + data.ID);
-            });
-        }else{
-            transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-            });
+        try{
+            setSubmitted(true);
+            if(productData==null){
+                transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                    navigate("/products/" + data.ID);
+                });
+            }else{
+                transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
+                    setSubmitted(false);
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                });
+            }
+        }
+        catch (err){
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
+            navigate("/products");
         }
     };
 
@@ -159,7 +169,6 @@ const Form = ({productData}) => {
                         <Controller
                             name="lowStockQty"
                             control={control}
-                            rules={{ required: 'Low Stock Quatity is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
@@ -193,6 +202,18 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="lastTradePrice"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Trade Price</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
                     <div className="field col-12 md:col-8">
                         <Controller
                             name="remarks"
@@ -220,7 +241,7 @@ const Form = ({productData}) => {
                     </div>
                 </div>
                 <>
-                    <Button type="submit" label="Submit" className="mt-2" />
+                    <Button type="submit" label="Submit" className="mt-2" disabled={submitted} />
                 </>
                 </form>
             </div>

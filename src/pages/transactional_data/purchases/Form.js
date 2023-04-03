@@ -18,11 +18,12 @@ import SelectMasterDataTable from '../../components/SelectMasterDataTable';
 import SelectMasterData from '../../components/SelectMasterData';
 
 import { HRService } from '../../../services/HRService';
-import { PURCHASE_MODEL, PRODUCT_MODEL, SUPPLIER_MODEL, WAREHOUSES_MODEL } from '../../../constants/models';
+import { TransactionService } from '../../../services/TransactionService';
+import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
+
+import { PURCHASE_MODEL, SUPPLIER_MODEL, WAREHOUSES_MODEL } from '../../../constants/models';
 
 const Form = ({purchaseProfile}) => {
-
-    const modelName = PURCHASE_MODEL;
 
     let navigate = useNavigate();
 
@@ -31,67 +32,62 @@ const Form = ({purchaseProfile}) => {
         barCode: null, // fetch from selected product
         lastPurchasePrice: 0.00, // fetch from selected product
 
-        quantity: 1,  // input, onBlur update: netPrice, totalPrice
-        unitCostF: 0.00,    // input, onBlur update: netPrice, profit, tradePrice
-        totalCostF: 0.00, // calculated, onBlur update: netPrice, profit, tr
-        conversionRate: 1, // input, onBlur update: unitPrice, unitPriceBDT, netUnitPrice, netUnitPriceBDT, tradeUnitPrice, tradeUnitPriceBDT
-        unitCostBDT: 0.00, // calculated, onBlur update: netPrice, profit, tradePrice
-        totalCostBDT: 0.00, // calculated, onBlur update: netPrice, profit, tradePrice
+        quantity: 1,  
+        unitCostF: 0.00,
+        totalCostF: 0.00,
+        conversionRate: 1,
+        unitCostBDT: 0.00,
+        totalCostBDT: 0.00,
 
-        transport: 0.00,    // optional, onBlur update: netPrice
-        duty: 0.00,     // optional, onBlur update: netPrice
+        transport: 0.00,
+        duty: 0.00,
 
-        netUnitCostBDT: 0.00, // onBlur update: profit, tradePrice
-        netCostBDT: 0.00, // onBlur update: profit, tradePrice
+        netUnitCostBDT: 0.00,
+        netCostBDT: 0.00,
 
-        profit: 0.00,  // input/calculated, onBlur update: tradePrice
+        profit: 0.00,
 
-        tradeUnitPriceBDT: 0.00, // input/calculated, onBlur update: profit
+        tradeUnitPriceBDT: 0.00,
 
-        minimumTradePrice: 0.00, // input
+        minimumTradePrice: 0.00,
     };
 
     let defaultValue = {
         _id: null,
         date: Date.now(),
         dtSupplier_id: null,
-        currency: null,  // fetch the currency on supplier selection, enable: conversionRate, CnF, BENo, LCNo, totalAmount
-        dtWarehouse_id: null, // default warehouse
+        currency: null,
+        dtWarehouse_id: null,
         CnF: null,
         BENo: null,
         LCNo: null,
         notes: null,
         items: [],
-        totalAmountF: 0.00, // auto calculate: items.netPrice * items.quantity
-        totalAmountBDT: 0.00, // auto calculate: totalAmount * conversionRate
-        totalQuantity: 0, // auto calculate: items.quantity
-        totalTransport: 0.00, // auto calculate: items.transport
-        totalDuty: 0.00,  // auto calculate: items.duty
-        netAmountBDT: 0.00, // auto calculate: totalAmount + totalTransport + totalDuty
+        totalQuantity: 0,
+        totalCostAmountF: 0.00,
+        totalCostAmountBDT: 0.00,
+        totalTransport: 0.00,
+        totalDuty: 0.00,
+        netCostAmountBDT: 0.00
     };
 
-    const [totalAmountF, setTotalAmountF] = useState(0.00);
-    const [totalAmountBDT, setTotalAmountBDT] = useState(0.00);
+    const toast = useRef(null);
+
+    const [totalCostAmountF, setTotalAmountF] = useState(0.00);
+    const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [totalTransport, setTotalTransport] = useState(0.00);
     const [totalDuty, setTotalDuty] = useState(0.00);
-    const [netAmountBDT, setNetAmountBDT] = useState(0.00);
-
-    const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
-
-
-    const toast = useRef(null);
-    
+    const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
+    const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);    
     const [purchases, setPurchases] = useState([]);
-    const [purchaseItem, setPurchaseItem] = useState({});
-    const [purchaseQuantity, setPurchaseQuantity] = useState(1);
-    const [purchasePrice, setPurchasePrice] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
     const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
-
     const [trigger, setTrigger] = useState(0);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
+
+    const transactionService = new TransactionService();
 
     const {
         register,
@@ -105,13 +101,25 @@ const Form = ({purchaseProfile}) => {
 
     const onSubmit = (formData) => {
         formData.items = purchases;
-        formData.totalAmountF = totalAmountF;
-        formData.totalAmountBDT = totalAmountBDT;
+        formData.totalCostAmountF = totalCostAmountF;
+        formData.totalCostAmountBDT = totalCostAmountBDT;
         formData.totalQuantity = totalQuantity;
         formData.totalTransport = totalTransport;
         formData.totalDuty = totalDuty;
-        formData.netAmountBDT = netAmountBDT;
+        formData.netCostAmountBDT = netCostAmountBDT;
         console.log("FORMDATA::", formData);
+
+        try {
+            transactionService.processTransaction(ON_PURCHASE_PRODUCT, formData).then(data => {
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                navigate("/purchases");
+            });
+        }
+        catch (err){
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+            navigate("/purchases");
+        }
     };
 
     const gotoList = () => {
@@ -128,7 +136,8 @@ const Form = ({purchaseProfile}) => {
         newPurchases.push(addedItem);
         console.log("NEWPURCHASE::", newPurchases);
         setPurchases(newPurchases);
-        calculateTotals();
+        console.log("PURCHASES::", purchases);
+        calculateTotals(newPurchases);
     };
 
     const removeItem = () => {
@@ -138,28 +147,30 @@ const Form = ({purchaseProfile}) => {
         setDeleteProfileDialog(false);
     };
 
-    const calculateTotals = () => {
-        let totalAmountF = 0;
-        let totalAmountBDT = 0;
+    const calculateTotals = (allpurchases) => {
+        console.log("CALCULATE-PURCHASES::", allpurchases)
+        let totalCostAmountF = 0;
+        let totalCostAmountBDT = 0;
         let totalTransport = 0;
         let totalDuty = 0;
-        let netAmountBDT = 0;
+        let netCostAmountBDT = 0;
 
-        if(purchases && purchases.length > 0) {
-            for(let i=0; i<purchases.length; i++) {
-                totalAmountF += purchases[i].totalAmountF;
-                totalAmountBDT += purchases[i].totalAmountBDT;
-                totalTransport += purchases[i].transport;
-                totalDuty += purchases[i].duty;
-                netAmountBDT += purchases[i].netAmountBDT;
+        if(allpurchases && allpurchases.length > 0) {
+            for(let i=0; i<allpurchases.length; i++) {
+                totalCostAmountF += allpurchases[i].totalCostF;
+                totalCostAmountBDT += allpurchases[i].totalCostBDT;
+                totalTransport += allpurchases[i].transport;
+                totalDuty += allpurchases[i].duty;
+                netCostAmountBDT += allpurchases[i].netCostBDT;
             }
         }
         setTotalQuantity(purchases.length);
-        setTotalAmountBDT(totalAmountBDT);
-        setTotalAmountF(totalAmountF);
+        setTotalAmountBDT(totalCostAmountBDT);
+        setTotalAmountF(totalCostAmountF);
         setTotalTransport(totalTransport);
         setTotalDuty(totalDuty);
-        setNetAmountBDT(netAmountBDT);
+        setNetAmountBDT(netCostAmountBDT);
+        console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
     };
 
     const editProfile = (dtProfile) => {
@@ -207,13 +218,13 @@ const Form = ({purchaseProfile}) => {
             <tr>
                 <td><b>Total Quantity:</b></td><td>{purchases ? purchases.length : 0} products.</td>
             </tr><tr>
-                <td><b>Total Cost ({selectedSupplier_currency}):</b></td><td>{totalAmountF}</td>
-                <td><b>Total Cost (BDT):</b></td><td>{totalAmountBDT}</td>
+                <td><b>Total Cost ({selectedSupplier_currency}):</b></td><td>{totalCostAmountF}</td>
+                <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
             </tr><tr>
                 <td><b>Total Transport Cost (BDT):</b></td><td>{totalTransport}</td>
                 <td><b>Total Duty (BDT):</b></td><td>{totalDuty}</td>
             </tr><tr>
-                <td><b>Total Net Cost (BDT):</b></td><td>{netAmountBDT}</td>
+                <td><b>Total Net Cost (BDT):</b></td><td>{netCostAmountBDT}</td>
             </tr>
         </tbody></table>
     );

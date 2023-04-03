@@ -37,18 +37,25 @@ const Form = ({supplierProfile}) => {
       });
 
     const onSubmit = (formData) => {
-        setSubmitted(true);
-        if(supplierProfile==null){
-            hrManagementService.create(modelName, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
-                navigate("/suppliers/" + data.ID);
-            });
-        }else{
-            hrManagementService.update(modelName, formData._id, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Updated', life: 3000 });
-                setSubmitted(false);
-                // navigate("/suppliers/" + data.ID);
-            });
+        try{        
+            setSubmitted(true);
+            if(supplierProfile==null){
+                hrManagementService.create(modelName, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
+                    navigate("/suppliers/" + data.ID);
+                });
+            }else{
+                hrManagementService.update(modelName, formData._id, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Updated', life: 3000 });
+                    setSubmitted(false);
+                    // navigate("/suppliers/" + data.ID);
+                });
+            }
+        }
+        catch (err){
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
+            navigate("/suppliers");
         }
     };
 

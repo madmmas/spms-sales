@@ -22,7 +22,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['name', 'dtProductCategory_id', 'code', 'barCode', 'brandName', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'status'],
+        fields: ['name', 'dtProductCategory_id', 'code', 'barCode', 'brandName', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'lastTradePrice', 'status'],
         first: 0,
         rows: 10,
         page: 1,
@@ -30,6 +30,8 @@ const List = () => {
         sortOrder: null,
         filters: {
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'partNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
@@ -227,6 +229,15 @@ const List = () => {
         );
     };
 
+    const lastTradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Last Trade Price</span>
+                {rowData.lastTradePrice}
+            </>
+        );
+    };
+
     const statusBodyTemplate = (rowData) => {
         return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
     };
@@ -292,6 +303,7 @@ const List = () => {
                         <Column field="lowStockQty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
                         <Column field="reorderQty" header="Reorder Qty" filter filterPlaceholder="Search by Reorder Qty" sortable body={reorderQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                         <Column field="lastPurchasePrice" header="Last Purchase Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastPurchasePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="lastTradePrice" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 

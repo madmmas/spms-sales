@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
@@ -9,6 +10,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
+import { TransactionService } from '../../../services/TransactionService';
+
 import { PURCHASE_MODEL } from '../../../constants/models';
 
 const List = () => {
@@ -42,6 +45,7 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const hrManagementService = new HRService();
+    const transactionService = new TransactionService();
 
     let loadLazyTimeout = null;
 
@@ -69,13 +73,19 @@ const List = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
                 setProfiles(data.rows);
                 setLoading(false);
             });
         }, Math.random() * 1000 + 250);
+    }
+
+    const getDate = (date) => {
+        return moment(parseInt(date)).format('DD/MM/YYYY');
+        // let d = new Date(parseInt(date));
+        // return d.toDateString();
     }
 
     const exportCSV = () => {
@@ -137,6 +147,7 @@ const List = () => {
         setProfile(null);
     };
 
+    
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -155,11 +166,10 @@ const List = () => {
         );
     };
 
-    const idBodyTemplate = (rowData) => {
+    const dateBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Purchase ID</span>
-                {rowData.purchaseId}
+                {getDate(rowData.date)}
             </>
         );
     };
@@ -167,8 +177,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.purchaseName}
+                {rowData.dtSupplier_id_shortname}
             </>
         );
     };
@@ -225,8 +234,8 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="purchaseId" header="Purchase ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="purchaseName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="date" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 

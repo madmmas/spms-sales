@@ -47,14 +47,32 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
         onHideDialog(false);
     };
 
+    const roundNumber = (num) => {
+        return Math.round((num + Number.EPSILON) * 100) / 100;
+        // return num.toFixed(2);
+    };
+
     const calculateCost = (_purchaseProduct) => {
-        _purchaseProduct.totalCostF = _purchaseProduct.unitCostF * _purchaseProduct.quantity;
-        _purchaseProduct.unitCostBDT = _purchaseProduct.unitCostF * _purchaseProduct.conversionRate;
-        _purchaseProduct.totalCostBDT = _purchaseProduct.unitCostBDT * _purchaseProduct.quantity;
-        _purchaseProduct.netUnitCostBDT = _purchaseProduct.unitCostBDT + (_purchaseProduct.transport/_purchaseProduct.quantity) + (_purchaseProduct.duty/_purchaseProduct.quantity);
-        _purchaseProduct.netCostBDT = _purchaseProduct.netUnitCostBDT * _purchaseProduct.quantity;
-        _purchaseProduct.tradeUnitPriceBDT = _purchaseProduct.netUnitCostBDT + _purchaseProduct.profit;
-        _purchaseProduct.profit = _purchaseProduct.tradeUnitPriceBDT - _purchaseProduct.netUnitCostBDT;
+        _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.quantity);
+        _purchaseProduct.unitCostBDT = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.conversionRate);
+        _purchaseProduct.totalCostBDT = roundNumber(_purchaseProduct.unitCostBDT * _purchaseProduct.quantity);
+        _purchaseProduct.netUnitCostBDT = roundNumber(_purchaseProduct.unitCostBDT + (_purchaseProduct.transport/_purchaseProduct.quantity) + (_purchaseProduct.duty/_purchaseProduct.quantity));
+        _purchaseProduct.netCostBDT = roundNumber(_purchaseProduct.netUnitCostBDT * _purchaseProduct.quantity);
+        setPurchaseProduct(_purchaseProduct);
+    };
+
+    const onProfitChange = (profit) => {
+        let _purchaseProduct = { ...purchaseProduct };
+        _purchaseProduct.profit = roundNumber(profit);
+        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
+        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
+        setPurchaseProduct(_purchaseProduct);
+    };
+
+    const onTradePriceChange = (tradeUnitPriceBDT) => {
+        let _purchaseProduct = { ...purchaseProduct };
+        _purchaseProduct.tradeUnitPriceBDT = roundNumber(tradeUnitPriceBDT);
+        _purchaseProduct.profit = roundNumber(_purchaseProduct.tradeUnitPriceBDT - _purchaseProduct.netUnitCostBDT);
         _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
         setPurchaseProduct(_purchaseProduct);
     };
@@ -66,7 +84,7 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
         calculateCost(_purchaseProduct);
     };
 
-    const onSupplierSelect = (selectedRow) => {
+    const onProductSelect = (selectedRow) => {
         console.log("PRODUCT SELECTED::", selectedRow)
         let _purchaseProduct = { ...purchaseProduct };
         console.log(selectedRow.barCode)
@@ -114,11 +132,11 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
                 rules={{ required: 'Product is required.' }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product*</label>
                         <SelectMasterData field={field} modelName={PRODUCT_MODEL}
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
-                            onSelect={onSupplierSelect}
+                            onSelect={onProductSelect}
                             columns={[
                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name'}, 
                                 {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category'}
@@ -181,12 +199,12 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
 
             <div className="field col-12 md:col-3">
                 <label htmlFor="name">Unit Profit (BDT)</label>
-                <InputNumber id="profit" value={purchaseProduct.profit} onValueChange={(e) => onInputChange(e, 'profit')}  maxFractionDigits={2} />
+                <InputNumber id="profit" value={purchaseProduct.profit} onValueChange={(e) => onProfitChange(e.value)}  maxFractionDigits={2} />
             </div>
 
             <div className="field col-12 md:col-3">
                 <label htmlFor="name">Unit Trade Price (BDT)</label>
-                <InputNumber id="tradeUnitPriceBDT" value={purchaseProduct.tradeUnitPriceBDT} onValueChange={(e) => onInputChange(e, 'tradeUnitPriceBDT')}  maxFractionDigits={2} />
+                <InputNumber id="tradeUnitPriceBDT" value={purchaseProduct.tradeUnitPriceBDT} onValueChange={(e) => onTradePriceChange(e.value)}  maxFractionDigits={2} />
             </div>
 
             <div className="field col-12 md:col-3">

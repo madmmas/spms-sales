@@ -12,8 +12,6 @@ import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
 import { STOCK_IN_MODEL } from '../../../constants/models';
 
-
-
 const StockIn = () => {
 
     const modelName = STOCK_IN_MODEL;
@@ -127,6 +125,22 @@ const StockIn = () => {
         );
     };
 
+    const totalPurchaseCostBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalPurchaseCost}
+            </>
+        );
+    };
+
+    const totalTradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalTradePrice}
+            </>
+        );
+    };
+
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -167,6 +181,8 @@ const StockIn = () => {
                         <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>
