@@ -6,15 +6,15 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { Dialog } from 'primereact/dialog';
-import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
+import { InputNumber } from 'primereact/inputnumber';
+import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
-import { CURRENCY } from '../../../constants/lookupData';
 
 const List = () => {
 
@@ -26,19 +26,19 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["name", "branch", "accNumber", "accName", "initBalance", "address", "phone", "note", "status"],
+        fields: ["dtBank_id", "branch", "accNumber", "accName", "initBalance", "address", "phone", "note", "status"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
+            'dtBank_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'branch': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'accNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'accName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'initBalance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'initBalance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'note': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
@@ -58,14 +58,14 @@ const List = () => {
 
     let loadLazyTimeout = null;
 
-    const [dtBankAccountCategory, setDtBankAccountCategory] = useState([]);
+    const [dtBank, setDtBank] = useState([]);
 
     const configurationService = new ConfigurationService();
 
     useEffect(() => {
         initFilters();
         configurationService.getAllWithoutParams(BANK_MODEL).then(data => {
-            setDtBankAccountCategory(data);
+            setDtBank(data);
         });
     }, []);
     
@@ -101,10 +101,12 @@ const List = () => {
     const exportCSV = () => {
         dt.current.exportCSV();
     };
+
     const onPage = (event) => {
         let _lazyParams = { ...lazyParams, ...event };
         setLazyParams(_lazyParams);
-    }
+    };
+
     const onSort = (event) => {
         let _lazyParams = { ...lazyParams, ...event };
         setLazyParams(_lazyParams);
@@ -176,7 +178,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.name}
+                {rowData.dtBank_id_shortname}
             </>
         );
     };
@@ -251,6 +253,15 @@ const List = () => {
             </div>
         );
     };
+
+    const initBalanceFilterTemplate = (options) => {
+        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+    };    
+
+    const bankFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtBank} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -302,13 +313,14 @@ const List = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="accName" header="Account Name" filter filterPlaceholder="Search by name" sortable body={accNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by name" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="branch" header="Branch" filter filterPlaceholder="Search by name" sortable body={branchBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="initBalance" header="Initial Balance" filter filterPlaceholder="Search by name" sortable body={initBalanceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="address" header="Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="phone" header="Phone" filter filterPlaceholder="Search by name" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="note" header="Note" filter filterPlaceholder="Search by name" sortable body={noteBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="dtBank_id" header="Bank Name" filter filterElement={bankFilterTemplate} sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="branch" header="Branch" filter filterPlaceholder="Search by branch" sortable body={branchBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by accNumber" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="accName" header="Account Name" filter filterPlaceholder="Search by accName" sortable body={accNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="initBalance" header="Initial Balance" filter filterElement={initBalanceFilterTemplate} sortable body={initBalanceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="address" header="Address" filter filterPlaceholder="Search by address" body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="phone" header="Phone" filter filterPlaceholder="Search by phone" body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="note" header="Note" filter filterPlaceholder="Search by note" body={noteBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 

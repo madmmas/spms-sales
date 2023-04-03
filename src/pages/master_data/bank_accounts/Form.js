@@ -2,19 +2,18 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
+import { InputMask } from "primereact/inputmask";
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Fieldset } from 'primereact/fieldset';
-import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 
 import { HRService } from '../../../services/HRService';
 
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
-import { CURRENCY } from '../../../constants/lookupData';
 
 const Form = ({bankAccountProfile}) => {
 
@@ -22,7 +21,7 @@ const Form = ({bankAccountProfile}) => {
     let navigate = useNavigate();
     const toast = useRef(null);
     const hrManagementService = new HRService();
-    const [status, setStatus] = useState('');
+    const [isEdit, setIsEdit] = useState(bankAccountProfile!=null);
     const [submitted, setSubmitted] = useState(false);
 
     const {
@@ -37,7 +36,7 @@ const Form = ({bankAccountProfile}) => {
 
     const onSubmit = (formData) => {
         setSubmitted(true);
-        if(bankAccountProfile==null){
+        if(isEdit){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Created', life: 3000 });
                 navigate("/bank_accounts/" + data.ID);
@@ -70,20 +69,6 @@ const Form = ({bankAccountProfile}) => {
 
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="accName"
-                            control={control}
-                            rules={{ required: 'Account Name is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Name*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-6">
-                        <Controller
                             name="dtBank_id"
                             control={control}
                             rules={{ required: 'Bank Account is required.' }}
@@ -105,7 +90,7 @@ const Form = ({bankAccountProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Branch Name*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputText  keyfilter={/^[^<>*!]+$/} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -118,8 +103,25 @@ const Form = ({bankAccountProfile}) => {
                             rules={{ required: 'Account Number is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Number*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Number*</label>                                
+                                <InputText disabled={isEdit} keyfilter="int" inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)}/>                                
+                                <small id="accNumber-help">
+                                    Enter numeric value only.
+                                </small>
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    <div className="field col-12 md:col-6">
+                        <Controller
+                            name="accName"
+                            control={control}
+                            rules={{ required: 'Account Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Account Name*</label>                                
+                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)}/>                                
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -129,11 +131,11 @@ const Form = ({bankAccountProfile}) => {
                         <Controller
                             name="initBalance"
                             control={control}
-                            rules={{ required: 'Initial Balance is required.' }}
+                            rules={{ required: 'Initial Balance is required.'}}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e)} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -146,7 +148,7 @@ const Form = ({bankAccountProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Phone</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+8801453656754" onChange={(e) => field.onChange(e.target.value)} />
+                                <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+880 9999 999999" />                                
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
