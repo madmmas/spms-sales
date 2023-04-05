@@ -38,8 +38,10 @@ function App() {
   const PackageList = React.lazy(() => import("./pages/master_data/packages/List"));
   const PackageDetail = React.lazy(() => import("./pages/master_data/packages/Detail"));
   const PackageForm = React.lazy(() => import("./pages/master_data/packages/Form"));  
-  const Warehouses = React.lazy(() => import("./pages/master_data/Warehouses"));
-
+  const WarehouseList = React.lazy(() => import("./pages/master_data/warehouses/List"));
+  const WarehouseDetail = React.lazy(() => import("./pages/master_data/warehouses/Detail"));
+  const WarehouseForm = React.lazy(() => import("./pages/master_data/warehouses/Form"));
+  
   const SaleList = React.lazy(() => import("./pages/transactional_data/sales/List"));
   const SaleDetail = React.lazy(() => import("./pages/transactional_data/sales/Detail"));
   const SaleForm = React.lazy(() => import("./pages/transactional_data/sales/Form"));
@@ -112,8 +114,11 @@ function App() {
           <Route path="new" element={<RouteAuth pageComponent={<PackageForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<PackageDetail />} />} />
         </Route>        
-        <Route path="/warehouses" element={<RouteAuth pageComponent={<Warehouses />} />} />
-
+        <Route path="/warehouses">
+          <Route index element={<RouteAuth pageComponent={<WarehouseList />} />} />
+          <Route path="new" element={<RouteAuth pageComponent={<WarehouseForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<WarehouseDetail />} />} />
+        </Route>
         <Route path="/sales">
           <Route index element={<RouteAuth pageComponent={<SaleList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />

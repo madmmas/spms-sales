@@ -81,10 +81,11 @@ const Form = ({warehouseProfile}) => {
                     <div className="field col-12 md:col-6">
                         <Controller
                             name="description"
+                            rules={{ required: 'Warehouse Description is required.' }}
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Description</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Description*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -94,10 +95,11 @@ const Form = ({warehouseProfile}) => {
                     <div className="field col-12 md:col-6">
                         <Controller
                             name="address"
+                            rules={{ required: 'Warehouse Address is required.' }}
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse Address</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse Address*</label>
                                 <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -105,9 +107,22 @@ const Form = ({warehouseProfile}) => {
                     </div>
 
                     <div className="field col-12 md:col-6 mt-2">
-                        <div className='field'>Status</div>
+                        <div className='field'>Status*</div>
                         <Controller
                             name="status"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <InputSwitch inputId={field.name} checked={field.value} inputRef={field.ref} onChange={(e) => field.onChange(e.value)} />
+                                </>
+                            )}
+                        />
+                    </div>
+
+                    <div className="field col-12 md:col-6 mt-2">
+                        <div className='field'>Default*</div>
+                        <Controller
+                            name="default*"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>

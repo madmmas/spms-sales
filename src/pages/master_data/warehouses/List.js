@@ -35,6 +35,7 @@ const List = () => {
             'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'default': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 
@@ -185,8 +186,7 @@ const List = () => {
     const statusBodyTemplate = (rowData) => {
         return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
     };
-
-    
+  
     const statusFilterTemplate = (options) => {
         return (
             <div className="flex align-items-center gap-2">
@@ -197,6 +197,22 @@ const List = () => {
             </div>
         );
     };
+
+    const defaultBodyTemplate = (rowData) => {
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.default, 'text-red-500 pi-times-circle': !rowData.default })}></i>;
+    };
+
+    const defaultFilterTemplate = (options) => {
+        return (
+            <div className="flex align-items-center gap-2">
+                <label htmlFor="status-filter" className="font-bold">
+                    Default Warehouse
+                </label>
+                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+            </div>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -249,9 +265,10 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '8rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="description" header="Description" filter filterPlaceholder="Search by name" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="address" header="Warehouse Address" filter filterPlaceholder="Search by name" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="address" header="Warehouse Address" filter filterPlaceholder="Search by address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="default" header="Default" filter filterElement={defaultFilterTemplate} sortable body={defaultBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
