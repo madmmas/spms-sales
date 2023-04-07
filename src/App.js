@@ -75,6 +75,15 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/pos" element={<POS />} />
 
+      <Route path="/sales">
+        <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />
+        <Route path=":id" element={<RouteAuth pageComponent={<SaleDetail />} />} />
+      </Route>
+      <Route path="/purchases">
+        <Route path="new" element={<RouteAuth pageComponent={<PurchaseForm />} />} />
+        <Route path=":id" element={<RouteAuth pageComponent={<PurchaseDetail />} />} />
+      </Route>
+
       <Route element={<Layout />}>
         <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
         <Route path="/about" element={<RequireAuth><About /></RequireAuth>} />
@@ -121,13 +130,13 @@ function App() {
         </Route>
         <Route path="/sales">
           <Route index element={<RouteAuth pageComponent={<SaleList />} />} />
-          <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />
-          <Route path=":id" element={<RouteAuth pageComponent={<SaleDetail />} />} />
+          {/* <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<SaleDetail />} />} /> */}
         </Route>
         <Route path="/purchases">
           <Route index element={<RouteAuth pageComponent={<PurchaseList />} />} />
-          <Route path="new" element={<RouteAuth pageComponent={<PurchaseForm />} />} />
-          <Route path=":id" element={<RouteAuth pageComponent={<PurchaseDetail />} />} />
+          {/* <Route path="new" element={<RouteAuth pageComponent={<PurchaseForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<PurchaseDetail />} />} /> */}
         </Route>
         {/* <Route path="/purchase_packages">
           <Route index element={<RouteAuth pageComponent={<PurchasePackageList />} />} />
