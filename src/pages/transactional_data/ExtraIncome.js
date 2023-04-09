@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -7,62 +8,93 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { useForm, Controller } from 'react-hook-form';
+import { InputNumber } from 'primereact/inputnumber';
+import SelectConstData from '../components/SelectConstData';
+import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
+import SelectLookupData from '../components/SelectLookupData';
+import SelectMasterData from '../components/SelectMasterData';
 import React, { useEffect, useRef, useState } from 'react';
 
-import SelectConstData from '../components/SelectConstData';
-
 import { ConfigurationService } from '../../services/ConfigurationService';
-import { EXTRA_INCOME_MODEL } from '../../constants/models';
-import { COLLECTION_TYPES } from '../../constants/lookupData';
+import { TransactionService } from '../../services/TransactionService';
+import { BANK_CASH, COLLECTION_TYPES } from '../../constants/lookupData';
+import { ON_EXPENSE_FROM_CASH, ON_EXPENSE_FROM_BANK } from '../../constants/transactions';
+
+import { EXTRA_INCOME_MODEL, EXTRA_INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
 
 const ExtraIncome = () => {
 
     const modelName = EXTRA_INCOME_MODEL;
 
-    const toast = useRef(null);
-    const dt = useRef(null);
-    const contextPath = '~';
-
-    const [date, setDate] = useState(null);
-
     let emptyExtraIncome = {
         _id: null,
-        empID: '',
-        name: ''
+        dtBankAccount_id: null,
+        dtExtraIncomeType_id: null,
+        dtCollectionType_id: null,
+        date: null,
+        amount: 0,
+        remarks: '',
+        bankOrCash: 'CASH',
     };
+    
+    const {
+        register,
+        control,
+        formState: { errors },
+        reset,
+        handleSubmit
+    } = useForm({
+        defaultValues: emptyExtraIncome
+    });
+    
+    const getFormErrorMessage = (name) => {
+        return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+    const toast = useRef(null);
+    const dt = useRef(null);
 
-    let defaultFilters = {
+    let defaultFilters = {        
+        fields: ["dtBankAccount_id", "dtExtraIncomeType_id", "dtCollectionType_id", "date", "amount", "bankOrCash",  "remarks"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtExtraIncomeType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtCollectionType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'bankOrCash': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [empProfiles, setExtraIncomes] = useState(null);
+    const [expenseData, setExpenseData] = useState(null);
     const [empProfileDialog, setExtraIncomeDialog] = useState(false);
-    const [deleteExtraIncomeDialog, setDeleteExtraIncomeDialog] = useState(false);
-    const [deleteExtraIncomesDialog, setDeleteExtraIncomesDialog] = useState(false);
-    const [extraIncome, setExtraIncome] = useState(emptyExtraIncome);
-    const [selectedExtraIncomes, setSelectedExtraIncomes] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
 
+    const [extraIncomeType, setExtraIncomeType] = useState([]);
+    const [bankCash, setBankCash] = useState("CASH");
+
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const configurationManagementService = new ConfigurationService();
-
+    const transactionService = new TransactionService();
+    const configurationService = new ConfigurationService();
     let loadLazyTimeout = null;
 
     useEffect(() => {
         initFilters();
+        configurationService.getAllWithoutParams(EXTRA_INCOME_TYPE_MODEL).then(data => {
+            setExtraIncomeType(data);
+        });
     }, []);
     
     const clearFilter = () => {
@@ -85,10 +117,10 @@ const ExtraIncome = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
                 console.log(data)
                 setTotalRecords(data.total);
-                setExtraIncomes(data.rows);
+                setExpenseData(data.rows);
                 setLoading(false);
             });
         }, Math.random() * 1000 + 250);
@@ -96,7 +128,8 @@ const ExtraIncome = () => {
 
     const openNew = () => {
         setCreateEdit(true);
-        setExtraIncome(emptyExtraIncome);
+        reset({ ...emptyExtraIncome });
+        setBankCash("CASH");
         setSubmitted(false);
         setExtraIncomeDialog(true);
     };
@@ -106,76 +139,29 @@ const ExtraIncome = () => {
         setExtraIncomeDialog(false);
     };
 
-    const hideDeleteExtraIncomeDialog = () => {
-        setDeleteExtraIncomeDialog(false);
-    };
-
-    const hideDeleteExtraIncomesDialog = () => {
-        setDeleteExtraIncomesDialog(false);
-    };
-
-    const saveExtraIncome = () => {
+    const saveExtraIncome = (formData) => {
         setSubmitted(true);
-
-        if (extraIncome.name.trim()) {
-            if (extraIncome._id) {
-                configurationManagementService.update(modelName, extraIncome._id, extraIncome).then(data => {
-                    console.log(data);
-                    loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Updated', life: 3000 });
-                });
-            } else {
-                configurationManagementService.create(modelName, extraIncome).then(data => {
-                    console.log(data);
-                    loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Created', life: 3000 });
-                });
-            }
-
-            setExtraIncomeDialog(false);
-            setExtraIncome(emptyExtraIncome);
+        console.debug(formData);
+        if (formData.bankOrCash == 'BANK') {
+            transactionService.processTransaction(ON_EXPENSE_FROM_BANK, formData).then(data => {
+                console.log(data);
+                loadLazyData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Created', life: 3000 });
+            });
+        } else if (formData.bankOrCash == 'CASH') {
+            transactionService.processTransaction(ON_EXPENSE_FROM_CASH, formData).then(data => {
+                console.log(data);
+                loadLazyData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Created', life: 3000 });
+            });
         }
-    };
 
-    const editExtraIncome = (extraIncome) => {
-        setCreateEdit(false);
-        setExtraIncome({ ...extraIncome });
-        setExtraIncomeDialog(true);
-    };
-
-    const confirmDeleteExtraIncome = (extraIncome) => {
-        setExtraIncome(extraIncome);
-        setDeleteExtraIncomeDialog(true);
-    };
-
-    const deleteExtraIncome = () => {
-        configurationManagementService.delete(modelName, extraIncome._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Deleted', life: 3000 });
-        });
-        setDeleteExtraIncomeDialog(false);
-        setExtraIncome(emptyExtraIncome);
+        setExtraIncomeDialog(false);
+        reset(emptyExtraIncome)
     };
 
     const exportCSV = () => {
         dt.current.exportCSV();
-    };
-
-    const deleteSelectedExtraIncomes = () => {
-        let _empProfiles = empProfiles.filter((val) => !selectedExtraIncomes.includes(val));
-        setExtraIncomes(_empProfiles);
-        setDeleteExtraIncomesDialog(false);
-        setSelectedExtraIncomes(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Incomes Deleted', life: 3000 });
-    };
-
-    const onInputChange = (e, name) => {
-        const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...extraIncome };
-        _empProfile[`${name}`] = val;
-
-        setExtraIncome(_empProfile);
     };
 
     const onPage = (event) => {
@@ -212,29 +198,38 @@ const ExtraIncome = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData) => {
+    const extraIncomeTypeFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={extraIncomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
+    const bankAccountFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={extraIncomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
+    const expenseBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.name}
+                {rowData.dtExtraIncomeType_id_shortname}
             </>
         );
     };
 
-    const descriptionBodyTemplate = (rowData) => {
+    const bankAccountBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
-                {rowData.description}
+                {rowData.dtBankAccount_id_shortname}
             </>
         );
+    };
+
+    const collectionTypeBodyTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={COLLECTION_TYPES} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
-                {rowData.date}
+                {moment(rowData.date).format('DD/MM/YYYY')}
             </>
         );
     };
@@ -242,35 +237,27 @@ const ExtraIncome = () => {
     const amountBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
                 {rowData.amount}
             </>
         );
     };
 
-    const collectionTypeBodyTemplate = (rowData) => {
+    const bankorcashFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={BANK_CASH} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+    };
+
+    const bankorcashBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
-                {rowData.collectionType}
+                {rowData.bankOrCash}
             </>
         );
     };
 
-    const collectionDetailsBodyTemplate = (rowData) => {
+    const remarksBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Description</span>
-                {rowData.collectionDetails}
-            </>
-        );
-    };
-
-    const actionBodyTemplate = (rowData) => {
-        return (
-            <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editExtraIncome(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteExtraIncome(rowData)} />
+                {rowData.remarks}
             </>
         );
     };
@@ -287,19 +274,7 @@ const ExtraIncome = () => {
     const empProfileDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveExtraIncome} />
-        </>
-    );
-    const deleteExtraIncomeDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteExtraIncomeDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteExtraIncome} />
-        </>
-    );
-    const deleteExtraIncomesDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteExtraIncomesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedExtraIncomes} />
+            <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => saveExtraIncome(d))} />
         </>
     );
 
@@ -311,73 +286,140 @@ const ExtraIncome = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={expenseData} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
+                        scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="date" header="Date" body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="amount" header="Amount" body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="collectionType" header="Collection Type" body={collectionTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="collectionDetails" header="Collection Details" body={collectionDetailsBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtExtraIncomeType_id" header="Extra Income Type" filter filterElement={extraIncomeTypeFilterTemplate} sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtCollectionType_id" header="Collection Type" filter filterPlaceholder="Search by Collection Type" sortable body={collectionTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="bankOrCash" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Extra Income`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>
-                        {extraIncome.image && <img src={`${contextPath}/demo/images/extraIncome/${extraIncome.image}`} alt={extraIncome.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
-                        <div className="field">
-                            <label htmlFor="name">Name</label>
-                            <InputText id="name" value={extraIncome.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !extraIncome.name })} />
-                            {submitted && !extraIncome.name && <small className="p-invalid">Name is required.</small>}
-                        </div>
-                        <div className="field">
-                            <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={extraIncome.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
-                        </div>
-                        <div className="field">
-                            <label htmlFor="date">Date</label>
-                            <Calendar id="date" value={extraIncome.date} onChange={(e) => setDate(e, 'date')} required rows={3} cols={20} showIcon />
-                            {/* <InputText id="date" value={extraIncome.date} onChange={(e) => onInputChange(e, 'date')} required rows={3} cols={20} /> */}
-                        </div>
-                        <div className="field">
-                            <label htmlFor="amount">Amount</label>
-                            <InputText id="amount" value={extraIncome.amount} onChange={(e) => onInputChange(e, 'amount')} required rows={3} cols={20} />
-                        </div>
-                        <div className="field">
-                            <label htmlFor="collectionType">Collection Type</label>
-                            <SelectConstData id="collectionType" data={COLLECTION_TYPES} value={extraIncome.collectionType} onChange={(e) => onInputChange(e, 'collectionType')} required rows={3} cols={20} />
-                        </div>
-                        <div className="field">
-                            <label htmlFor="collectionDetails">Collection Details</label>
-                            <InputTextarea id="collectionDetails" value={extraIncome.collectionDetails} onChange={(e) => onInputChange(e, 'collectionDetails')} required rows={3} cols={20} />
-                        </div>
-                    </Dialog>
-
-                    <Dialog visible={deleteExtraIncomeDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExtraIncomeDialogFooter} onHide={hideDeleteExtraIncomeDialog}>
-                        <div className="flex align-items-center justify-content-center">
-                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {extraIncome && (
-                                <span>
-                                    Are you sure you want to delete <b>{extraIncome.empID}</b>?
-                                </span>
-                            )}
-                        </div>
-                    </Dialog>
-
-                    <Dialog visible={deleteExtraIncomesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExtraIncomesDialogFooter} onHide={hideDeleteExtraIncomesDialog}>
-                        <div className="flex align-items-center justify-content-center">
-                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {extraIncome && <span>Are you sure you want to delete the selected items?</span>}
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Extra Income`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
+                        <div className="p-fluid formgrid grid">
+                            <div className="field col-12 md:col-6">
+                                <Controller
+                                    name="dtExtraIncomeType_id"
+                                    control={control}
+                                    rules={{ required: 'Extra Income Type Id is required.' }}
+                                    render={({ field, fieldState }) => (
+                                    <>
+                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Extra Income Type*</label>
+                                        <SelectLookupData field={field} model={EXTRA_INCOME_TYPE_MODEL}
+                                            className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="date"
+                                control={control}
+                                rules={{ required: 'Date is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name}>Date*</label>
+                                    <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
+                                        dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
+                                    {getFormErrorMessage(field.name)}
+                                </>                                
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="amount"
+                                control={control}
+                                rules={{
+                                    validate: (value) => (value > 0) || 'Enter a valid amount.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="amount">Amount</label>
+                                    <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                        onValueChange={(e) => field.onChange(e)} 
+                                        className={classNames({ 'p-invalid': fieldState.error })} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="dtCollectionType_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Collection Type</label>
+                                    <SelectConstData field={field} data={COLLECTION_TYPES}
+                                        onSelectChange={(value) => {console.log(value); setBankCash(value)}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="bankOrCash"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Or Cash</label>
+                                    <SelectConstData field={field} data={BANK_CASH}
+                                        onSelectChange={(value) => {console.log(value); setBankCash(value)}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div hidden={bankCash !== "BANK"} className="field col-12 md:col-6">
+                            <Controller
+                                name="dtBankAccount_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                                    <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        onSelect={(e) => {console.log(e);}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-12">
+                            <Controller
+                                name="remarks"
+                                control={control}
+                                rules={{ required: 'Remarks is required.' }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="remarks">Remarks*</label>
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
                         </div>
                     </Dialog>
                 </div>
