@@ -6,7 +6,7 @@ const AppMenu = () => {
         {
             items: [
                 { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-                { label: 'POS', icon: 'pi pi-fw pi-home', to: '/pos' },
+                { label: 'New Purchase', icon: 'pi pi-fw pi-home', to: '/purchases/new' },
             ]
         },
         {

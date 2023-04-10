@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 import { HRService } from '../../../services/HRService';
-import { WAREHOUSES_MODEL } from '../../../constants/models';
+import { WAREHOUSE_MODEL } from '../../../constants/models';
 
 const WarehouseForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "warehouseProfile" */ './Form'), "warehouseProfile"));
 
@@ -15,7 +15,7 @@ const Detail = () => {
 
     let navigate = useNavigate();
 
-    const modelName = WAREHOUSES_MODEL;
+    const modelName = WAREHOUSE_MODEL;
 
     const hrManagementService = new HRService();
     const [empData, setWarehouseData] = useState(null);

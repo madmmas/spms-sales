@@ -6,7 +6,7 @@ export const EMPLOYEE_MODEL = 'dtEmployee';
 export const PACKAGE_MODEL = 'dtPackageProduct';
 export const PRODUCT_MODEL = 'dtProduct';
 export const SUPPLIER_MODEL = 'dtSupplier';
-export const WAREHOUSES_MODEL = 'dtWarehouse';
+export const WAREHOUSE_MODEL = 'dtWarehouse';
 export const STOCK_MODEL = 'dtStock';
 
 export const ATTENDANCE_MODEL = 'trxAttendance';

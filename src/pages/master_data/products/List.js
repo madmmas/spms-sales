@@ -8,7 +8,7 @@ import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-
+import { InputText } from 'primereact/inputtext';
 import { HRService } from '../../../services/HRService';
 import { PRODUCT_MODEL } from '../../../constants/models';
 
@@ -22,15 +22,17 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['name', 'dtProductCategory_id', 'code', 'barCode', 'brandName', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'lastTradePrice', 'status'],
+        fields: ['name', 'dtProductCategory_id', 'dtWarehouse_id', 'code', 'barCode', 'brandName', 'modelNo', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'lastTradePrice', 'status'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'modelNo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'partNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
@@ -43,6 +45,7 @@ const List = () => {
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
     const [dtProduct, setProduct] = useState({});
     const [selectedProducts, setSelectedProducts] = useState(null);
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -102,6 +105,24 @@ const List = () => {
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
     }
+
+    const onGlobalFilterChange = (e) => {
+        let _lazyParams = { ...lazyParams};
+        console.log(_lazyParams);
+
+        const value = e.target.value;
+
+        setGlobalFilterValue(value);
+
+        if(value === null || value === undefined || value === '' || value.length < 1) {
+            return;
+        }
+
+        _lazyParams['filters']['global'].value = value;
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+
+    };
 
     const openNew = () => {
         navigate("/products/new");
@@ -184,11 +205,29 @@ const List = () => {
         );
     };
 
+    const dtWarehouse_idBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Warehouse</span>
+                {rowData.dtWarehouse_id_shortname}
+            </>
+        );
+    };
+
     const brandNameBodyTemplate = (rowData) => {
         return (
             <>
                 <span className="p-column-title">Brand Name </span>
                 {rowData.brandName}
+            </>
+        );
+    };
+
+    const modelNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Model No</span>
+                {rowData.modelNo}
             </>
         );
     };
@@ -245,11 +284,15 @@ const List = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Products</h5>
-                <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
+                </span>
+                <h5 className="m-0 ">Manage Products</h5>                
+                <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
             </div>
-        )
-    }
+        );
+    };
 
     const actionBodyTemplate = (rowData) => {
         return (
@@ -299,11 +342,13 @@ const List = () => {
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="dtProductCategory_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="modelNo" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="partNumber" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
                         <Column field="lowStockQty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
-                        <Column field="reorderQty" header="Reorder Qty" filter filterPlaceholder="Search by Reorder Qty" sortable body={reorderQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        {/* <Column field="reorderQty" header="Reorder Qty" filter filterPlaceholder="Search by Reorder Qty" sortable body={reorderQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                               */}
                         <Column field="lastPurchasePrice" header="Last Purchase Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastPurchasePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="lastTradePrice" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtWarehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 

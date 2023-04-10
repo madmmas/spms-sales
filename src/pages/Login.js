@@ -20,7 +20,8 @@ const LoginPage = () => {
   
     let from = location.state?.from?.pathname || "/";
 
-  const handleLogin = () => {  
+  const handleLogin = (event) => {  
+    event.preventDefault()
     dispatch(login(username, password))
         .then(() => {
            navigate(from);
@@ -53,7 +54,7 @@ const LoginPage = () => {
                           <Password inputid="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" toggleMask className="w-full mb-5" inputClassName='w-full p-3 md:w-30rem'></Password>
 
                           <div className="flex align-items-center justify-content-between mb-5 gap-5"></div>
-                          <Button label="Sign In" className="w-full p-3 text-xl" onClick={() => handleLogin()}></Button>
+                          <Button label="Sign In" className="w-full p-3 text-xl" onClick={(e) => handleLogin(e)}></Button>
                       </div>
                   </div>
               </div>

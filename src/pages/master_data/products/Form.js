@@ -10,9 +10,10 @@ import { classNames } from 'primereact/utils';
 
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
+import SelectMasterData from '../../components/SelectMasterData';
 
 import { TransactionService } from '../../../services/TransactionService';
-import { PRODUCT_CATEGORY_MODEL } from '../../../constants/models';
+import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 import { ON_ADD_PRODUCT, ON_UPDATE_PRODUCT } from '../../../constants/transactions';
 import { MEASUREMENT_UNITS } from '../../../constants/lookupData';
 
@@ -127,12 +128,12 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="partNumber"
+                            name="brandName"
                             control={control}
-                            rules={{ required: 'Part Number is required.' }}
+                            rules={{ required: 'Brand Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Brand Name</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -140,12 +141,25 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="brandName"
+                            name="modelNo"
                             control={control}
-                            rules={{ required: 'Brand Name is required.' }}
+                            rules={{ required: 'Model No is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Brand Name</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Model No</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>                    
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="partNumber"
+                            control={control}
+                            rules={{ required: 'Part Number is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -177,7 +191,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-4">
+                    {/* <div className="field col-12 md:col-4">
                         <Controller
                             name="reorderQty"
                             control={control}
@@ -189,7 +203,7 @@ const Form = ({productData}) => {
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                    </div>
+                    </div> */}
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="lastPurchasePrice"
@@ -210,6 +224,24 @@ const Form = ({productData}) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Trade Price</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                    <Controller
+                        name="dtWarehouse_id"
+                        control={control}
+                        rules={{ required: 'Warehouse is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
+                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
+                                    displayField="name"
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}, 
+                                    ]} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

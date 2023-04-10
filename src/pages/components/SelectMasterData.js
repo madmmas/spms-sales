@@ -12,11 +12,14 @@ export default function SelectMasterData({ field, displayField, showFields=[], m
     const [trigger, setTrigger] = useState(0);
 
     useEffect(() => {
-        if(field.value==null || field.value=="") return;
+        if(field.value==null || field.value=="") {
+            setSelectedRow("");
+            return;
+        }
         masterDataService.getById(modelName, field.value).then(data => {
             setSelectedRow(data[displayField]);
         });
-    }, []);
+    }, [field.value]);
 
     const onSelection = (e) => {
         setSelectedRow(e.value[displayField]);

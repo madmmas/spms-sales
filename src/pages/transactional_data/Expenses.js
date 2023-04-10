@@ -63,6 +63,7 @@ const Expenses = () => {
         sortField: null,
         sortOrder: null,
         filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'dtExpenseType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'expensePeriod': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
@@ -79,6 +80,7 @@ const Expenses = () => {
     const [empProfileDialog, setExpensesDialog] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const [expenseType, setExpenseType] = useState([]);
     const [bankCash, setBankCash] = useState("CASH");
@@ -108,7 +110,7 @@ const Expenses = () => {
         loadLazyData();
     }, [lazyParams]);
 
-    const loadLazyData = () => {
+    const loadLazyData = async () => {
         setLoading(true);
 
         if (loadLazyTimeout) {
@@ -123,6 +125,12 @@ const Expenses = () => {
                 setLoading(false);
             });
         }, Math.random() * 1000 + 250);
+        // await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        //     console.log(data)
+        //     setTotalRecords(data.total);
+        //     setExpenseData(data.rows);
+        //     setLoading(false);
+        // });
     }
 
     const openNew = () => {
@@ -178,6 +186,25 @@ const Expenses = () => {
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
     }
+
+    const onGlobalFilterChange = (e) => {
+        let _lazyParams = { ...lazyParams};
+        console.log(_lazyParams);
+
+        const value = e.target.value;
+
+        setGlobalFilterValue(value);
+
+        if(value === null || value === undefined || value === '' || value.length < 1) {
+            return;
+        }
+
+        _lazyParams['filters']['global'].value = value;
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+
+    };
+
 
     const leftToolbarTemplate = () => {
         return (
@@ -265,14 +292,26 @@ const Expenses = () => {
         );
     };
 
+    // const renderHeader = () => {
+    //     return (
+    //         <div className="flex justify-content-between">
+    //             <h5 className="m-0">Manage Expenses</h5>
+    //             <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
+    //         </div>
+    //     )
+    // }
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Expenses</h5>
-                <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
+                <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
+                </span>
             </div>
-        )
-    }
+        );
+    };
 
     const empProfileDialogFooter = (
         <>

@@ -11,11 +11,11 @@ import { Fieldset } from 'primereact/fieldset';
 
 import { HRService } from '../../../services/HRService';
 
-import { WAREHOUSES_MODEL } from '../../../constants/models';
+import { WAREHOUSE_MODEL } from '../../../constants/models';
 
 const Form = ({warehouseProfile}) => {
 
-    const modelName = WAREHOUSES_MODEL;
+    const modelName = WAREHOUSE_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);
     const hrManagementService = new HRService();

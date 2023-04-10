@@ -4,9 +4,10 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select"}) {
+export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
 
     const dt = useRef(null);
 
@@ -18,11 +19,12 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS }            
         }
     };
 
     const [loading, setLoading] = useState(false);
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [totalRecords, setTotalRecords] = useState(0);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [tmpData, setTmpData] = useState([]);
@@ -47,12 +49,20 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
                 setTmpData(data.rows);
                 setLoading(false);
             });
-        }, Math.random() * 1000 + 250);
+        }, Math.random() * 10 + 250);
     }
 
     const hideDialog = () => {
         setTableDialog(false);
     };
+
+    useEffect(() => {
+        initFilters();
+    }, []);
+
+    useEffect(() => {
+        loadLazyData();
+    }, [lazyParams]);
 
     useEffect(() => {
         if (trigger) {
@@ -64,6 +74,15 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
         setLazyParams(defaultFilters);
         loadLazyData();
         setTableDialog(true);
+    };
+
+    const initFilters = () => {
+        setLazyParams(defaultFilters);
+        setGlobalFilterValue('');
+    };
+
+    const clearFilter = () => {
+        initFilters();
     };
 
     const onPage = (event) => {
@@ -82,6 +101,23 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
         setLazyParams(_lazyParams);
     }
 
+    const onGlobalFilterChange = (e) => {
+        let _lazyParams = { ...lazyParams };
+        console.log(_lazyParams);
+
+        const value = e.target.value;
+        
+        setGlobalFilterValue(value);
+
+        if(value === null || value === undefined || value === '' || value.length < 1) {
+            return;
+        }
+
+        _lazyParams['filters']['global'].value = value;
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+    };
+
     const onSelection = (e) => {
         setTableDialog(false);
         onSelect(e)
@@ -93,25 +129,40 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
 
     const rowClassName = (data) => (isSelectable(data) ? '' : 'p-disabled');
 
+    const renderHeader = () => {
+        return (
+            <div className="flex justify-content-between">
+                <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
+                </span>
+            </div>
+        );
+    };
+
+    const header = renderHeader();
+
     return (
         <>
             <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
-            <Dialog visible={tableDialog} header={caption} modal 
-            style={{ width: '75vw' }} maximizable contentStyle={{ height: '300px' }}
+            <Dialog visible={tableDialog} header={header} modal 
+            style={{ width: dialogWidth }} maximizable contentStyle={{ height: dialogHeight }}
             onHide={hideDialog}>
                 <DataTable
                     ref={dt} value={tmpData} dataKey="_id"
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                    onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
+                    onFilter={onFilter} filterDisplay="row"
+                    filters={lazyParams.filters}
                     isDataSelectable={isRowSelectable} rowClassName={rowClassName}
                     scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
                     paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                     rowsPerPageOptions={[5,10, 15]}
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
+                    globalFilterFields={['name']}
                     selectionMode="single" selection={selectedRow}
                     onSelectionChange={(e) => {onSelection(e)}} 
 

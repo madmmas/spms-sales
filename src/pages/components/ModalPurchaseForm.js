@@ -15,7 +15,6 @@ import SelectMasterData from '../components/SelectMasterData';
 import { MasterDataService } from '../../services/MasterDataService';
 import { PRODUCT_MODEL } from '../../constants/models';
 
-
 export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialog, currency, selectedProduct, defaultPurchaseProduct }) {
 
     const {
@@ -49,7 +48,6 @@ export default function ModalPurchaseForm({ visible, trigger, onAdd, onHideDialo
 
     const roundNumber = (num) => {
         return Math.round((num + Number.EPSILON) * 100) / 100;
-        // return num.toFixed(2);
     };
 
     const calculateCost = (_purchaseProduct) => {
