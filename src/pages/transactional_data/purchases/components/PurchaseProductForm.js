@@ -93,7 +93,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     const onProfitPercentageChange = (profitPercentage) => {
         let _purchaseProduct = { ...purchaseProduct };
         _purchaseProduct.profitPercentage = roundNumber(profitPercentage);
-        _purchaseProduct.profit = _purchaseProduct.netCostBDT * roundNumber(profitPercentage) / 100;
+        _purchaseProduct.profit = _purchaseProduct.netUnitCostBDT * roundNumber(profitPercentage) / 100;
         _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
         _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
         setPurchaseProduct(_purchaseProduct);
