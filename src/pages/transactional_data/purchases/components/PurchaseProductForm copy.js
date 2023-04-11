@@ -6,7 +6,6 @@ import { InputNumber } from 'primereact/inputnumber';
 import { classNames } from 'primereact/utils';
 
 import SelectMasterData from '../../../components/SelectMasterData';
-import SelectMasterDataOL from '../../../components/SelectMasterDataOL';
 
 import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../../constants/models';
 
@@ -107,7 +106,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     const onProfitChange = (profit) => {
         let _purchaseProduct = { ...purchaseProduct };
         _purchaseProduct.profit = roundNumber(profit);
-        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
+        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netCostBDT * 100);
         _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
         _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
         setPurchaseProduct(_purchaseProduct);
@@ -122,7 +121,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
         let _purchaseProduct = { ...purchaseProduct };
         _purchaseProduct.tradeUnitPriceBDT = roundNumber(tradeUnitPriceBDT);
         _purchaseProduct.profit = roundNumber(_purchaseProduct.tradeUnitPriceBDT - _purchaseProduct.netUnitCostBDT);
-        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
+        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netCostBDT * 100);
         _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
         setPurchaseProduct(_purchaseProduct);
 
@@ -194,7 +193,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product*</label>
-                        <SelectMasterDataOL field={field} modelName={PRODUCT_MODEL}
+                        <SelectMasterData field={field} modelName={PRODUCT_MODEL}
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             onSelect={onProductSelect}
