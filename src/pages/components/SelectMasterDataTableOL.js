@@ -107,7 +107,7 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
         
         setGlobalFilterValue(value);
 
-        if(value === null || value === undefined || value === '' || value.length < 1) {
+        if(value === null || value === undefined) {
             return;
         }
 
