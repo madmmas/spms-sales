@@ -30,9 +30,9 @@ export const MEASUREMENT_UNITS = [
 ];
 
 export const COLLECTION_TYPES = [
-    { id: 'Cash', name: 'Cash' },
+    { id: 'CASH', name: 'Cash' },
     { id: 'MFS', name: 'MFS' },
-    { id: 'Bank Deposit', name: 'Bank Deposit' }    
+    { id: 'BANK', name: 'Bank Deposit' }    
 ];
 
 export const BANK_CASH = [
