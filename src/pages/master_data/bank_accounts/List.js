@@ -26,7 +26,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["dtBank_id", "branch", "accNumber", "accName", "initBalance", "address", "phone", "note", "status"],
+        fields: ["dtBank_id", "branch", "accNumber", "accName", "initBalance", "balance", "address", "phone", "note", "status"],
         first: 0,
         rows: 10,
         page: 1,
@@ -39,6 +39,7 @@ const List = () => {
             'accNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'accName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'initBalance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'balance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'note': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
@@ -216,6 +217,14 @@ const List = () => {
         );
     };
 
+    const balanceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.balance}
+            </>
+        );
+    };
+
     const addressBodyTemplate = (rowData) => {
         return (
             <>
@@ -256,6 +265,10 @@ const List = () => {
     };
 
     const initBalanceFilterTemplate = (options) => {
+        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+    };    
+
+    const balanceFilterTemplate = (options) => {
         return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
@@ -319,6 +332,7 @@ const List = () => {
                         <Column field="accNumber" header="Account Number" filter filterPlaceholder="Search by accNumber" sortable body={accNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="accName" header="Account Name" filter filterPlaceholder="Search by accName" sortable body={accNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="initBalance" header="Initial Balance" filter filterElement={initBalanceFilterTemplate} sortable body={initBalanceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="balance" header="Current Balance" filter filterElement={balanceFilterTemplate} sortable body={balanceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="address" header="Address" filter filterPlaceholder="Search by address" body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="phone" header="Phone" filter filterPlaceholder="Search by phone" body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="note" header="Note" filter filterPlaceholder="Search by note" body={noteBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        

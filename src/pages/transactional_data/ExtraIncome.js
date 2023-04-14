@@ -204,7 +204,7 @@ const ExtraIncome = () => {
         return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={extraIncomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
-    const expenseBodyTemplate = (rowData) => {
+    const extraIncomeBodyTemplate = (rowData) => {
         return (
             <>
                 {rowData.dtExtraIncomeType_id_shortname}
@@ -293,7 +293,7 @@ const ExtraIncome = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtExtraIncomeType_id" header="Extra Income Type" filter filterElement={extraIncomeTypeFilterTemplate} sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtExtraIncomeType_id" header="Extra Income Type" filter filterElement={extraIncomeTypeFilterTemplate} sortable body={extraIncomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtCollectionType_id" header="Collection Type" filter  filterElement={collectionTypeFilterTemplate} sortable body={collectionTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
