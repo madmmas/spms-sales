@@ -8,6 +8,12 @@ export class MasterDataService {
         return resp.data;
     }
 
+    async getByFilters(modelName, filters) {
+        const resp = await axiosInstance.get(`/dataByParams/${modelName}?params=`  + JSON.stringify(filters));
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async getAll(modelName, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
 

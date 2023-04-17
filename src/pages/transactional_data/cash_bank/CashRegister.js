@@ -71,8 +71,6 @@ const CashRegister = () => {
     const [addOrWithdraw, setAddOrWithdraw] = useState(false);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    let loadLazyTimeout = null;
-
     const transactionService = new TransactionService();
 
     useEffect(() => {

@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
@@ -12,48 +10,19 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
     const dt = useRef(null);
     const op = useRef(null);
 
-    let __defaultFilters = {
-        fields: showFields,
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-        filters: {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS }            
-        }
-    };
-
     const [loading, setLoading] = useState(false);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [totalRecords, setTotalRecords] = useState(0);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [tmpData, setTmpData] = useState([]);
     const [selectedRow, setSelectedRow] = useState({});
-    const [tableDialog, setTableDialog] = useState(false);
 
     const masterDataService = new MasterDataService();
 
-    let loadLazyTimeout = null;
-    
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-        
-        loadLazyTimeout = setTimeout(() => {
-            // masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            //     console.log(data)
-            //     setTotalRecords(data.total);
-            //     setTmpData(data.rows);
-            //     setLoading(false);
-            // });
-        }, Math.random() * 250);
-
         masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
             setTotalRecords(data.total);
             setTmpData(data.rows);
             setLoading(false);
@@ -71,10 +40,6 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
     const initFilters = () => {
         setLazyParams(defaultFilters);
         setGlobalFilterValue('');
-    };
-
-    const clearFilter = () => {
-        initFilters();
     };
 
     const onPage = (event) => {
@@ -95,7 +60,6 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
 
     const onGlobalFilterChange = (e) => {
         let _lazyParams = { ...lazyParams };
-        console.log(_lazyParams);
 
         const value = e.target.value;
         
@@ -111,7 +75,6 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
     };
 
     const onSelection = (e) => {
-        // setTableDialog(false);
         op.current.hide();
         setGlobalFilterValue('');
         onSelect(e)
@@ -123,26 +86,14 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
 
     const rowClassName = (data) => (isSelectable(data) ? '' : 'p-disabled');
 
-    const renderHeader = () => {
-        return (
-            <div className="flex justify-content-between">
-                <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
-            </div>
-        );
-    };
-
-    const header = renderHeader();
-
     return (
         <>
-            {/* <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} /> */}
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
                     onClick={(e) => {op.current.show(e)}}
                     onFocus={(e) => {e.target.select()}}
-                    // onBlur={(e) => {op.current.hide()}}
-                    placeholder="Product Search" />
+                    placeholder="Search" />
             </span>
             <OverlayPanel ref={op} showCloseIcon>
                 <DataTable
@@ -160,8 +111,7 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     globalFilterFields={['name']}
                     selectionMode="single" selection={selectedRow}
-                    onSelectionChange={(e) => {onSelection(e)}} 
-
+                    onSelectionChange={(e) => {onSelection(e)}}
                     emptyMessage="No data found."
                 >
                     <Column selectionMode="single" headerStyle={{ minWidth: '3rem' }}></Column>

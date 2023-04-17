@@ -35,7 +35,7 @@ const Form = ({productData}) => {
         handleSubmit
     } = useForm({
         defaultValues: productData //async () =>  hrManagementService.getById(modelName, ProductProfile)
-      });
+    });
 
     const onSubmit = (formData) => {
         try{

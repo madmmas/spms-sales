@@ -3,6 +3,7 @@ export const BANK_ACCOUNT_MODEL = 'dtBankAccount';
 export const CASH_MODEL = 'dtCash';
 export const CUSTOMER_MODEL = 'dtCustomer';
 export const EMPLOYEE_MODEL = 'dtEmployee';
+export const EMP_HISTORY_MODEL = 'dtEmploymentHistory';
 export const PACKAGE_MODEL = 'dtPackageProduct';
 export const PRODUCT_MODEL = 'dtProduct';
 export const SUPPLIER_MODEL = 'dtSupplier';

@@ -47,8 +47,8 @@ export const BANK_CASH = [
 ];
 
 export const CUSTOMER_CATEGORY = [
-    { id: 1, name: 'Permanent' },
-    { id: 2, name: 'Regular' }
-
+    { id: 'WALKIN', name: 'Walk-in' },
+    { id: 'REGISTERED', name: 'Registered' },
+    { id: 'CONDITIONAL', name: 'Conditional' }
 ];
 

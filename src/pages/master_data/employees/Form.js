@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { Fieldset } from 'primereact/fieldset';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
@@ -10,6 +12,7 @@ import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import { InputNumber } from 'primereact/inputnumber';
 import { HRService } from '../../../services/HRService';
+import { DISTRICT } from '../../../constants/lookupData';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 
 
@@ -76,12 +79,29 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="first_name"
+                            name="fullname"
                             control={control}
                             rules={{ required: 'First Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>First Name</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Full Name</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    <Fieldset className="card col-12" legend="Personal Information">
+                    <div className="p-fluid grid">
+
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="fathername"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Father's Name</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -89,18 +109,167 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="last_name"
+                            name="parmanentaddress"
                             control={control}
                             rules={{ required: 'Last Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Name</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Permanent Address</label>
+                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="presentaddress"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Present Address</label>
+                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="dob"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Date of Birth</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
-
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="nationality"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Nationality</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="nid_birth_certificate"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>NID / Birth Certificate No</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="gender"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Gender</label>
+                                <SelectConstData field={field} data={DISTRICT}
+                                        onSelectChange={(value) => {console.log(value); 
+                                            // setBankCash(value)
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="bloodgroup"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Blood Group</label>
+                                <SelectConstData field={field} data={DISTRICT}
+                                        onSelectChange={(value) => {console.log(value); 
+                                            // setBankCash(value)
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="religion"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Religion</label>
+                                <SelectConstData field={field} data={DISTRICT}
+                                        onSelectChange={(value) => {console.log(value); 
+                                            // setBankCash(value)
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="maritalstatus"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Marital Status</label>
+                                <SelectConstData field={field} data={DISTRICT}
+                                        onSelectChange={(value) => {console.log(value); 
+                                            // setBankCash(value)
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="tinId"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>TIN ID</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="passportNo"
+                            control={control}
+                            rules={{ required: 'Last Name is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Passport No</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    </div>
+                    </Fieldset>
+                    <Fieldset className="card col-12" legend="Contact Information">
+                    <div className="p-fluid grid">
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="phone"
@@ -114,7 +283,6 @@ const Form = ({empProfile}) => {
                             </>
                         )}/>
                     </div>
-
 
                     <div className="field col-12 md:col-4">
                         <Controller
@@ -131,98 +299,154 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="punchID"
+                            name="secondaryPhone"
                             control={control}
-                            rules={{ required: 'Punch ID is required.' }}
+                            rules={{ required: 'Email is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Punch</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Secondary Phone Number</label>
+                                <InputText type='email' inputId={field.name}  value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="dtGrade_id"
+                            name="emergencyContactPersonNumber"
                             control={control}
+                            rules={{ required: 'Email is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Grade</label>
-                                <SelectLookupData field={field} model={GRADE_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Emergency Conctact Number</label>
+                                <InputText type='email' inputId={field.name}  value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="dtDepartment_id"
+                            name="emergencyContactPersonName"
                             control={control}
+                            rules={{ required: 'Email is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Department</label>
-                                <SelectLookupData field={field} model={DEPARTMENT_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Emergency Contact Person Name</label>
+                                <InputText type='email' inputId={field.name}  value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="dtDesignation_id"
+                            name="relationWithEmergencyContactPerson"
                             control={control}
+                            rules={{ required: 'Email is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Designation</label>
-                                <SelectLookupData field={field} model={DESIGNATION_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Relation with Emergency Contact Person</label>
+                                <InputText type='email' inputId={field.name}  value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
+                    </div>
+                    </Fieldset>                    
+                    <Fieldset className="card col-12" legend="Office Related Information">
+                    <div className="p-fluid grid">
                     <div className="field col-12 md:col-4">
-                        <Controller
-                            name="dtOfficeTime_id"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Office Time</label>
-                                <SelectLookupData field={field} model={OFFICE_TIME_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="dtGroup_id"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Group</label>
-                                <SelectLookupData field={field} model={GROUP_MODEL}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-4 ">
-                        <div className='field'>Status</div>
-                        <Controller
-                            name="status"
-                            control={control}
-                            render={({ field, fieldState }) => (
+                            <Controller
+                                name="punchID"
+                                control={control}
+                                rules={{ required: 'Punch ID is required.' }}
+                                render={({ field, fieldState }) => (
                                 <>
-                                    <InputSwitch inputId={field.name} checked={field.value} inputRef={field.ref} onChange={(e) => field.onChange(e.value)} />
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Punch</label>
+                                    <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                    {getFormErrorMessage(field.name)}
                                 </>
-                            )}
-                        />
-                    </div>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-4">
+                            <Controller
+                                name="dtGrade_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Grade</label>
+                                    <SelectLookupData field={field} model={GRADE_MODEL}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-4">
+                            <Controller
+                                name="dtDepartment_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Department</label>
+                                    <SelectLookupData field={field} model={DEPARTMENT_MODEL}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-4">
+                            <Controller
+                                name="dtDesignation_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Designation</label>
+                                    <SelectLookupData field={field} model={DESIGNATION_MODEL}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-4">
+                            <Controller
+                                name="dtOfficeTime_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Office Time</label>
+                                    <SelectLookupData field={field} model={OFFICE_TIME_MODEL}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
 
-               
-                </div>
+                        <div className="field col-12 md:col-4">
+                            <Controller
+                                name="dtGroup_id"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Group</label>
+                                    <SelectLookupData field={field} model={GROUP_MODEL}
+                                        className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                        </div>
+                        <div className="field col-12 md:col-4 ">
+                            <div className='field'>Status</div>
+                            <Controller
+                                name="status"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <InputSwitch inputId={field.name} checked={field.value} inputRef={field.ref} onChange={(e) => field.onChange(e.value)} />
+                                    </>
+                                )}
+                            />
+                        </div>
+                    </div>
+                    </Fieldset>
+                    </div>
                 <>
                     <Button type="submit" label="Submit" className="mt-2" />
                 </>

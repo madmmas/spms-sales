@@ -1,19 +1,17 @@
+import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
-import { STOCK_MODEL } from '../../../constants/models';
+import { STOCK_OUT_MODEL } from '../../../constants/models';
 
-const StockOut = () => {
+const StockIn = () => {
 
-    const modelName = STOCK_MODEL;
+    const modelName = STOCK_OUT_MODEL;
 
     const toast = useRef(null);
     const dt = useRef(null);
@@ -32,19 +30,13 @@ const StockOut = () => {
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [dtStockOut, setStockOut] = useState(null);
+    const [dtStockIn, setStockIn] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
-
-    let loadLazyTimeout = null;
 
     const transactionService = new TransactionService();
 
     useEffect(() => {
         initFilters();
-        // transactionService.getAllWithoutParams(BANK_MODEL).then(data => {
-        //     setStockOut(data);
-        // });
     }, []);
     
     const clearFilter = () => {
@@ -62,18 +54,12 @@ const StockOut = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setStockOut(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 500 );
+        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setStockIn(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {
@@ -94,11 +80,48 @@ const StockOut = () => {
         setLazyParams(_lazyParams);
     }
 
+    const getDate = (date) => {
+        return moment(parseInt(date)).format('DD/MM/YYYY');
+        // let d = new Date(parseInt(date));
+        // return d.toDateString();
+    }
+
+    const dateBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getDate(rowData.date)}
+            </>
+        );
+    };
 
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.name}
+                {rowData.dtProduct_id_shortname}
+            </>
+        );
+    };
+
+    const quantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.quantity}
+            </>
+        );
+    };
+
+    const totalPurchaseCostBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalPurchaseCost}
+            </>
+        );
+    };
+
+    const totalTradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalTradePrice}
             </>
         );
     };
@@ -121,7 +144,7 @@ const StockOut = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <DataTable
-                        ref={dt} value={dtStockOut} dataKey="_id" 
+                        ref={dt} value={dtStockIn} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -133,7 +156,10 @@ const StockOut = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="accName" header="Account Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        {/* <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
                     </DataTable>
                 </div>
             </div>
@@ -141,4 +167,4 @@ const StockOut = () => {
     );
 };
 
-export default StockOut;
+export default StockIn;

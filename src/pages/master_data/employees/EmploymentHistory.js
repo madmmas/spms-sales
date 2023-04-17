@@ -10,21 +10,29 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { ConfigurationService } from '../../services/ConfigurationService';
-import { GRADE_MODEL } from '../../constants/models';
+import { HRService } from '../../../services/HRService';
+import { EMP_HISTORY_MODEL } from '../../../constants/models';
 
-const Grade = () => {
+const EmploymentHistory = ({empProfile}) => {
 
-    const modelName = GRADE_MODEL;
+    const modelName = EMP_HISTORY_MODEL;
 
     const toast = useRef(null);
     const dt = useRef(null);
     const contextPath = '~';
 
-    let emptyGrade = {
+    let emptyEmploymentHistory = {
         _id: null,
-        description: '',
-        name: ''
+        empId: '',
+        designation: '',
+        department: '',
+        workLocation: '',
+        supervisorId: '',
+        joiningDate: '',
+        leavingDate: '',
+        employmentStatus: '',
+        dateOfParmanent: '',
+        grossSalary: ''
     };
 
     let defaultFilters = {
@@ -35,25 +43,33 @@ const Grade = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'empId': { operator: FilterOperator.AND, constraints: [{ value: empProfile.empId, matchMode: FilterMatchMode.EQUALS }] },
+            'designation': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'department': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'workLocation': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'supervisorId': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'joiningDate': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'leavingDate': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'employmentStatus': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'dateOfParmanent': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] },
+            'grossSalary': { operator: FilterOperator.AND, constraints: [{ value: '', matchMode: FilterMatchMode.EQUALS }] }
         }
     };
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [empProfiles, setGrades] = useState(null);
-    const [empProfileDialog, setGradeDialog] = useState(false);
-    const [deleteGradeDialog, setDeleteGradeDialog] = useState(false);
-    const [deleteGradesDialog, setDeleteGradesDialog] = useState(false);
-    const [grade, setGrade] = useState(emptyGrade);
-    const [selectedGrades, setSelectedGrades] = useState(null);
+    const [empProfiles, setEmploymentHistorys] = useState(null);
+    const [empProfileDialog, setEmploymentHistoryDialog] = useState(false);
+    const [deleteEmploymentHistoryDialog, setDeleteEmploymentHistoryDialog] = useState(false);
+    const [deleteEmploymentHistorysDialog, setDeleteEmploymentHistorysDialog] = useState(false);
+    const [employmentHistory, setEmploymentHistory] = useState(emptyEmploymentHistory);
+    const [selectedEmploymentHistorys, setSelectedEmploymentHistorys] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const configurationManagementService = new ConfigurationService();
+    const hrManagementService = new HRService();
 
     useEffect(() => {
         initFilters();
@@ -73,97 +89,96 @@ const Grade = () => {
 
     const loadLazyData = () => {
         setLoading(true);
-
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
-            setGrades(data.rows);
+            setEmploymentHistorys(data.rows);
             setLoading(false);
         });
     }
 
     const openNew = () => {
         setCreateEdit(true);
-        setGrade(emptyGrade);
+        setEmploymentHistory(emptyEmploymentHistory);
         setSubmitted(false);
-        setGradeDialog(true);
+        setEmploymentHistoryDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setGradeDialog(false);
+        setEmploymentHistoryDialog(false);
     };
 
-    const hideDeleteGradeDialog = () => {
-        setDeleteGradeDialog(false);
+    const hideDeleteEmploymentHistoryDialog = () => {
+        setDeleteEmploymentHistoryDialog(false);
     };
 
-    const hideDeleteGradesDialog = () => {
-        setDeleteGradesDialog(false);
+    const hideDeleteEmploymentHistorysDialog = () => {
+        setDeleteEmploymentHistorysDialog(false);
     };
 
-    const saveGrade = () => {
+    const saveEmploymentHistory = () => {
         setSubmitted(true);
 
-        if (grade.name.trim()) {
-            if (grade._id) {
-                configurationManagementService.update(modelName, grade._id, grade).then(data => {
+        if (employmentHistory.name.trim()) {
+            if (employmentHistory._id) {
+                hrManagementService.update(modelName, employmentHistory._id, employmentHistory).then(data => {
                     console.log(data);
                     loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Grade Updated', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistory Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, grade).then(data => {
+                hrManagementService.create(modelName, employmentHistory).then(data => {
                     console.log(data);
                     loadLazyData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Grade Created', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistory Created', life: 3000 });
                 });
             }
 
-            setGradeDialog(false);
-            setGrade(emptyGrade);
+            setEmploymentHistoryDialog(false);
+            setEmploymentHistory(emptyEmploymentHistory);
         }
     };
 
-    const editGrade = (grade) => {
+    const editEmploymentHistory = (employmentHistory) => {
         setCreateEdit(false);
-        setGrade({ ...grade });
-        setGradeDialog(true);
+        setEmploymentHistory({ ...employmentHistory });
+        setEmploymentHistoryDialog(true);
     };
 
-    const confirmDeleteGrade = (grade) => {
-        setGrade(grade);
-        setDeleteGradeDialog(true);
+    const confirmDeleteEmploymentHistory = (employmentHistory) => {
+        setEmploymentHistory(employmentHistory);
+        setDeleteEmploymentHistoryDialog(true);
     };
 
-    const deleteGrade = () => {
-        configurationManagementService.delete(modelName, grade._id).then(data => {
+    const deleteEmploymentHistory = () => {
+        hrManagementService.delete(modelName, employmentHistory._id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
         });
-        setDeleteGradeDialog(false);
-        setGrade(emptyGrade);
+        setDeleteEmploymentHistoryDialog(false);
+        setEmploymentHistory(emptyEmploymentHistory);
     };
 
     const exportCSV = () => {
         dt.current.exportCSV();
     };
 
-    const deleteSelectedGrades = () => {
-        let _empProfiles = empProfiles.filter((val) => !selectedGrades.includes(val));
-        setGrades(_empProfiles);
-        setDeleteGradesDialog(false);
-        setSelectedGrades(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Grades Deleted', life: 3000 });
+    const deleteSelectedEmploymentHistorys = () => {
+        let _empProfiles = empProfiles.filter((val) => !selectedEmploymentHistorys.includes(val));
+        setEmploymentHistorys(_empProfiles);
+        setDeleteEmploymentHistorysDialog(false);
+        setSelectedEmploymentHistorys(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistorys Deleted', life: 3000 });
     };
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...grade };
+        let _empProfile = { ...employmentHistory };
         _empProfile[`${name}`] = val;
 
-        setGrade(_empProfile);
+        setEmploymentHistory(_empProfile);
     };
 
     const onPage = (event) => {
@@ -221,8 +236,8 @@ const Grade = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editGrade(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteGrade(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editEmploymentHistory(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteEmploymentHistory(rowData)} />
             </>
         );
     };
@@ -230,7 +245,7 @@ const Grade = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Grade</h5>
+                <h5 className="m-0">Manage EmploymentHistory</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -239,19 +254,19 @@ const Grade = () => {
     const empProfileDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveGrade} />
+            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveEmploymentHistory} />
         </>
     );
-    const deleteGradeDialogFooter = (
+    const deleteEmploymentHistoryDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteGradeDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteGrade} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteEmploymentHistoryDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteEmploymentHistory} />
         </>
     );
-    const deleteGradesDialogFooter = (
+    const deleteEmploymentHistorysDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteGradesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedGrades} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteEmploymentHistorysDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedEmploymentHistorys} />
         </>
     );
 
@@ -280,34 +295,34 @@ const Grade = () => {
                         <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Grade`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                        
-                        {grade.image && <img src={`${contextPath}/demo/images/grade/${grade.image}`} alt={grade.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} EmploymentHistory`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                        
+                        {employmentHistory.image && <img src={`${contextPath}/demo/images/employmentHistory/${employmentHistory.image}`} alt={employmentHistory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name*</label>
-                            <InputText id="name" value={grade.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !grade.name })} />
-                            {submitted && !grade.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={employmentHistory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !employmentHistory.name })} />
+                            {submitted && !employmentHistory.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={grade.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={employmentHistory.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteGradeDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteGradeDialogFooter} onHide={hideDeleteGradeDialog}>
+                    <Dialog visible={deleteEmploymentHistoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmploymentHistoryDialogFooter} onHide={hideDeleteEmploymentHistoryDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {grade && (
+                            {employmentHistory && (
                                 <span>
-                                    Are you sure you want to delete <b>{grade.empID}</b>?
+                                    Are you sure you want to delete <b>{employmentHistory.empID}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteGradesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteGradesDialogFooter} onHide={hideDeleteGradesDialog}>
+                    <Dialog visible={deleteEmploymentHistorysDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmploymentHistorysDialogFooter} onHide={hideDeleteEmploymentHistorysDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {grade && <span>Are you sure you want to delete the selected items?</span>}
+                            {employmentHistory && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>
@@ -316,4 +331,4 @@ const Grade = () => {
     );
 };
 
-export default Grade;
+export default EmploymentHistory;

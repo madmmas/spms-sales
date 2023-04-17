@@ -3,19 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
+import SelectConstData from '../../components/SelectConstData';
+import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
-import { SUPPLIER_MODEL } from '../../../constants/models';
+import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
+import { ON_SALES_PRODUCT } from '../../../constants/transactions';
+import { PRODUCT_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
-import SaleProductForm from './components/SaleProductForm';
-import SaleProductDetail from './components/SaleProductDetail';
+import { ProductService } from '../../../services/ProductService';
+
+import SalesProductForm from './components/SalesProductForm';
+import SalesProductDetail from './components/SalesProductDetail';
 
 const Form = () => {
 
@@ -24,61 +30,55 @@ const Form = () => {
     let defaultValue = {
         _id: null,
         date: Date.now(),
-        dtSupplier_id: null,
-        currency: null,
-        dtWarehouse_id: null,
-        CnF: null,
-        BENo: null,
-        LCNo: null,
+        customerCategory: "WALKIN",
+        dtCustomer_id: null,
         notes: null,
         items: [],
         totalQuantity: 0,
-        totalCostAmountF: 0.00,
-        totalCostAmountBDT: 0.00,
-        totalTransport: 0.00,
-        totalDuty: 0.00,
-        netCostAmountBDT: 0.00
+        totalPrice: 0.00,
+        totalDiscount: 0.00,
+        deliveryCost: 0.00,
+        vat: 0.00,
+        netAmount: 0.00,
+        payment: {}
     };
 
-    let defaultSaleProduct = {
-        dtProduct_id: null, // select product
-        barCode: null, // fetch from selected product
-        lastSalePrice: 0.00, // fetch from selected product
+    let defaultSalesProduct = {
+        _id: null,
+        dtProduct_id: "",
+        barCode: "",
+        lastSalePrice: 0.00,
 
+        unitTradePrice: 0.00,
         quantity: 1,  
-        unitCostF: 0.00,
-        totalCostF: 0.00,
-        conversionRate: 1,
-        unitCostBDT: 0.00,
-        totalCostBDT: 0.00,
+        totalPrice: 0.00,
+        discount: 0.00,
+        netPrice: 0.00,
 
-        transport: 0.00,
-        duty: 0.00,
-
-        netUnitCostBDT: 0.00,
-        netCostBDT: 0.00,
-
-        profit: 0.00,
-
-        tradeUnitPriceBDT: 0.00,
-
-        minimumTradePrice: 0.00,
+        remarks: "",
     };
 
     const toast = useRef(null);
 
-    const [totalCostAmountF, setTotalAmountF] = useState(0.00);
-    const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
+    const [totalPrice, setTotalPrice] = useState(0.00);
+    const [totalDiscount, setTotalDiscount] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
-    const [totalTransport, setTotalTransport] = useState(0.00);
-    const [totalDuty, setTotalDuty] = useState(0.00);
-    const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
+    const [vat, setVat] = useState(0.00);
+    const [netAmount, setNetAmount] = useState(0.00);
+
     const [sales, setSales] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(defaultSaleProduct);
-    const [deleteProfileDialog, setDeleteSaleProductDialog] = useState(false);
-    const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
+    const [selectedItem, setSelectedItem] = useState({});
+    const [selectedTableItem, setSelectedTableItem] = useState({});
+    const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
+    const [deleteProfileDialog, setDeleteSalesProductDialog] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer_currency] = useState("INR");
+    const [customerCategory, setCustomerCategory] = useState("WALKIN");
+
+    const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
 
     const transactionService = new TransactionService();
+    const productService = new ProductService();
 
     const {
         register,
@@ -87,27 +87,30 @@ const Form = () => {
         resetField,
         handleSubmit
     } = useForm({
-        defaultValues: defaultValue //async () =>  hrManagementService.getById(modelName, SaleProfile)
+        defaultValues: defaultValue
     });
 
     const onSubmit = (formData) => {
+        if(sales.length === 0) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
+            return;
+        }
+
         formData.items = sales;
-        formData.totalCostAmountF = totalCostAmountF;
-        formData.totalCostAmountBDT = totalCostAmountBDT;
         formData.totalQuantity = totalQuantity;
-        formData.totalTransport = totalTransport;
-        formData.totalDuty = totalDuty;
-        formData.netCostAmountBDT = netCostAmountBDT;
-        console.log("FORMDATA::", formData);
+        formData.totalPrice = totalPrice;
+        formData.totalDiscount = totalDiscount;
+        formData.deliveryCost = 0.00;
+        formData.vat = vat;
+        formData.netAmount = netAmount;
 
         try {
-            transactionService.processTransaction(ON_PURCHASE_PRODUCT, formData).then(data => {
+            transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
                 navigate("/sales");
             });
         }
         catch (err){
-            console.log(err)
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
             navigate("/sales");
         }
@@ -125,186 +128,235 @@ const Form = () => {
         let newSales = [...sales];
         addedItem['index'] = sales.length;
         newSales.push(addedItem);
-        console.log("NEWPURCHASE::", newSales);
         setSales(newSales);
-        console.log("PURCHASES::", sales);
         calculateTotals(newSales);
+        clearProductSelection();
     };
 
-    const updateSalelist = (dtSaleProduct) => {
+    const updateSalelist = (dtSalesProduct) => {
         let newSales = [...sales];
-        newSales[selectedProduct.index] = dtSaleProduct;
-        console.log("EDIT::", dtSaleProduct);
+        newSales[selectedProduct.index] = dtSalesProduct;
         setSales(newSales);
         calculateTotals(newSales);
+        clearProductSelection();
+    };
+
+    const clearProductSelection = () => {
+        setSelectedProduct(defaultSalesProduct);
+        setSelectedItem({});
+        setSelectedTableItem({});
+        setUpdateSaleItemMode(false);
     };
 
     const removeItem = () => {
         let newSales = [...sales];
         newSales.splice(selectedProduct.index, 1);
         setSales(newSales);
-        setDeleteSaleProductDialog(false);
+        setDeleteSalesProductDialog(false);
     };
 
     const calculateTotals = (allsales) => {
-        console.log("CALCULATE-PURCHASES::", allsales)
-        let totalCostAmountF = 0;
-        let totalCostAmountBDT = 0;
-        let totalTransport = 0;
-        let totalDuty = 0;
-        let netCostAmountBDT = 0;
-
-        if(allsales && allsales.length > 0) {
-            for(let i=0; i<allsales.length; i++) {
-                totalCostAmountF += allsales[i].totalCostF;
-                totalCostAmountBDT += allsales[i].totalCostBDT;
-                totalTransport += allsales[i].transport;
-                totalDuty += allsales[i].duty;
-                netCostAmountBDT += allsales[i].netCostBDT;
-            }
-        }
-        setTotalQuantity(sales.length);
-        setTotalAmountBDT(totalCostAmountBDT);
-        setTotalAmountF(totalCostAmountF);
-        setTotalTransport(totalTransport);
-        setTotalDuty(totalDuty);
-        setNetAmountBDT(netCostAmountBDT);
-        console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
-        
+        let total = 0.00;
+        let discount = 0.00;
+        let quantity = 0;
+        let vat = 0.00;
+        let netAmount = 0.00;
+        allsales.forEach(sale => {
+            total += sale.totalPrice;
+            discount += sale.discount;
+            quantity += sale.quantity;
+        });
+        vat = (total - discount) * 0.15;
+        netAmount = total - discount + vat;
+        setTotalPrice(total);
+        setTotalDiscount(discount);
+        setTotalQuantity(quantity);
+        setVat(vat);
+        setNetAmount(netAmount);
     };
 
-    const editSaleProduct = (dtSaleProduct) => {
-        console.log("EDIT::", dtSaleProduct);
-        setSelectedProduct(dtSaleProduct);
-        console.log("SET SELECTED PRODUCT::", selectedProduct);
+    const editSalesProduct = (dtSalesProduct) => {
+        console.log(dtSalesProduct);
+        setSelectedProduct(dtSalesProduct);
+        setSelectedTableItem({ "_id": dtSalesProduct.dtProduct_id });
+        setUpdateSaleItemMode(true);
     };
 
-    const confirmDeleteSaleProduct = (dtSaleProduct) => {
-        // setSelectedProduct(dtSaleProduct);
-        setDeleteSaleProductDialog(true);
+    const confirmDeleteSalesProduct = (dtSalesProduct) => {
+        setDeleteSalesProductDialog(true);
     };
 
-    const hideDeleteSaleProductDialog = () => {
-        setDeleteSaleProductDialog(false);
+    const hideDeleteSalesProductDialog = () => {
+        setDeleteSalesProductDialog(false);
     };
 
     const deleteProfileDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSaleProductDialog} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
         </>
     );
 
-    const onSupplierSelect = (selectedRow) => {
-        console.log("SELECTED SUPPLIER::", selectedRow);
-        setSelectedSupplier_currency(selectedRow.currency);
+    const onCustomerSelect = (selectedRow) => {
+        setSelectedCustomer(selectedRow);
     };
+
+    const onSelection = async (e) => {
+        let productSelected = e.value;
+
+        if(selectedCustomer!==null || customerCategory==="WALKIN") {
+            if(updateSaleItemMode) {
+                toast.current.show({ severity: 'warn', summary: 'Please Cancel the update', detail: 'Product in update', life: 3000 });
+                return;
+            }
+
+            let alreadySelected = false;
+            sales.forEach(sale => {
+                if(sale.dtProduct_id === productSelected._id) {
+                    alreadySelected = true;
+                }
+            });
+            if(alreadySelected) {
+                toast.current.show({ severity: 'warn', summary: 'Already Added', detail: 'Product Already Added', life: 3000 });
+                setSelectedTableItem({});
+                setSelectedItem({});
+                setSelectedProduct(defaultSalesProduct);
+                return;
+            }
+
+            let lastTradePrice = 0
+            if(selectedCustomer!==null){
+                lastTradePrice = await productService.getProductCustomerLastPrice(productSelected._id, selectedCustomer);
+            }
+            productSelected['lastTradePrice'] = lastTradePrice;
+
+            setSelectedTableItem({ "_id": productSelected._id });
+            setSelectedItem(productSelected);
+        } else {
+            toast.current.show({ severity: 'warn', summary: 'Please Select Customer', detail: 'Select a Customer First', life: 3000 });
+        }
+    }
+
+    let defaultFilters = {
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        }
+    }
 
     return (
 
 <div className="grid h-screen">    
     <Toast ref={toast} />    
-    <div className="col-3">
-        <div class="card">
-            <Button onClick={() => gotoList()} className="p-button-outlined" label="Go to Sale List" /> 
-            <h5>Sale Detail</h5>
-            <div className=" col-12 md:col-12">
-                <div className="p-fluid formgrid grid">
-                    <div className="field col-12">
-                        <Controller
-                            name="dtSupplier_id"
-                            control={control}
-                            rules={{ required: 'Supplier is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
-                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
-                                    displayField="name"
-                                    onSelect={onSupplierSelect}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
-                                    ]} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
-                        <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="CnF"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="BENo"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="LCNo"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No.</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="notes"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                                <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                </div>
-            </div>
-            <>
-                <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
-            </>
-        </div>
-    </div>
-    <div className="card col-9" >
-        <div className="col-12">
-            {/* <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Add Product</h5> */}
-            <SaleProductForm 
-                onAdd={(dt) => addToSaleList(dt)} 
-                onEdit={(dt) => updateSalelist(dt)}
-                currency={selectedSupplier_currency} 
-                defaultSaleProduct={defaultSaleProduct} 
-                selectedProduct={selectedProduct}
+    <div className="card col-5">
+        <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Sale Detail</h5>
+        <div className="card col-12 md:col-12">
+        <SelectMasterDataTableList displayField="name"
+                fieldValue=""
+                scrollHeight="350px"
+                defaultFilters={defaultFilters}
+                modelName={PRODUCT_MODEL} caption="Select Product"
+                selectedItem={selectedTableItem}
+                showFields={[]} onSelect={onSelection}
+                columns={[
+                    {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
+                    {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
+                    {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
+                    {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
+                    {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
+                ]} 
                 />
         </div>
-        <div className="col-12">
-            <SaleProductDetail sales={sales} supplierCurrency={selectedSupplier_currency}
-                onEdit={(dt) => editSaleProduct(dt)} onDelete={(dt) => confirmDeleteSaleProduct(dt)}
-            />
+        <div className="card col-12 md:col-12">
+            <div className="p-fluid formgrid grid">
+                <div className="field col-12 md:col-4">
+                    <Controller
+                        name="customerCategory"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer Category</label>
+                            <SelectConstData field={field} data={CUSTOMER_CATEGORY}
+                                onSelectChange={(value) => {setCustomerCategory(value)}}
+                                className={classNames({ 'p-invalid': fieldState.error })} /> 
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>
+                <div className="field col-12 md:col-8">
+                <Controller
+                    name="notes"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
+                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} />
+                        </>
+                    )}/>
+                </div>
+
+                <div className="field col-12 md:col-2">
+                    <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-warning" onClick={handleSubmit((d) => onSubmit(d))}/>
+                </div>
+                <div className="field col-12 md:col-2">
+                    <Button type="submit" label="Submit Order" className="p-button p-button-success" onClick={handleSubmit((d) => onSubmit(d))}/>
+                </div>
+
+                <div className="field col-12 md:col-5">
+                    <Controller
+                        name="dtCustomer_id"
+                        control={control}
+                        rules={{
+                            validate: (value) => ((customerCategory === "WALKIN") || (customerCategory !== "WALKIN" && value !== null)) || 'Customer is required.'
+                        }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>
+                            <SelectMasterData field={field} modelName={CUSTOMER_MODEL}
+                                displayField="name"
+                                onSelect={onCustomerSelect}
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                columns={[
+                                    {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'}
+                                ]} />
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>
+                <div className="field col-12 md:col-3">
+                    <label>Last Voucher</label>
+                    <InputText  readOnly={true}/>
+                </div>
+
+            </div>
         </div>
-        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteSaleProductDialog}>
+        
+    </div>
+    <div className="card col-7" >
+        <SalesProductForm 
+            onAdd={(dt) => addToSaleList(dt)} 
+            onEdit={(dt) => updateSalelist(dt)}
+            onCancel={() => clearProductSelection()}
+            currency={selectedCustomer_currency} 
+            defaultSalesProduct={defaultSalesProduct} 
+            selectedItem={selectedItem}
+            selectedProduct={selectedProduct}
+            />
+        <SalesProductDetail sales={sales}
+                totalPrice={totalPrice} netAmount={netAmount} 
+                totalDiscount={totalDiscount} vat={vat}
+                onEdit={(dt) => editSalesProduct(dt)} 
+                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
+            />
+        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteSalesProductDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 <span>
@@ -312,7 +364,7 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
-    </div>
+    </div>     
     </div>
     );
 }

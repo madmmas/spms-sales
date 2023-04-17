@@ -62,8 +62,6 @@ const List = () => {
 
     const hrManagementService = new HRService();
 
-    let loadLazyTimeout = null;
-
     useEffect(() => {
         initFilters();
         configurationService.getAllWithoutParams(GRADE_MODEL).then(data => {
@@ -115,18 +113,12 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setEmpProfiles(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 1000 + 250);
+        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setEmpProfiles(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {

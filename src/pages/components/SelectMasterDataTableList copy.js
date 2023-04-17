@@ -3,11 +3,11 @@ import { DataTable } from 'primereact/datatable';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
+import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
+export default function SelectMasterDataTableList({ scrollHeight, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
 
     const dt = useRef(null);
 
@@ -44,10 +44,6 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
         });
     }
 
-    const hideDialog = () => {
-        setTableDialog(false);
-    };
-
     useEffect(() => {
         initFilters();
     }, []);
@@ -55,18 +51,6 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
     useEffect(() => {
         loadLazyData();
     }, [lazyParams]);
-
-    useEffect(() => {
-        if (trigger) {
-            showDialog();
-        }
-    }, [trigger]);
-
-    const showDialog = () => {
-        setLazyParams(defaultFilters);
-        loadLazyData();
-        setTableDialog(true);
-    };
 
     const initFilters = () => {
         setLazyParams(defaultFilters);
@@ -84,12 +68,6 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
 
     const onSort = (event) => {
         let _lazyParams = { ...lazyParams, ...event };
-        setLazyParams(_lazyParams);
-    }
-
-    const onFilter = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
     }
 
@@ -111,7 +89,10 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
     };
 
     const onSelection = (e) => {
-        setTableDialog(false);
+        // setTableDialog(false);
+        setGlobalFilterValue('');
+        // reload the data
+        initFilters();
         onSelect(e)
     }
 
@@ -125,10 +106,6 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
         return (
             <div className="flex justify-content-between">
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
-                <span className="p-input-icon-left">
-                    <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
-                </span>
             </div>
         );
     };
@@ -137,37 +114,38 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
 
     return (
         <>
-            <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} />
-            <Dialog visible={tableDialog} header={header} modal 
-            style={{ width: dialogWidth }} maximizable contentStyle={{ height: dialogHeight }}
-            onHide={hideDialog}>
-                <DataTable
-                    ref={dt} value={tmpData} dataKey="_id"
-                    className="datatable-responsive" responsiveLayout="scroll"
-                    lazy loading={loading} rows={lazyParams.rows}
-                    onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                    onFilter={onFilter} filterDisplay="row"
-                    filters={lazyParams.filters}
-                    isDataSelectable={isRowSelectable} rowClassName={rowClassName}
-                    scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
-                    paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
-                    rowsPerPageOptions={[5,10, 15]}
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                    globalFilterFields={['name']}
-                    selectionMode="single" selection={selectedRow}
-                    onSelectionChange={(e) => {onSelection(e)}} 
+            {/* <Button icon="pi pi-search" className="p-button-warning" onClick={(e)=>{e.preventDefault(); showDialog()}} /> */}
+            <span className="p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
+                    placeholder="Product Search" />
+            </span>
+            <DataTable
+                ref={dt} value={tmpData} dataKey="_id"
+                className="datatable-responsive" responsiveLayout="scroll"
+                lazy loading={loading} rows={lazyParams.rows}
+                onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
+                // onFilter={onFilter} 
+                filters={lazyParams.filters}
+                isDataSelectable={isRowSelectable} rowClassName={rowClassName}
+                scrollable scrollHeight={scrollHeight} tableStyle={{ minWidth: '50rem' }}
+                paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
+                rowsPerPageOptions={[5, 10]}
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                globalFilterFields={['name']}
+                selectionMode="single" selection={selectedRow}
+                onSelectionChange={(e) => {onSelection(e)}} 
 
-                    emptyMessage="No data found."
-                >
-                    <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
-                    {columns.map((col, index) => {
-                        return (
-                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
-                        )
-                    })}
-                </DataTable>
-            </Dialog>
+                emptyMessage="No data found."
+            >
+                <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
+                {columns.map((col, index) => {
+                    return (
+                        <Column key={index} field={col.field} header={col.header} sortable></Column>
+                    )
+                })}
+            </DataTable>
         </>
     );
 }

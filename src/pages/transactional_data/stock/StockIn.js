@@ -1,14 +1,11 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
 import { STOCK_IN_MODEL } from '../../../constants/models';
 
@@ -35,17 +32,11 @@ const StockIn = () => {
     const [totalRecords, setTotalRecords] = useState(0);
     const [dtStockIn, setStockIn] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
-
-    let loadLazyTimeout = null;
 
     const transactionService = new TransactionService();
 
     useEffect(() => {
         initFilters();
-        // transactionService.getAllWithoutParams(BANK_MODEL).then(data => {
-        //     setStockIn(data);
-        // });
     }, []);
     
     const clearFilter = () => {
@@ -63,18 +54,12 @@ const StockIn = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setStockIn(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 500 );
+        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setStockIn(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {
@@ -174,8 +159,8 @@ const StockIn = () => {
                         <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        {/* <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
+                        {/* <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
                     </DataTable>
                 </div>
             </div>

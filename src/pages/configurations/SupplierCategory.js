@@ -55,8 +55,6 @@ const SupplierCategory = () => {
 
     const configurationManagementService = new ConfigurationService();
 
-    let loadLazyTimeout = null;
-
     useEffect(() => {
         initFilters();
     }, []);
@@ -76,18 +74,12 @@ const SupplierCategory = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setSupplierCategorys(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 1000 + 250);
+        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setSupplierCategorys(data.rows);
+            setLoading(false);
+        });
     }
 
     const openNew = () => {

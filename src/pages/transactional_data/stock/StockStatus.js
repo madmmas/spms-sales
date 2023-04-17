@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
-import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
-import { TransactionService } from '../../../services/TransactionService';
+
+import { MasterDataService } from '../../../services/MasterDataService';
+
 import { STOCK_MODEL } from '../../../constants/models';
 
 const StockStatus = () => {
@@ -33,17 +32,11 @@ const StockStatus = () => {
     const [totalRecords, setTotalRecords] = useState(0);
     const [dtStockStatus, setStockStatus] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
 
-    let loadLazyTimeout = null;
-
-    const transactionService = new TransactionService();
+    const masterDataService = new MasterDataService();
 
     useEffect(() => {
         initFilters();
-        // transactionService.getAllWithoutParams(BANK_MODEL).then(data => {
-        //     setStockStatus(data);
-        // });
     }, []);
     
     const clearFilter = () => {
@@ -61,18 +54,12 @@ const StockStatus = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setStockStatus(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 500 );
+        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setStockStatus(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {
@@ -92,7 +79,6 @@ const StockStatus = () => {
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
     }
-
 
     const productNameBodyTemplate = (rowData) => {
         return (

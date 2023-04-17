@@ -86,7 +86,6 @@ const ExtraIncome = () => {
 
     const transactionService = new TransactionService();
     const configurationService = new ConfigurationService();
-    let loadLazyTimeout = null;
 
     useEffect(() => {
         initFilters();
@@ -110,18 +109,12 @@ const ExtraIncome = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setExpenseData(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 1000 + 250);
+        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setExpenseData(data.rows);
+            setLoading(false);
+        });
     }
 
     const openNew = () => {

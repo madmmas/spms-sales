@@ -36,15 +36,10 @@ const StockAdjustment = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const hrManagementService = new HRService();
 
-    let loadLazyTimeout = null;
-
     const transactionService = new TransactionService();
 
     useEffect(() => {
         initFilters();
-        // transactionService.getAllWithoutParams(BANK_MODEL).then(data => {
-        //     setStockAdjustment(data);
-        // });
     }, []);
     
     const clearFilter = () => {
@@ -62,18 +57,12 @@ const StockAdjustment = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setStockAdjustment(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 500 );
+        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setStockAdjustment(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {

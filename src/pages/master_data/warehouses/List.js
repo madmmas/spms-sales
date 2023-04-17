@@ -49,8 +49,6 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const hrManagementService = new HRService();
 
-    let loadLazyTimeout = null;
-
     const configurationService = new ConfigurationService();
     
 
@@ -70,18 +68,12 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setProfiles(data.rows);
-                setLoading(false);
-            });
-        }, Math.random() * 500 );
+        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setProfiles(data.rows);
+            setLoading(false);
+        });
     }
 
     const exportCSV = () => {

@@ -47,8 +47,6 @@ const List = () => {
     const hrManagementService = new HRService();
     const transactionService = new TransactionService();
 
-    let loadLazyTimeout = null;
-
     useEffect(() => {
         initFilters();
     }, []);
@@ -65,22 +63,10 @@ const List = () => {
         loadLazyData();
     }, [lazyParams]);
 
-    const loadLazyData = () => {
+    const loadLazyData = async () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            // transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            //     console.log(data)
-            //     setTotalRecords(data.total);
-            //     setProfiles(data.rows);
-            //     setLoading(false);
-            // });
-        }, Math.random() * 1000 + 250);
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);

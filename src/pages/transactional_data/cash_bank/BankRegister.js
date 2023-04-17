@@ -72,15 +72,10 @@ const BankRegister = () => {
     const [addWithdraw, setAddWithdraw] = useState(false);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    let loadLazyTimeout = null;
-
     const transactionService = new TransactionService();
 
     useEffect(() => {
         initFilters();
-        // transactionService.getAllWithoutParams(BANK_MODEL).then(data => {
-        //     setBankRegister(data);
-        // });
     }, []);
     
     const clearFilter = () => {

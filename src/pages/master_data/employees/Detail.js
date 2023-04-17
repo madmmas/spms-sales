@@ -8,6 +8,7 @@ import { HRService } from '../../../services/HRService';
 import { EMPLOYEE_MODEL } from '../../../constants/models';
 
 const EmpForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "empProfile" */ './Form'), "empProfile"));
+const EmploymentHistory = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "employmentHistory" */ './EmploymentHistory'), "employmentHistory"));
 // const EmpAttendance = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "empAttendance" */ '../components/AttendanceHistory'), "empAttendance"));
 
 const Detail = () => {
@@ -23,12 +24,14 @@ const Detail = () => {
 
     const tabs = [
         { component: EmpForm },
+        { component: EmploymentHistory },
         // { component: EmpAttendance },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
+        {label: 'Employment History', icon: 'pi pi-fw pi-home'},
         // {label: 'Attendance', icon: 'pi pi-fw pi-calendar'},
     ];
 

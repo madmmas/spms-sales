@@ -47,8 +47,6 @@ const List = () => {
     const hrManagementService = new HRService();
     const transactionService = new TransactionService();
 
-    let loadLazyTimeout = null;
-
     useEffect(() => {
         initFilters();
     }, []);
@@ -65,22 +63,10 @@ const List = () => {
         loadLazyData();
     }, [lazyParams]);
 
-    const loadLazyData = () => {
+    const loadLazyData = async () => {
         setLoading(true);
 
-        if (loadLazyTimeout) {
-            clearTimeout(loadLazyTimeout);
-        }
-
-        loadLazyTimeout = setTimeout(() => {
-            // transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            //     console.log(data)
-            //     setTotalRecords(data.total);
-            //     setProfiles(data.rows);
-            //     setLoading(false);
-            // });
-        }, Math.random() * 1000 + 250);
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -188,6 +174,62 @@ const List = () => {
         );
     };
 
+    const customerCategoryBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.customerCategory}
+            </>
+        );
+    };
+
+    const totalQuantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalQuantity}
+            </>
+        );
+    };
+
+    const totalPriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalPrice}
+            </>
+        );
+    };
+
+    const totalDiscountBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalDiscount}
+            </>
+        );
+    };
+
+    const deliveryCostBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.deliveryCost}
+            </>
+        );
+    };
+
+    const vatBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.vat}
+            </>
+        );
+    };
+
+    const netAmountBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.netAmount}
+            </>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -201,7 +243,6 @@ const List = () => {
         return (
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
             </>
         );
     };
@@ -240,9 +281,16 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="date" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="date" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtCustomer_id" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customerCategory" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalPrice" header="Total Price" filter filterPlaceholder="Search by name" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalDiscount" header="Total Discount" filter filterPlaceholder="Search by name" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="deliveryCost" header="Delivery Cost" filter filterPlaceholder="Search by name" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="vat" header="VAT" filter filterPlaceholder="Search by name" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="netAmount" header="Net Amount" filter filterPlaceholder="Search by name" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

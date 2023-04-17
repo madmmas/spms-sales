@@ -1,25 +1,30 @@
-import axiosInstance from "./AxiosService";
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { MasterDataService } from './MasterDataService';
 
 export class ProductService {
+
     constructor() {
-        // this.contextPath = getConfig().publicRuntimeConfig.contextPath;
+        this.masterDataService = new MasterDataService();
     }
 
-    async getProductsSmall() {
-        return fetch('/demo/data/products-small.json', { headers: { 'Cache-Control': 'no-cache' } })
-            .then((res) => res.json())
-            .then((d) => d.data);
+    async getProductCurrentStock(id) {
+        let filters = {
+            'dtProduct_id': { "operator": FilterOperator.AND, "constraints": [{ "value": id, "matchMode": FilterMatchMode.EQUALS }] },
+        }
+
+        let data = await this.masterDataService.getByFilters("dtStock", filters)
+        console.log(data)
+        return data.currentStock
     }
 
-    async getProducts() {
-        return fetch('/demo/data/products.json', { headers: { 'Cache-Control': 'no-cache' } })
-            .then((res) => res.json())
-            .then((d) => d.data);
-    }
+    async getProductCustomerLastPrice(productId, customerId) {
+        let filters = {
+            'dtProduct_id': { "operator": FilterOperator.AND, "constraints": [{ "value": productId, "matchMode": FilterMatchMode.EQUALS }] },
+            'dtCustomer_id': { "operator": FilterOperator.AND, "constraints": [{ "value": customerId, "matchMode": FilterMatchMode.EQUALS }] },
+        }
 
-    async getProductsWithOrdersSmall() {
-        return fetch('/demo/data/products-orders-small.json', { headers: { 'Cache-Control': 'no-cache' } })
-            .then((res) => res.json())
-            .then((d) => d.data);
+        let data = await this.masterDataService.getByFilters("dtProductSalesCustomer", filters)
+        console.log(data)
+        return data.lastTradePrice
     }
 }

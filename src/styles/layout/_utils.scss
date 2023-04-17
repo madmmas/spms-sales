@@ -8,7 +8,7 @@
 .card {
     background: var(--surface-card);
     border: 1px solid var(--surface-border);
-    padding: 1.5rem;
+    padding: 1rem;
     margin-bottom: 2rem;
     box-shadow: var(--card-shadow);
     border-radius: $borderRadius;
@@ -16,6 +16,18 @@
     &:last-child {
         margin-bottom: 0;
     }
+}
+
+.field > label {
+    margin-bottom: 0;
+}
+
+.p-button.p-button-icon-only {
+    padding: 0;
+}
+
+.p-input-icon-left > i, .p-input-icon-right > i, .p-input-icon-left > svg, .p-input-icon-right > svg, .p-input-icon-left > .p-input-prefix, .p-input-icon-right > .p-input-suffix {
+    // margin-top: -.7rem;
 }
 
 .p-toast {
@@ -27,7 +39,7 @@
 }
 
 .p-inputtext {
-    padding: .5rem;
+    padding: .4rem;
 }
 
 .p-button {
@@ -41,7 +53,7 @@
     height: 2rem;
 }
 .p-datatable .p-datatable-thead > tr > th, .p-datatable .p-datatable-tbody > tr > td {
-    padding: 0.5rem;
+    padding: 0.25rem;
 }
 
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {

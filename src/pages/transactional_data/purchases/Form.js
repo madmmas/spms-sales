@@ -217,7 +217,7 @@ const Form = () => {
                             rules={{ required: 'Supplier is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Suppier*</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier*</label>
                                 <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
                                     displayField="name"
                                     onSelect={onSupplierSelect}
