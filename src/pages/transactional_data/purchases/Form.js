@@ -3,26 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import SelectMasterDataTable from '../../components/SelectMasterDataTable';
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { PACKAGE_MODEL, PRODUCT_MODEL } from '../../../constants/models';
 import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
-import { PURCHASE_MODEL, SUPPLIER_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
+import { SUPPLIER_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
 import PurchaseProductForm from './components/PurchaseProductForm';
 import PurchaseProductDetail from './components/PurchaseProductDetail';
 
-const Form = ({packageProfile}) => {
-
-    const modelName = PACKAGE_MODEL;
+const Form = () => {
 
     let navigate = useNavigate();
 
@@ -240,25 +235,6 @@ const Form = ({packageProfile}) => {
                     </div>
                     <div className="field col-12">
                         <Controller
-                            name="dtWarehouse_id"
-                            control={control}
-                            rules={{ required: 'Warehouse is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
-                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
-                                    displayField="name"
-                                    // onSelect={onSupplierSelect}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}
-                                    ]} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
                             name="CnF"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -306,12 +282,10 @@ const Form = ({packageProfile}) => {
                         )}/>
                     </div>
                 </div>
-            </div>     
-            
+            </div>
             <>
                 <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
             </>
-
         </div>
     </div>
     <div className="card col-9" >
@@ -338,10 +312,7 @@ const Form = ({packageProfile}) => {
                 </span>
             </div>
         </Dialog>
-    </div>     
-
-    
-
+    </div>
     </div>
     );
 }

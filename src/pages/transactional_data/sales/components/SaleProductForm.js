@@ -1,26 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { DataTable } from 'primereact/datatable';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { classNames } from 'primereact/utils';
 
 import SelectMasterData from '../../../components/SelectMasterData';
+import SelectMasterDataOL from '../../../components/SelectMasterDataOL';
 
-import { MasterDataService } from '../../../../services/MasterDataService';
-import { PRODUCT_MODEL } from '../../../../constants/models';
+import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../../constants/models';
 
-export default function SalesProductForm({ visible, trigger, onAdd, onEdit, currency, selectedProduct, defaultPurchaseProduct }) {
+export default function SaleProductForm({ onAdd, onEdit, currency, selectedProduct, defaultSaleProduct }) {
 
-    let emptyPurchaseProduct = {
+    let emptySaleProduct = {
         dtProduct_id: "", // select product
+        dtWarehouse_id: "", // select warehouse
         barCode: "", // fetch from selected product
-        lastPurchasePrice: 0.00, // fetch from selected product
+        lastSalePrice: 0.00, // fetch from selected product
 
         quantity: 1,  
         unitCostF: 0.00,
@@ -35,6 +32,7 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
         netUnitCostBDT: 0.00,
         netCostBDT: 0.00,
 
+        profitPercentage: 0,
         profit: 0.00,
 
         tradeUnitPriceBDT: 0.00,
@@ -50,20 +48,20 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: emptyPurchaseProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: emptySaleProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
     });
 
     const quantityRef = useRef(null);
 
-    const [purchaseProduct, setPurchaseProduct] = useState(defaultPurchaseProduct);
+    const [saleProduct, setSaleProduct] = useState(defaultSaleProduct);
     const [submitted, setSubmitted] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
-        if (selectedProduct) {
+        if (selectedProduct.dtProduct_id) {
             // showDialog();
             reset({ ...selectedProduct });
-            setPurchaseProduct(selectedProduct);
+            setSaleProduct(selectedProduct);
             console.log("Selected Product :::: ", selectedProduct);
             setIsEdit(true);
         }
@@ -73,56 +71,73 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
         return Math.round((num + Number.EPSILON) * 100) / 100;
     };
 
-    const calculateCost = (_purchaseProduct) => {
-        _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.quantity);
-        _purchaseProduct.unitCostBDT = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.conversionRate);
-        _purchaseProduct.totalCostBDT = roundNumber(_purchaseProduct.unitCostBDT * _purchaseProduct.quantity);
-        _purchaseProduct.netUnitCostBDT = roundNumber(_purchaseProduct.unitCostBDT + (_purchaseProduct.transport/_purchaseProduct.quantity) + (_purchaseProduct.duty/_purchaseProduct.quantity));
-        _purchaseProduct.netCostBDT = roundNumber(_purchaseProduct.netUnitCostBDT * _purchaseProduct.quantity);
+    const calculateCost = (_saleProduct) => {
+        _saleProduct.totalCostF = roundNumber(_saleProduct.unitCostF * _saleProduct.quantity);
+        _saleProduct.unitCostBDT = roundNumber(_saleProduct.unitCostF * _saleProduct.conversionRate);
+        _saleProduct.totalCostBDT = roundNumber(_saleProduct.unitCostBDT * _saleProduct.quantity);
+        _saleProduct.netUnitCostBDT = roundNumber(_saleProduct.unitCostBDT + (_saleProduct.transport/_saleProduct.quantity) + (_saleProduct.duty/_saleProduct.quantity));
+        _saleProduct.netCostBDT = roundNumber(_saleProduct.netUnitCostBDT * _saleProduct.quantity);
 
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
-        setPurchaseProduct(_purchaseProduct);
+        _saleProduct.tradeUnitPriceBDT = roundNumber(_saleProduct.netUnitCostBDT + _saleProduct.profit);
+        _saleProduct.minimumTradePrice = _saleProduct.tradeUnitPriceBDT;
+        setSaleProduct(_saleProduct);
 
-        setValue('totalCostF', _purchaseProduct.totalCostF);
-        setValue('unitCostBDT', _purchaseProduct.unitCostBDT);
-        setValue('totalCostBDT', _purchaseProduct.totalCostBDT);
-        setValue('netUnitCostBDT', _purchaseProduct.netUnitCostBDT);
-        setValue('netCostBDT', _purchaseProduct.netCostBDT);
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('totalCostF', _saleProduct.totalCostF);
+        setValue('unitCostBDT', _saleProduct.unitCostBDT);
+        setValue('totalCostBDT', _saleProduct.totalCostBDT);
+        setValue('netUnitCostBDT', _saleProduct.netUnitCostBDT);
+        setValue('netCostBDT', _saleProduct.netCostBDT);
+        setValue('tradeUnitPriceBDT', _saleProduct.tradeUnitPriceBDT);
+        setValue('minimumTradePrice', _saleProduct.minimumTradePrice);
+    };
+
+    const onProfitPercentageChange = (profitPercentage) => {
+        let _saleProduct = { ...saleProduct };
+        _saleProduct.profitPercentage = roundNumber(profitPercentage);
+        _saleProduct.profit = _saleProduct.netUnitCostBDT * roundNumber(profitPercentage) / 100;
+        _saleProduct.tradeUnitPriceBDT = roundNumber(_saleProduct.netUnitCostBDT + _saleProduct.profit);
+        _saleProduct.minimumTradePrice = _saleProduct.tradeUnitPriceBDT;
+        setSaleProduct(_saleProduct);
+
+        setValue('profit', _saleProduct.profit);
+        setValue('profitPercentage', _saleProduct.profitPercentage);
+        setValue('tradeUnitPriceBDT', _saleProduct.tradeUnitPriceBDT);
+        setValue('minimumTradePrice', _saleProduct.minimumTradePrice);
     };
 
     const onProfitChange = (profit) => {
-        let _purchaseProduct = { ...purchaseProduct };
-        _purchaseProduct.profit = roundNumber(profit);
-        // _purchaseProduct.profit =  _purchaseProduct.netCostBDT * roundNumber(profit) / 100;
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
-        setPurchaseProduct(_purchaseProduct);
+        let _saleProduct = { ...saleProduct };
+        _saleProduct.profit = roundNumber(profit);
+        _saleProduct.profitPercentage =  roundNumber(_saleProduct.profit / _saleProduct.netUnitCostBDT * 100);
+        _saleProduct.tradeUnitPriceBDT = roundNumber(_saleProduct.netUnitCostBDT + _saleProduct.profit);
+        _saleProduct.minimumTradePrice = _saleProduct.tradeUnitPriceBDT;
+        setSaleProduct(_saleProduct);
 
-        setValue('profit', _purchaseProduct.profit);
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('profit', _saleProduct.profit);
+        setValue('profitPercentage', _saleProduct.profitPercentage);
+        setValue('tradeUnitPriceBDT', _saleProduct.tradeUnitPriceBDT);
+        setValue('minimumTradePrice', _saleProduct.minimumTradePrice);
     };
 
     const onTradePriceChange = (tradeUnitPriceBDT) => {
-        let _purchaseProduct = { ...purchaseProduct };
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(tradeUnitPriceBDT);
-        _purchaseProduct.profit = roundNumber(_purchaseProduct.tradeUnitPriceBDT - _purchaseProduct.netUnitCostBDT);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
-        setPurchaseProduct(_purchaseProduct);
+        let _saleProduct = { ...saleProduct };
+        _saleProduct.tradeUnitPriceBDT = roundNumber(tradeUnitPriceBDT);
+        _saleProduct.profit = roundNumber(_saleProduct.tradeUnitPriceBDT - _saleProduct.netUnitCostBDT);
+        _saleProduct.profitPercentage =  roundNumber(_saleProduct.profit / _saleProduct.netUnitCostBDT * 100);
+        _saleProduct.minimumTradePrice = _saleProduct.tradeUnitPriceBDT;
+        setSaleProduct(_saleProduct);
 
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('profit', _purchaseProduct.profit);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('tradeUnitPriceBDT', _saleProduct.tradeUnitPriceBDT);
+        setValue('profit', _saleProduct.profit);
+        setValue('profitPercentage', _saleProduct.profitPercentage);
+        setValue('minimumTradePrice', _saleProduct.minimumTradePrice);
     };
     
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || 0;
-        let _purchaseProduct = { ...purchaseProduct };
-        _purchaseProduct[`${name}`] = val;
-        calculateCost(_purchaseProduct);
+        let _saleProduct = { ...saleProduct };
+        _saleProduct[`${name}`] = val;
+        calculateCost(_saleProduct);
 
         setValue(name, val);
     };
@@ -131,44 +146,59 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
         // set focus to quantity
         quantityRef.current.focus();
         console.log("PRODUCT SELECTED::", selectedRow)
-        let _purchaseProduct = { ...purchaseProduct };
+        let _saleProduct = { ...saleProduct };
         console.log(selectedRow.barCode)
-        console.log(selectedRow.lastPurchasePrice)
-        _purchaseProduct['dtProduct_id'] = selectedRow._id;
-        _purchaseProduct['productName'] = selectedRow.name;
-        _purchaseProduct['barCode'] = selectedRow.barCode;
-        _purchaseProduct['lastPurchasePrice'] = selectedRow.lastPurchasePrice;
-        setPurchaseProduct(_purchaseProduct);
+        console.log(selectedRow.lastSalePrice)
+        _saleProduct['dtProduct_id'] = selectedRow._id;
+        _saleProduct['productName'] = selectedRow.name;
+        _saleProduct['barCode'] = selectedRow.barCode;
+        _saleProduct['lastSalePrice'] = selectedRow.lastSalePrice;
+        setSaleProduct(_saleProduct);
 
         setValue('dtProduct_id', selectedRow._id);
         setValue('barCode', selectedRow.barCode);
         setValue('productName', selectedRow.name);
-        setValue('lastPurchasePrice', selectedRow.lastPurchasePrice);
+        setValue('lastSalePrice', selectedRow.lastSalePrice);
+        setValue('dtWarehouse_id', selectedRow.dtWarehouse_id);
     };
 
     const onAddItem = (dt) => {
         console.log(dt);
         onAdd(dt);
-        // setPurchaseProduct(emptyPurchaseProduct);
-        reset({ ...emptyPurchaseProduct });
+        // setSaleProduct(emptySaleProduct);
+        reset({ ...emptySaleProduct });
     };
 
     const onEditItem = (dt) => {
         console.log(dt);
         onEdit(dt);
         setIsEdit(false);
-        reset({ ...emptyPurchaseProduct });
+        reset({ ...emptySaleProduct });
     };
 
     const onCancelEditItem = () => {
         setIsEdit(false);
-        reset({ ...emptyPurchaseProduct });
+        reset({ ...emptySaleProduct });
     };
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
+    let defaultFilters = {
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        }
+    }
     return (
         <div className="p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
@@ -179,13 +209,36 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product*</label>
-                        <SelectMasterData field={field} modelName={PRODUCT_MODEL}
+                        <SelectMasterDataOL field={field} modelName={PRODUCT_MODEL}
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             onSelect={onProductSelect}
+                            defaultFilters={defaultFilters}
                             columns={[
-                                {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name'}, 
-                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category'}
+                                {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
+                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                            ]} />
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
+            </div>
+            <div className="field col-12 md:col-2">
+            <Controller
+                name="dtWarehouse_id"
+                control={control}
+                rules={{ required: 'Warehouse is required.' }}
+                    render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
+                        <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
+                            displayField="name"
+                            className={classNames({ 'p-invalid': fieldState.error })} 
+                            // onSelect={onWarehouseSelect}
+                            columns={[
+                                {field: 'name', header: 'Warehouse', filterPlaceholder: 'Filter by Warehouse'}, 
                             ]} />
                         {getFormErrorMessage(field.name)}
                     </>
@@ -205,11 +258,11 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="lastPurchasePrice"
+                name="lastSalePrice"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
-                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Purchase Price</label>
+                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Sale Price</label>
                 <InputNumber 
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })} 
@@ -358,6 +411,21 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
 
             <div className="field col-12 md:col-2">
             <Controller
+                name="profitPercentage"
+                control={control}
+                render={({ field, fieldState }) => (
+                    <>
+                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Profit (%)</label>
+                <InputNumber
+                    onFocus={(e) => e.target.select()}
+                    inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
+                    onValueChange={(e) => onProfitPercentageChange(e.value)} />
+                    </>
+                )}/>
+            </div>
+
+            <div className="field col-12 md:col-2">
+            <Controller
                 name="profit"
                 control={control}
                 render={({ field, fieldState }) => (
@@ -404,7 +472,7 @@ export default function SalesProductForm({ visible, trigger, onAdd, onEdit, curr
                 {isEdit && <Button  label="Update" className="p-button-primary mr-2" onClick={handleSubmit((d) => onEditItem(d))}></Button>}
                 {isEdit && <Button label="Cancel" className="p-button-warning" onClick={() => onCancelEditItem()}></Button>}            
 
-                {!isEdit && <Button type="submit" label="Add" className="mt-2" onClick={handleSubmit((d) => onAddItem(d))}/>}                
+                {!isEdit && <Button type="submit" label="Add Product" className="mt-2" onClick={handleSubmit((d) => onAddItem(d))}/>}                
             </div>
         </div>
     );

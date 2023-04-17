@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
@@ -184,6 +185,20 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
+    let defaultFilters = {
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        }
+    }
     return (
         <div className="p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
@@ -198,12 +213,13 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             onSelect={onProductSelect}
+                            defaultFilters={defaultFilters}
                             columns={[
-                                {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name'}, 
-                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name'},
-                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No'},
-                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number'},
-                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category'}
+                                {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
+                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
                             ]} />
                         {getFormErrorMessage(field.name)}
                     </>

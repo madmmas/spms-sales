@@ -7,13 +7,12 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
+export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
 
     const dt = useRef(null);
     const op = useRef(null);
-    const isMounted = useRef(false);
 
-    let defaultFilters = {
+    let __defaultFilters = {
         fields: showFields,
         first: 0,
         rows: 10,
@@ -45,13 +44,20 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
         }
         
         loadLazyTimeout = setTimeout(() => {
-            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setTmpData(data.rows);
-                setLoading(false);
-            });
+            // masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            //     console.log(data)
+            //     setTotalRecords(data.total);
+            //     setTmpData(data.rows);
+            //     setLoading(false);
+            // });
         }, Math.random() * 250);
+
+        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setTmpData(data.rows);
+            setLoading(false);
+        });
     }
 
     useEffect(() => {
@@ -61,18 +67,6 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
     useEffect(() => {
         loadLazyData();
     }, [lazyParams]);
-
-    // useEffect(() => {
-    //     if (trigger) {
-    //         showDialog();
-    //     }
-    // }, [trigger]);
-
-    const showDialog = () => {
-        setLazyParams(defaultFilters);
-        loadLazyData();
-        setTableDialog(true);
-    };
 
     const initFilters = () => {
         setLazyParams(defaultFilters);
@@ -147,6 +141,7 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
                 <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
                     onClick={(e) => {op.current.show(e)}}
                     onFocus={(e) => {e.target.select()}}
+                    // onBlur={(e) => {op.current.hide()}}
                     placeholder="Product Search" />
             </span>
             <OverlayPanel ref={op} showCloseIcon>
@@ -155,7 +150,7 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                    // onFilter={onFilter} 
+                    onFilter={onFilter} filterDisplay="row"
                     filters={lazyParams.filters}
                     isDataSelectable={isRowSelectable} rowClassName={rowClassName}
                     scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
@@ -169,10 +164,10 @@ export default function SelectMasterDataTableOL({ trigger, fieldValue, onSelect,
 
                     emptyMessage="No data found."
                 >
-                    <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
+                    <Column selectionMode="single" headerStyle={{ minWidth: '3rem' }}></Column>
                     {columns.map((col, index) => {
                         return (
-                            <Column key={index} field={col.field} header={col.header} sortable></Column>
+                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable headerStyle={{ width: col.width }}></Column>
                         )
                     })}
                 </DataTable>

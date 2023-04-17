@@ -3,26 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { InputNumber } from 'primereact/inputnumber';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import SelectMasterDataTable from '../../components/SelectMasterDataTable';
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { PACKAGE_MODEL, PRODUCT_MODEL } from '../../../constants/models';
 import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
-import { PURCHASE_MODEL, SUPPLIER_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
+import { SUPPLIER_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
-import PurchaseProductForm from './components/SalesProductForm';
-import PurchaseProductDetail from './components/SalesProductDetail';
+import SaleProductForm from './components/SaleProductForm';
+import SaleProductDetail from './components/SaleProductDetail';
 
-const Form = ({packageProfile}) => {
-
-    const modelName = PACKAGE_MODEL;
+const Form = () => {
 
     let navigate = useNavigate();
 
@@ -45,10 +40,10 @@ const Form = ({packageProfile}) => {
         netCostAmountBDT: 0.00
     };
 
-    let defaultPurchaseProduct = {
+    let defaultSaleProduct = {
         dtProduct_id: null, // select product
         barCode: null, // fetch from selected product
-        lastPurchasePrice: 0.00, // fetch from selected product
+        lastSalePrice: 0.00, // fetch from selected product
 
         quantity: 1,  
         unitCostF: 0.00,
@@ -78,9 +73,9 @@ const Form = ({packageProfile}) => {
     const [totalTransport, setTotalTransport] = useState(0.00);
     const [totalDuty, setTotalDuty] = useState(0.00);
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
-    const [purchases, setPurchases] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
-    const [deleteProfileDialog, setDeletePurchaseProductDialog] = useState(false);
+    const [sales, setSales] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(defaultSaleProduct);
+    const [deleteProfileDialog, setDeleteSaleProductDialog] = useState(false);
     const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
 
     const transactionService = new TransactionService();
@@ -92,11 +87,11 @@ const Form = ({packageProfile}) => {
         resetField,
         handleSubmit
     } = useForm({
-        defaultValues: defaultValue //async () =>  hrManagementService.getById(modelName, PurchaseProfile)
+        defaultValues: defaultValue //async () =>  hrManagementService.getById(modelName, SaleProfile)
     });
 
     const onSubmit = (formData) => {
-        formData.items = purchases;
+        formData.items = sales;
         formData.totalCostAmountF = totalCostAmountF;
         formData.totalCostAmountBDT = totalCostAmountBDT;
         formData.totalQuantity = totalQuantity;
@@ -107,94 +102,95 @@ const Form = ({packageProfile}) => {
 
         try {
             transactionService.processTransaction(ON_PURCHASE_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-                navigate("/purchases");
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
+                navigate("/sales");
             });
         }
         catch (err){
             console.log(err)
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-            navigate("/purchases");
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
+            navigate("/sales");
         }
     };
 
     const gotoList = () => {
-        navigate("/purchases");
+        navigate("/sales");
     };
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    const addToPurchaseList = (addedItem) => {
-        let newPurchases = [...purchases];
-        addedItem['index'] = purchases.length;
-        newPurchases.push(addedItem);
-        console.log("NEWPURCHASE::", newPurchases);
-        setPurchases(newPurchases);
-        console.log("PURCHASES::", purchases);
-        calculateTotals(newPurchases);
+    const addToSaleList = (addedItem) => {
+        let newSales = [...sales];
+        addedItem['index'] = sales.length;
+        newSales.push(addedItem);
+        console.log("NEWPURCHASE::", newSales);
+        setSales(newSales);
+        console.log("PURCHASES::", sales);
+        calculateTotals(newSales);
     };
 
-    const updatePurchaselist = (dtPurchaseProduct) => {
-        let newPurchases = [...purchases];
-        newPurchases[selectedProduct.index] = dtPurchaseProduct;
-        console.log("EDIT::", dtPurchaseProduct);
-        setPurchases(newPurchases);
-        calculateTotals(newPurchases);
+    const updateSalelist = (dtSaleProduct) => {
+        let newSales = [...sales];
+        newSales[selectedProduct.index] = dtSaleProduct;
+        console.log("EDIT::", dtSaleProduct);
+        setSales(newSales);
+        calculateTotals(newSales);
     };
 
     const removeItem = () => {
-        let newPurchases = [...purchases];
-        newPurchases.splice(selectedProduct.index, 1);
-        setPurchases(newPurchases);
-        setDeletePurchaseProductDialog(false);
+        let newSales = [...sales];
+        newSales.splice(selectedProduct.index, 1);
+        setSales(newSales);
+        setDeleteSaleProductDialog(false);
     };
 
-    const calculateTotals = (allpurchases) => {
-        console.log("CALCULATE-PURCHASES::", allpurchases)
+    const calculateTotals = (allsales) => {
+        console.log("CALCULATE-PURCHASES::", allsales)
         let totalCostAmountF = 0;
         let totalCostAmountBDT = 0;
         let totalTransport = 0;
         let totalDuty = 0;
         let netCostAmountBDT = 0;
 
-        if(allpurchases && allpurchases.length > 0) {
-            for(let i=0; i<allpurchases.length; i++) {
-                totalCostAmountF += allpurchases[i].totalCostF;
-                totalCostAmountBDT += allpurchases[i].totalCostBDT;
-                totalTransport += allpurchases[i].transport;
-                totalDuty += allpurchases[i].duty;
-                netCostAmountBDT += allpurchases[i].netCostBDT;
+        if(allsales && allsales.length > 0) {
+            for(let i=0; i<allsales.length; i++) {
+                totalCostAmountF += allsales[i].totalCostF;
+                totalCostAmountBDT += allsales[i].totalCostBDT;
+                totalTransport += allsales[i].transport;
+                totalDuty += allsales[i].duty;
+                netCostAmountBDT += allsales[i].netCostBDT;
             }
         }
-        setTotalQuantity(purchases.length);
+        setTotalQuantity(sales.length);
         setTotalAmountBDT(totalCostAmountBDT);
         setTotalAmountF(totalCostAmountF);
         setTotalTransport(totalTransport);
         setTotalDuty(totalDuty);
         setNetAmountBDT(netCostAmountBDT);
         console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
+        
     };
 
-    const editPurchaseProduct = (dtPurchaseProduct) => {
-        console.log("EDIT::", dtPurchaseProduct);
-        setSelectedProduct(dtPurchaseProduct);
+    const editSaleProduct = (dtSaleProduct) => {
+        console.log("EDIT::", dtSaleProduct);
+        setSelectedProduct(dtSaleProduct);
         console.log("SET SELECTED PRODUCT::", selectedProduct);
     };
 
-    const confirmDeletePurchaseProduct = (dtPurchaseProduct) => {
-        // setSelectedProduct(dtPurchaseProduct);
-        setDeletePurchaseProductDialog(true);
+    const confirmDeleteSaleProduct = (dtSaleProduct) => {
+        // setSelectedProduct(dtSaleProduct);
+        setDeleteSaleProductDialog(true);
     };
 
-    const hideDeletePurchaseProductDialog = () => {
-        setDeletePurchaseProductDialog(false);
+    const hideDeleteSaleProductDialog = () => {
+        setDeleteSaleProductDialog(false);
     };
 
     const deleteProfileDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeletePurchaseProductDialog} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSaleProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
         </>
     );
@@ -208,36 +204,10 @@ const Form = ({packageProfile}) => {
 
 <div className="grid h-screen">    
     <Toast ref={toast} />    
-    
-    <div className="card col-9" >
-        <div className="col-12">
-            <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Add Product</h5>
-            <PurchaseProductForm 
-                onAdd={(dt) => addToPurchaseList(dt)} 
-                onEdit={(dt) => updatePurchaselist(dt)}
-                currency={selectedSupplier_currency} 
-                defaultPurchaseProduct={defaultPurchaseProduct} 
-                selectedProduct={selectedProduct}
-                />
-        </div>
-        <div className="col-12">
-            <PurchaseProductDetail purchases={purchases} supplierCurrency={selectedSupplier_currency}
-                onEdit={(dt) => editPurchaseProduct(dt)} onDelete={(dt) => confirmDeletePurchaseProduct(dt)}
-            />
-        </div>
-        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeletePurchaseProductDialog}>
-            <div className="flex align-items-center justify-content-center">
-                <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                <span>
-                    Are you sure you want to delete?
-                </span>
-            </div>
-        </Dialog>
-    </div>     
-
     <div className="col-3">
         <div class="card">
-            <h5>Purchase Detail</h5>
+            <Button onClick={() => gotoList()} className="p-button-outlined" label="Go to Sale List" /> 
+            <h5>Sale Detail</h5>
             <div className=" col-12 md:col-12">
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12">
@@ -262,25 +232,6 @@ const Form = ({packageProfile}) => {
                     <div className="field col-12">
                         <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
                         <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="dtWarehouse_id"
-                            control={control}
-                            rules={{ required: 'Warehouse is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
-                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
-                                    displayField="name"
-                                    // onSelect={onSupplierSelect}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}
-                                    ]} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
                     </div>
                     <div className="field col-12">
                         <Controller
@@ -331,15 +282,37 @@ const Form = ({packageProfile}) => {
                         )}/>
                     </div>
                 </div>
-            </div>     
-            
+            </div>
             <>
                 <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
             </>
-
         </div>
     </div>
-
+    <div className="card col-9" >
+        <div className="col-12">
+            {/* <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Add Product</h5> */}
+            <SaleProductForm 
+                onAdd={(dt) => addToSaleList(dt)} 
+                onEdit={(dt) => updateSalelist(dt)}
+                currency={selectedSupplier_currency} 
+                defaultSaleProduct={defaultSaleProduct} 
+                selectedProduct={selectedProduct}
+                />
+        </div>
+        <div className="col-12">
+            <SaleProductDetail sales={sales} supplierCurrency={selectedSupplier_currency}
+                onEdit={(dt) => editSaleProduct(dt)} onDelete={(dt) => confirmDeleteSaleProduct(dt)}
+            />
+        </div>
+        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteSaleProductDialog}>
+            <div className="flex align-items-center justify-content-center">
+                <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                <span>
+                    Are you sure you want to delete?
+                </span>
+            </div>
+        </Dialog>
+    </div>
     </div>
     );
 }

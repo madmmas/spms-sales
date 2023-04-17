@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
@@ -9,6 +10,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
+import { TransactionService } from '../../../services/TransactionService';
+
 import { SALE_MODEL } from '../../../constants/models';
 
 const List = () => {
@@ -42,6 +45,7 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const hrManagementService = new HRService();
+    const transactionService = new TransactionService();
 
     let loadLazyTimeout = null;
 
@@ -69,13 +73,25 @@ const List = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setProfiles(data.rows);
-                setLoading(false);
-            });
+            // transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            //     console.log(data)
+            //     setTotalRecords(data.total);
+            //     setProfiles(data.rows);
+            //     setLoading(false);
+            // });
         }, Math.random() * 1000 + 250);
+        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setProfiles(data.rows);
+            setLoading(false);
+        });
+    }
+
+    const getDate = (date) => {
+        return moment(parseInt(date)).format('DD/MM/YYYY');
+        // let d = new Date(parseInt(date));
+        // return d.toDateString();
     }
 
     const exportCSV = () => {
@@ -131,12 +147,13 @@ const List = () => {
         hrManagementService.delete(modelName, dtProfile._id).then(data => {
             console.log(data);
             loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Profile Deleted', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
         });
         setDeleteProfileDialog(false);
         setProfile(null);
     };
 
+    
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -155,11 +172,10 @@ const List = () => {
         );
     };
 
-    const idBodyTemplate = (rowData) => {
+    const dateBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Sale ID</span>
-                {rowData.saleId}
+                {getDate(rowData.date)}
             </>
         );
     };
@@ -167,8 +183,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Name</span>
-                {rowData.saleName}
+                {rowData.dtSupplier_id_shortname}
             </>
         );
     };
@@ -225,8 +240,8 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="saleId" header="Sale ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="saleName" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="date" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 

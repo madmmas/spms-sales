@@ -103,19 +103,14 @@ const StockOut = () => {
         );
     };
 
-    const rightToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
-            </React.Fragment>
-        );
-    };
-
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
                 <h5 className="m-0">Stock Out</h5>
-                <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
+                <div className="p-toolbar-group-right">
+                    <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
+                    <Button label="Export" icon="pi pi-upload" className="p-button-help m-2" onClick={exportCSV} />
+                </div>
             </div>
         )
     }
@@ -125,8 +120,6 @@ const StockOut = () => {
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" right={rightToolbarTemplate}></Toolbar>
-
                     <DataTable
                         ref={dt} value={dtStockOut} dataKey="_id" 
                         className="datatable-responsive" responsiveLayout="scroll"

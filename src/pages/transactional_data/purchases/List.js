@@ -73,13 +73,19 @@ const List = () => {
         }
 
         loadLazyTimeout = setTimeout(() => {
-            transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-                console.log(data)
-                setTotalRecords(data.total);
-                setProfiles(data.rows);
-                setLoading(false);
-            });
+            // transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            //     console.log(data)
+            //     setTotalRecords(data.total);
+            //     setProfiles(data.rows);
+            //     setLoading(false);
+            // });
         }, Math.random() * 1000 + 250);
+        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            console.log(data)
+            setTotalRecords(data.total);
+            setProfiles(data.rows);
+            setLoading(false);
+        });
     }
 
     const getDate = (date) => {
