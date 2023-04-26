@@ -24,13 +24,21 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ["date", "dtSupplier_id", "CnF", "BENo", "LCNo", "totalAmountF", "totalAmountBDT", "totalQuantity", "totalTransport", "totalDuty", "netAmountBDT"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
-        filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        filters: {            
+            'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtSupplier_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'CnF': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'BENo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'LCNo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'totalAmountF': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'totalAmountBDT': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'netAmountBDT': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
@@ -104,15 +112,6 @@ const List = () => {
         navigate("/purchases/new");
     };
 
-    const editProfile = (dtProfile) => {
-        navigate("/purchases/" + dtProfile._id);
-    };
-
-    const confirmDeleteProfile = (dtProfile) => {
-        setProfile(dtProfile);
-        setDeleteProfileDialog(true);
-    };
-
     const hideDeleteProfileDialog = () => {
         setDeleteProfileDialog(false);
     };
@@ -174,6 +173,78 @@ const List = () => {
         );
     };
 
+    const cnfBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.CnF}                
+            </>
+        );
+    };
+
+    const beNoBodyTemplate = (rowData) => {
+        return (
+            <>                
+                {rowData.BENo}
+            </>
+        );
+    };
+
+    const lcNOBodyTemplate = (rowData) => {
+        return (
+            <>                
+                {rowData.LCNo}
+            </>
+        );
+    };
+
+    const totalAmountBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalAmountF}
+            </>
+        );
+    };
+
+    const totalAmountBDTBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalAmountBDT}
+            </>
+        );
+    };
+
+    const totalQuantityBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalQuantity}
+            </>
+        );
+    };
+
+    const totalTransportBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalTransport}
+            </>
+        );
+    };
+
+    const totalDutyBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalDuty}
+            </>
+        );
+    };
+
+    const netAmountBDTBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.totalAmountBDT}
+            </>
+        );
+    };
+    
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -182,15 +253,6 @@ const List = () => {
             </div>
         )
     }
-
-    const actionBodyTemplate = (rowData) => {
-        return (
-            <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
-            </>
-        );
-    };
 
     const deleteProfileDialogFooter = (
         <>
@@ -227,8 +289,16 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="date" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="CnF" header="CnF" filter filterPlaceholder="Search by CnF" sortable body={cnfBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="BENo" header="B/E No" filter filterPlaceholder="Search by B/E No" sortable body={beNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="LCNo" header="LC No" filter filterPlaceholder="Search by LC No" sortable body={lcNOBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalAmountF" header="Total Amount F" filter filterPlaceholder="Search by ID" sortable body={totalAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalAmountBDT" header="Total Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={totalAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by Quantity" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalTransport" header="Total Transport" filter filterPlaceholder="Search by Transport" sortable body={totalTransportBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="totalDuty" header="Total Duty" filter filterPlaceholder="Search by Duty" sortable body={totalDutyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="netAmountBDT" header="Net Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={netAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
