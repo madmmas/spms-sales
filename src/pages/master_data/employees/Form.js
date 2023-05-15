@@ -12,7 +12,7 @@ import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import { InputNumber } from 'primereact/inputnumber';
 import { HRService } from '../../../services/HRService';
-import { DISTRICT } from '../../../constants/lookupData';
+import { BLOOD_GROUP, GENDER, MARITAL_STATUS, RELIGION } from '../../../constants/lookupData';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 
 
@@ -81,7 +81,7 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="fullname"
                             control={control}
-                            rules={{ required: 'First Name is required.' }}
+                            rules={{ required: 'Employee Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Full Name</label>
@@ -98,7 +98,7 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="fathername"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Father Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Father's Name</label>
@@ -109,26 +109,13 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="parmanentaddress"
+                            name="mothername"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Mother Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Permanent Address</label>
-                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="presentaddress"
-                            control={control}
-                            rules={{ required: 'Last Name is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Present Address</label>
-                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Mother's Name</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -137,7 +124,7 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="dob"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Date of birth is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Date of Birth</label>
@@ -148,9 +135,35 @@ const Form = ({empProfile}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
+                            name="presentaddress"
+                            control={control}
+                            rules={{ required: 'Present address is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Present Address</label>
+                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="parmanentaddress"
+                            control={control}
+                            rules={{ required: 'Parmanent address is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Permanent Address</label>
+                                <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
                             name="nationality"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Nationality is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Nationality</label>
@@ -163,7 +176,6 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="nid_birth_certificate"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>NID / Birth Certificate No</label>
@@ -176,11 +188,11 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="gender"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Gender is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Gender</label>
-                                <SelectConstData field={field} data={DISTRICT}
+                                <SelectConstData field={field} data={GENDER}
                                         onSelectChange={(value) => {console.log(value); 
                                             // setBankCash(value)
                                         }}
@@ -193,11 +205,10 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="bloodgroup"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Blood Group</label>
-                                <SelectConstData field={field} data={DISTRICT}
+                                <SelectConstData field={field} data={BLOOD_GROUP}
                                         onSelectChange={(value) => {console.log(value); 
                                             // setBankCash(value)
                                         }}
@@ -210,11 +221,11 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="religion"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Religion is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Religion</label>
-                                <SelectConstData field={field} data={DISTRICT}
+                                <SelectConstData field={field} data={RELIGION}
                                         onSelectChange={(value) => {console.log(value); 
                                             // setBankCash(value)
                                         }}
@@ -227,11 +238,11 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="maritalstatus"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
+                            rules={{ required: 'Marital Status is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Marital Status</label>
-                                <SelectConstData field={field} data={DISTRICT}
+                                <SelectConstData field={field} data={MARITAL_STATUS}
                                         onSelectChange={(value) => {console.log(value); 
                                             // setBankCash(value)
                                         }}
@@ -244,7 +255,6 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="tinId"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>TIN ID</label>
@@ -257,7 +267,6 @@ const Form = ({empProfile}) => {
                         <Controller
                             name="passportNo"
                             control={control}
-                            rules={{ required: 'Last Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Passport No</label>
