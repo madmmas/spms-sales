@@ -55,10 +55,16 @@ export const GENDER = [
     { id: 'FEMALE', name: 'Female' }
 ];
 
+export const EMPLOYMENT_STATUS = [
+    { id: 'PART-TIMER', name: 'Part-Timer' },
+    { id: 'CONTRACTUAL', name: 'Contractual' },
+    { id: 'PERMANENT', name: 'Permanent' }
+];
+
 export const MARITAL_STATUS = [
     { id: 'MARRIED', name: 'Married' },
     { id: 'DIVORCED', name: 'Divorced' },
-    { id: 'SAPERATED', name: 'Saperated' },
+    { id: 'SEPARATED', name: 'Separated' },
     { id: 'WIDOWED', name: 'Widowed' },
     { id: 'NEVERMARRIED', name: 'Never Married' }
 ];

@@ -28,7 +28,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["empID", "first_name", "last_name", "phone", "email", "dtGrade_id", "dtDepartment_id", "dtDesignation_id",
+        fields: ["empID", "name", "phone", "email", "dtGrade_id", "dtDepartment_id", "dtDesignation_id",
                  "dtOfficeTime_id","dtGroup_id"],
         first: 0,
         rows: 10,
@@ -37,8 +37,7 @@ const List = () => {
         sortOrder: null,
         filters: {
             'empID': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'first_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'last_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },           
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'email': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'dtGrade_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
@@ -205,19 +204,11 @@ const List = () => {
             </>
         );
     };
-    const first_nameBodyTemplate = (rowData) => {
+    const nameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">First Name</span>
+                <span className="p-column-title">Name</span>
                 {rowData.first_name}
-            </>
-        );
-    };
-    const last_nameBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Last Name</span>
-                {rowData.last_name}
             </>
         );
     };
@@ -234,19 +225,6 @@ const List = () => {
             <>
                 <span className="p-column-title">Email</span>
                 {rowData.email}
-            </>
-        );
-    };
-
-    const gradeCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtgradeCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-
-    const gradeBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Grade ID</span>
-                {rowData.dtGrade_id_shortname}
             </>
         );
     };
@@ -272,29 +250,6 @@ const List = () => {
             </>
         );
     };
-    const officeTimeCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={officeTime} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-    const officetimeBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Office Time</span>
-                {rowData.dtOfficeTime_id_shortname}
-            </>
-        );
-    };
-    const gropuCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={Group} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-    const grouptimeBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Group ID</span>
-                {rowData.dtGroup_id_shortname}
-            </>
-        );
-    };
-
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -349,15 +304,11 @@ const List = () => {
                     >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="empID" header="Employee ID" filter filterPlaceholder="Search by ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="first_name" header="First Name" filter filterPlaceholder="Search by First Name" sortable body={first_nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="last_name" header="Last Name" filter filterPlaceholder="Search by last_name" sortable body={last_nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="phone" header="Phone" filter filterPlaceholder="Search by Phone" sortable body={phoneBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtGrade_id" header="Grade" filter filterElement={gradeCategoryFilterTemplate} sortable body={gradeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtDepartment_id" header="Department" filter filterElement={departmentCategoryFilterTemplate} sortable body={departmentBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtDesignation_id" header="Designation" filter filterElement={designationCategoryFilterTemplate} sortable body={designationBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtOfficeTime_id" header="Office Time" filter filterElement={officeTimeCategoryFilterTemplate} sortable body={officetimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtGroup_id" header="Group ID" filter filterElement={gropuCategoryFilterTemplate} sortable body={grouptimeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> 
+                        <Column field="dtDesignation_id" header="Designation" filter filterElement={designationCategoryFilterTemplate} sortable body={designationBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                       
+                        <Column field="dtDepartment_id" header="Department" filter filterElement={departmentCategoryFilterTemplate} sortable body={departmentBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                
                     </DataTable>
 
                     <Dialog visible={deleteEmpProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteEmpProfileDialogFooter} onHide={hideDeleteEmpProfileDialog}>
