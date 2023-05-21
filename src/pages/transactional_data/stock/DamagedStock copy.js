@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
@@ -12,16 +12,15 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import SelectMasterDataOL from '../../components/SelectMasterDataOL';
+// import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
 import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
-import { PRODUCT_MODEL, DAMAGED_STOCK_MODEL } from '../../../constants/models';
-import { ON_DAMAGED_STOCK } from '../../../constants/transactions';
+import { PRODUCT_MODEL, STOCK_MODEL } from '../../../constants/models';
 
 const DamagedStock = () => {
 
-    const modelName = DAMAGED_STOCK_MODEL;
+    const modelName = STOCK_MODEL;
 
     let defaultValue = {
         date: Date.now(),
@@ -32,8 +31,6 @@ const DamagedStock = () => {
 
     const toast = useRef(null);
     const dt = useRef(null);
-    const quantityRef = useRef(null);
-    const detailsRef = useRef(null);
 
     let defaultFilters = {
         fields: [],
@@ -53,6 +50,8 @@ const DamagedStock = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    const hrManagementService = new HRService();
 
     const transactionService = new TransactionService();
 
@@ -85,7 +84,7 @@ const DamagedStock = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setDamagedStock(data.rows);
@@ -111,11 +110,6 @@ const DamagedStock = () => {
         setLazyParams(_lazyParams);
     }
 
-    const onProductSelect = (selectedRow) => {
-        console.log("PRODUCT SELECTED::", selectedRow)
-        // select quantity from stock
-        quantityRef.current.focus();
-    };
 
     const nameBodyTemplate = (rowData) => {
         return (
@@ -125,48 +119,15 @@ const DamagedStock = () => {
         );
     };
 
-    // reset all form fields
-    const resetForm = () => {
-        resetField('dtProduct_id');
-        resetField('quantity');
-        resetField('details');
-        setSubmitted(false);
+    const addDamagedStock = () => {
+        // 
     };
 
-    // show Add form
-    const openNew = () => {
-        resetForm();
-        setShowForm(true);
-    };
-
-    const addDamagedStock = (formData) => {
-        setSubmitted(true);
-        if (quantityRef.current.value < 1) {
-            return;
-        }
-        let _data = {
-            dtProduct_id: formData.dtProduct_id,
-            quantity: formData.quantity,
-            details: formData.details,
-        };
-        console.log(_data);
-        transactionService.processTransaction(ON_DAMAGED_STOCK, _data).then(response => {
-            console.log(response);
-            if (response.success) {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
-                resetForm();
-                setShowForm(false);
-                loadLazyData();
-            } else {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: response.message, life: 3000 });
-            }
-        });
-    };
 
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button onClick={() => openNew()} className="p-button p-button-primary mr-2" label="Add Damaged Stock" />
+                <Button onClick={() => addDamagedStock()} className="p-button p-button-primary mr-2" label="Add Damaged Stock" />
             </React.Fragment>
         );
     };
@@ -227,13 +188,9 @@ const DamagedStock = () => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    const hideForm = () => {
-        setShowForm(false);
-    };
-
     const footerDialog = (
         <>
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideForm} />
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={setShowForm(false)} />
             <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => addDamagedStock(d))} />
         </>
     );
@@ -265,7 +222,7 @@ const DamagedStock = () => {
                         <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
-                    <Dialog visible={showForm} style={{ width: '450px' }} header={`Add Damaged Stock`} modal className="p-fluid" footer={footerDialog} onHide={hideForm}>                    
+                    {/* <Dialog visible={showForm} style={{ width: '450px' }} header={`Add Damaged Stock`} modal className="p-fluid" footer={footerDialog} onHide={setShowForm(false)}>                    
                         <div className="p-fluid formgrid grid">
                             <div className="field col-12 md:col-6">
                             <Controller
@@ -278,7 +235,7 @@ const DamagedStock = () => {
                                         <SelectMasterDataOL field={field} modelName={PRODUCT_MODEL}
                                             displayField="name"
                                             className={classNames({ 'p-invalid': fieldState.error })} 
-                                            onSelect={onProductSelect}
+                                            // onSelect={onProductSelect}
                                             defaultFilters={defaultFilters}
                                             columns={[
                                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
@@ -301,8 +258,7 @@ const DamagedStock = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="quantity">Quantity*</label>
-                                    <InputNumber ref={quantityRef}
-                                        inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                                         onValueChange={(e) => field.onChange(e)} 
                                         className={classNames({ 'p-invalid': fieldState.error })} />
                                     {getFormErrorMessage(field.name)}
@@ -313,12 +269,10 @@ const DamagedStock = () => {
                             <Controller
                                 name="details"
                                 control={control}
-                                rules={{ required: 'Details is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="details">Details*</label>
-                                    <InputTextarea ref={detailsRef}
-                                        inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
                                         className={classNames({ 'p-invalid': fieldState.error })} 
                                         onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
                                     {getFormErrorMessage(field.name)}
@@ -326,7 +280,7 @@ const DamagedStock = () => {
                             )}/>
                             </div>
                         </div>
-                    </Dialog>
+                    </Dialog> */}
                 </div>
             </div>
         </div>

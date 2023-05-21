@@ -38,6 +38,13 @@ export const COLLECTION_TYPES = [
     { id: 'BANK', name: 'Bank Deposit' }    
 ];
 
+export const PAYMENT_TYPES = [
+    { id: 'CASH', name: 'Cash' },
+    { id: 'MFS', name: 'MFS' },
+    { id: 'BANK', name: 'Bank Deposit' }    
+];
+
+
 export const CUSTOMER_CATEGORY = [
     { id: 'WALKIN', name: 'Walk-in' },
     { id: 'REGISTERED', name: 'Registered' },

@@ -9,6 +9,7 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
+import PaymentDialog from './components/PaymentDialog';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
@@ -40,6 +41,8 @@ const Form = () => {
         deliveryCost: 0.00,
         vat: 0.00,
         netAmount: 0.00,
+        isPaid: false,
+        dueAmount: 0.00,
         payment: {}
     };
 
@@ -64,18 +67,20 @@ const Form = () => {
     const [totalDiscount, setTotalDiscount] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [vat, setVat] = useState(0.00);
+    const [deliveryCost, setDeliveryCost] = useState(0.00);
+    const [vatPercentage, setVatPercentage] = useState(0.00);
     const [netAmount, setNetAmount] = useState(0.00);
 
     const [sales, setSales] = useState([]);
     const [selectedItem, setSelectedItem] = useState({});
     const [selectedTableItem, setSelectedTableItem] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
-    const [deleteProfileDialog, setDeleteSalesProductDialog] = useState(false);
+    const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedCustomer_currency] = useState("INR");
     const [customerCategory, setCustomerCategory] = useState("WALKIN");
-
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
+    const [trigger, setTrigger] = useState(0);
 
     const transactionService = new TransactionService();
     const productService = new ProductService();
@@ -91,10 +96,22 @@ const Form = () => {
     });
 
     const onSubmit = (formData) => {
+        // paymentDialog(true);
         if(sales.length === 0) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
             return;
         }
+
+        if(customerCategory !== "CONDITIONAL") {
+            setTrigger((trigger) => trigger + 1);
+            return;
+        }
+
+        onPaymnetSubmit({});
+    };
+
+    const onPaymnetSubmit = (paymentData) => {
+        let formData = {};
 
         formData.items = sales;
         formData.totalQuantity = totalQuantity;
@@ -103,6 +120,9 @@ const Form = () => {
         formData.deliveryCost = 0.00;
         formData.vat = vat;
         formData.netAmount = netAmount;
+        formData.payment = paymentData;
+        formData.dueAmount = paymentData.dueAmount;
+        formData.isPaid = paymentData.dueAmount === 0.00;
 
         try {
             transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
@@ -141,6 +161,17 @@ const Form = () => {
         clearProductSelection();
     };
 
+    const onVATChange = (vatPercentage) => {
+        setVatPercentage(vatPercentage);
+        let newSales = [...sales];
+        calculateTotals(newSales);
+    };
+
+    const onDeliveryCostChange = (deliveryCost) => {
+        setDeliveryCost(deliveryCost);
+        let newSales = [...sales];
+        calculateTotals(newSales);
+    };
     const clearProductSelection = () => {
         setSelectedProduct(defaultSalesProduct);
         setSelectedItem({});
@@ -166,8 +197,8 @@ const Form = () => {
             discount += sale.discount;
             quantity += sale.quantity;
         });
-        vat = (total - discount) * 0.15;
-        netAmount = total - discount + vat;
+        vat = (total - discount) * (vatPercentage / 100);
+        netAmount = total - discount + vat + deliveryCost;
         setTotalPrice(total);
         setTotalDiscount(discount);
         setTotalQuantity(quantity);
@@ -181,21 +212,6 @@ const Form = () => {
         setSelectedTableItem({ "_id": dtSalesProduct.dtProduct_id });
         setUpdateSaleItemMode(true);
     };
-
-    const confirmDeleteSalesProduct = (dtSalesProduct) => {
-        setDeleteSalesProductDialog(true);
-    };
-
-    const hideDeleteSalesProductDialog = () => {
-        setDeleteSalesProductDialog(false);
-    };
-
-    const deleteProfileDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
-        </>
-    );
 
     const onCustomerSelect = (selectedRow) => {
         setSelectedCustomer(selectedRow);
@@ -252,9 +268,24 @@ const Form = () => {
         }
     }
 
+    const confirmDeleteSalesProduct = (dtSalesProduct) => {
+        setDeleteSalesProductDialog(true);
+    };
+
+    const hideDeleteSalesProductDialog = () => {
+        setDeleteSalesProductDialog(false);
+    };
+
+    const deleteProductDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
+        </>
+    );
+
     return (
 
-<div className="grid h-screen">    
+    <div className="grid h-screen">    
     <Toast ref={toast} />    
     <div className="card col-5">
         <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Sale Detail</h5>
@@ -307,7 +338,9 @@ const Form = () => {
                     <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-warning" onClick={handleSubmit((d) => onSubmit(d))}/>
                 </div>
                 <div className="field col-12 md:col-2">
-                    <Button type="submit" label="Submit Order" className="p-button p-button-success" onClick={handleSubmit((d) => onSubmit(d))}/>
+                    <Button type="submit" label="Submit Order" className="p-button p-button-success" 
+                    onClick={handleSubmit((d) => onSubmit(d))}
+                    />
                 </div>
 
                 <div className="field col-12 md:col-5">
@@ -352,11 +385,13 @@ const Form = () => {
             />
         <SalesProductDetail sales={sales}
                 totalPrice={totalPrice} netAmount={netAmount} 
-                totalDiscount={totalDiscount} vat={vat}
+                totalDiscount={totalDiscount} 
+                vat={vat} onVATChange={onVATChange}
+                onDeliveryCostChange={onDeliveryCostChange}
                 onEdit={(dt) => editSalesProduct(dt)} 
                 onDelete={(dt) => confirmDeleteSalesProduct(dt)}
             />
-        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteSalesProductDialog}>
+        <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteSalesProductDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 <span>
@@ -364,6 +399,11 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
+        <PaymentDialog 
+            customerCategory={customerCategory}
+            netAmount={netAmount} onPaymnetSubmit={(dt) => onPaymnetSubmit(dt)}
+            trigger={trigger} style={{ width: '450px' }} header="Payment" 
+            />
     </div>     
     </div>
     );

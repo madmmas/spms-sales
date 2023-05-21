@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
@@ -20,7 +21,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { getConstantNameById } from '../../utils';
-import { BANK_CASH, COLLECTION_TYPES } from '../../constants/lookupData';
+import { COLLECTION_TYPES } from '../../constants/lookupData';
 import { ON_EXTRA_INCOME_TO_CASH, ON_EXTRA_INCOME_TO_BANK } from '../../constants/transactions';
 
 import { EXTRA_INCOME_MODEL, EXTRA_INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
@@ -36,6 +37,7 @@ const ExtraIncome = () => {
         dtCollectionType_id: null,
         date: null,
         amount: 0,
+        ref: "",
         remarks: '',
     };
     
@@ -68,6 +70,7 @@ const ExtraIncome = () => {
             'dtCollectionType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'ref': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
@@ -249,6 +252,14 @@ const ExtraIncome = () => {
         );
     };
 
+    const refBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.ref}
+            </>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -289,6 +300,7 @@ const ExtraIncome = () => {
                         <Column field="dtExtraIncomeType_id" header="Extra Income Type" filter filterElement={extraIncomeTypeFilterTemplate} sortable body={extraIncomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtCollectionType_id" header="Collection Type" filter  filterElement={collectionTypeFilterTemplate} sortable body={collectionTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="ref" header="Reference" filter filterPlaceholder="Search by ref" sortable body={refBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
@@ -323,23 +335,7 @@ const ExtraIncome = () => {
                                 </>                                
                             )}/>
                             </div>
-                            <div className="field col-12 md:col-6">
-                            <Controller
-                                name="amount"
-                                control={control}
-                                rules={{
-                                    validate: (value) => (value > 0) || 'Enter a valid amount.'
-                                }}
-                                render={({ field, fieldState }) => (
-                                <>
-                                    <label htmlFor="amount">Amount</label>
-                                    <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                                        onValueChange={(e) => field.onChange(e)} 
-                                        className={classNames({ 'p-invalid': fieldState.error })} />
-                                    {getFormErrorMessage(field.name)}
-                                </>
-                            )}/>
-                            </div>
+
                             <div className="field col-12 md:col-6">
                             <Controller
                                 name="dtCollectionType_id"
@@ -377,11 +373,41 @@ const ExtraIncome = () => {
                                 </>
                             )}/>
                             </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="ref"
+                                control={control}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="ref">Reference</label>
+                                    <InputText inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
+                            <Controller
+                                name="amount"
+                                control={control}
+                                rules={{
+                                    validate: (value) => (value > 0) || 'Enter a valid amount.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor="amount">Amount*</label>
+                                    <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                        onValueChange={(e) => field.onChange(e)} 
+                                        className={classNames({ 'p-invalid': fieldState.error })} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>                            
                             <div className="field col-12 md:col-12">
                             <Controller
                                 name="remarks"
                                 control={control}
-                                rules={{ required: 'Remarks is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks*</label>

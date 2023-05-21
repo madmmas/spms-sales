@@ -11,7 +11,7 @@ export const WAREHOUSE_MODEL = 'dtWarehouse';
 export const STOCK_MODEL = 'dtStock';
 
 export const ATTENDANCE_MODEL = 'trxAttendance';
-export const DAMAGED_GOODS_MODEL = 'trxDamagedGood';
+export const DAMAGED_STOCK_MODEL = 'trxDamagedStock';
 export const EXPENSE_MODEL = 'trxExpense';
 export const EXTRA_INCOME_MODEL = 'trxExtraIncome';
 export const INVOICE_MODEL = 'trxInvoice';
@@ -26,7 +26,7 @@ export const BANK_REGISTER = 'trxBankRegister';
 export const CASH_REGISTER = 'trxCashRegister';
 export const EXTRA_INCOME_REGISTER = 'trxExtraIncomeRegister';
 export const EXPENSE_REGISTER = 'trxExpenseRegister';
-export const PYAMENT_REGISTER = 'trxPaymentRegister';
+export const PYAMENT_REGISTER = 'trxPayment';
 
 export const CUSTOMER_CATEGORY_MODEL = 'dtCustomerCategory';
 export const DEPARTMENT_MODEL = 'dtDepartment';
