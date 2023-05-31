@@ -68,6 +68,7 @@ function App() {
   const Designation = React.lazy(() => import("./pages/configurations/Designation"));
   const Grade = React.lazy(() => import("./pages/configurations/Grade"));
   const Group = React.lazy(() => import("./pages/configurations/Group"));
+  const LeavePolicy = React.lazy(() => import("./pages/configurations/LeavePolicy"));
   const OfficeTime = React.lazy(() => import("./pages/configurations/OfficeTime"));
   const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
 
@@ -158,6 +159,7 @@ function App() {
         <Route path="/extra_income_type" element={<RouteAuth pageComponent={<ExtraIncomeType />} />} />
         <Route path="/grade" element={<RouteAuth pageComponent={<Grade />} />} />
         <Route path="/group" element={<RouteAuth pageComponent={<Group />} />} />
+        <Route path="/leave_policy" element={<RouteAuth pageComponent={<LeavePolicy />} />} />
         <Route path="/office_time" element={<RouteAuth pageComponent={<OfficeTime />} />} />
         <Route path="/payment_type" element={<RouteAuth pageComponent={<PaymentType />} />} />
         <Route path="/product_category" element={<RouteAuth pageComponent={<ProductCategory />} />} />

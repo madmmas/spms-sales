@@ -59,6 +59,7 @@ const AppMenu = () => {
                         { label: 'Extra Income Type', icon: 'pi pi-fw pi-list', to: '/extra_income_type' },
                         { label: 'Grade', icon: 'pi pi-fw pi-list', to: '/grade' },
                         { label: 'Group', icon: 'pi pi-fw pi-list', to: '/group' },
+                        { label: 'Leave Policy', icon: 'pi pi-fw pi-list', to: '/leave_policy' },
                         { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
                         { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
