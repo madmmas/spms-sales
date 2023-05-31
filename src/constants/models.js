@@ -11,6 +11,7 @@ export const WAREHOUSE_MODEL = 'dtWarehouse';
 export const STOCK_MODEL = 'dtStock';
 
 export const ATTENDANCE_MODEL = 'trxAttendance';
+export const LEAVE_REQUEST_MODEL = 'trxLeaveRequest';
 export const DAMAGED_STOCK_MODEL = 'trxDamagedStock';
 export const EXPENSE_MODEL = 'trxExpense';
 export const EXTRA_INCOME_MODEL = 'trxExtraIncome';
@@ -35,6 +36,7 @@ export const EXPENSE_TYPE_MODEL = 'dtExpenseType';
 export const EXTRA_INCOME_TYPE_MODEL = 'dtExtraIncomeType';
 export const GRADE_MODEL = 'dtGrade';
 export const GROUP_MODEL = 'dtGroup';
+export const LEAVE_TYPE_MODEL = 'dtLeaveType';
 export const OFFICE_TIME_MODEL = 'dtOfficeTime';
 export const PAYMENT_TYPE_MODEL = 'dtPaymentType';
 export const PRODUCT_CATEGORY_MODEL = 'dtProductCategory';

@@ -23,21 +23,24 @@ function App() {
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
   const BankAccountDetail = React.lazy(() => import("./pages/master_data/bank_accounts/Detail"));
   const BankAccountForm = React.lazy(() => import("./pages/master_data/bank_accounts/Form"));
-  const EmpList = React.lazy(() => import("./pages/master_data/employees/List"));
-  const EmpDetail = React.lazy(() => import("./pages/master_data/employees/Detail"));
-  const EmpForm = React.lazy(() => import("./pages/master_data/employees/Form"));
-  const SupplierList = React.lazy(() => import("./pages/master_data/suppliers/List"));
-  const SupplierDetail = React.lazy(() => import("./pages/master_data/suppliers/Detail"));
-  const SupplierForm = React.lazy(() => import("./pages/master_data/suppliers/Form"));
   const CustomerList = React.lazy(() => import("./pages/master_data/customers/List"));
   const CustomerDetail = React.lazy(() => import("./pages/master_data/customers/Detail"));
   const CustomerForm = React.lazy(() => import("./pages/master_data/customers/Form"));
+  const EmpList = React.lazy(() => import("./pages/master_data/employees/List"));
+  const EmpDetail = React.lazy(() => import("./pages/master_data/employees/Detail"));
+  const EmpForm = React.lazy(() => import("./pages/master_data/employees/Form"));
+  const LeaveList = React.lazy(() => import("./pages/master_data/leaves/List"));
+  const LeaveDetail = React.lazy(() => import("./pages/master_data/leaves/Detail"));
+  const LeaveForm = React.lazy(() => import("./pages/master_data/leaves/Form"));
   const ProductList = React.lazy(() => import("./pages/master_data/products/List"));
   const ProductDetail = React.lazy(() => import("./pages/master_data/products/Detail"));
   const ProductForm = React.lazy(() => import("./pages/master_data/products/Form"));
   const PackageList = React.lazy(() => import("./pages/master_data/packages/List"));
   const PackageDetail = React.lazy(() => import("./pages/master_data/packages/Detail"));
-  const PackageForm = React.lazy(() => import("./pages/master_data/packages/Form"));  
+  const PackageForm = React.lazy(() => import("./pages/master_data/packages/Form"));
+  const SupplierList = React.lazy(() => import("./pages/master_data/suppliers/List"));
+  const SupplierDetail = React.lazy(() => import("./pages/master_data/suppliers/Detail"));
+  const SupplierForm = React.lazy(() => import("./pages/master_data/suppliers/Form"));
   const WarehouseList = React.lazy(() => import("./pages/master_data/warehouses/List"));
   const WarehouseDetail = React.lazy(() => import("./pages/master_data/warehouses/Detail"));
   const WarehouseForm = React.lazy(() => import("./pages/master_data/warehouses/Form"));
@@ -104,6 +107,13 @@ function App() {
           <Route path="new" element={<RouteAuth pageComponent={<EmpForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<EmpDetail />} />} />
         </Route>
+
+        <Route path="/leaves">
+          <Route index element={<RouteAuth pageComponent={<LeaveList />} />} />
+          <Route path="new" element={<RouteAuth pageComponent={<LeaveForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<LeaveDetail />} />} />
+        </Route>
+
         <Route path="/suppliers">
           <Route index element={<RouteAuth pageComponent={<SupplierList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<SupplierForm />} />} />
