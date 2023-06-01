@@ -26,6 +26,9 @@ function App() {
   const EmpList = React.lazy(() => import("./pages/master_data/employees/List"));
   const EmpDetail = React.lazy(() => import("./pages/master_data/employees/Detail"));
   const EmpForm = React.lazy(() => import("./pages/master_data/employees/Form"));
+  const LeaveBalList = React.lazy(() => import("./pages/master_data/leave_balances/List"));
+  const LeaveBalDetail = React.lazy(() => import("./pages/master_data/leave_balances/Detail"));
+  const LeaveBalForm = React.lazy(() => import("./pages/master_data/leave_balances/Form"));
   const SupplierList = React.lazy(() => import("./pages/master_data/suppliers/List"));
   const SupplierDetail = React.lazy(() => import("./pages/master_data/suppliers/Detail"));
   const SupplierForm = React.lazy(() => import("./pages/master_data/suppliers/Form"));
@@ -103,6 +106,11 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<EmpList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<EmpForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<EmpDetail />} />} />
+        </Route>
+        <Route path="/leave_balances">
+          <Route index element={<RouteAuth pageComponent={<LeaveBalList />} />} />
+          <Route path="new" element={<RouteAuth pageComponent={<LeaveBalForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<LeaveBalDetail />} />} />
         </Route>
         <Route path="/suppliers">
           <Route index element={<RouteAuth pageComponent={<SupplierList />} />} />
