@@ -5,8 +5,6 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
-import { InputSwitch } from 'primereact/inputswitch';
-import { Calendar } from 'primereact/calendar';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Fieldset } from 'primereact/fieldset';
 import SelectConstData from '../../components/SelectConstData';
@@ -47,19 +45,19 @@ const Form = ({leaveProfile}) => {
                 hrManagementService.update(modelName, formData._id, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Leave Balance Updated', life: 3000 });
                     setSubmitted(false);
-                    // navigate("/leaves/" + data.ID);
+                    // navigate("/leave_balances/" + data.ID);
                 });
             }
         }
         catch (err){
             console.log(err)
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
-            navigate("/leaves");
+            navigate("/leave_balances");
         }
     };
 
     const gotoList = () => {
-        navigate("/leaves");
+        navigate("/leave_balances");
     };
 
     const getFormErrorMessage = (name) => {
@@ -71,7 +69,7 @@ const Form = ({leaveProfile}) => {
             <Toast ref={toast} />
             <div className="card col-12">
                 {leaveProfile==null && <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />}
-                <h5>{leaveProfile==null?"New":"Edit"} Leave</h5>
+                <h5>{leaveProfile==null?"New":"Edit"} Leave Balance</h5>
                 <form onSubmit={handleSubmit(onSubmit)} >
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12 md:col-6">
@@ -111,7 +109,7 @@ const Form = ({leaveProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Leave Days</label>
-                                <InputText Disabled inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputText disabled  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -124,7 +122,7 @@ const Form = ({leaveProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Leave Taken</label>
-                                <InputText Disabled inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputText disabled  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
