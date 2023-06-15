@@ -51,6 +51,11 @@ export const CUSTOMER_CATEGORY = [
     { id: 'CONDITIONAL', name: 'Conditional' }
 ];
 
+export const ADJUSTMENT_TYPE = [
+    { id: 'ADD', name: 'Addition' },
+    { id: 'REDUCE', name: 'Reduction' }
+];
+
 export const DISTRICT = [
     { id: 'DHAKA', name: 'DHAKA' },
     { id: 'CUMILLA', name: 'CUMILLA' },

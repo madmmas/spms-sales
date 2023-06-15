@@ -44,8 +44,13 @@ const Form = ( { customerCategory, trigger, netAmount, onPaymnetSubmit }) => {
     useEffect(() => {
         if (trigger) {
             showDialog();
-            setValue('dueAmount', 0);
-            setValue('paidAmount', netAmount);
+            if (customerCategory === "WALKIN") {
+                setValue('dueAmount', 0);
+                setValue('paidAmount', netAmount);
+            } else {
+                setValue('dueAmount', netAmount);
+                setValue('paidAmount', 0);    
+            }
         }
     }, [trigger]);
 

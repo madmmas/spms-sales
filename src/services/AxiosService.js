@@ -15,7 +15,7 @@ export const clearLocalStorage = () => {
 export const axiosInstance = axios.create({
    baseURL: env.APP_API_URL,
    timeout: 1000,
- });
+});
 
 axiosInstance.interceptors.request.use(function(config) {
    config.headers = {

@@ -17,7 +17,6 @@ const Login = (username, password) => {
     });
 };
 
-
 const Logout = () => {
   clearLocalStorage()
 };

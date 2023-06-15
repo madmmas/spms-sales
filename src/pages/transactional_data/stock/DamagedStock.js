@@ -14,7 +14,6 @@ import { Toolbar } from 'primereact/toolbar';
 
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
-import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
 import { PRODUCT_MODEL, DAMAGED_STOCK_MODEL } from '../../../constants/models';
 import { ON_DAMAGED_STOCK } from '../../../constants/transactions';

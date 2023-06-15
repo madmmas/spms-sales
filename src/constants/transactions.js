@@ -15,5 +15,4 @@ export const ON_EXTRA_INCOME_TO_BANK = 'onExtraIncomeToBank';
 export const ON_CASH_TO_BANK = 'onCashToBank';
 export const ON_BANK_TO_CASH = 'onBankToCash';
 export const ON_DAMAGED_STOCK = 'onDamagedStock';
-export const ON_STOCK_UP_ADJUSTMENT = 'onStockUpAdjustment';
-export const ON_STOCK_DOWN_ADJUSTMENT = 'onStockDownAdjustment';
+export const ON_STOCK_ADJUSTMENT = 'onStockAdjustment';

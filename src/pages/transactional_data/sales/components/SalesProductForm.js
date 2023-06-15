@@ -21,6 +21,7 @@ export default function SalesProductForm({
         quantity: 1,  
         totalPrice: 0.00,
         discount: 0.00,
+        discountedAmount: 0.00,
         netPrice: 0.00,
 
         remarks: "",
@@ -85,11 +86,13 @@ export default function SalesProductForm({
 
     const calculatePrice = (_saleProduct) => {
         _saleProduct.totalPrice = roundNumber(_saleProduct.unitTradePrice * _saleProduct.quantity);
-        _saleProduct.netPrice = roundNumber(_saleProduct.totalPrice - (_saleProduct.totalPrice * _saleProduct.discount / 100));
+        _saleProduct.discountedAmount = roundNumber(_saleProduct.totalPrice * _saleProduct.discount / 100);
+        _saleProduct.netPrice = roundNumber(_saleProduct.totalPrice -  _saleProduct.discountedAmount);
 
         setSalesProduct(_saleProduct);
 
         setValue('totalPrice', _saleProduct.totalPrice);
+        setValue('discountedAmount', _saleProduct.discountedAmount);
         setValue('netPrice', _saleProduct.netPrice);
     };
     
@@ -110,13 +113,16 @@ export default function SalesProductForm({
         let _saleProduct = { ...salesProduct };
         _saleProduct['dtProduct_id'] = productSelected._id;
         _saleProduct['productName'] = productSelected.name;
-        _saleProduct['barCode'] = productSelected.barCode;
+        _saleProduct['brandName'] = productSelected.brandName;
+        _saleProduct['modelNo'] = productSelected.modelNo;
+        _saleProduct['partNumber'] = productSelected.partNumber;
+        // _saleProduct['barCode'] = productSelected.barCode;
         _saleProduct['unitTradePrice'] = productSelected.unitTradePrice;
         _saleProduct['lastTradePrice'] = productSelected.lastTradePrice;
         _saleProduct['currentStock'] = productStock;
         _saleProduct['quantity'] = 1;
         _saleProduct['discount'] = 0;
-        _saleProduct['remarks'] = '';
+        _saleProduct['remarks'] = productSelected.remarks===null ? '' : productSelected.remarks;
 
         setSalesProduct(_saleProduct);
 
@@ -281,7 +287,7 @@ export default function SalesProductForm({
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Remarks</label>
                 <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
-                    onChange={(e) => onInputChange(e, 'remarks')} />
+                    onChange={(e) => onInputChange(e, 'remarks')} disabled={true} />
                     </>
                 )}/>
             </div>

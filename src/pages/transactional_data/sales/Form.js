@@ -28,23 +28,31 @@ const Form = () => {
 
     let navigate = useNavigate();
 
-    let defaultValue = {
-        _id: null,
-        date: Date.now(),
-        customerCategory: "WALKIN",
-        dtCustomer_id: null,
-        notes: null,
-        items: [],
-        totalQuantity: 0,
-        totalPrice: 0.00,
-        totalDiscount: 0.00,
-        deliveryCost: 0.00,
-        vat: 0.00,
-        netAmount: 0.00,
-        isPaid: false,
-        dueAmount: 0.00,
-        payment: {}
+    let defaultFormValues = {
+        notes: '',
+        dtCustomer_id: '',
+        customerCategory: 'WALKIN',
+        customerMobileNumber: '',
+        customerName: '',
     };
+
+    // let defaultValue = {
+    //     _id: null,
+    //     date: Date.now(),
+    //     customerCategory: "WALKIN",
+    //     dtCustomer_id: null,
+    //     notes: '',
+    //     items: [],
+    //     totalQuantity: 0,
+    //     totalPrice: 0.00,
+    //     totalDiscount: 0.00,
+    //     deliveryCost: 0.00,
+    //     vat: 0.00,
+    //     netAmount: 0.00,
+    //     isPaid: false,
+    //     dueAmount: 0.00,
+    //     payment: {}
+    // };
 
     let defaultSalesProduct = {
         _id: null,
@@ -56,6 +64,7 @@ const Form = () => {
         quantity: 1,  
         totalPrice: 0.00,
         discount: 0.00,
+        discountedAmount: 0.00,
         netPrice: 0.00,
 
         remarks: "",
@@ -65,6 +74,7 @@ const Form = () => {
 
     const [totalPrice, setTotalPrice] = useState(0.00);
     const [totalDiscount, setTotalDiscount] = useState(0.00);
+    const [totalDiscountedAmount, setTotalDiscountedAmount] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [vat, setVat] = useState(0.00);
     const [deliveryCost, setDeliveryCost] = useState(0.00);
@@ -86,13 +96,13 @@ const Form = () => {
     const productService = new ProductService();
 
     const {
-        register,
         control,
         formState: { errors },
-        resetField,
+        reset,
+        setValue,
         handleSubmit
     } = useForm({
-        defaultValues: defaultValue
+        defaultValues: defaultFormValues
     });
 
     const onSubmit = (formData) => {
@@ -117,6 +127,7 @@ const Form = () => {
         formData.totalQuantity = totalQuantity;
         formData.totalPrice = totalPrice;
         formData.totalDiscount = totalDiscount;
+        formData.totalDiscountedAmount = totalDiscountedAmount;
         formData.deliveryCost = 0.00;
         formData.vat = vat;
         formData.netAmount = netAmount;
@@ -172,11 +183,26 @@ const Form = () => {
         let newSales = [...sales];
         calculateTotals(newSales);
     };
+
     const clearProductSelection = () => {
         setSelectedProduct(defaultSalesProduct);
         setSelectedItem({});
         setSelectedTableItem({});
         setUpdateSaleItemMode(false);
+    };
+
+    const clearAll = () => {
+        setSales([]);
+        setTotalPrice(0.00);
+        setTotalDiscount(0.00);
+        setTotalQuantity(0);
+        setVat(0.00);
+        setDeliveryCost(0.00);
+        setVatPercentage(0.00);
+        setNetAmount(0.00);
+        setCustomerCategory("WALKIN");
+        setSelectedCustomer(null);
+        reset(defaultFormValues);
     };
 
     const removeItem = () => {
@@ -189,18 +215,21 @@ const Form = () => {
     const calculateTotals = (allsales) => {
         let total = 0.00;
         let discount = 0.00;
+        let discountedAmount = 0.00;
         let quantity = 0;
         let vat = 0.00;
         let netAmount = 0.00;
         allsales.forEach(sale => {
             total += sale.totalPrice;
             discount += sale.discount;
+            discountedAmount += sale.discountedAmount;
             quantity += sale.quantity;
         });
-        vat = (total - discount) * (vatPercentage / 100);
-        netAmount = total - discount + vat + deliveryCost;
+        vat = (total - discountedAmount) * (vatPercentage / 100);
+        netAmount = total - discountedAmount + vat + deliveryCost;
         setTotalPrice(total);
         setTotalDiscount(discount);
+        setTotalDiscountedAmount(discountedAmount);
         setTotalQuantity(quantity);
         setVat(vat);
         setNetAmount(netAmount);
@@ -217,9 +246,20 @@ const Form = () => {
         setSelectedCustomer(selectedRow);
     };
 
+    const onCustomerCategoryChange = (value) => {
+        setCustomerCategory(value);
+        if(value === "WALKIN") {
+            setSelectedCustomer('');
+            setValue('dtCustomer_id', '');
+            setValue('notes', '');
+            setValue('customerMobileNumber', '');
+            setValue('customerName', '');
+        }
+    };
+
     const onSelection = async (e) => {
         let productSelected = e.value;
-
+        console.log("selectedCustomer::", selectedCustomer);
         if(selectedCustomer!==null || customerCategory==="WALKIN") {
             if(updateSaleItemMode) {
                 toast.current.show({ severity: 'warn', summary: 'Please Cancel the update', detail: 'Product in update', life: 3000 });
@@ -242,7 +282,8 @@ const Form = () => {
 
             let lastTradePrice = 0
             if(selectedCustomer!==null){
-                lastTradePrice = await productService.getProductCustomerLastPrice(productSelected._id, selectedCustomer);
+                // crash here
+                // lastTradePrice = await productService.getProductCustomerLastPrice(productSelected._id, selectedCustomer);
             }
             productSelected['lastTradePrice'] = lastTradePrice;
 
@@ -309,18 +350,18 @@ const Form = () => {
         <div className="card col-12 md:col-12">
             <div className="p-fluid formgrid grid">
                 <div className="field col-12 md:col-4">
-                    <Controller
-                        name="customerCategory"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer Category</label>
-                            <SelectConstData field={field} data={CUSTOMER_CATEGORY}
-                                onSelectChange={(value) => {setCustomerCategory(value)}}
-                                className={classNames({ 'p-invalid': fieldState.error })} /> 
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
+                <Controller
+                    name="customerCategory"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer Category</label>
+                        <SelectConstData field={field} data={CUSTOMER_CATEGORY}
+                            onSelectChange={(value) => onCustomerCategoryChange(value)}
+                            className={classNames({ 'p-invalid': fieldState.error })} /> 
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
                 </div>
                 <div className="field col-12 md:col-8">
                 <Controller
@@ -329,49 +370,74 @@ const Form = () => {
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} />
+                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
                         </>
                     )}/>
                 </div>
 
                 <div className="field col-12 md:col-2">
-                    <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-warning" onClick={handleSubmit((d) => onSubmit(d))}/>
+                    <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-warning" 
+                        onClick={() => clearAll()}
+                    />
                 </div>
                 <div className="field col-12 md:col-2">
                     <Button type="submit" label="Submit Order" className="p-button p-button-success" 
-                    onClick={handleSubmit((d) => onSubmit(d))}
+                        onClick={handleSubmit((d) => onSubmit(d))}
                     />
                 </div>
-
-                <div className="field col-12 md:col-5">
-                    <Controller
-                        name="dtCustomer_id"
-                        control={control}
-                        rules={{
-                            validate: (value) => ((customerCategory === "WALKIN") || (customerCategory !== "WALKIN" && value !== null)) || 'Customer is required.'
-                        }}
-                        render={({ field, fieldState }) => (
+                {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-8">
+                <div className="field col-12 md:col-6">
+                <Controller
+                    name="customerMobileNumber"
+                    control={control}
+                    rules={{ required: 'Mobile Number is required.' }}
+                    render={({ field, fieldState }) => (
                         <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>
-                            <SelectMasterData field={field} modelName={CUSTOMER_MODEL}
-                                displayField="name"
-                                onSelect={onCustomerSelect}
-                                className={classNames({ 'p-invalid': fieldState.error })} 
-                                columns={[
-                                    {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'}
-                                ]} />
-                            {getFormErrorMessage(field.name)}
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Mobile Number</label>
+                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                    {getFormErrorMessage(field.name)}
                         </>
                     )}/>
                 </div>
-                <div className="field col-12 md:col-3">
+                <div className="field col-12 md:col-6">
+                <Controller
+                    name="customerName"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Name</label>
+                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                        </>
+                    )}/>
+                </div>
+                </div>)}
+                {(customerCategory !== "WALKIN") && (<div className="grid col-12 md:col-8">
+                <div className="field col-12 md:col-8">
+                <Controller
+                    name="dtCustomer_id"
+                    control={control}
+                    rules={{ required: 'Custmer is required.' }}
+                    render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>
+                        <SelectMasterData field={field} modelName={CUSTOMER_MODEL}
+                            displayField="name"
+                            onSelect={onCustomerSelect}
+                            className={classNames({ 'p-invalid': fieldState.error })} 
+                            columns={[
+                                {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'}
+                            ]} />
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
+                </div>
+                <div className="field col-12 md:col-4">
                     <label>Last Voucher</label>
                     <InputText  readOnly={true}/>
                 </div>
-
+                </div>)}
             </div>
         </div>
-        
     </div>
     <div className="card col-7" >
         <SalesProductForm 
@@ -385,7 +451,7 @@ const Form = () => {
             />
         <SalesProductDetail sales={sales}
                 totalPrice={totalPrice} netAmount={netAmount} 
-                totalDiscount={totalDiscount} 
+                totalDiscount={totalDiscountedAmount} 
                 vat={vat} onVATChange={onVATChange}
                 onDeliveryCostChange={onDeliveryCostChange}
                 onEdit={(dt) => editSalesProduct(dt)} 

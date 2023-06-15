@@ -12,6 +12,7 @@ export const STOCK_MODEL = 'dtStock';
 
 export const ATTENDANCE_MODEL = 'trxAttendance';
 export const DAMAGED_STOCK_MODEL = 'trxDamagedStock';
+export const STOCK_ADJUSTMENT_MODEL = 'trxStockAdjustment';
 export const EXPENSE_MODEL = 'trxExpense';
 export const EXTRA_INCOME_MODEL = 'trxExtraIncome';
 export const INVOICE_MODEL = 'trxInvoice';
