@@ -13,7 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { HRService } from '../../../services/HRService';
 import { CITIES,DISTRICT } from '../../../constants/lookupData';
 
-import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { ROUTE_MODEL, CUSTOMER_MODEL, CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 const List = () => {
 
@@ -32,7 +32,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','route'],
+        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','dtRoute_id'],
         first: 0,
         rows: 10,
         page: 1,
@@ -45,7 +45,7 @@ const List = () => {
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'district': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'route': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtRoute_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'email': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
 
@@ -79,7 +79,7 @@ const List = () => {
     
     useEffect(() => {
         initFilters();
-        configurationService.getAllWithoutParams(CITIES).then(data => {
+        configurationService.getAllWithoutParams(ROUTE_MODEL).then(data => {
             setRoute(data);
         });
     }, []);
@@ -244,12 +244,12 @@ const List = () => {
     };
   
     const routeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CITIES} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={route} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
     const routeBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.route}
+                {rowData.dtRoute_id_shortname}
             </>
         );
     };
@@ -317,7 +317,7 @@ const List = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtCustomerCategory_id" header="Customer Category" filter filterElement={customerCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -325,7 +325,7 @@ const List = () => {
                         <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="district" header="District" filter filterElement={districtFilterTemplate} sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="route" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtRoute_id" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 

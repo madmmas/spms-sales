@@ -11,7 +11,7 @@ import { CITIES,DISTRICT } from '../../../constants/lookupData';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import { HRService } from '../../../services/HRService';
-import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { ROUTE_MODEL, CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 
 const Form = ({customerProfile}) => {
 
@@ -61,8 +61,7 @@ const Form = ({customerProfile}) => {
                 <h5>{customerProfile==null?"New":"Edit"} Customer</h5>
                 <form onSubmit={handleSubmit(onSubmit)} >
                 <div className="p-fluid formgrid grid">
-
-                <div className="field col-12 md:col-6">
+                    <div className="field col-12 md:col-6">
                         <Controller
                             name="dtCustomerCategory_id"
                             control={control}
@@ -168,13 +167,13 @@ const Form = ({customerProfile}) => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="route"
+                            name="dtRoute_id"
                             control={control}
-                            rules={{ required: 'Route is required.' }}
+                            rules={{ required: 'Business Route is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Route*</label>
-                                <SelectConstData field={field} data={CITIES}
+                                <SelectLookupData field={field} model={ROUTE_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
