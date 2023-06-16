@@ -20,6 +20,7 @@ const AppMenu = () => {
                         { label: 'Bank Accounts', icon: 'pi pi-fw pi-list', to: '/bank_accounts' },
                         { label: 'Customers', icon: 'pi pi-fw pi-list', to: '/customers' },
                         { label: 'Employees', icon: 'pi pi-fw pi-list', to: '/employees' },
+                        { label: 'Leave Approvers', icon: 'pi pi-fw pi-list', to: '/leave_approvers' },
                         { label: 'Package-Products', icon: 'pi pi-fw pi-list', to: '/packages' },
                         { label: 'Products', icon: 'pi pi-fw pi-list', to: '/products' },
                         { label: 'Suppliers', icon: 'pi pi-fw pi-list', to: '/suppliers' },
