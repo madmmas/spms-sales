@@ -3,288 +3,419 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import SelectMasterData from '../../components/SelectMasterData';
+import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 
-import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
+import { ON_SALES_PRODUCT } from '../../../constants/transactions';
+import { PRODUCT_MODEL, PACKAGE_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
+import { ProductService } from '../../../services/ProductService';
+
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
 
 const Form = () => {
 
+    const modelName = PACKAGE_MODEL;
+
     let navigate = useNavigate();
 
-    let defaultValue = {
-        _id: null,
-        date: Date.now(),
-        dtSupplier_id: null,
-        currency: null,
-        dtWarehouse_id: null,
-        CnF: null,
-        BENo: null,
-        LCNo: null,
-        notes: null,
-        items: [],
-        totalQuantity: 0,
-        totalCostAmountF: 0.00,
-        totalCostAmountBDT: 0.00,
-        totalTransport: 0.00,
-        totalDuty: 0.00,
-        netCostAmountBDT: 0.00
+    let defaultFormValues = {
+        notes: '',
+        dtCustomer_id: '',
+        customerCategory: 'WALKIN',
+        customerMobileNumber: '',
+        customerName: '',
     };
 
-    let defaultPackageProduct = {
-        dtProduct_id: null, // select product
-        barCode: null, // fetch from selected product
-        lastPackagePrice: 0.00, // fetch from selected product
+    let defaultSalesProduct = {
+        _id: null,
+        dtProduct_id: "",
+        barCode: "",
+        lastSalePrice: 0.00,
 
+        unitTradePrice: 0.00,
         quantity: 1,  
-        unitCostF: 0.00,
-        totalCostF: 0.00,
-        conversionRate: 1,
-        unitCostBDT: 0.00,
-        totalCostBDT: 0.00,
+        totalPrice: 0.00,
+        discount: 0.00,
+        discountedAmount: 0.00,
+        netPrice: 0.00,
 
-        transport: 0.00,
-        duty: 0.00,
-
-        netUnitCostBDT: 0.00,
-        netCostBDT: 0.00,
-
-        profit: 0.00,
-
-        tradeUnitPriceBDT: 0.00,
-
-        minimumTradePrice: 0.00,
+        remarks: "",
     };
 
     const toast = useRef(null);
 
-    const [totalCostAmountF, setTotalAmountF] = useState(0.00);
-    const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
+    const [totalPrice, setTotalPrice] = useState(0.00);
+    const [totalDiscount, setTotalDiscount] = useState(0.00);
+    const [totalDiscountedAmount, setTotalDiscountedAmount] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
-    const [totalTransport, setTotalTransport] = useState(0.00);
-    const [totalDuty, setTotalDuty] = useState(0.00);
-    const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
-    const [purchases, setPackages] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(defaultPackageProduct);
-    const [deleteProfileDialog, setDeletePackageProductDialog] = useState(false);
-    const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
+    const [vat, setVat] = useState(0.00);
+    const [deliveryCost, setDeliveryCost] = useState(0.00);
+    const [vatPercentage, setVatPercentage] = useState(0.00);
+    const [netAmount, setNetAmount] = useState(0.00);
+
+    const [sales, setSales] = useState([]);
+    const [selectedItem, setSelectedItem] = useState({});
+    const [selectedTableItem, setSelectedTableItem] = useState({});
+    const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
+    const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedCustomer_currency] = useState("INR");
+    const [customerCategory, setCustomerCategory] = useState("WALKIN");
+    const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
+    const [trigger, setTrigger] = useState(0);
 
     const transactionService = new TransactionService();
+    const productService = new ProductService();
 
     const {
-        register,
         control,
         formState: { errors },
-        resetField,
+        reset,
+        setValue,
         handleSubmit
     } = useForm({
-        defaultValues: defaultValue //async () =>  hrManagementService.getById(modelName, PackageProfile)
+        defaultValues: defaultFormValues
     });
 
     const onSubmit = (formData) => {
-        formData.items = purchases;
-        formData.totalCostAmountF = totalCostAmountF;
-        formData.totalCostAmountBDT = totalCostAmountBDT;
+        // paymentDialog(true);
+        if(sales.length === 0) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
+            return;
+        }
+
+        if(customerCategory !== "CONDITIONAL") {
+            setTrigger((trigger) => trigger + 1);
+            return;
+        }
+
+        onPaymnetSubmit({});
+    };
+
+    const onPaymnetSubmit = (paymentData) => {
+        let formData = {};
+
+        formData.items = sales;
         formData.totalQuantity = totalQuantity;
-        formData.totalTransport = totalTransport;
-        formData.totalDuty = totalDuty;
-        formData.netCostAmountBDT = netCostAmountBDT;
-        console.log("FORMDATA::", formData);
+        formData.totalPrice = totalPrice;
+        formData.totalDiscount = totalDiscount;
+        formData.totalDiscountedAmount = totalDiscountedAmount;
+        formData.deliveryCost = 0.00;
+        formData.vat = vat;
+        formData.netAmount = netAmount;
+        formData.payment = paymentData;
+        formData.dueAmount = paymentData.dueAmount;
+        formData.isPaid = paymentData.dueAmount === 0.00;
 
         try {
-            transactionService.processTransaction(ON_PURCHASE_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Record Created', life: 3000 });
-                navigate("/purchases");
-            });
-        }
+            // transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
+            //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Record Created', life: 3000 });
+            //     navigate("/sales");
+            // });
+        // if(packageProfile==null){
+        //     hrManagementService.create(modelName, formData).then(data => {
+        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Created', life: 3000 });
+        //         navigate("/packages/" + data.ID);
+        //     });
+        // }else{
+        //     hrManagementService.update(modelName, formData._id, formData).then(data => {
+        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Updated', life: 3000 });
+        //     });
+        // }
+    }
         catch (err){
-            console.log(err)
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Record Created', life: 3000 });
-            navigate("/purchases");
+            navigate("/sales");
         }
     };
 
     const gotoList = () => {
-        navigate("/purchases");
+        navigate("/sales");
     };
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    const addToPackageList = (addedItem) => {
-        let newPackages = [...purchases];
-        addedItem['index'] = purchases.length;
-        newPackages.push(addedItem);
-        console.log("NEWPURCHASE::", newPackages);
-        setPackages(newPackages);
-        console.log("PURCHASES::", purchases);
-        calculateTotals(newPackages);
+    const addToSaleList = (addedItem) => {
+        let newSales = [...sales];
+        addedItem['index'] = sales.length;
+        newSales.push(addedItem);
+        setSales(newSales);
+        calculateTotals(newSales);
+        clearProductSelection();
     };
 
-    const updatePackagelist = (dtPackageProduct) => {
-        let newPackages = [...purchases];
-        newPackages[selectedProduct.index] = dtPackageProduct;
-        console.log("EDIT::", dtPackageProduct);
-        setPackages(newPackages);
-        calculateTotals(newPackages);
+    const updateSalelist = (dtSalesProduct) => {
+        let newSales = [...sales];
+        newSales[selectedProduct.index] = dtSalesProduct;
+        setSales(newSales);
+        calculateTotals(newSales);
+        clearProductSelection();
+    };
+
+    const onVATChange = (vatPercentage) => {
+        setVatPercentage(vatPercentage);
+        let newSales = [...sales];
+        calculateTotals(newSales);
+    };
+
+    const onDeliveryCostChange = (deliveryCost) => {
+        setDeliveryCost(deliveryCost);
+        let newSales = [...sales];
+        calculateTotals(newSales);
+    };
+
+    const clearProductSelection = () => {
+        setSelectedProduct(defaultSalesProduct);
+        setSelectedItem({});
+        setSelectedTableItem({});
+        setUpdateSaleItemMode(false);
+    };
+
+    const clearAll = () => {
+        setSales([]);
+        setTotalPrice(0.00);
+        setTotalDiscount(0.00);
+        setTotalQuantity(0);
+        setVat(0.00);
+        setDeliveryCost(0.00);
+        setVatPercentage(0.00);
+        setNetAmount(0.00);
+        setCustomerCategory("WALKIN");
+        setSelectedCustomer(null);
+        reset(defaultFormValues);
     };
 
     const removeItem = () => {
-        let newPackages = [...purchases];
-        newPackages.splice(selectedProduct.index, 1);
-        setPackages(newPackages);
-        setDeletePackageProductDialog(false);
+        let newSales = [...sales];
+        newSales.splice(selectedProduct.index, 1);
+        setSales(newSales);
+        setDeleteSalesProductDialog(false);
     };
 
-    const calculateTotals = (allpurchases) => {
-        console.log("CALCULATE-PURCHASES::", allpurchases)
-        let totalCostAmountF = 0;
-        let totalCostAmountBDT = 0;
-        let totalTransport = 0;
-        let totalDuty = 0;
-        let netCostAmountBDT = 0;
+    const calculateTotals = (allsales) => {
+        let total = 0.00;
+        let discount = 0.00;
+        let discountedAmount = 0.00;
+        let quantity = 0;
+        let vat = 0.00;
+        let netAmount = 0.00;
+        allsales.forEach(sale => {
+            total += sale.totalPrice;
+            discount += sale.discount;
+            discountedAmount += sale.discountedAmount;
+            quantity += sale.quantity;
+        });
+        vat = (total - discountedAmount) * (vatPercentage / 100);
+        netAmount = total - discountedAmount + vat + deliveryCost;
+        setTotalPrice(total);
+        setTotalDiscount(discount);
+        setTotalDiscountedAmount(discountedAmount);
+        setTotalQuantity(quantity);
+        setVat(vat);
+        setNetAmount(netAmount);
+    };
 
-        if(allpurchases && allpurchases.length > 0) {
-            for(let i=0; i<allpurchases.length; i++) {
-                totalCostAmountF += allpurchases[i].totalCostF;
-                totalCostAmountBDT += allpurchases[i].totalCostBDT;
-                totalTransport += allpurchases[i].transport;
-                totalDuty += allpurchases[i].duty;
-                netCostAmountBDT += allpurchases[i].netCostBDT;
-            }
+    const editSalesProduct = (dtSalesProduct) => {
+        console.log(dtSalesProduct);
+        setSelectedProduct(dtSalesProduct);
+        setSelectedTableItem({ "_id": dtSalesProduct.dtProduct_id });
+        setUpdateSaleItemMode(true);
+    };
+
+    const onCustomerSelect = (selectedRow) => {
+        setSelectedCustomer(selectedRow);
+    };
+
+    const onCustomerCategoryChange = (value) => {
+        setCustomerCategory(value);
+        if(value === "WALKIN") {
+            setSelectedCustomer('');
+            setValue('dtCustomer_id', '');
+            setValue('notes', '');
+            setValue('customerMobileNumber', '');
+            setValue('customerName', '');
         }
-        setTotalQuantity(purchases.length);
-        setTotalAmountBDT(totalCostAmountBDT);
-        setTotalAmountF(totalCostAmountF);
-        setTotalTransport(totalTransport);
-        setTotalDuty(totalDuty);
-        setNetAmountBDT(netCostAmountBDT);
-        console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
-        
     };
 
-    const editPackageProduct = (dtPackageProduct) => {
-        console.log("EDIT::", dtPackageProduct);
-        setSelectedProduct(dtPackageProduct);
-        console.log("SET SELECTED PRODUCT::", selectedProduct);
+    const onSelection = async (e) => {
+        let productSelected = e.value;
+        console.log("selectedCustomer::", selectedCustomer);
+        if(selectedCustomer!==null || customerCategory==="WALKIN") {
+            if(updateSaleItemMode) {
+                toast.current.show({ severity: 'warn', summary: 'Please Cancel the update', detail: 'Product in update', life: 3000 });
+                return;
+            }
+
+            let alreadySelected = false;
+            sales.forEach(sale => {
+                if(sale.dtProduct_id === productSelected._id) {
+                    alreadySelected = true;
+                }
+            });
+            if(alreadySelected) {
+                toast.current.show({ severity: 'warn', summary: 'Already Added', detail: 'Product Already Added', life: 3000 });
+                setSelectedTableItem({});
+                setSelectedItem({});
+                setSelectedProduct(defaultSalesProduct);
+                return;
+            }
+
+            let lastTradePrice = 0
+            if(selectedCustomer!==null){
+                // crash here
+                // lastTradePrice = await productService.getProductCustomerLastPrice(productSelected._id, selectedCustomer);
+            }
+            productSelected['lastTradePrice'] = lastTradePrice;
+
+            setSelectedTableItem({ "_id": productSelected._id });
+            setSelectedItem(productSelected);
+        } else {
+            toast.current.show({ severity: 'warn', summary: 'Please Select Customer', detail: 'Select a Customer First', life: 3000 });
+        }
+    }
+
+    let defaultFilters = {
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        }
+    }
+
+    const confirmDeleteSalesProduct = (dtSalesProduct) => {
+        setDeleteSalesProductDialog(true);
     };
 
-    const confirmDeletePackageProduct = (dtPackageProduct) => {
-        // setSelectedProduct(dtPackageProduct);
-        setDeletePackageProductDialog(true);
+    const hideDeleteSalesProductDialog = () => {
+        setDeleteSalesProductDialog(false);
     };
 
-    const hideDeletePackageProductDialog = () => {
-        setDeletePackageProductDialog(false);
-    };
-
-    const deleteProfileDialogFooter = (
+    const deleteProductDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeletePackageProductDialog} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
         </>
     );
 
-    const onSupplierSelect = (selectedRow) => {
-        console.log("SELECTED SUPPLIER::", selectedRow);
-        setSelectedSupplier_currency(selectedRow.currency);
-    };
-
     return (
 
-<div className="grid h-screen">    
+    <div className="grid h-screen">    
     <Toast ref={toast} />    
-    <div className="col-3">
-        <div class="card">
-            <Button onClick={() => gotoList()} className="p-button-outlined" label="Go to Package List" /> 
-            <h5>Package Detail</h5>
-            <div className=" col-12 md:col-12">
-                <div className="p-fluid formgrid grid">
-                    <div className="field col-12">
-                        <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
-                        <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="CnF"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="BENo"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="LCNo"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No.</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12">
-                        <Controller
-                            name="notes"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                                <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                </div>
-            </div>
-            <>
-                <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
-            </>
-        </div>
-    </div>
-    <div className="card col-9" >
-        <div className="col-12">
-            {/* <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Add Product</h5> */}
-            <PackageProductForm 
-                onAdd={(dt) => addToPackageList(dt)} 
-                onEdit={(dt) => updatePackagelist(dt)}
-                currency={selectedSupplier_currency} 
-                defaultPackageProduct={defaultPackageProduct} 
-                selectedProduct={selectedProduct}
+    <div className="card col-4">
+        <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Package Detail</h5>
+        <div className="card col-12 md:col-12">
+        <SelectMasterDataTableList displayField="name"
+                fieldValue=""
+                scrollHeight="200px"
+                defaultFilters={defaultFilters}
+                modelName={PRODUCT_MODEL} caption="Select Product"
+                selectedItem={selectedTableItem}
+                showFields={[]} onSelect={onSelection}
+                columns={[
+                    {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
+                    {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
+                    {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
+                    {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
+                    {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
+                ]} 
                 />
         </div>
-        <div className="col-12">
-            <PackageProductDetail purchases={purchases} supplierCurrency={selectedSupplier_currency}
-                onEdit={(dt) => editPackageProduct(dt)} onDelete={(dt) => confirmDeletePackageProduct(dt)}
-            />
+        <div className="card col-12 md:col-12">
+            <div className="p-fluid formgrid grid">
+                
+                <div className="field col-12 md:col-6">
+                    <Button type="submit" label="Cancel" className="p-button-outlined p-button-warning" 
+                        onClick={() => clearAll()}
+                    />
+                </div>
+                <div className="field col-12 md:col-6">
+                    <Button type="submit" label="Save" className="p-button p-button-success" 
+                        onClick={handleSubmit((d) => onSubmit(d))}
+                    />
+                </div>
+                
+            </div>
         </div>
-        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeletePackageProductDialog}>
+    </div>
+    <div className="card col-8" >
+    <div className="card col-12 md:col-12">
+            <div className="p-fluid formgrid grid">
+                <div className="field col-12 md:col-4">
+                <Controller
+                    name="name"
+                    control={control}
+                    rules={{ required: 'Name is required.' }}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Name*</label>
+                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                    {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>
+                <div className="field col-12 md:col-2">
+                <Controller
+                    name="code"
+                    control={control}
+                    rules={{ required: 'Code is required.' }}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>
+                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                    {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>
+                <div className="field col-12 md:col-6">
+                <Controller
+                    name="notes"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
+                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                        </>
+                    )}/>
+                </div>
+
+                
+            </div>
+        </div>
+        <PackageProductForm 
+            onAdd={(dt) => addToSaleList(dt)} 
+            onEdit={(dt) => updateSalelist(dt)}
+            onCancel={() => clearProductSelection()}
+            currency={selectedCustomer_currency} 
+            defaultSalesProduct={defaultSalesProduct} 
+            selectedItem={selectedItem}
+            selectedProduct={selectedProduct}
+            />
+        <PackageProductDetail sales={sales}
+                totalPrice={totalPrice} netAmount={netAmount} 
+                totalDiscount={totalDiscountedAmount} 
+                vat={vat} onVATChange={onVATChange}
+                onDeliveryCostChange={onDeliveryCostChange}
+                onEdit={(dt) => editSalesProduct(dt)} 
+                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
+            />
+        <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteSalesProductDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 <span>
@@ -292,7 +423,12 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
-    </div>
+        {/* <PaymentDialog 
+            customerCategory={customerCategory}
+            netAmount={netAmount} onPaymnetSubmit={(dt) => onPaymnetSubmit(dt)}
+            trigger={trigger} style={{ width: '450px' }} header="Payment" 
+            /> */}
+    </div>     
     </div>
     );
 }

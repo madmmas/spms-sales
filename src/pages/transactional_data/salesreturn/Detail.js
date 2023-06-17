@@ -19,7 +19,7 @@ const Detail = () => {
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
-        {label: 'Edit', icon: 'pi pi-fw pi-home'},
+        {label: 'View', icon: 'pi pi-fw pi-home'},
         {label: 'Invoice', icon: 'pi pi-fw pi-home'},
         {label: 'Return', icon: 'pi pi-fw pi-home'},
     ];

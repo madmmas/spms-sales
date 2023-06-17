@@ -10,7 +10,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 
-// import SelectMasterDataTable from '../../components/SelectMasterDataTable';
+import SelectMasterDataTable from '../../components/SelectMasterDataTable';
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
 import { HRService } from '../../../services/HRService';
@@ -104,24 +104,18 @@ const Form = ({packageProfile}) => {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please enter a valid quantity', life: 3000 });
             return;
         }
-        if(packagePrice==null || packagePrice <= 0) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please enter a valid price', life: 3000 });
-            return;
-        }
 
         let newpackages = [...packages];
         newpackages.push({
             index: packages.length,
             itemId: packageItem._id,
-            itemName: packageItem.productName,
+            itemName: packageItem.name,
+            brandName: packageItem.brandName,
+            partNumber: packageItem.partNumber,
+            modelNo: packageItem.modelNo,
             quantity: parseFloat(packageQuantity),
-            packagePrice: parseFloat(packagePrice),
-            amount: parseFloat(packagePrice) * parseFloat(packageQuantity),
-            // discount: null,
-            // netAmount: null,
-            // tax: null,
-            // taxAmount: null,
-            // totalAmount: null,
+            packagePrice: parseFloat(packageItem.unitTradePrice),
+            amount: parseFloat(packageItem.unitTradePrice) * parseFloat(packageQuantity),
         });
         setpackages(newpackages);
         resetItemSelection();
@@ -139,15 +133,13 @@ const Form = ({packageProfile}) => {
         newpackages[selectedProduct.index] = {
             index: selectedProduct.index,
             itemId: packageItem._id,
-            itemName: packageItem.productName,
+            itemName: packageItem.name,
+            brandName: packageItem.brandName,
+            partNumber: packageItem.partNumber,
+            modelNo: packageItem.modelNo,
             quantity: parseFloat(packageQuantity),
-            packagePrice: parseFloat(packagePrice),
-            amount: parseFloat(packagePrice) * parseFloat(packageQuantity),
-            // discount: null,
-            // netAmount: null,
-            // tax: null,
-            // taxAmount: null,
-            // totalAmount: null,
+            packagePrice: parseFloat(packageItem.unitTradePrice),
+            amount: parseFloat(packageItem.unitTradePrice) * parseFloat(packageQuantity),
         };
         setpackages(newpackages);
         setIfAdd(true);
@@ -203,15 +195,18 @@ const Form = ({packageProfile}) => {
             <div className="formgroup-inline">
                 <div className="field">
                     <div className="p-inputgroup">
-                        {/* <InputText readonly="true" value={packageItem.productName} placeholder="Select a Product" 
+                        <InputText readonly="true" value={packageItem.name} placeholder="Select a Product" 
                             onClick={() => setTrigger((trigger) => trigger + 1)} />
                         <SelectMasterDataTable trigger={trigger} fieldName="itemName" fieldValue={packageItem._id} modelName={PRODUCT_MODEL}
                             onSelect={(e) => {onItemSelect(e)}} selRow={packageItem}
                             caption="Select a Product" displayField="productName"
                             columns={[
-                                {field: 'productId', header: 'Product ID', filterPlaceholder: 'Filter by Supplier ID'}, 
-                                {field: 'productName', header: 'Product Name', filterPlaceholder: 'Filter by Supplier Name'}
-                            ]} /> */}
+                                {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
+                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                            ]} />
                         {/* <SelectMasterDataOL field={field} modelName={PRODUCT_MODEL}
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
@@ -236,7 +231,7 @@ const Form = ({packageProfile}) => {
                     <label htmlFor="packagePrice" className="p-sr-only">
                         package Price
                     </label>
-                    <InputNumber id="packagePrice" value={packagePrice} type="text" placeholder="package Price" onValueChange={(e) => setpackagePrice(e.value)}/>
+                    <InputNumber id="packagePrice" value={packageItem.unitTradePrice} type="text" placeholder="package Price" onValueChange={(e) => setpackagePrice(e.value)}/>
                 </div>
                 {ifAdd ?
                 <Button  label="Add" className="p-button-success" onClick={() => addItem()}></Button>
@@ -318,8 +313,11 @@ const Form = ({packageProfile}) => {
                 >
                     <Column body={actionBodyTemplate} headerStyle={{ width: '6.4rem' }}></Column>
                     <Column field="itemName" header="Item Name"></Column>
+                    <Column field="brandName" header="brandName"></Column>
+                    <Column field="partNumber" header="partNumber"></Column>
+                    <Column field="modelNo" header="modelNo"></Column>
                     <Column field="quantity" header="Quantity"></Column>
-                    <Column field="packagePrice" header="package Price"></Column>
+                    <Column field="unitPrice" header="Unit Trade Price"></Column>
                     <Column field="amount" header="Total Price"></Column>
                 </DataTable>
                 <>
