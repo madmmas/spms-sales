@@ -6,6 +6,7 @@ import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
 const SalesEditView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesEditView" */ './Edit'), "salesEditView"));
+const SalesInvoice = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesInvoice" */ './Invoice'), "salesInvoice"));
 
 const Detail = () => {
     
@@ -15,6 +16,7 @@ const Detail = () => {
 
     const tabs = [
         { component: SalesEditView },
+        { component: SalesInvoice },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
