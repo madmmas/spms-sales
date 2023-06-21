@@ -3,9 +3,8 @@ import {Text, View, StyleSheet } from '@react-pdf/renderer';
 import { getDate, getDatetime } from '../../../utils';
 
 const styles = StyleSheet.create({
-    invoiceNoContainer: {
+    invoiceContainer: {
         flexDirection: 'row',
-        marginTop: 10,
         justifyContent: 'flex-end'
     },
     invoiceDateContainer: {
@@ -13,7 +12,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end'
     },
     invoiceNo: {
-        fontSize: 12,
+        fontSize: 11,
         fontStyle: 'bold',
     },
     entry: {
@@ -21,6 +20,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     label: {
+        justifyContent: 'flex-end',
         width: 60
     }
     
@@ -30,19 +30,19 @@ const styles = StyleSheet.create({
         <Fragment>
             <View style={styles.entry}>
                 <Text style={styles.label}>Served By: </Text>
-                <Text >{invoice.serverBy?invoice.server_by:''}</Text>
+                <Text >{invoice.servedBy?invoice.servedBy:''}</Text>
             </View >
             <View style={styles.entry}>
                 <Text style={styles.label}>Entry Time: </Text>
                 <Text >{getDatetime(invoice.entryTime)}</Text>
             </View >
-            <View style={styles.invoiceNoContainer}>
+            <View style={styles.invoiceContainer}>
+                <Text style={styles.label}>Invoice Date:</Text>
+                <Text >{getDate(invoice.invoiceDate)}</Text>
+            </View >
+            <View style={styles.invoiceContainer}>
                 <Text style={styles.label}>Invoice No:</Text>
                 <Text style={styles.invoiceNo}>{invoice.voucherNo}</Text>
-            </View >
-            <View style={styles.invoiceDateContainer}>
-                <Text style={styles.label}>Date: </Text>
-                <Text >{getDate(invoice.invoiceDate)}</Text>
             </View >
         </Fragment>
   );

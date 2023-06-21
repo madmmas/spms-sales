@@ -19,7 +19,6 @@ import { ON_SALES_PRODUCT } from '../../../constants/transactions';
 import { PRODUCT_MODEL, CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
-import { ProductService } from '../../../services/ProductService';
 
 import SalesProductForm from './components/SalesProductForm';
 import SalesProductDetail from './components/SalesProductDetail';
@@ -37,24 +36,6 @@ const Form = () => {
         customerMobileNumber: '',
         customerName: '',
     };
-
-    // let defaultValue = {
-    //     _id: null,
-    //     date: Date.now(),
-    //     customerCategory: "WALKIN",
-    //     dtCustomer_id: null,
-    //     notes: '',
-    //     items: [],
-    //     totalQuantity: 0,
-    //     totalPrice: 0.00,
-    //     totalDiscount: 0.00,
-    //     deliveryCost: 0.00,
-    //     vat: 0.00,
-    //     netAmount: 0.00,
-    //     isPaid: false,
-    //     dueAmount: 0.00,
-    //     payment: {}
-    // };
 
     let defaultSalesProduct = {
         _id: null,
@@ -116,7 +97,6 @@ const Form = () => {
     }, []);
 
     const onSubmit = (formData) => {
-        // paymentDialog(true);
         if(sales.length === 0) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
             return;
@@ -138,8 +118,6 @@ const Form = () => {
     };
 
     const saveData = (formData, paymentData) => {
-        // let formData = {};
-
         formData.invoiceDate = Date.now();
         formData.entryTime = Date.now();
         formData.servedBy = "ADMIN";
@@ -180,7 +158,7 @@ const Form = () => {
         try {
             transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
-                navigate("/sales");
+                navigate("/sales/" + data.ID);
             });
         }
         catch (err){

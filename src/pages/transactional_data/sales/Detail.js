@@ -32,7 +32,7 @@ const Detail = () => {
         { component: SalesReturn },
     ];
 
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeIndex, setActiveIndex] = useState(1);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
         {label: 'Invoice', icon: 'pi pi-fw pi-home'},

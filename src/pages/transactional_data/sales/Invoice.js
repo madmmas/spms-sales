@@ -6,9 +6,9 @@ const MyDocument = ({ sales }) => {
     return (
         <div className="grid h-screen">
             <Fragment >
-                <PDFViewer className='card col-12' >
+                {sales!=null && (<PDFViewer className='card col-12' >
                     <Invoice invoice={sales} />
-                </PDFViewer>
+                </PDFViewer>)}
             </Fragment>
         </div>
     )

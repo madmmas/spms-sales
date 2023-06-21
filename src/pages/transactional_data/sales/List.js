@@ -156,7 +156,7 @@ const List = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDate(rowData.invoiceDate)}
             </>
         );
     };
@@ -164,7 +164,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtSupplier_id_shortname}
+                {rowData.customerName}
             </>
         );
     };
@@ -277,8 +277,8 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="date" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtCustomer_id" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="invoiceDate" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customerName" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="customerCategory" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="totalPrice" header="Total Price" filter filterPlaceholder="Search by name" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
