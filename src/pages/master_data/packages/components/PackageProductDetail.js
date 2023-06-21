@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
 import { Badge } from 'primereact/badge';
 
-const PackageProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat, onVATChange, onDeliveryCostChange, onEdit, onDelete}) => {
+const PackageProductDetail = ({products, totalPrice, netAmount, totalDiscount, vat, onVATChange, onDeliveryCostChange, onEdit, onDelete}) => {
 
     const roundNumber = (num) => {
         return Math.round((num + Number.EPSILON) * 100) / 100;
@@ -29,7 +29,7 @@ const PackageProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat,
     };
 
     return (
-        <DataTable value={sales} 
+        <DataTable value={products} 
             stripedRows showGridlines scrollable scrollHeight="25rem" 
             header={footer} 
         >

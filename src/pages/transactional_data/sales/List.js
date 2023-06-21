@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { getDate, getDatetime } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
@@ -12,11 +13,11 @@ import { Toolbar } from 'primereact/toolbar';
 import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
 
-import { SALE_MODEL } from '../../../constants/models';
+import { SALES_MODEL } from '../../../constants/models';
 
 const List = () => {
 
-    const modelName = SALE_MODEL;
+    const modelName = SALES_MODEL;
 
     let navigate = useNavigate();
 
@@ -72,12 +73,6 @@ const List = () => {
             setProfiles(data.rows);
             setLoading(false);
         });
-    }
-
-    const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY');
-        // let d = new Date(parseInt(date));
-        // return d.toDateString();
     }
 
     const exportCSV = () => {

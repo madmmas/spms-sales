@@ -3,7 +3,7 @@ import axiosInstance from "./AxiosService";
 export class TransactionService {
 
     async getById(modelName, id) {
-        const resp = await axiosInstance.get(`/data/${modelName}/` + id);
+        const resp = await axiosInstance.get(`/trxdata/${modelName}/` + id);
         console.log(resp.data);
         return resp.data;
     }

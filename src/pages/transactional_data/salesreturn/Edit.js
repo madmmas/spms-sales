@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { SALE_MODEL } from '../../../constants/models';
+import { SALES_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
 

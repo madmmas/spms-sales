@@ -8,10 +8,8 @@ const styles = StyleSheet.create({
         marginTop: 24,
     },
     reportTitle:{
-        // color: '#61dafb',
         letterSpacing: 4,
         fontSize: 13,
-        // textAlign: 'center',
         textTransform: 'uppercase',
     },
     orgTitle:{
@@ -34,7 +32,7 @@ const styles = StyleSheet.create({
         <Text style={styles.orgDetail}>R.N ROAD,JASHORE,BANGLADESH</Text>
         <Text style={styles.orgDetail}>MOBILE NO - 01712202310, 01913959501</Text>
         <Svg height="10" width="450">
-            <Line x1="0" y1="5" x2="450" y2="5" strokeWidth={1} stroke="rgb(0,0,0)" />
+            <Line x1="0" y1="5" x2="250" y2="5" strokeWidth={1} stroke="rgb(0,0,0)" />
        </Svg>
         <Text style={styles.reportTitle}>{title}</Text>
     </View>

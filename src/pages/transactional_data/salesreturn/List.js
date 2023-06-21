@@ -12,11 +12,11 @@ import { Toolbar } from 'primereact/toolbar';
 import { HRService } from '../../../services/HRService';
 import { TransactionService } from '../../../services/TransactionService';
 
-import { SALE_MODEL } from '../../../constants/models';
+import { SALES_MODEL } from '../../../constants/models';
 
 const List = () => {
 
-    const modelName = SALE_MODEL;
+    const modelName = SALES_MODEL;
 
     let navigate = useNavigate();
 

@@ -5,11 +5,23 @@ import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
+import { CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
+
+import { MasterDataService } from '../../../services/MasterDataService';
+import { TransactionService } from '../../../services/TransactionService';
+
 const SalesEditView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesEditView" */ './Edit'), "salesEditView"));
 const SalesInvoice = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesInvoice" */ './Invoice'), "salesInvoice"));
+const SalesReturn = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesReturn" */ './Return'), "salesReturn"));
 
 const Detail = () => {
     
+    const modelName = SALES_MODEL;
+
+    const [sales, setSales] = useState(null);
+
+    const transactionService = new TransactionService();
+
     let { id } = useParams();
 
     let navigate = useNavigate();
@@ -17,6 +29,7 @@ const Detail = () => {
     const tabs = [
         { component: SalesEditView },
         { component: SalesInvoice },
+        { component: SalesReturn },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
@@ -25,6 +38,12 @@ const Detail = () => {
         {label: 'Invoice', icon: 'pi pi-fw pi-home'},
         {label: 'Return', icon: 'pi pi-fw pi-home'},
     ];
+
+    useEffect(() => {
+        transactionService.getById(modelName, id).then(data => {
+            setSales(data);
+        });
+    }, []);
 
     const gotoList = () => {
         navigate("/sales");
@@ -36,7 +55,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel salesId={id}/>;
+        return <TabPanel sales={sales}/>;
     };
 
     return (

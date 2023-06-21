@@ -1,16 +1,21 @@
 import React from 'react';
 import {Text, View, StyleSheet } from '@react-pdf/renderer';
 
-const borderColor = '#90e5fc'
+const borderColor = '#000'
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
-        borderBottomColor: '#bff0fd',
+        borderBottomColor: '#000',
         borderBottomWidth: 1,
         alignItems: 'center',
-        height: 24,
-        fontSize: 12,
-        fontStyle: 'bold',
+        height: 14,
+        fontSize: 10,
+    },
+    row2: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 14,
+        fontSize: 10,
     },
     description: {
         width: '85%',
@@ -27,41 +32,40 @@ const styles = StyleSheet.create({
   });
 
 
-const InvoiceTableFooter = ({items}) => {
-    const total = items.map(item => item.qty * item.rate)
-        .reduce((accumulator, currentValue) => accumulator + currentValue , 0)
+const InvoiceTableFooter = ({invoice}) => {
     return(    
-        <View style={styles.row}>
-            <Text style={styles.description}>TOTAL</Text>
-            <Text style={styles.total}>{ Number.parseFloat(total).toFixed(2)}</Text>
-            <table class="table table-borderless">
-                      <tbody>
-                          <tr class="add">
-                              <td>Description</td>
-                              <td>Days</td>
-                              <td>Price</td>
-                              <td class="text-center">Total</td>
-                          </tr>
-                          <tr class="content">
-                              <td>Website Redesign</td>
-                              <td>15</td>
-                              <td>$1,500</td>
-                              <td class="text-center">$22,500</td>
-                          </tr>
-                          <tr class="content">
-                              <td>Logo & Identity</td>
-                              <td>10</td>
-                              <td>$1,500</td>
-                              <td class="text-center">$15,000</td>
-                          </tr>
-                          <tr class="content">
-                              <td>Marketing Collateral</td>
-                              <td>3</td>
-                              <td>$1,500</td>
-                              <td class="text-center">$4,500</td>
-                          </tr>
-                      </tbody>
-                  </table>
+        <View>
+            <View style={styles.row}>
+                <Text style={styles.description}>Total Amount</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.totalPrice).toFixed(2)}</Text>
+            </View>
+            {(invoice.totalDiscountedAmount>0) && (<View style={styles.row}>
+                <Text style={styles.description}>Discount</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.totalDiscountedAmount).toFixed(2)}</Text>
+            </View>)}
+            <View style={styles.row}>
+                <Text style={styles.description}>Net Amount</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.netAmount).toFixed(2)}</Text>
+            </View>
+            {(invoice.customerCategory!=="WALKIN") && (<View>
+            <View style={styles.row2}>
+                <Text style={styles.description}>(+) B/F Balance</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.balanceForward).toFixed(2)}</Text>
+            </View>
+            <View style={styles.row2}>
+                <Text style={styles.description}>(-) Received Amount</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.payment.paidAmount).toFixed(2)}</Text>
+            </View>
+            <View style={styles.row2}>
+                <Text style={styles.description}>Net Balance</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.netBalance).toFixed(2)}</Text>
+            </View>
+            </View>)}
+            {(invoice.customerCategory==="WALKIN") && (
+            <View style={styles.row2}>
+                <Text style={styles.description}>Paid Amount</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.payment.paidAmount).toFixed(2)}</Text>
+            </View>)}
         </View>
     )
 };

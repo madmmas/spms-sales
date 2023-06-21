@@ -2,6 +2,12 @@ import axiosInstance from "./AxiosService";
 
 export class ConfigurationService {
 
+    async getNextId(modelName) {
+        const resp = await axiosInstance.get(`/nextid/${modelName}`);
+        // console.log(resp.data);
+        return resp.data;
+    }
+
     async getById(modelName, id) {
         const resp = await axiosInstance.get(`/data/${modelName}/` + id);
         console.log(resp.data);

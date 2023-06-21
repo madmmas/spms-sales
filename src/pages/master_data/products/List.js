@@ -30,6 +30,7 @@ const List = () => {
         sortOrder: null,
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'modelNo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },

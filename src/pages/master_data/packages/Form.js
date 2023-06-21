@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
@@ -10,9 +11,10 @@ import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
+import SelectMasterData from '../../components/SelectMasterData';
 
-import { ON_SALES_PRODUCT } from '../../../constants/transactions';
-import { PRODUCT_MODEL, PACKAGE_MODEL } from '../../../constants/models';
+import { ON_ADD_PRODUCT } from '../../../constants/transactions';
+import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
 import { ProductService } from '../../../services/ProductService';
@@ -20,31 +22,34 @@ import { ProductService } from '../../../services/ProductService';
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
 
-const Form = () => {
+const Form = ({ productData }) => {
 
-    const modelName = PACKAGE_MODEL;
+    const modelName = PRODUCT_MODEL;
 
     let navigate = useNavigate();
 
     let defaultFormValues = {
-        notes: '',
-        dtCustomer_id: '',
-        customerCategory: 'WALKIN',
-        customerMobileNumber: '',
-        customerName: '',
+        // name, code, packageTradePrice, products, dtWarehouse_id, status, remarks
+        name: '',
+        code: '',
+        remarks: '',
+        dtWarehouse_id: '',
+        type: 'PACKAGE',
+        status: 'ACTIVE',
+        products: [],
     };
 
     let defaultSalesProduct = {
         _id: null,
         dtProduct_id: "",
         barCode: "",
-        lastSalePrice: 0.00,
+        // lastSalePrice: 0.00,
 
         unitTradePrice: 0.00,
         quantity: 1,  
         totalPrice: 0.00,
-        discount: 0.00,
-        discountedAmount: 0.00,
+        // discount: 0.00,
+        // discountedAmount: 0.00,
         netPrice: 0.00,
 
         remarks: "",
@@ -61,7 +66,7 @@ const Form = () => {
     const [vatPercentage, setVatPercentage] = useState(0.00);
     const [netAmount, setNetAmount] = useState(0.00);
 
-    const [sales, setSales] = useState([]);
+    const [products, setSales] = useState([]);
     const [selectedItem, setSelectedItem] = useState({});
     const [selectedTableItem, setSelectedTableItem] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
@@ -71,6 +76,7 @@ const Form = () => {
     const [customerCategory, setCustomerCategory] = useState("WALKIN");
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
     const [trigger, setTrigger] = useState(0);
+    const [submitted, setSubmitted] = useState(false);
 
     const transactionService = new TransactionService();
     const productService = new ProductService();
@@ -86,59 +92,43 @@ const Form = () => {
     });
 
     const onSubmit = (formData) => {
-        // paymentDialog(true);
-        if(sales.length === 0) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
-            return;
+    
+        formData.products = products;
+        // formData.totalQuantity = totalQuantity;
+        // formData.totalPrice = totalPrice;
+        // formData.totalDiscount = totalDiscount;
+        // formData.totalDiscountedAmount = totalDiscountedAmount;
+        // formData.deliveryCost = 0.00;
+        // formData.vat = vat;
+        // formData.netAmount = netAmount;
+        // formData.payment = paymentData;
+        // formData.dueAmount = paymentData.dueAmount;
+        // formData.isPaid = paymentData.dueAmount === 0.00;
+
+        console.log(formData);
+        try{
+            setSubmitted(true);
+            if(productData==null){
+                transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                    navigate("/products/" + data.ID);
+                });
+            }else{
+                // transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
+                //     setSubmitted(false);
+                //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                // });
+            }
         }
-
-        if(customerCategory !== "CONDITIONAL") {
-            setTrigger((trigger) => trigger + 1);
-            return;
-        }
-
-        onPaymnetSubmit({});
-    };
-
-    const onPaymnetSubmit = (paymentData) => {
-        let formData = {};
-
-        formData.items = sales;
-        formData.totalQuantity = totalQuantity;
-        formData.totalPrice = totalPrice;
-        formData.totalDiscount = totalDiscount;
-        formData.totalDiscountedAmount = totalDiscountedAmount;
-        formData.deliveryCost = 0.00;
-        formData.vat = vat;
-        formData.netAmount = netAmount;
-        formData.payment = paymentData;
-        formData.dueAmount = paymentData.dueAmount;
-        formData.isPaid = paymentData.dueAmount === 0.00;
-
-        try {
-            // transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
-            //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Record Created', life: 3000 });
-            //     navigate("/sales");
-            // });
-        // if(packageProfile==null){
-        //     hrManagementService.create(modelName, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Created', life: 3000 });
-        //         navigate("/packages/" + data.ID);
-        //     });
-        // }else{
-        //     hrManagementService.update(modelName, formData._id, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Updated', life: 3000 });
-        //     });
-        // }
-    }
         catch (err){
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Record Created', life: 3000 });
-            navigate("/sales");
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
+            navigate("/products");
         }
     };
 
     const gotoList = () => {
-        navigate("/sales");
+        navigate("/products");
     };
 
     const getFormErrorMessage = (name) => {
@@ -146,8 +136,8 @@ const Form = () => {
     };
 
     const addToSaleList = (addedItem) => {
-        let newSales = [...sales];
-        addedItem['index'] = sales.length;
+        let newSales = [...products];
+        addedItem['index'] = products.length;
         newSales.push(addedItem);
         setSales(newSales);
         calculateTotals(newSales);
@@ -155,7 +145,7 @@ const Form = () => {
     };
 
     const updateSalelist = (dtSalesProduct) => {
-        let newSales = [...sales];
+        let newSales = [...products];
         newSales[selectedProduct.index] = dtSalesProduct;
         setSales(newSales);
         calculateTotals(newSales);
@@ -164,13 +154,13 @@ const Form = () => {
 
     const onVATChange = (vatPercentage) => {
         setVatPercentage(vatPercentage);
-        let newSales = [...sales];
+        let newSales = [...products];
         calculateTotals(newSales);
     };
 
     const onDeliveryCostChange = (deliveryCost) => {
         setDeliveryCost(deliveryCost);
-        let newSales = [...sales];
+        let newSales = [...products];
         calculateTotals(newSales);
     };
 
@@ -196,7 +186,7 @@ const Form = () => {
     };
 
     const removeItem = () => {
-        let newSales = [...sales];
+        let newSales = [...products];
         newSales.splice(selectedProduct.index, 1);
         setSales(newSales);
         setDeleteSalesProductDialog(false);
@@ -232,20 +222,6 @@ const Form = () => {
         setUpdateSaleItemMode(true);
     };
 
-    const onCustomerSelect = (selectedRow) => {
-        setSelectedCustomer(selectedRow);
-    };
-
-    const onCustomerCategoryChange = (value) => {
-        setCustomerCategory(value);
-        if(value === "WALKIN") {
-            setSelectedCustomer('');
-            setValue('dtCustomer_id', '');
-            setValue('notes', '');
-            setValue('customerMobileNumber', '');
-            setValue('customerName', '');
-        }
-    };
 
     const onSelection = async (e) => {
         let productSelected = e.value;
@@ -257,7 +233,7 @@ const Form = () => {
             }
 
             let alreadySelected = false;
-            sales.forEach(sale => {
+            products.forEach(sale => {
                 if(sale.dtProduct_id === productSelected._id) {
                     alreadySelected = true;
                 }
@@ -383,19 +359,61 @@ const Form = () => {
                         </>
                     )}/>
                 </div>
-                <div className="field col-12 md:col-6">
-                <Controller
-                    name="notes"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
-                        </>
-                    )}/>
-                </div>
-
-                
+                <div className="field col-12 md:col-4">
+                        <Controller
+                            name="packageTradePrice"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Price</label>
+                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                    <Controller
+                        name="dtWarehouse_id"
+                        control={control}
+                        rules={{ required: 'Warehouse is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
+                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
+                                    displayField="name"
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}, 
+                                    ]} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-8">
+                        <Controller
+                            name="remarks"
+                            control={control}                            
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Remarks</label>
+                                 <InputTextarea  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} 
+                                    onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-6 mt-2">
+                        <div className='field'>Status</div>
+                        <Controller
+                            name="status"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                                <>
+                                    <InputSwitch inputId={field.name} checked={field.value} inputRef={field.ref} onChange={(e) => field.onChange(e.value)} />
+                                </>
+                            )}
+                        />
+                    </div>
             </div>
         </div>
         <PackageProductForm 
@@ -407,7 +425,7 @@ const Form = () => {
             selectedItem={selectedItem}
             selectedProduct={selectedProduct}
             />
-        <PackageProductDetail sales={sales}
+        <PackageProductDetail products={products}
                 totalPrice={totalPrice} netAmount={netAmount} 
                 totalDiscount={totalDiscountedAmount} 
                 vat={vat} onVATChange={onVATChange}

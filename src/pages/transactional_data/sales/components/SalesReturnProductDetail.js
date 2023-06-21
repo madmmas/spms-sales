@@ -3,13 +3,12 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 
-const SalesProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat, onVATChange, onDeliveryCostChange, onEdit, onDelete}) => {
+const SalesReturnProductDetail = ({sales, onEdit}) => {
 
     const actionBodyTemplate = (rowData) => {
         return (
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDelete(rowData)} />
             </>
         );
     };
@@ -25,8 +24,6 @@ const SalesProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat, o
             <Column field="partNumber" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="quantity" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="unitTradePrice" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
-            {/* <Column field="totalPrice" header={`Total Price`} headerStyle={{ minWidth: '10rem' }}></Column> */}
-            {/* <Column field="discount" header={`Discount (%)`} headerStyle={{ minWidth: '10rem' }}></Column> */}
             <Column field="discountedAmount" header={`Discounted Amount`} headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="netPrice" header="Net Cost" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="lastSalePrice" header="Last Sale Price" headerStyle={{ minWidth: '10rem' }}></Column>
@@ -35,4 +32,4 @@ const SalesProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat, o
     );
 }
 
-export default SalesProductDetail;
+export default SalesReturnProductDetail;

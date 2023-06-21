@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -16,13 +16,15 @@ import SelectMasterData from '../../components/SelectMasterData';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { ON_SALES_PRODUCT } from '../../../constants/transactions';
-import { PRODUCT_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
 import { ProductService } from '../../../services/ProductService';
 
 import SalesProductForm from './components/SalesProductForm';
 import SalesProductDetail from './components/SalesProductDetail';
+import SalesProductTotal from './components/SalesProductTotal';
+import { ConfigurationService } from '../../../services/ConfigurationService';
 
 const Form = () => {
 
@@ -83,6 +85,7 @@ const Form = () => {
 
     const [sales, setSales] = useState([]);
     const [selectedItem, setSelectedItem] = useState({});
+    const [salesFormData, setSalesFormData] = useState({});
     const [selectedTableItem, setSelectedTableItem] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
     const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
@@ -91,9 +94,10 @@ const Form = () => {
     const [customerCategory, setCustomerCategory] = useState("WALKIN");
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
     const [trigger, setTrigger] = useState(0);
+    const [trxNo, setTrxNo] = useState('XXXXX');
 
     const transactionService = new TransactionService();
-    const productService = new ProductService();
+    const configurationService = new ConfigurationService();
 
     const {
         control,
@@ -105,6 +109,12 @@ const Form = () => {
         defaultValues: defaultFormValues
     });
 
+    useEffect(() => {
+        configurationService.getNextId(SALES_MODEL).then(data => {
+            setTrxNo(data.nextID);
+        });
+    }, []);
+
     const onSubmit = (formData) => {
         // paymentDialog(true);
         if(sales.length === 0) {
@@ -113,17 +123,44 @@ const Form = () => {
         }
 
         if(customerCategory !== "CONDITIONAL") {
+            setSalesFormData(formData);
             setTrigger((trigger) => trigger + 1);
             return;
         }
 
-        onPaymnetSubmit({});
+        saveData(formData, {});
     };
 
     const onPaymnetSubmit = (paymentData) => {
-        let formData = {};
+        let formData = salesFormData;
+
+        saveData(formData, paymentData);
+    };
+
+    const saveData = (formData, paymentData) => {
+        // let formData = {};
+
+        formData.invoiceDate = Date.now();
+        formData.entryTime = Date.now();
+        formData.servedBy = "ADMIN";
+        formData.voucherNo = trxNo;
+        formData.customerCategory = customerCategory;
+
+        if(customerCategory === "WALKIN") {
+            formData.dtCustomer_id = null;
+            formData.customerMobileNumber = formData.customerMobileNumber;
+            formData.customerName = formData.customerName;
+            formData.customerAddress = '';
+        } else {
+            console.log("selectedCustomer::", selectedCustomer);
+            formData.dtCustomer_id = selectedCustomer._id;
+            formData.customerMobileNumber = selectedCustomer.phone;
+            formData.customerName = selectedCustomer.name;
+            formData.customerAddress = selectedCustomer.address;
+        }
 
         formData.items = sales;
+
         formData.totalQuantity = totalQuantity;
         formData.totalPrice = totalPrice;
         formData.totalDiscount = totalDiscount;
@@ -134,6 +171,11 @@ const Form = () => {
         formData.payment = paymentData;
         formData.dueAmount = paymentData.dueAmount;
         formData.isPaid = paymentData.dueAmount === 0.00;
+
+        // need to add balance forword here
+        formData.balanceForward = 0.00;
+        formData.netBalance = formData.balanceForward + formData.dueAmount;
+        // need to save this balance as well in the transaction
 
         try {
             transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
@@ -201,7 +243,7 @@ const Form = () => {
         setVatPercentage(0.00);
         setNetAmount(0.00);
         setCustomerCategory("WALKIN");
-        setSelectedCustomer(null);
+        setSelectedCustomer({});
         reset(defaultFormValues);
     };
 
@@ -249,7 +291,7 @@ const Form = () => {
     const onCustomerCategoryChange = (value) => {
         setCustomerCategory(value);
         if(value === "WALKIN") {
-            setSelectedCustomer('');
+            setSelectedCustomer({});
             setValue('dtCustomer_id', '');
             setValue('notes', '');
             setValue('customerMobileNumber', '');
@@ -329,7 +371,7 @@ const Form = () => {
     <div className="grid h-screen">    
     <Toast ref={toast} />    
     <div className="card col-5">
-        <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Sale Detail</h5>
+        <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Sale Detail :: VoucherNo ({trxNo}) </h5>
         <div className="card col-12 md:col-12">
         <SelectMasterDataTableList displayField="name"
                 fieldValue=""
@@ -448,6 +490,14 @@ const Form = () => {
             defaultSalesProduct={defaultSalesProduct} 
             selectedItem={selectedItem}
             selectedProduct={selectedProduct}
+            />
+        <SalesProductTotal sales={sales}
+                totalPrice={totalPrice} netAmount={netAmount} 
+                totalDiscount={totalDiscountedAmount} 
+                vat={vat} onVATChange={onVATChange}
+                onDeliveryCostChange={onDeliveryCostChange}
+                onEdit={(dt) => editSalesProduct(dt)} 
+                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
             />
         <SalesProductDetail sales={sales}
                 totalPrice={totalPrice} netAmount={netAmount} 

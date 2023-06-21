@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -9,22 +9,24 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import PaymentDialog from './components/PaymentDialog';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { ON_SALES_PRODUCT } from '../../../constants/transactions';
-import { PRODUCT_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, SALES_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
 
 import { TransactionService } from '../../../services/TransactionService';
 import { ProductService } from '../../../services/ProductService';
 
-import SalesProductForm from './components/SalesProductForm';
-import SalesProductDetail from './components/SalesProductDetail';
+import SalesReturnProductForm from './components/SalesReturnProductForm';
+import SalesReturnProductDetail from './components/SalesReturnProductDetail';
+import SalesProductDetailReturn from './components/SalesProductDetailReturn';
 
-const Form = () => {
+const Form = ({ salesId }) => {
+
+    const modelName = SALES_MODEL;
 
     let navigate = useNavigate();
 
@@ -82,6 +84,9 @@ const Form = () => {
     const [netAmount, setNetAmount] = useState(0.00);
 
     const [sales, setSales] = useState([]);
+    const [salesReturn, setSalesReturn] = useState([]);
+    const [salesData, setSalesData] = useState([]);
+    const [voucherNo, setVoucherNo] = useState('');
     const [selectedItem, setSelectedItem] = useState({});
     const [selectedTableItem, setSelectedTableItem] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
@@ -104,6 +109,14 @@ const Form = () => {
     } = useForm({
         defaultValues: defaultFormValues
     });
+
+    
+    useEffect(() => {
+        transactionService.getById(modelName, salesId).then(data => {
+            setSalesData(data);
+            setSales(data.items);
+        });  
+    }, []);
 
     const onSubmit = (formData) => {
         // paymentDialog(true);
@@ -153,6 +166,15 @@ const Form = () => {
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+
+    const addToSalesReturnList = (addedItem) => {
+        let newSalesReturn = [...salesReturn];
+        addedItem['index'] = salesReturn.length;
+        newSalesReturn.push(addedItem);
+        setSalesReturn(newSalesReturn);
+        // calculateTotals(newSales);
+        // clearProductSelection();
     };
 
     const addToSaleList = (addedItem) => {
@@ -206,9 +228,9 @@ const Form = () => {
     };
 
     const removeItem = () => {
-        let newSales = [...sales];
-        newSales.splice(selectedProduct.index, 1);
-        setSales(newSales);
+        let newSalesReturn = [...salesReturn];
+        newSalesReturn.splice(selectedProduct.index, 1);
+        setSalesReturn(newSalesReturn);
         setDeleteSalesProductDialog(false);
     };
 
@@ -331,38 +353,22 @@ const Form = () => {
     <div className="card col-5">
         <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Sale Detail</h5>
         <div className="card col-12 md:col-12">
-        <SelectMasterDataTableList displayField="name"
-                fieldValue=""
-                scrollHeight="300px"
-                defaultFilters={defaultFilters}
-                modelName={PRODUCT_MODEL} caption="Select Product"
-                selectedItem={selectedTableItem}
-                showFields={[]} onSelect={onSelection}
-                columns={[
-                    {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
-                    {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
-                    {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
-                    {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
-                    {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
-                ]} 
-                />
+            <SalesReturnProductDetail sales={sales}
+                totalPrice={totalPrice} netAmount={netAmount} 
+                totalDiscount={totalDiscountedAmount} 
+                vat={vat} onVATChange={onVATChange}
+                onDeliveryCostChange={onDeliveryCostChange}
+                onEdit={(dt) => editSalesProduct(dt)} 
+                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
+            />
         </div>
         <div className="card col-12 md:col-12">
             <div className="p-fluid formgrid grid">
                 <div className="field col-12 md:col-4">
-                <Controller
-                    name="customerCategory"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                    <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer Category</label>
-                        <SelectConstData field={field} data={CUSTOMER_CATEGORY}
-                            onSelectChange={(value) => onCustomerCategoryChange(value)}
-                            className={classNames({ 'p-invalid': fieldState.error })} /> 
-                        {getFormErrorMessage(field.name)}
-                    </>
-                )}/>
+                    <label>Voucher No</label>
+                    <InputText value={voucherNo}  readOnly={true}/>
                 </div>
+
                 <div className="field col-12 md:col-8">
                 <Controller
                     name="notes"
@@ -385,77 +391,22 @@ const Form = () => {
                         onClick={handleSubmit((d) => onSubmit(d))}
                     />
                 </div>
-                {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-8">
-                <div className="field col-12 md:col-6">
-                <Controller
-                    name="customerMobileNumber"
-                    control={control}
-                    rules={{ required: 'Mobile Number is required.' }}
-                    render={({ field, fieldState }) => (
-                        <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Mobile Number</label>
-                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
-                    {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div>
-                <div className="field col-12 md:col-6">
-                <Controller
-                    name="customerName"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Name</label>
-                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
-                        </>
-                    )}/>
-                </div>
-                </div>)}
-                {(customerCategory !== "WALKIN") && (<div className="grid col-12 md:col-8">
-                <div className="field col-12 md:col-8">
-                <Controller
-                    name="dtCustomer_id"
-                    control={control}
-                    rules={{ required: 'Custmer is required.' }}
-                    render={({ field, fieldState }) => (
-                    <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>
-                        <SelectMasterData field={field} modelName={CUSTOMER_MODEL}
-                            displayField="name"
-                            onSelect={onCustomerSelect}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'}
-                            ]} />
-                        {getFormErrorMessage(field.name)}
-                    </>
-                )}/>
-                </div>
-                <div className="field col-12 md:col-4">
-                    <label>Last Voucher</label>
-                    <InputText  readOnly={true}/>
-                </div>
-                </div>)}
             </div>
         </div>
     </div>
     <div className="card col-7" >
-        <SalesProductForm 
-            onAdd={(dt) => addToSaleList(dt)} 
-            onEdit={(dt) => updateSalelist(dt)}
+        <SalesReturnProductForm 
+            onAdd={(dt) => addToSalesReturnList(dt)} 
+            // onEdit={(dt) => updateSalelist(dt)}
             onCancel={() => clearProductSelection()}
             currency={selectedCustomer_currency} 
             defaultSalesProduct={defaultSalesProduct} 
             selectedItem={selectedItem}
             selectedProduct={selectedProduct}
             />
-        <SalesProductDetail sales={sales}
-                totalPrice={totalPrice} netAmount={netAmount} 
-                totalDiscount={totalDiscountedAmount} 
-                vat={vat} onVATChange={onVATChange}
-                onDeliveryCostChange={onDeliveryCostChange}
-                onEdit={(dt) => editSalesProduct(dt)} 
-                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
+        <SalesProductDetailReturn sales={salesReturn}
+            // onEdit={(dt) => editSalesProduct(dt)}
+            onDelete={(dt) => confirmDeleteSalesProduct(dt)}
             />
         <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteSalesProductDialog}>
             <div className="flex align-items-center justify-content-center">
@@ -465,11 +416,6 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
-        <PaymentDialog 
-            customerCategory={customerCategory}
-            netAmount={netAmount} onPaymnetSubmit={(dt) => onPaymnetSubmit(dt)}
-            trigger={trigger} style={{ width: '450px' }} header="Payment" 
-            />
     </div>     
     </div>
     );

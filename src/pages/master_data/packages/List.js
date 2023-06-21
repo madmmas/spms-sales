@@ -9,11 +9,11 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
-import { PACKAGE_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL } from '../../../constants/models';
 
 const List = () => {
 
-    const modelName = PACKAGE_MODEL;
+    const modelName = PRODUCT_MODEL;
 
     let navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'type': { operator: FilterOperator.AND, constraints: [{ value: "PACKAGE", matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 

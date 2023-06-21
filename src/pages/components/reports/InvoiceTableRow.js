@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: 'center',
         height: 24,
-        fontStyle: 'bold',
+        fontSize: 10,
     },
     product_name: {
         width: '20%',
@@ -17,7 +17,12 @@ const styles = StyleSheet.create({
         borderRightColor: borderColor,
         borderRightWidth: 1,
         paddingLeft: 4,
-        wrap: false,
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        wordWrap: false,
+        wordBreak: 'break-all',
+        overflowWrap: 'break-word',
     },
     brand: {
         width: '10%',
@@ -72,22 +77,23 @@ const styles = StyleSheet.create({
         width: '15%',
         textAlign: 'right',
         paddingRight: 8,
+        fontWeight: 'bold',
     },
   });
 
 
 const InvoiceTableRow = ({items}) => {
     const rows = items.map( item => 
-        <View wrap={false} style={styles.row} key={item.sno.toString()}>
-            <Text wrap={false} style={styles.sno}>{item.sno}</Text>
-            <Text wrap={false} style={styles.qty}>{item.qty} {item.measure}</Text>
-            <Text wrap={false} style={styles.product_name}>{item.product_name}</Text>
-            <Text wrap={false} style={styles.brand}>{item.brand}</Text>
-            <Text wrap={false} style={styles.part_no}>{item.part_no}</Text>
-            <Text wrap={false} style={styles.model}>{item.model}</Text>
-            <Text wrap={false} style={styles.rate}>{item.rate}</Text>
+        <View style={styles.row} key={item.index.toString()}>
+            <Text wrap={false} style={styles.sno}>{item.index}</Text>
+            <Text wrap={false} style={styles.qty}>{item.quantity}</Text>
+            <Text wordWrap={false} style={styles.product_name}>{item.productName}</Text>
+            <Text wrap={false} style={styles.brand}>{item.brandName}</Text>
+            <Text wrap={false} style={styles.part_no}>{item.partNumber}</Text>
+            <Text wrap={false} style={styles.model}>{item.modelNo}</Text>
+            <Text wrap={false} style={styles.rate}>{Number.parseFloat(item.unitTradePrice).toFixed(2)}</Text>
             <Text wrap={false} style={styles.discount}>{item.discount}</Text>
-            <Text wrap={false} style={styles.amount}>{item.amount}</Text>
+            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.netPrice).toFixed(2) }</Text>
         </View>
     )
     return (<Fragment>{rows}</Fragment> )

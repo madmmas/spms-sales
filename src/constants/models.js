@@ -17,7 +17,7 @@ export const EXPENSE_MODEL = 'trxExpense';
 export const EXTRA_INCOME_MODEL = 'trxExtraIncome';
 export const INVOICE_MODEL = 'trxInvoice';
 export const PURCHASE_MODEL = 'trxPurchase';
-export const SALE_MODEL = 'trxSales';
+export const SALES_MODEL = 'trxSales';
 export const STOCK_IN_MODEL = 'trxStockIn';
 export const STOCK_OUT_MODEL = 'trxStockOut';
 
