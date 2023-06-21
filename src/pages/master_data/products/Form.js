@@ -40,6 +40,7 @@ const Form = ({productData}) => {
     const onSubmit = (formData) => {
         try{
             setSubmitted(true);
+            formData.type = 'GENERAL';
             if(productData==null){
                 transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });

@@ -70,6 +70,7 @@ const Form = ( { customerCategory, trigger, netAmount, onPaymnetSubmit }) => {
         const val = (e.target && e.target.value) || 0;
         const dueAmount = netAmount - val;
         setValue('dueAmount', dueAmount);
+        setValue('paidAmount', val);
     };
 
     const paymentDialogFooter = (
