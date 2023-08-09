@@ -69,16 +69,26 @@ const Form = ({packageProfile}) => {
     const onSubmit = (formData) => {
         console.log(formData);
         formData.items = packages;
-        // if(packageProfile==null){
-        //     hrManagementService.create(modelName, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Created', life: 3000 });
-        //         navigate("/packages/" + data.ID);
-        //     });
-        // }else{
-        //     hrManagementService.update(modelName, formData._id, formData).then(data => {
-        //         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'package Updated', life: 3000 });
-        //     });
-        // }
+        try{
+            setSubmitted(true);
+            formData.type = 'GENERAL';
+            if(productData==null){
+                transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                    navigate("/products/" + data.ID);
+                });
+            }else{
+                transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
+                    setSubmitted(false);
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                });
+            }
+        }
+        catch (err){
+            console.log(err)
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
+            navigate("/products");
+        }
     };
 
     const gotoList = () => {

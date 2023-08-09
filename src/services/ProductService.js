@@ -1,10 +1,39 @@
+import axiosInstance from "./AxiosService";
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { MasterDataService } from './MasterDataService';
+import { TransactionService } from './TransactionService';
+
+import { ON_STOCK_IN_PACKAGE_PRODUCT } from '../constants/transactions';
 
 export class ProductService {
 
     constructor() {
         this.masterDataService = new MasterDataService();
+        this.transactionService = new TransactionService();
+    }
+
+    async getById(id) {
+        const resp = await axiosInstance.get(`/products/` + id);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async getAll(params) {
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+
+        return axiosInstance.get(`/products?` + queryParams).then(res => res.data);
+    }
+
+    async create(data) {
+        const resp = await axiosInstance.post(`/products`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async update(id, data) {
+        const resp = await axiosInstance.put(`/products/` + id, data);
+        console.log(resp.data);
+        return resp.data;
     }
 
     async getProductCurrentStock(id) {
@@ -15,6 +44,12 @@ export class ProductService {
         let data = await this.masterDataService.getByFilters("dtStock", filters)
         console.log(data)
         return data.currentStock
+    }
+
+    async addPackageToStock(data) {
+        let res = await this.transactionService.processTransaction(ON_STOCK_IN_PACKAGE_PRODUCT, data)
+        console.log(res)
+        return res
     }
 
     async getProductCustomerLastPrice(productId, customerId) {

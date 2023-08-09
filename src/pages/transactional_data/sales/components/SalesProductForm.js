@@ -16,7 +16,7 @@ export default function SalesProductForm({
         dtProduct_id: "",
         barCode: "",
         lastTradePrice: 0.00,
-        unitTradePrice: 0.00,
+        price: 0.00,
 
         quantity: 1,  
         totalPrice: 0.00,
@@ -42,7 +42,7 @@ export default function SalesProductForm({
 
     const [salesProduct, setSalesProduct] = useState(defaultSalesProduct);
     const [productName, setProductName] = useState('');
-    const [currentStock, setCurrentStock] = useState(0);
+    const [current_stock, setCurrentStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
     const productService = new ProductService();
@@ -59,7 +59,7 @@ export default function SalesProductForm({
     };
 
     useEffect(() => {
-        if (selectedItem._id) {
+        if (selectedItem.id) {
             setIsEdit(false);
             onProductSelect(selectedItem);
         }else{
@@ -72,7 +72,7 @@ export default function SalesProductForm({
             reset({ ...selectedProduct });
             setSalesProduct(selectedProduct);
             setIsEdit(true);
-            setProductAndItsStock(selectedProduct["productName"], selectedProduct["currentStock"]);
+            setProductAndItsStock(selectedProduct["productName"], selectedProduct["current_stock"]);
             quantityRef.current.focus();
         }else{
             setIsEdit(false);
@@ -85,7 +85,7 @@ export default function SalesProductForm({
     };
 
     const calculatePrice = (_saleProduct) => {
-        _saleProduct.totalPrice = roundNumber(_saleProduct.unitTradePrice * _saleProduct.quantity);
+        _saleProduct.totalPrice = roundNumber(_saleProduct.price * _saleProduct.quantity);
         _saleProduct.discountedAmount = roundNumber(_saleProduct.totalPrice * _saleProduct.discount / 100);
         _saleProduct.netPrice = roundNumber(_saleProduct.totalPrice -  _saleProduct.discountedAmount);
 
@@ -107,19 +107,20 @@ export default function SalesProductForm({
 
     const onProductSelect = async (productSelected) => {
         // get product current stock
-        let productStock = await productService.getProductCurrentStock(productSelected._id);
+        // let productStock = await productService.getProductCurrentStock(productSelected.id);
+        let productStock = productSelected.current_stock;
 
         // set focus to quantity
         let _saleProduct = { ...salesProduct };
-        _saleProduct['dtProduct_id'] = productSelected._id;
+        _saleProduct['dtProduct_id'] = productSelected.id;
         _saleProduct['productName'] = productSelected.name;
-        _saleProduct['brandName'] = productSelected.brandName;
-        _saleProduct['modelNo'] = productSelected.modelNo;
-        _saleProduct['partNumber'] = productSelected.partNumber;
+        _saleProduct['brand_name'] = productSelected.brand_name;
+        _saleProduct['model_no'] = productSelected.model_no;
+        _saleProduct['part_number'] = productSelected.part_number;
         // _saleProduct['barCode'] = productSelected.barCode;
-        _saleProduct['unitTradePrice'] = productSelected.unitTradePrice;
-        _saleProduct['lastTradePrice'] = productSelected.lastTradePrice;
-        _saleProduct['currentStock'] = productStock;
+        _saleProduct['price'] = productSelected.price;
+        // _saleProduct['lastTradePrice'] = productSelected.lastTradePrice;
+        _saleProduct['current_stock'] = productStock;
         _saleProduct['quantity'] = 1;
         _saleProduct['discount'] = 0;
         _saleProduct['remarks'] = productSelected.remarks===null ? '' : productSelected.remarks;
@@ -202,7 +203,7 @@ export default function SalesProductForm({
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="unitTradePrice"
+                name="price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -216,7 +217,7 @@ export default function SalesProductForm({
             </div>
             <div className="field col-12 md:col-2">
                 <label>Current Stock</label>
-                <InputText readonly="true" value={currentStock} placeholder="Current Stock" />
+                <InputText readonly="true" value={current_stock} placeholder="Current Stock" />
             </div>
             <div className="field col-12 md:col-2">
             <Controller
@@ -224,7 +225,7 @@ export default function SalesProductForm({
                 control={control}
                 rules={{ 
                     required: 'Quantity is required.', 
-                    max: { value: currentStock, message: 'Must be less than or equal to current stock.' } 
+                    max: { value: current_stock, message: 'Must be less than or equal to current stock.' } 
                 }}
                 render={({ field, fieldState }) => (
                     <>

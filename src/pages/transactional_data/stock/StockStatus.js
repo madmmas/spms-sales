@@ -6,7 +6,7 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 
 
-import { MasterDataService } from '../../../services/MasterDataService';
+import { ProductService } from '../../../services/ProductService';
 
 import { STOCK_MODEL } from '../../../constants/models';
 
@@ -18,6 +18,7 @@ const StockStatus = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ['name', 'code', 'price', 'cost', 'unit', 'current_stock', 'prev_stock', 'total_stock_in', 'total_stock_out', 'low_stock_qty'],
         first: 0,
         rows: 10,
         page: 1,
@@ -33,7 +34,7 @@ const StockStatus = () => {
     const [dtStockStatus, setStockStatus] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const masterDataService = new MasterDataService();
+    const productService = new ProductService();
 
     useEffect(() => {
         initFilters();
@@ -54,7 +55,7 @@ const StockStatus = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setStockStatus(data.rows);
@@ -83,14 +84,23 @@ const StockStatus = () => {
     const productNameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtProduct_id_shortname}
+                {rowData.name}
             </>
         );
     };
+
     const currentStockBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.currentStock}
+                {rowData.current_stock}
+            </>
+        );
+    };
+
+    const prevStockBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.prev_stock}
             </>
         );
     };
@@ -98,7 +108,7 @@ const StockStatus = () => {
     const lowStockQtyBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.lowStockQty}
+                {rowData.low_stock_qty}
             </>
         );
     };
@@ -106,7 +116,7 @@ const StockStatus = () => {
     const totalStockInBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalStockIn}
+                {rowData.total_stock_in}
             </>
         );
     };
@@ -114,7 +124,7 @@ const StockStatus = () => {
     const totalStockOutBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalStockOut}
+                {rowData.total_stock_out}
             </>
         );
     };
@@ -122,23 +132,39 @@ const StockStatus = () => {
     const totalDamagedStockBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalDamagedStock}
+                {rowData.total_damaged_stock}
             </>
         );
     };
 
-    const totalPurchaseCostBodyTemplate = (rowData) => {
+    const costBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalPurchaseCost}
+                {rowData.cost}
             </>
         );
     };
 
-    const totalTradePriceBodyTemplate = (rowData) => {
+    const totalCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalTradePrice}
+                {rowData.cost * rowData.current_stock}
+            </>
+        );
+    };
+
+    const priceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.price}
+            </>
+        );
+    };
+
+    const totalPriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.price * rowData.current_stock}
             </>
         );
     };
@@ -174,14 +200,17 @@ const StockStatus = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by Product Name" sortable body={productNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="currentStock" header="currentStock" filter filterPlaceholder="Search by currentStock" sortable body={currentStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="lowStockQty" header="lowStockQty" filter filterPlaceholder="Search by lowStockQty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalStockIn" header="totalStockIn" filter filterPlaceholder="Search by totalStockIn" sortable body={totalStockInBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalStockOut" header="totalStockOut" filter filterPlaceholder="Search by totalStockOut" sortable body={totalStockOutBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalDamagedStock" header="totalDamagedStock" filter filterPlaceholder="Search by totalDamagedStock" sortable body={totalDamagedStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="name" header="Product Name" filter filterPlaceholder="Search by Product Name" sortable body={productNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="current_stock" header="Current Stock" filter filterPlaceholder="Search by Current Stock" sortable body={currentStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="prev_stock" header="Previous Stock" filter filterPlaceholder="Search by Previous Stock" sortable body={prevStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by lowStockQty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_stock_in" header="totalStockIn" filter filterPlaceholder="Search by totalStockIn" sortable body={totalStockInBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_stock_out" header="totalStockOut" filter filterPlaceholder="Search by totalStockOut" sortable body={totalStockOutBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        {/* <Column field="total_damage_stock" header="totalDamagedStock" filter filterPlaceholder="Search by totalDamagedStock" sortable body={totalDamagedStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
+                        <Column field="cost" header="Unit Cost" filter filterPlaceholder="Search by cost" sortable body={costBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_cost" header="Total Cost" filter filterPlaceholder="Search by cost" sortable body={totalCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="price" header="Trade Price" filter filterPlaceholder="Search by totalTradePrice" sortable body={priceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_price" header="Total Price" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>

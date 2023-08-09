@@ -14,30 +14,30 @@ import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../../constants/models';
 export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedProduct, defaultPurchaseProduct }) {
 
     let emptyPurchaseProduct = {
-        dtProduct_id: "", // select product
-        dtWarehouse_id: "", // select warehouse
-        barCode: "", // fetch from selected product
-        lastPurchasePrice: 0.00, // fetch from selected product
+        product_id: "", // select product
+        warehouse_id: "", // select warehouse
+        bar_code: "", // fetch from selected product
+        last_purchase_price: 0.00, // fetch from selected product
 
-        quantity: 1,  
-        unitCostF: 0.00,
+        qty: 1,  
+        unit_cost_f: 0.00,
         totalCostF: 0.00,
-        conversionRate: 1,
-        unitCostBDT: 0.00,
+        conversion_rate: 1,
+        unit_cost: 0.00,
         totalCostBDT: 0.00,
 
         transport: 0.00,
-        duty: 0.00,
+        duty_vat: 0.00,
 
         netUnitCostBDT: 0.00,
         netCostBDT: 0.00,
 
-        profitPercentage: 0,
+        discount_profit: 0,
         profit: 0.00,
 
-        tradeUnitPriceBDT: 0.00,
+        trade_price: 0.00,
 
-        minimumTradePrice: 0.00,
+        min_trade_price: 0.00,
     };
 
     const {
@@ -58,7 +58,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
-        if (selectedProduct.dtProduct_id) {
+        if (selectedProduct.product_id) {
             // showDialog();
             reset({ ...selectedProduct });
             setPurchaseProduct(selectedProduct);
@@ -72,65 +72,65 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     };
 
     const calculateCost = (_purchaseProduct) => {
-        _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.quantity);
-        _purchaseProduct.unitCostBDT = roundNumber(_purchaseProduct.unitCostF * _purchaseProduct.conversionRate);
-        _purchaseProduct.totalCostBDT = roundNumber(_purchaseProduct.unitCostBDT * _purchaseProduct.quantity);
-        _purchaseProduct.netUnitCostBDT = roundNumber(_purchaseProduct.unitCostBDT + (_purchaseProduct.transport/_purchaseProduct.quantity) + (_purchaseProduct.duty/_purchaseProduct.quantity));
-        _purchaseProduct.netCostBDT = roundNumber(_purchaseProduct.netUnitCostBDT * _purchaseProduct.quantity);
+        _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unit_cost_f * _purchaseProduct.qty);
+        _purchaseProduct.unit_cost = roundNumber(_purchaseProduct.unit_cost_f * _purchaseProduct.conversion_rate);
+        _purchaseProduct.totalCostBDT = roundNumber(_purchaseProduct.unit_cost * _purchaseProduct.qty);
+        _purchaseProduct.netUnitCostBDT = roundNumber(_purchaseProduct.unit_cost + (_purchaseProduct.transport/_purchaseProduct.qty) + (_purchaseProduct.duty_vat/_purchaseProduct.qty));
+        _purchaseProduct.netCostBDT = roundNumber(_purchaseProduct.netUnitCostBDT * _purchaseProduct.qty);
 
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
+        _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
+        _purchaseProduct.min_trade_price = _purchaseProduct.trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('totalCostF', _purchaseProduct.totalCostF);
-        setValue('unitCostBDT', _purchaseProduct.unitCostBDT);
+        setValue('unit_cost', _purchaseProduct.unit_cost);
         setValue('totalCostBDT', _purchaseProduct.totalCostBDT);
         setValue('netUnitCostBDT', _purchaseProduct.netUnitCostBDT);
         setValue('netCostBDT', _purchaseProduct.netCostBDT);
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('trade_price', _purchaseProduct.trade_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
-    const onProfitPercentageChange = (profitPercentage) => {
+    const onProfitPercentageChange = (discount_profit) => {
         let _purchaseProduct = { ...purchaseProduct };
-        _purchaseProduct.profitPercentage = roundNumber(profitPercentage);
-        _purchaseProduct.profit = _purchaseProduct.netUnitCostBDT * roundNumber(profitPercentage) / 100;
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
+        _purchaseProduct.discount_profit = roundNumber(discount_profit);
+        _purchaseProduct.profit = _purchaseProduct.netUnitCostBDT * roundNumber(discount_profit) / 100;
+        _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
+        _purchaseProduct.min_trade_price = _purchaseProduct.trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('profit', _purchaseProduct.profit);
-        setValue('profitPercentage', _purchaseProduct.profitPercentage);
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('discount_profit', _purchaseProduct.discount_profit);
+        setValue('trade_price', _purchaseProduct.trade_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
     const onProfitChange = (profit) => {
         let _purchaseProduct = { ...purchaseProduct };
         _purchaseProduct.profit = roundNumber(profit);
-        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
+        _purchaseProduct.discount_profit =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
+        _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
+        _purchaseProduct.min_trade_price = _purchaseProduct.trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('profit', _purchaseProduct.profit);
-        setValue('profitPercentage', _purchaseProduct.profitPercentage);
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('discount_profit', _purchaseProduct.discount_profit);
+        setValue('trade_price', _purchaseProduct.trade_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
-    const onTradePriceChange = (tradeUnitPriceBDT) => {
+    const onTradePriceChange = (trade_price) => {
         let _purchaseProduct = { ...purchaseProduct };
-        _purchaseProduct.tradeUnitPriceBDT = roundNumber(tradeUnitPriceBDT);
-        _purchaseProduct.profit = roundNumber(_purchaseProduct.tradeUnitPriceBDT - _purchaseProduct.netUnitCostBDT);
-        _purchaseProduct.profitPercentage =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
-        _purchaseProduct.minimumTradePrice = _purchaseProduct.tradeUnitPriceBDT;
+        _purchaseProduct.trade_price = roundNumber(trade_price);
+        _purchaseProduct.profit = roundNumber(_purchaseProduct.trade_price - _purchaseProduct.netUnitCostBDT);
+        _purchaseProduct.discount_profit =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
+        _purchaseProduct.min_trade_price = _purchaseProduct.trade_price;
         setPurchaseProduct(_purchaseProduct);
 
-        setValue('tradeUnitPriceBDT', _purchaseProduct.tradeUnitPriceBDT);
+        setValue('trade_price', _purchaseProduct.trade_price);
         setValue('profit', _purchaseProduct.profit);
-        setValue('profitPercentage', _purchaseProduct.profitPercentage);
-        setValue('minimumTradePrice', _purchaseProduct.minimumTradePrice);
+        setValue('discount_profit', _purchaseProduct.discount_profit);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
     
     const onInputChange = (e, name) => {
@@ -143,23 +143,23 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     };
 
     const onProductSelect = (selectedRow) => {
-        // set focus to quantity
+        // set focus to qty
         quantityRef.current.focus();
         console.log("PRODUCT SELECTED::", selectedRow)
         let _purchaseProduct = { ...purchaseProduct };
-        console.log(selectedRow.barCode)
-        console.log(selectedRow.lastPurchasePrice)
-        _purchaseProduct['dtProduct_id'] = selectedRow._id;
-        _purchaseProduct['productName'] = selectedRow.name;
-        _purchaseProduct['barCode'] = selectedRow.barCode;
-        _purchaseProduct['lastPurchasePrice'] = selectedRow.lastPurchasePrice;
+        console.log(selectedRow.bar_code)
+        console.log(selectedRow.last_purchase_price)
+        _purchaseProduct['product_id'] = selectedRow.id;
+        _purchaseProduct['product_name'] = selectedRow.name;
+        _purchaseProduct['bar_code'] = selectedRow.bar_code;
+        _purchaseProduct['last_purchase_price'] = selectedRow.last_purchase_price;
         setPurchaseProduct(_purchaseProduct);
 
-        setValue('dtProduct_id', selectedRow._id);
-        setValue('barCode', selectedRow.barCode);
-        setValue('productName', selectedRow.name);
-        setValue('lastPurchasePrice', selectedRow.lastPurchasePrice);
-        setValue('dtWarehouse_id', selectedRow.dtWarehouse_id);
+        setValue('product_id', selectedRow.id);
+        setValue('bar_code', selectedRow.bar_code);
+        setValue('product_name', selectedRow.name);
+        setValue('last_purchase_price', selectedRow.last_purchase_price);
+        setValue('warehouse_id', selectedRow.warehouse_id);
     };
 
     const onAddItem = (dt) => {
@@ -186,6 +186,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     };
 
     let defaultFilters = {
+        fields: ['id', 'name', 'brand_name', 'model_no', 'part_number'],
         first: 0,
         rows: 10,
         page: 1,
@@ -203,7 +204,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
         <div className="p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
             <Controller
-                name="dtProduct_id"
+                name="product_id"
                 control={control}
                 rules={{ required: 'Product is required.' }}
                     render={({ field, fieldState }) => (
@@ -216,10 +217,10 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                             defaultFilters={defaultFilters}
                             columns={[
                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
-                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
-                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                                {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                                {field: 'category_name', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
                             ]} />
                         {getFormErrorMessage(field.name)}
                     </>
@@ -227,7 +228,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="dtWarehouse_id"
+                name="warehouse_id"
                 control={control}
                 rules={{ required: 'Warehouse is required.' }}
                     render={({ field, fieldState }) => (
@@ -246,7 +247,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="barCode"
+                name="bar_code"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -258,7 +259,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="lastPurchasePrice"
+                name="last_purchase_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -273,7 +274,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="quantity"
+                name="qty"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -281,13 +282,13 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'quantity')} min={1} max={10000000} />
+                    onValueChange={(e) => onInputChange(e, 'qty')} min={1} max={10000000} />
                     </>
                 )}/>
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="unitCostF"
+                name="unit_cost_f"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -295,7 +296,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'unitCostF')}  maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'unit_cost_f')}  maxFractionDigits={2} />
                     </>
                 )}/>
             </div>
@@ -314,7 +315,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="conversionRate"
+                name="conversion_rate"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -322,13 +323,13 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'conversionRate')} min={1} maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'conversion_rate')} min={1} maxFractionDigits={2} />
                     </>
                 )}/>
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="unitCostBDT"
+                name="unit_cost"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -369,7 +370,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="duty"
+                name="duty_vat"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -377,7 +378,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'duty')} maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'duty_vat')} maxFractionDigits={2} />
                     </>
                 )}/>
             </div>
@@ -411,7 +412,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="profitPercentage"
+                name="discount_profit"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -441,7 +442,7 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="tradeUnitPriceBDT"
+                name="trade_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -456,15 +457,15 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
             
             <div className="field col-12 md:col-2">
             <Controller
-                name="minimumTradePrice"
+                name="min_trade_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
-                <label htmlFor="minimumTradePrice">Min Trade Price (U)</label>
+                <label htmlFor="min_trade_price">Min Trade Price (U)</label>
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'minimumTradePrice')}  maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'min_trade_price')}  maxFractionDigits={2} />
                     </>
                 )}/>
             </div>

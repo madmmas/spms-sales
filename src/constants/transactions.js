@@ -1,12 +1,15 @@
 export const ON_ADD_PRODUCT = 'onAddProduct';
 export const ON_UPDATE_PRODUCT = 'onUpdateProduct';
 export const ON_ADD_PACKAGE_PRODUCT = 'onAddPackageProduct';
+export const ON_STOCK_IN_PACKAGE_PRODUCT = 'onStockInPackageProduct';
 export const ON_UPDATE_PACKAGE_PRODUCT = 'onUpdatePackageProduct';
 export const ON_PURCHASE_PRODUCT = 'onPurchaseProduct';
 export const ON_UPDATE_PURCHASE_PRODUCT = 'onPurchaseUpdate';
 export const ON_PURCHASE_RETURN = 'onPurchaseReturn';
 export const ON_SALES_PRODUCT = 'onSalesProduct';
 export const ON_SALES_RETURN = 'onSalesReturn';
+export const ON_CANCEL_SALES_ORDER = 'onCancelSalesOrder';
+export const ON_CONFIRM_SALES_ORDER = 'onConfirmSalesOrder';
 export const ON_UPDATE_SALES_PRODUCT = 'onSalesUpdate';
 export const ON_EXPENSE_FROM_CASH = 'onExpenseFromCash';
 export const ON_EXPENSE_FROM_BANK = 'onExpenseFromBank';

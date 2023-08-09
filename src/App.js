@@ -48,9 +48,6 @@ function App() {
   const PurchaseList = React.lazy(() => import("./pages/transactional_data/purchases/List"));
   const PurchaseDetail = React.lazy(() => import("./pages/transactional_data/purchases/Detail"));
   const PurchaseForm = React.lazy(() => import("./pages/transactional_data/purchases/Form"));
-  // const PurchasePackageList = React.lazy(() => import("./pages/transactional_data/purchasePackages/List"));
-  // const PurchasePackageDetail = React.lazy(() => import("./pages/transactional_data/purchasePackages/Detail"));
-  // const PurchasePackageForm = React.lazy(() => import("./pages/transactional_data/purchasePackages/Form"));
   const StockStatus = React.lazy(() => import("./pages/transactional_data/stock/Detail"));
   const Accounts = React.lazy(() => import("./pages/transactional_data/accounts/Detail"));
   const Expenses = React.lazy(() => import("./pages/transactional_data/Expenses"));
@@ -70,6 +67,12 @@ function App() {
   const Group = React.lazy(() => import("./pages/configurations/Group"));
   const OfficeTime = React.lazy(() => import("./pages/configurations/OfficeTime"));
   const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
+
+  const Ledger = React.lazy(() => import("./pages/reports/ReportLedger"));
+  // const PurchaseLedger = React.lazy(() => import("./pages/reports/PurchaseLedger"));
+  // const AccountsPayable = React.lazy(() => import("./pages/reports/AccountsPayable"));
+  // const BankLedger = React.lazy(() => import("./pages/reports/BankLedger"));
+  // const CashLedger = React.lazy(() => import("./pages/reports/CashLedger"));
 
   return (
     <Routes>
@@ -99,6 +102,12 @@ function App() {
           <Route path=":id" element={<RouteAuth pageComponent={<BankAccountDetail />} />} />
         </Route>
 
+        <Route path="/ledger">
+          <Route path="purchase" element={<RouteAuth pageComponent={<Ledger type="purchase" header="Purchase Ledger" />} />} />
+          <Route path="accpayable" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="A/C Payable"/>} />} />
+          <Route path="bank" element={<RouteAuth pageComponent={<Ledger type="bank" header="Bank Ledger"/>} />} />
+          <Route path="cash" element={<RouteAuth pageComponent={<Ledger type="cash" header="Cash Ledger"/>} />} />
+        </Route>
         <Route path="/employees">
           <Route index element={<RouteAuth pageComponent={<EmpList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<EmpForm />} />} />

@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputText } from 'primereact/inputtext';
-import { MasterDataService } from '../../services/MasterDataService';
+import { ProductService } from '../../services/ProductService';
 
 export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
 
@@ -17,12 +17,12 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
     const [tmpData, setTmpData] = useState([]);
     const [selectedRow, setSelectedRow] = useState({});
 
-    const masterDataService = new MasterDataService();
+    const productService = new ProductService();
 
     const loadLazyData = () => {
         setLoading(true);
 
-        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             setTotalRecords(data.total);
             setTmpData(data.rows);
             setLoading(false);

@@ -1,68 +1,74 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { Tag } from 'primereact/tag';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
 
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { ON_PURCHASE_PRODUCT } from '../../../constants/transactions';
-import { SUPPLIER_MODEL } from '../../../constants/models';
+import { PURCHASE_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
 
-import { TransactionService } from '../../../services/TransactionService';
+import { OrderService } from '../../../services/OrderService';
+import { ConfigurationService } from '../../../services/ConfigurationService';
+
 import PurchaseProductForm from './components/PurchaseProductForm';
 import PurchaseProductDetail from './components/PurchaseProductDetail';
+import ReturnItemDialog from '../../components/ReturnItemDialog';
 
-const Form = () => {
+const Form = ({ purchase }) => {
 
     let navigate = useNavigate();
 
     let defaultValue = {
-        _id: null,
-        date: Date.now(),
-        dtSupplier_id: null,
+        id: null,
+        party_type: 'dtSupplier',
+        party_id: null,
         currency: null,
-        dtWarehouse_id: null,
-        CnF: null,
-        BENo: null,
-        LCNo: null,
+        cnf: null,
+        be_no: null,
+        lc_no: null,
         notes: null,
-        items: [],
-        totalQuantity: 0,
-        totalCostAmountF: 0.00,
-        totalCostAmountBDT: 0.00,
-        totalTransport: 0.00,
-        totalDuty: 0.00,
-        netCostAmountBDT: 0.00
+        // status: 'draft', // draft, approved, cancelled
+        // trx_status: 'pending', // pending, completed, cancelled
+        // items: [],
+        // gross: 0.00,
+        // transport: 0.00,
+        // duty_vat: 0.00,
+        // net: 0.00
     };
 
     let defaultPurchaseProduct = {
-        dtProduct_id: null, // select product
-        barCode: null, // fetch from selected product
-        lastPurchasePrice: 0.00, // fetch from selected product
+        product_id: "", // select product
+        warehouse_id: "", // select warehouse
+        bar_code: "", // fetch from selected product
+        last_purchase_price: 0.00, // fetch from selected product
 
         quantity: 1,  
-        unitCostF: 0.00,
+        unit_cost_f: 0.00,
         totalCostF: 0.00,
-        conversionRate: 1,
-        unitCostBDT: 0.00,
+        conversion_rate: 1,
+        unit_cost: 0.00,
         totalCostBDT: 0.00,
 
         transport: 0.00,
-        duty: 0.00,
+        duty_vat: 0.00,
 
         netUnitCostBDT: 0.00,
         netCostBDT: 0.00,
 
+        discount_profit: 0,
         profit: 0.00,
 
-        tradeUnitPriceBDT: 0.00,
+        trade_price: 0.00,
 
-        minimumTradePrice: 0.00,
+        min_trade_price: 0.00,
     };
 
     const toast = useRef(null);
@@ -74,42 +80,150 @@ const Form = () => {
     const [totalDuty, setTotalDuty] = useState(0.00);
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
     const [purchases, setPurchases] = useState([]);
+    const [purchaseData, setPurchaseData] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
     const [deleteProfileDialog, setDeletePurchaseProductDialog] = useState(false);
+    const [statusChangeDialog, setStatusChangeDialogFooter] = useState(false);
     const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
+    const [trxNo, setTrxNo] = useState('XXXXX');
+    const [dialogMsg, setDialogMsg] = useState('');
+    const [status, setStatus] = useState('draft');
+    const [editMode, setEditMode] = useState(true);
 
-    const transactionService = new TransactionService();
+    const [returnMode, setReturnMode] = useState(false);
+    const [selectedReturnItem, setSelectedReturnItem] = useState({});
+    const [selectedReturnItems, setSelectedReturnItems] = useState([]);
+    const [returnItems, setReturnItems] = useState([]);
+    const [trigger, setTrigger] = useState(false);
+    
+
+    const orderService = new OrderService();
+    const configurationService = new ConfigurationService();
 
     const {
-        register,
+        reset,
         control,
         formState: { errors },
-        resetField,
         handleSubmit
     } = useForm({
-        defaultValues: defaultValue //async () =>  hrManagementService.getById(modelName, PurchaseProfile)
+        defaultValues: defaultValue
     });
 
-    const onSubmit = (formData) => {
+    useEffect(() => {
+        if (purchase===null || purchase===undefined) {
+            if (trxNo === 'XXXXX') {
+                configurationService.getNextId(PURCHASE_MODEL).then(data => {
+                    setTrxNo(data.nextID);
+                    console.log("NEXT ID::", data.nextID);
+                });
+            }
+        } else {
+            console.log("FETCHED-PURCHASE::", purchase);
+            reset({
+                id: purchase.id,
+                party_type: purchase.party_type,
+                party_id: purchase.party_id,
+                currency: purchase.currency,
+                cnf: purchase.cnf,
+                be_no: purchase.be_no,
+                lc_no: purchase.lc_no,
+                notes: purchase.notes,
+                // status: purchase.status,
+                // trx_status: purchase.trx_status,
+                // items: purchase.items,
+                // gross: purchase.gross,
+                // transport: purchase.transport,
+                // duty_vat: purchase.duty_vat,
+                // net: purchase.net
+            });
+            setSelectedSupplier_currency(purchase.currency);
+            setPurchases(purchase.items);
+            setReturnItems(purchase.return_items);
+            calculateTotals(purchase.items);
+            setTrxNo(purchase.voucher_no);
+            setEditMode(purchase.status === 'draft');
+            setReturnMode(purchase.status === 'approved');
+            console.log("EDIT MODE:::=>", purchase.status, purchase.status === 'draft');
+        }
+
+        console.log("EDIT MODE::", editMode);
+    }, [purchase]);
+
+    const submitReturnItems = (data) => {
+        console.log("COFIRM RETURN ITEMS::", selectedReturnItems);
+        orderService.return(PURCHASE_MODEL, purchase.id, selectedReturnItems).then(data => {
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+            // navigate("/purchases");
+        });
+    };
+
+    const onSubmit = (action, formData) => {
+        if(action === 'save'){
+            setStatus('draft');
+            submitForm(formData);
+        } else {
+            if(purchases.length === 0){
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please add at least one product to purchase', life: 3000 });
+                return;
+            }
+            if(action === 'approve'){
+                setStatus('approved');
+                setDialogMsg('Are you sure you want to approve this purchase?');
+            } else if(action === 'cancel'){
+                setStatus('cancelled');
+                setDialogMsg('Are you sure you want to cancel this purchase?');
+            }
+            // show confirmation dialog
+            setStatusChangeDialogFooter(true);
+            // save the form data
+            setPurchaseData(formData);
+        }
+    };
+
+    const sumbitFormData = () => {
+        submitForm(purchaseData);
+    };
+
+    const submitForm = (formData) => {
+        formData.status = status;
+        formData.currency = selectedSupplier_currency;
+        formData.voucher_no = trxNo;
+
         formData.items = purchases;
-        formData.totalCostAmountF = totalCostAmountF;
-        formData.totalCostAmountBDT = totalCostAmountBDT;
-        formData.totalQuantity = totalQuantity;
-        formData.totalTransport = totalTransport;
-        formData.totalDuty = totalDuty;
-        formData.netCostAmountBDT = netCostAmountBDT;
+
+        formData.gross = totalCostAmountBDT;
+        formData.transport = totalTransport;
+        formData.duty_vat = totalDuty;
+        formData.net = netCostAmountBDT;
+        formData.due = 0.00;
+        formData.paid = netCostAmountBDT;
+
         console.log("FORMDATA::", formData);
 
         try {
-            transactionService.processTransaction(ON_PURCHASE_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-                navigate("/purchases");
-            });
+            if(purchase){
+                if(status === 'approved'){
+                    orderService.commit(PURCHASE_MODEL, purchase.id, formData).then(data => {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                        // navigate("/purchases");
+                    });
+                } else {
+                    orderService.update(PURCHASE_MODEL, purchase.id, formData).then(data => {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                        // navigate("/purchases");
+                    });
+                }
+            } else {
+                orderService.create(PURCHASE_MODEL, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                    navigate("/purchases");
+                });
+            }
         }
         catch (err){
             console.log(err)
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-            navigate("/purchases");
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to create Purchase Record!', life: 3000 });
+            // navigate("/purchases");  
         }
     };
 
@@ -159,11 +273,11 @@ const Form = () => {
                 totalCostAmountF += allpurchases[i].totalCostF;
                 totalCostAmountBDT += allpurchases[i].totalCostBDT;
                 totalTransport += allpurchases[i].transport;
-                totalDuty += allpurchases[i].duty;
+                totalDuty += allpurchases[i].duty_vat;
                 netCostAmountBDT += allpurchases[i].netCostBDT;
             }
         }
-        setTotalQuantity(purchases.length);
+        setTotalQuantity(purchases?purchases.length:0);
         setTotalAmountBDT(totalCostAmountBDT);
         setTotalAmountF(totalCostAmountF);
         setTotalTransport(totalTransport);
@@ -175,7 +289,7 @@ const Form = () => {
 
     const editPurchaseProduct = (dtPurchaseProduct) => {
         console.log("EDIT::", dtPurchaseProduct);
-        setSelectedProduct(dtPurchaseProduct);
+        setSelectedProduct({...dtPurchaseProduct});
         console.log("SET SELECTED PRODUCT::", selectedProduct);
     };
 
@@ -188,10 +302,22 @@ const Form = () => {
         setDeletePurchaseProductDialog(false);
     };
 
+    const hideStatusChangeDialog = () => {
+        setStatus('draft');
+        setStatusChangeDialogFooter(false);
+    };
+
     const deleteProfileDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeletePurchaseProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
+        </>
+    );
+
+    const statusChangeDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideStatusChangeDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={sumbitFormData} />
         </>
     );
 
@@ -200,19 +326,63 @@ const Form = () => {
         setSelectedSupplier_currency(selectedRow.currency);
     };
 
+    const onReturnItem = (selectedRow) => {
+        console.log("SELECTED RETURN ITEM::", selectedRow);
+        setSelectedReturnItem(selectedRow);
+        setTrigger((trigger) => trigger + 1);
+    };
+
+    const onAddReturnItem = (returnItem) => {
+        console.log("SELECTED RETURN ITEM::", returnItem);
+        // add index to return item
+        returnItem['index'] = selectedReturnItems.length;
+        // add timestamp
+        returnItem['created_at'] = new Date();
+        // check if already added
+        for(let i=0; i<selectedReturnItems.length; i++) {
+            if(selectedReturnItems[i].product_id === returnItem.product_id) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Item already added!', life: 3000 });
+                return;
+            }
+        }
+
+        setSelectedReturnItems([...selectedReturnItems, returnItem]);
+    };
+
+    const onDeleteFromReturnList = (rowData) => {
+        console.log("DELETE RETURN ITEM::", rowData);
+        let newReturnItems = [...selectedReturnItems];
+        newReturnItems.splice(rowData.index, 1);
+        setSelectedReturnItems(newReturnItems);
+    };
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <>
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDeleteFromReturnList(rowData)} />
+            </>
+        );
+    };
+
     return (
 
 <div className="grid h-screen">    
     <Toast ref={toast} />    
     <div className="col-3">
         <div class="card">
-            <Button onClick={() => gotoList()} className="p-button-outlined" label="Go to Purchase List" /> 
-            <h5>Purchase Detail</h5>
+            {!purchase && <Button onClick={() => gotoList()} className="p-button-outlined" label="Go to Purchase List" /> }
+            <h5>Purchase Detail :: VoucherNo ({trxNo}) {purchase && <Tag severity="warning" value={purchase.status}></Tag>}</h5>
+            
             <div className=" col-12 md:col-12">
                 <div className="p-fluid formgrid grid">
+                    
                     <div className="field col-12">
-                        <Controller
-                            name="dtSupplier_id"
+                        {!editMode && <>
+                            <label>Supplier Name</label>
+                            <InputText readonly="true" value={purchase.party_id} placeholder="empty" />
+                        </>}
+                        {editMode && <Controller
+                            name="party_id"
                             control={control}
                             rules={{ required: 'Supplier is required.' }}
                             render={({ field, fieldState }) => (
@@ -227,15 +397,20 @@ const Form = () => {
                                     ]} />
                                 {getFormErrorMessage(field.name)}
                             </>
-                        )}/>
+                        )}/>}
                     </div>
                     <div className="field col-12">
                         <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
                         <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
                     </div>
                     <div className="field col-12">
-                        <Controller
-                            name="CnF"
+                        {!editMode && <>
+                            <label>CnF</label>
+                            <InputText readonly="true" value={purchase.cnf} placeholder="empty" />
+                        </>}
+                        {editMode && <Controller
+
+                            name="cnf"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -243,11 +418,16 @@ const Form = () => {
                                 <InputText inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
-                        )}/>
+                        )}/>}
                     </div>
                     <div className="field col-12">
-                        <Controller
-                            name="BENo"
+                        {!editMode && <>
+                            <label>B/E No.</label>
+                            <InputText readonly="true" value={purchase.be_no} placeholder="empty" />
+                        </>}
+                        {editMode && <Controller
+
+                            name="be_no"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -255,11 +435,16 @@ const Form = () => {
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
-                        )}/>
+                        )}/>}
                     </div>
                     <div className="field col-12">
-                        <Controller
-                            name="LCNo"
+                        {!editMode && <>
+                            <label>LC No.</label>
+                            <InputText readonly="true" value={purchase.lc_no} placeholder="empty" />
+                        </>}
+                        {editMode && <Controller
+
+                            name="lc_no"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -267,10 +452,15 @@ const Form = () => {
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
-                        )}/>
+                        )}/>}
                     </div>
                     <div className="field col-12">
-                        <Controller
+                        {!editMode && <>
+                            <label>Notes</label>
+                            <InputText readonly="true" value={purchase.notes} placeholder="empty" />
+                        </>}
+                        {editMode && <Controller
+
                             name="notes"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -279,18 +469,20 @@ const Form = () => {
                                 <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
                                 {getFormErrorMessage(field.name)}
                             </>
-                        )}/>
+                        )}/>}
                     </div>
                 </div>
             </div>
-            <>
-                <Button type="submit" label="Submit" className="mt-2" onClick={handleSubmit((d) => onSubmit(d))}/>
-            </>
+            {editMode && <>
+                <Button type="submit" label="Save as Draft" className="mt-2 m-1" onClick={handleSubmit((d) => onSubmit('save', d))}/>
+                <Button type="submit" label="Confirm Purchase" className="mt-2 m-1 p-button-warning" onClick={handleSubmit((d) => onSubmit('approve', d))}/>
+                <Button type="submit" label="Cancel Purchase" className="mt-2 m-1 p-button-outlined p-button-warning" onClick={handleSubmit((d) => onSubmit('cancel', d))}/>
+            </>}
+            {returnMode && <Button type="submit" label="Return Purchases" className="mt-2 m-1 p-button-outlined p-button-warning" onClick={handleSubmit((d) => submitReturnItems(d))}/>}
         </div>
     </div>
     <div className="card col-9" >
-        <div className="col-12">
-            {/* <h5><Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back" /> Add Product</h5> */}
+        {editMode && <div className="col-12">
             <PurchaseProductForm 
                 onAdd={(dt) => addToPurchaseList(dt)} 
                 onEdit={(dt) => updatePurchaselist(dt)}
@@ -298,12 +490,37 @@ const Form = () => {
                 defaultPurchaseProduct={defaultPurchaseProduct} 
                 selectedProduct={selectedProduct}
                 />
-        </div>
+        </div>}
         <div className="col-12">
-            <PurchaseProductDetail purchases={purchases} supplierCurrency={selectedSupplier_currency}
-                onEdit={(dt) => editPurchaseProduct(dt)} onDelete={(dt) => confirmDeletePurchaseProduct(dt)}
-            />
+            {purchases && <PurchaseProductDetail 
+                editMode={editMode} 
+                returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}
+                purchases={purchases} supplierCurrency={selectedSupplier_currency}
+                onEdit={(dt) => editPurchaseProduct(dt)} 
+                onDelete={(dt) => confirmDeletePurchaseProduct(dt)}
+            />}
         </div>
+
+        {selectedReturnItems && selectedReturnItems.length>0 && <div className="col-12">
+            <h5>New Returns:</h5>
+            <DataTable value={selectedReturnItems} stripedRows showGridlines scrollable scrollHeight="25rem" >
+                <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
+                <Column field="product_name" header="Product Name" sortable></Column>
+                <Column field="return_qty" header="Returned Qty" sortable></Column>
+                <Column field="reason" header="Reason" sortable></Column>
+            </DataTable>
+        </div>}
+
+        {returnItems && returnItems.length>0 && <div className="col-12">
+            <h5>Returned Items:</h5>
+            <DataTable value={returnItems} stripedRows showGridlines scrollable scrollHeight="25rem" >
+                <Column field="product_name" header="Product Name" sortable></Column>
+                <Column field="return_qty" header="Returned Qty" sortable></Column>
+                <Column field="reason" header="Reason" sortable></Column>
+                <Column field="created_at" header="Returned Date" sortable></Column>
+            </DataTable>
+        </div>}
+
         <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeletePurchaseProductDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
@@ -312,9 +529,23 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
+        <Dialog visible={statusChangeDialog} style={{ width: '450px' }} header="Confirm" modal footer={statusChangeDialogFooter} onHide={hideStatusChangeDialog}>
+            <div className="flex align-items-center justify-content-center">
+                <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                <span>
+                    ${dialogMsg}
+                </span>
+            </div>
+        </Dialog>
+        <ReturnItemDialog 
+            trigger={trigger} 
+            selectedReturnItem={selectedReturnItem}
+            onAddReturnItem={(dt) => onAddReturnItem(dt)}
+            />   
+            
     </div>
     </div>
     );
-}
+};
                  
 export default Form;

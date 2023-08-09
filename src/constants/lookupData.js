@@ -82,10 +82,10 @@ export const MARITAL_STATUS = [
 ];
 
 export const MEASUREMENT_UNITS = [
-    { id: 'Piece', name: 'Piece' },
-    { id: 'Pack', name: 'Pack' },
-    { id: 'Set', name: 'Set' },
-    { id: 'Dozen', name: 'Dozen' }
+    { id: 'PCS', name: 'PCS' },
+    { id: 'DZN', name: 'DZN' },
+    { id: 'PKT', name: 'PKT' },
+    { id: 'SET', name: 'SET' }
 ];
 
 export const PRODUCT_STATUS = [

@@ -7,11 +7,12 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
+import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
-import { TransactionService } from '../../../services/TransactionService';
+import { OrderService } from '../../../services/OrderService';
 
 import { SALES_MODEL } from '../../../constants/models';
 
@@ -25,6 +26,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        fields: ["created_at", "party_id", "customer_category", "customer_name", "customer_phone",  "gross", "transport", "duty_vat", "net"],
         first: 0,
         rows: 10,
         page: 1,
@@ -46,7 +48,7 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const hrManagementService = new HRService();
-    const transactionService = new TransactionService();
+    const orderService = new OrderService();
 
     useEffect(() => {
         initFilters();
@@ -67,7 +69,7 @@ const List = () => {
     const loadLazyData = async () => {
         setLoading(true);
 
-        await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        await orderService.getAll(SALES_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -100,7 +102,7 @@ const List = () => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/sales/" + dtProfile._id);
+        navigate("/sales/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -125,7 +127,7 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
+        hrManagementService.delete(modelName, dtProfile.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
@@ -153,10 +155,26 @@ const List = () => {
         );
     };
 
+    const voucherNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.voucher_no}
+            </>
+        );
+    };
+
+    const statusNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {<Tag severity="warning" value={rowData.status}></Tag>}
+            </>
+        );
+    };
+
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.invoiceDate)}
+                {getDate(rowData.created_at)}
             </>
         );
     };
@@ -164,7 +182,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.customerName}
+                {rowData.customer_name}
             </>
         );
     };
@@ -172,7 +190,7 @@ const List = () => {
     const customerCategoryBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.customerCategory}
+                {rowData.customer_category}
             </>
         );
     };
@@ -188,7 +206,7 @@ const List = () => {
     const totalPriceBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalPrice}
+                {rowData.gross}
             </>
         );
     };
@@ -196,7 +214,7 @@ const List = () => {
     const totalDiscountBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalDiscount}
+                {rowData.discount}
             </>
         );
     };
@@ -204,7 +222,7 @@ const List = () => {
     const deliveryCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.deliveryCost}
+                {rowData.transport}
             </>
         );
     };
@@ -212,7 +230,7 @@ const List = () => {
     const vatBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.vat}
+                {rowData.duty_vat}
             </>
         );
     };
@@ -220,7 +238,7 @@ const List = () => {
     const netAmountBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.netAmount}
+                {rowData.net}
             </>
         );
     };
@@ -263,7 +281,7 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -277,15 +295,17 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="invoiceDate" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customerName" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customerCategory" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalPrice" header="Total Price" filter filterPlaceholder="Search by name" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalDiscount" header="Total Discount" filter filterPlaceholder="Search by name" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="deliveryCost" header="Delivery Cost" filter filterPlaceholder="Search by name" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="vat" header="VAT" filter filterPlaceholder="Search by name" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="netAmount" header="Net Amount" filter filterPlaceholder="Search by name" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        <Column field="gross" header="Total Price" filter filterPlaceholder="Search by gross" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="duty_vat" header="VAT" filter filterPlaceholder="Search by Vat Amount" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="net" header="Net Amount" filter filterPlaceholder="Search by Net Amount" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

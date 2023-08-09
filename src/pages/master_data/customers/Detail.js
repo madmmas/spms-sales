@@ -8,6 +8,7 @@ import { HRService } from '../../../services/HRService';
 import { CUSTOMER_MODEL } from '../../../constants/models';
 
 const CustomerForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "customerProfile" */ './Form'), "customerProfile"));
+const CustomerLedger = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "customerLedger" */ './Ledger'), "customerLedger"));
 
 const Detail = () => {
     
@@ -18,15 +19,17 @@ const Detail = () => {
     const modelName = CUSTOMER_MODEL;
 
     const hrManagementService = new HRService();
-    const [empData, setCustomerData] = useState(null);
+    const [customerData, setCustomerData] = useState(null);
 
     const tabs = [
         { component: CustomerForm },
+        { component: CustomerLedger },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
+        {label: 'Ledger', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {
@@ -50,7 +53,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel customerProfile={empData}/>;
+        return <TabPanel customerProfile={customerData}/>;
     };
 
     return (
@@ -60,7 +63,7 @@ const Detail = () => {
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
                     {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderCustomerForm():(empData && renderTabPanel())}
+                        {id=="new"?renderCustomerForm():(customerData && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

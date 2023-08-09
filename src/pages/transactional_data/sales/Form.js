@@ -9,7 +9,6 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import PaymentDialog from './components/PaymentDialog';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
@@ -18,23 +17,25 @@ import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { ON_SALES_PRODUCT } from '../../../constants/transactions';
 import { PRODUCT_MODEL, CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
 
-import { TransactionService } from '../../../services/TransactionService';
 
 import SalesProductForm from './components/SalesProductForm';
 import SalesProductDetail from './components/SalesProductDetail';
 import SalesProductTotal from './components/SalesProductTotal';
-import { ConfigurationService } from '../../../services/ConfigurationService';
 
-const Form = () => {
+import { TransactionService } from '../../../services/TransactionService';
+import { ConfigurationService } from '../../../services/ConfigurationService';
+import { OrderService } from '../../../services/OrderService';
+
+const Form = React.memo(({ sales }) => {
 
     let navigate = useNavigate();
 
     let defaultFormValues = {
         notes: '',
         dtCustomer_id: '',
-        customerCategory: 'WALKIN',
-        customerMobileNumber: '',
-        customerName: '',
+        customer_category: 'WALKIN',
+        customer_phone: '',
+        customer_name: '',
     };
 
     let defaultSalesProduct = {
@@ -64,9 +65,8 @@ const Form = () => {
     const [vatPercentage, setVatPercentage] = useState(0.00);
     const [netAmount, setNetAmount] = useState(0.00);
 
-    const [sales, setSales] = useState([]);
+    const [salesItems, setSalesItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState({});
-    const [salesFormData, setSalesFormData] = useState({});
     const [selectedTableItem, setSelectedTableItem] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
     const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
@@ -74,10 +74,12 @@ const Form = () => {
     const [selectedCustomer_currency] = useState("INR");
     const [customerCategory, setCustomerCategory] = useState("WALKIN");
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
-    const [trigger, setTrigger] = useState(0);
     const [trxNo, setTrxNo] = useState('XXXXX');
+    const [dialogMsg, setDialogMsg] = useState('');
+    const [status, setStatus] = useState('draft');
+    const [editMode, setEditMode] = useState(true);
 
-    const transactionService = new TransactionService();
+    const orderService = new OrderService();
     const configurationService = new ConfigurationService();
 
     const {
@@ -91,79 +93,91 @@ const Form = () => {
     });
 
     useEffect(() => {
-        configurationService.getNextId(SALES_MODEL).then(data => {
-            setTrxNo(data.nextID);
-        });
-    }, []);
+        if (sales===null || sales===undefined) {
+            if (trxNo === 'XXXXX') {
+                configurationService.getNextId(SALES_MODEL).then(data => {
+                    setTrxNo(data.nextID);
+                    // console.log("NEXT ID::", data.nextID);
+                });
+            }
+            // setEditMode(true);
+        } else {
+            // console.log("FETCHED-SALES::", sales);    
+            reset({
+                id: sales.id,
+                party_type: sales.party_type,
+                dtCustomer_id: sales.party_id,
+                customer_category: sales.customer_category,
+                customer_phone: sales.customer_phone,
+                customer_name: sales.customer_name,
+                notes: sales.notes,
+            });
+            setSalesItems(sales.items);
+            calculateTotals(sales.items);
+            setTrxNo(sales.voucher_no);
+            setEditMode(sales.status === 'draft');
+            // console.log("EDIT MODE:::=>", sales.status, sales.status === 'draft');
+        }
+    }, [sales]);
+
 
     const onSubmit = (formData) => {
-        if(sales.length === 0) {
+
+        if(salesItems.length === 0) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No Product Added', life: 3000 });
             return;
         }
 
-        if(customerCategory !== "CONDITIONAL") {
-            setSalesFormData(formData);
-            setTrigger((trigger) => trigger + 1);
-            return;
-        }
-
-        saveData(formData, {});
-    };
-
-    const onPaymnetSubmit = (paymentData) => {
-        let formData = salesFormData;
-
-        saveData(formData, paymentData);
-    };
-
-    const saveData = (formData, paymentData) => {
-        formData.invoiceDate = Date.now();
-        formData.entryTime = Date.now();
-        formData.servedBy = "ADMIN";
-        formData.voucherNo = trxNo;
-        formData.customerCategory = customerCategory;
+        formData.status = status;
+        formData.voucher_no = trxNo;
 
         if(customerCategory === "WALKIN") {
-            formData.dtCustomer_id = null;
-            formData.customerMobileNumber = formData.customerMobileNumber;
-            formData.customerName = formData.customerName;
-            formData.customerAddress = '';
+            formData.party_type = " ";
+            formData.party_id = " ";
+            formData.customer_phone = formData.customer_phone;
+            formData.customer_name = formData.customer_name;
+            // formData.customerAddress = '';
+            formData.salesStatus = "COMPLETED";
         } else {
-            console.log("selectedCustomer::", selectedCustomer);
-            formData.dtCustomer_id = selectedCustomer._id;
-            formData.customerMobileNumber = selectedCustomer.phone;
-            formData.customerName = selectedCustomer.name;
-            formData.customerAddress = selectedCustomer.address;
+            // console.log("selectedCustomer::", selectedCustomer);
+            formData.party_type = "dtCustomer";
+            formData.party_id = selectedCustomer._id;
+            formData.customer_phone = selectedCustomer.phone;
+            formData.customer_name = selectedCustomer.name;
+            // formData.customerAddress = selectedCustomer.address;
+            // if(paymentData.dueAmount === 0.00) {
+            //     formData.salesStatus = "COMPLETED";
+            // } else {
+            //     formData.salesStatus = "PENDING";
+            // }
         }
 
-        formData.items = sales;
+        formData.items = salesItems;
 
-        formData.totalQuantity = totalQuantity;
-        formData.totalPrice = totalPrice;
-        formData.totalDiscount = totalDiscount;
-        formData.totalDiscountedAmount = totalDiscountedAmount;
-        formData.deliveryCost = 0.00;
-        formData.vat = vat;
-        formData.netAmount = netAmount;
-        formData.payment = paymentData;
-        formData.dueAmount = paymentData.dueAmount;
-        formData.isPaid = paymentData.dueAmount === 0.00;
-
-        // need to add balance forword here
-        formData.balanceForward = 0.00;
-        formData.netBalance = formData.balanceForward + formData.dueAmount;
-        // need to save this balance as well in the transaction
+        formData.gross = totalPrice;
+        formData.discount = totalDiscount;
+        formData.duty_vat = vat;
+        formData.net = netAmount;
+        formData.due = netAmount;
+        formData.paid = 0;
 
         try {
-            transactionService.processTransaction(ON_SALES_PRODUCT, formData).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
-                navigate("/sales/" + data.ID);
-            });
+            if (sales) {
+                orderService.update(SALES_MODEL, sales.id, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                    // navigate("/sales");
+                });                
+            } else {
+                orderService.create(SALES_MODEL, formData).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
+                    // navigate("/sales");
+                });
+            }
         }
         catch (err){
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sale Record Created', life: 3000 });
-            navigate("/sales");
+            console.log(err)
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to create Purchase Record!', life: 3000 });
+            // navigate("/sales");  
         }
     };
 
@@ -176,31 +190,31 @@ const Form = () => {
     };
 
     const addToSaleList = (addedItem) => {
-        let newSales = [...sales];
-        addedItem['index'] = sales.length;
+        let newSales = [...salesItems];
+        addedItem['index'] = salesItems.length;
         newSales.push(addedItem);
-        setSales(newSales);
+        setSalesItems(newSales);
         calculateTotals(newSales);
         clearProductSelection();
     };
 
     const updateSalelist = (dtSalesProduct) => {
-        let newSales = [...sales];
+        let newSales = [...salesItems];
         newSales[selectedProduct.index] = dtSalesProduct;
-        setSales(newSales);
+        setSalesItems(newSales);
         calculateTotals(newSales);
         clearProductSelection();
     };
 
     const onVATChange = (vatPercentage) => {
         setVatPercentage(vatPercentage);
-        let newSales = [...sales];
+        let newSales = [...salesItems];
         calculateTotals(newSales);
     };
 
     const onDeliveryCostChange = (deliveryCost) => {
         setDeliveryCost(deliveryCost);
-        let newSales = [...sales];
+        let newSales = [...salesItems];
         calculateTotals(newSales);
     };
 
@@ -212,7 +226,7 @@ const Form = () => {
     };
 
     const clearAll = () => {
-        setSales([]);
+        setSalesItems([]);
         setTotalPrice(0.00);
         setTotalDiscount(0.00);
         setTotalQuantity(0);
@@ -226,9 +240,9 @@ const Form = () => {
     };
 
     const removeItem = () => {
-        let newSales = [...sales];
+        let newSales = [...salesItems];
         newSales.splice(selectedProduct.index, 1);
-        setSales(newSales);
+        setSalesItems(newSales);
         setDeleteSalesProductDialog(false);
     };
 
@@ -257,8 +271,8 @@ const Form = () => {
 
     const editSalesProduct = (dtSalesProduct) => {
         console.log(dtSalesProduct);
-        setSelectedProduct(dtSalesProduct);
-        setSelectedTableItem({ "_id": dtSalesProduct.dtProduct_id });
+        setSelectedProduct({ ...dtSalesProduct });
+        setSelectedTableItem({ "id": dtSalesProduct.dtProduct_id });
         setUpdateSaleItemMode(true);
     };
 
@@ -272,8 +286,8 @@ const Form = () => {
             setSelectedCustomer({});
             setValue('dtCustomer_id', '');
             setValue('notes', '');
-            setValue('customerMobileNumber', '');
-            setValue('customerName', '');
+            setValue('customer_phone', '');
+            setValue('customer_name', '');
         }
     };
 
@@ -287,8 +301,8 @@ const Form = () => {
             }
 
             let alreadySelected = false;
-            sales.forEach(sale => {
-                if(sale.dtProduct_id === productSelected._id) {
+            salesItems.forEach(sale => {
+                if(sale.dtProduct_id === productSelected.id) {
                     alreadySelected = true;
                 }
             });
@@ -307,7 +321,7 @@ const Form = () => {
             }
             productSelected['lastTradePrice'] = lastTradePrice;
 
-            setSelectedTableItem({ "_id": productSelected._id });
+            setSelectedTableItem({ "id": productSelected.id });
             setSelectedItem(productSelected);
         } else {
             toast.current.show({ severity: 'warn', summary: 'Please Select Customer', detail: 'Select a Customer First', life: 3000 });
@@ -315,6 +329,7 @@ const Form = () => {
     }
 
     let defaultFilters = {
+        fields: ['id', 'name', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'price'],
         first: 0,
         rows: 10,
         page: 1,
@@ -359,19 +374,19 @@ const Form = () => {
                 selectedItem={selectedTableItem}
                 showFields={[]} onSelect={onSelection}
                 columns={[
-                    {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
-                    {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
-                    {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
-                    {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
-                    {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
-                ]} 
+                    {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
+                    {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                    {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                    {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                    {field: 'category_name', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+    ]} 
                 />
         </div>
         <div className="card col-12 md:col-12">
             <div className="p-fluid formgrid grid">
                 <div className="field col-12 md:col-4">
                 <Controller
-                    name="customerCategory"
+                    name="customer_category"
                     control={control}
                     render={({ field, fieldState }) => (
                     <>
@@ -401,14 +416,15 @@ const Form = () => {
                     />
                 </div>
                 <div className="field col-12 md:col-2">
-                    <Button type="submit" label="Submit Order" className="p-button p-button-success" 
+                    <Button type="submit" label="Save Order" className="p-button p-button-success" 
                         onClick={handleSubmit((d) => onSubmit(d))}
                     />
                 </div>
+
                 {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-8">
                 <div className="field col-12 md:col-6">
                 <Controller
-                    name="customerMobileNumber"
+                    name="customer_phone"
                     control={control}
                     rules={{ required: 'Mobile Number is required.' }}
                     render={({ field, fieldState }) => (
@@ -421,7 +437,7 @@ const Form = () => {
                 </div>
                 <div className="field col-12 md:col-6">
                 <Controller
-                    name="customerName"
+                    name="customer_name"
                     control={control}
                     render={({ field, fieldState }) => (
                         <>
@@ -469,7 +485,7 @@ const Form = () => {
             selectedItem={selectedItem}
             selectedProduct={selectedProduct}
             />
-        <SalesProductTotal sales={sales}
+        <SalesProductTotal sales={salesItems}
                 totalPrice={totalPrice} netAmount={netAmount} 
                 totalDiscount={totalDiscountedAmount} 
                 vat={vat} onVATChange={onVATChange}
@@ -477,7 +493,7 @@ const Form = () => {
                 onEdit={(dt) => editSalesProduct(dt)} 
                 onDelete={(dt) => confirmDeleteSalesProduct(dt)}
             />
-        <SalesProductDetail sales={sales}
+        <SalesProductDetail sales={salesItems}
                 totalPrice={totalPrice} netAmount={netAmount} 
                 totalDiscount={totalDiscountedAmount} 
                 vat={vat} onVATChange={onVATChange}
@@ -493,14 +509,9 @@ const Form = () => {
                 </span>
             </div>
         </Dialog>
-        <PaymentDialog 
-            customerCategory={customerCategory}
-            netAmount={netAmount} onPaymnetSubmit={(dt) => onPaymnetSubmit(dt)}
-            trigger={trigger} style={{ width: '450px' }} header="Payment" 
-            />
     </div>     
     </div>
     );
-}
+});
                  
 export default Form;

@@ -8,9 +8,9 @@ import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-
+import { Tag } from 'primereact/tag';
 import { HRService } from '../../../services/HRService';
-import { TransactionService } from '../../../services/TransactionService';
+import { OrderService } from '../../../services/OrderService';
 
 import { PURCHASE_MODEL } from '../../../constants/models';
 
@@ -24,7 +24,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["date", "dtSupplier_id", "CnF", "BENo", "LCNo", "totalAmountF", "totalAmountBDT", "totalQuantity", "totalTransport", "totalDuty", "netAmountBDT"],
+        fields: ["date", "party_id", "cnf", "be_no", "lc_no",  "gross", "transport", "duty_vat", "net"],
         first: 0,
         rows: 10,
         page: 1,
@@ -32,13 +32,12 @@ const List = () => {
         sortOrder: null,
         filters: {            
             'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'dtSupplier_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'CnF': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'BENo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'LCNo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'totalAmountF': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'totalAmountBDT': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'netAmountBDT': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'party_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'cnf': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'be_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'lc_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'gross': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'net': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
@@ -53,7 +52,7 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const hrManagementService = new HRService();
-    const transactionService = new TransactionService();
+    const orderService = new OrderService();
 
     useEffect(() => {
         initFilters();
@@ -74,7 +73,7 @@ const List = () => {
     const loadLazyData = async () => {
         setLoading(true);
 
-        await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        await orderService.getAll(PURCHASE_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -157,10 +156,34 @@ const List = () => {
         );
     };
 
+    const voucherNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.voucher_no}
+            </>
+        );
+    };
+
+    const statusNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {<Tag severity="warning" value={rowData.status}></Tag>}
+            </>
+        );
+    };
+
+    const trxStatusNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {<Tag severity="info" value={rowData.trx_status}></Tag>}
+            </>
+        );
+    };
+
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDate(rowData.created_at)}
             </>
         );
     };
@@ -168,7 +191,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtSupplier_id_shortname}
+                {rowData.party_name}
             </>
         );
     };
@@ -176,7 +199,7 @@ const List = () => {
     const cnfBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.CnF}                
+                {rowData.cnf}                
             </>
         );
     };
@@ -184,7 +207,7 @@ const List = () => {
     const beNoBodyTemplate = (rowData) => {
         return (
             <>                
-                {rowData.BENo}
+                {rowData.be_no}
             </>
         );
     };
@@ -192,7 +215,7 @@ const List = () => {
     const lcNOBodyTemplate = (rowData) => {
         return (
             <>                
-                {rowData.LCNo}
+                {rowData.lc_no}
             </>
         );
     };
@@ -200,7 +223,7 @@ const List = () => {
     const totalAmountBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalAmountF}
+                {rowData.gross}
             </>
         );
     };
@@ -208,7 +231,7 @@ const List = () => {
     const totalAmountBDTBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalAmountBDT}
+                {rowData.gross}
             </>
         );
     };
@@ -224,7 +247,7 @@ const List = () => {
     const totalTransportBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalTransport}
+                {rowData.transport}
             </>
         );
     };
@@ -232,7 +255,7 @@ const List = () => {
     const totalDutyBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalDuty}
+                {rowData.duty_vat}
             </>
         );
     };
@@ -240,7 +263,7 @@ const List = () => {
     const netAmountBDTBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalAmountBDT}
+                {rowData.net}
             </>
         );
     };
@@ -267,6 +290,18 @@ const List = () => {
         </>
     );
 
+    const editProfile = (dtProfile) => {
+        navigate("/purchases/" + dtProfile.id);
+    };
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <>
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -288,17 +323,21 @@ const List = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="date" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtSupplier_id" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        {/* <Column field="trx_status" header="Transaction Status" filter filterPlaceholder="Search by status" sortable body={trxStatusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column> */}
+                        <Column field="created_at" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="party_it" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="CnF" header="CnF" filter filterPlaceholder="Search by CnF" sortable body={cnfBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="BENo" header="B/E No" filter filterPlaceholder="Search by B/E No" sortable body={beNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="LCNo" header="LC No" filter filterPlaceholder="Search by LC No" sortable body={lcNOBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalAmountF" header="Total Amount F" filter filterPlaceholder="Search by ID" sortable body={totalAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalAmountBDT" header="Total Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={totalAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by Quantity" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalTransport" header="Total Transport" filter filterPlaceholder="Search by Transport" sortable body={totalTransportBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="totalDuty" header="Total Duty" filter filterPlaceholder="Search by Duty" sortable body={totalDutyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="netAmountBDT" header="Net Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={netAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="totalAmountF" header="Total Amount F" filter filterPlaceholder="Search by ID" sortable body={totalAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        <Column field="gross" header="Total Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={totalAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by Quantity" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        <Column field="transport" header="Total Transport" filter filterPlaceholder="Search by Transport" sortable body={totalTransportBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="duty_vat" header="Total Duty" filter filterPlaceholder="Search by Duty" sortable body={totalDutyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="net" header="Net Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={netAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
-import { MasterDataService } from '../../services/MasterDataService';
+
+import { ProductService } from '../../services/ProductService';
 
 export default function SelectMasterDataTableList({ defaultFilters, selectedItem, fieldValue, onSelect, modelName, columns, showFields=[]}) {
 
@@ -16,13 +17,13 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
     const [tmpData, setTmpData] = useState([]);
     // const [selectedRow, setSelectedRow] = useState(selectedItem);
 
-    const masterDataService = new MasterDataService();
+    const productService = new ProductService();
 
     
     const loadLazyData = () => {
         setLoading(true);
 
-        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setTmpData(data.rows);
@@ -84,7 +85,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
         onSelect(e)
     }
 
-    const isSelectable = (data) => data._id !== fieldValue;
+    const isSelectable = (data) => data.id !== fieldValue;
 
     const isRowSelectable = (event) => (event.data ? isSelectable(event.data) : true);
 
@@ -100,7 +101,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
                     placeholder="Search" />
             </span>
                 <DataTable
-                    ref={dt} value={tmpData} dataKey="_id"
+                    ref={dt} value={tmpData} dataKey="id"
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -119,7 +120,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
                         if(e.value){
                             onSelection(e)
                         }
-                        console.log("SELECTED::"+e)
+                        console.log(e)
                     }} 
 
                     emptyMessage="No data found."

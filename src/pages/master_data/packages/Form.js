@@ -1,55 +1,36 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { FilterMatchMode } from 'primereact/api';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
+import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 
-import { ON_ADD_PRODUCT } from '../../../constants/transactions';
-import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
-
-import { TransactionService } from '../../../services/TransactionService';
 import { ProductService } from '../../../services/ProductService';
+import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
 
 const Form = ({ productData }) => {
 
-    const modelName = PRODUCT_MODEL;
-
     let navigate = useNavigate();
 
-    let defaultFormValues = {
-        // name, code, packageTradePrice, products, dtWarehouse_id, status, remarks
-        name: '',
-        code: '',
-        remarks: '',
-        dtWarehouse_id: '',
-        type: 'PACKAGE',
-        status: 'ACTIVE',
-        products: [],
-    };
-
-    let defaultSalesProduct = {
-        _id: null,
+    let defaultPackageProduct = {
+        id: null,
         dtProduct_id: "",
-        barCode: "",
-        // lastSalePrice: 0.00,
+        code: "",
 
         unitTradePrice: 0.00,
         quantity: 1,  
         totalPrice: 0.00,
-        // discount: 0.00,
-        // discountedAmount: 0.00,
         netPrice: 0.00,
 
         remarks: "",
@@ -57,28 +38,16 @@ const Form = ({ productData }) => {
 
     const toast = useRef(null);
 
+    const [products, setProducts] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0.00);
-    const [totalDiscount, setTotalDiscount] = useState(0.00);
-    const [totalDiscountedAmount, setTotalDiscountedAmount] = useState(0.00);
-    const [totalQuantity, setTotalQuantity] = useState(0);
-    const [vat, setVat] = useState(0.00);
-    const [deliveryCost, setDeliveryCost] = useState(0.00);
-    const [vatPercentage, setVatPercentage] = useState(0.00);
-    const [netAmount, setNetAmount] = useState(0.00);
-
-    const [products, setSales] = useState([]);
     const [selectedItem, setSelectedItem] = useState({});
+    const [selectedProduct, setSelectedProduct] = useState(defaultPackageProduct);
     const [selectedTableItem, setSelectedTableItem] = useState({});
-    const [selectedProduct, setSelectedProduct] = useState(defaultSalesProduct);
-    const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [selectedCustomer_currency] = useState("INR");
-    const [customerCategory, setCustomerCategory] = useState("WALKIN");
+    const [deleteProductDialog, setDeletePackageProductDialog] = useState(false);
+
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
-    const [trigger, setTrigger] = useState(0);
     const [submitted, setSubmitted] = useState(false);
 
-    const transactionService = new TransactionService();
     const productService = new ProductService();
 
     const {
@@ -88,47 +57,75 @@ const Form = ({ productData }) => {
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: defaultFormValues
+        defaultValues: productData
     });
 
-    const onSubmit = (formData) => {
-    
-        formData.products = products;
-        // formData.totalQuantity = totalQuantity;
-        // formData.totalPrice = totalPrice;
-        // formData.totalDiscount = totalDiscount;
-        // formData.totalDiscountedAmount = totalDiscountedAmount;
-        // formData.deliveryCost = 0.00;
-        // formData.vat = vat;
-        // formData.netAmount = netAmount;
-        // formData.payment = paymentData;
-        // formData.dueAmount = paymentData.dueAmount;
-        // formData.isPaid = paymentData.dueAmount === 0.00;
+    const resetForm = () => {
+        reset({ 
+            id: null,
+            code: "",
+            name: "",
+            price: 0.00,
+            type: "PACKAGE",
+            warehouse_id: "",
+            bar_code: "",
+            low_stock_qty: 0,
+            remarks: "",
+            items: [],
+            active: true
+         });
+    };
 
-        console.log(formData);
+    useEffect(() => {
+        if (productData) {
+            reset(productData);
+        } else {
+            resetForm();
+        }
+    }, [productData]);
+
+    const buildFormData = (data) => {
+        return {
+            id: data.id,
+            code: data.code,
+            name: data.name,
+            price: Number(data.price),
+            type: 'PACKAGE',
+            warehouse_id: data.warehouse_id,
+            bar_code: data.bar_code,
+            low_stock_qty: Number(data.low_stock_qty),
+            remarks: data.remarks,
+            items: data.items,
+            active: data.active
+        }
+    }
+
+
+    const onSubmit = (formData) => {
+        let data = buildFormData({ ...formData, ...{ items: products }});
         try{
-            setSubmitted(true);
+            setSubmitted(true);            
             if(productData==null){
-                transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
+                productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    navigate("/products/" + data.ID);
+                    navigate("/packages/" + data.ID);
                 });
-            }else{
-                // transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
-                //     setSubmitted(false);
-                //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-                // });
+            } else {
+                productService.update(data.id, data).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                    navigate("/packages/" + data.ID);
+                });
             }
         }
         catch (err){
             console.log(err)
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
-            navigate("/products");
+            navigate("/packages");
         }
     };
 
     const gotoList = () => {
-        navigate("/products");
+        navigate("/packages");
     };
 
     const getFormErrorMessage = (name) => {
@@ -136,97 +133,62 @@ const Form = ({ productData }) => {
     };
 
     const addToSaleList = (addedItem) => {
-        let newSales = [...products];
+        let newProducts = [...products];
         addedItem['index'] = products.length;
-        newSales.push(addedItem);
-        setSales(newSales);
-        calculateTotals(newSales);
+        newProducts.push(addedItem);
+        setProducts(newProducts);
+        calculateTotals(newProducts);
         clearProductSelection();
     };
 
-    const updateSalelist = (dtSalesProduct) => {
-        let newSales = [...products];
-        newSales[selectedProduct.index] = dtSalesProduct;
-        setSales(newSales);
-        calculateTotals(newSales);
+    const updateSalelist = (dtPackageProduct) => {
+        let newProducts = [...products];
+        newProducts[selectedProduct.index] = dtPackageProduct;
+        setProducts(newProducts);
+        calculateTotals(newProducts);
         clearProductSelection();
-    };
-
-    const onVATChange = (vatPercentage) => {
-        setVatPercentage(vatPercentage);
-        let newSales = [...products];
-        calculateTotals(newSales);
-    };
-
-    const onDeliveryCostChange = (deliveryCost) => {
-        setDeliveryCost(deliveryCost);
-        let newSales = [...products];
-        calculateTotals(newSales);
     };
 
     const clearProductSelection = () => {
-        setSelectedProduct(defaultSalesProduct);
+        setSelectedProduct(defaultPackageProduct);
         setSelectedItem({});
         setSelectedTableItem({});
         setUpdateSaleItemMode(false);
     };
 
     const clearAll = () => {
-        setSales([]);
+        setProducts([]);
         setTotalPrice(0.00);
-        setTotalDiscount(0.00);
-        setTotalQuantity(0);
-        setVat(0.00);
-        setDeliveryCost(0.00);
-        setVatPercentage(0.00);
-        setNetAmount(0.00);
-        setCustomerCategory("WALKIN");
-        setSelectedCustomer(null);
-        reset(defaultFormValues);
+        resetForm();
     };
 
     const removeItem = () => {
-        let newSales = [...products];
-        newSales.splice(selectedProduct.index, 1);
-        setSales(newSales);
-        setDeleteSalesProductDialog(false);
+        let newProducts = [...products];
+        newProducts.splice(selectedProduct.index, 1);
+        setProducts(newProducts);
+        setDeletePackageProductDialog(false);
     };
 
     const calculateTotals = (allsales) => {
         let total = 0.00;
-        let discount = 0.00;
-        let discountedAmount = 0.00;
-        let quantity = 0;
-        let vat = 0.00;
-        let netAmount = 0.00;
         allsales.forEach(sale => {
             total += sale.totalPrice;
-            discount += sale.discount;
-            discountedAmount += sale.discountedAmount;
-            quantity += sale.quantity;
         });
-        vat = (total - discountedAmount) * (vatPercentage / 100);
-        netAmount = total - discountedAmount + vat + deliveryCost;
         setTotalPrice(total);
-        setTotalDiscount(discount);
-        setTotalDiscountedAmount(discountedAmount);
-        setTotalQuantity(quantity);
-        setVat(vat);
-        setNetAmount(netAmount);
     };
 
-    const editSalesProduct = (dtSalesProduct) => {
-        console.log(dtSalesProduct);
-        setSelectedProduct(dtSalesProduct);
-        setSelectedTableItem({ "_id": dtSalesProduct.dtProduct_id });
+    const editPackageProduct = (dtPackageProduct) => {
+        console.log("EDIT PRODUCT::", dtPackageProduct);
+        setSelectedProduct({ ...dtPackageProduct});
+        setSelectedTableItem({ "id": dtPackageProduct.dtProduct_id });
         setUpdateSaleItemMode(true);
     };
 
 
     const onSelection = async (e) => {
         let productSelected = e.value;
-        console.log("selectedCustomer::", selectedCustomer);
-        if(selectedCustomer!==null || customerCategory==="WALKIN") {
+        console.log("productSelected::", productSelected);
+        if(productSelected!==null) {
             if(updateSaleItemMode) {
                 toast.current.show({ severity: 'warn', summary: 'Please Cancel the update', detail: 'Product in update', life: 3000 });
                 return;
@@ -234,7 +196,7 @@ const Form = ({ productData }) => {
 
             let alreadySelected = false;
             products.forEach(sale => {
-                if(sale.dtProduct_id === productSelected._id) {
+                if(sale.dtProduct_id === productSelected.id) {
                     alreadySelected = true;
                 }
             });
@@ -242,25 +204,17 @@ const Form = ({ productData }) => {
                 toast.current.show({ severity: 'warn', summary: 'Already Added', detail: 'Product Already Added', life: 3000 });
                 setSelectedTableItem({});
                 setSelectedItem({});
-                setSelectedProduct(defaultSalesProduct);
+                setSelectedProduct(defaultPackageProduct);
                 return;
             }
 
-            let lastTradePrice = 0
-            if(selectedCustomer!==null){
-                // crash here
-                // lastTradePrice = await productService.getProductCustomerLastPrice(productSelected._id, selectedCustomer);
-            }
-            productSelected['lastTradePrice'] = lastTradePrice;
-
-            setSelectedTableItem({ "_id": productSelected._id });
+            setSelectedTableItem({ "id": productSelected.id });
             setSelectedItem(productSelected);
-        } else {
-            toast.current.show({ severity: 'warn', summary: 'Please Select Customer', detail: 'Select a Customer First', life: 3000 });
         }
     }
 
     let defaultFilters = {
+        fields: ['id', 'name', 'code',  'brand_name', 'model_no', 'part_number', 'price'],
         first: 0,
         rows: 10,
         page: 1,
@@ -268,6 +222,7 @@ const Form = ({ productData }) => {
         sortOrder: null,
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
             modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -275,17 +230,17 @@ const Form = ({ productData }) => {
         }
     }
 
-    const confirmDeleteSalesProduct = (dtSalesProduct) => {
-        setDeleteSalesProductDialog(true);
+    const confirmDeletePackageProduct = (dtPackageProduct) => {
+        setDeletePackageProductDialog(true);
     };
 
-    const hideDeleteSalesProductDialog = () => {
-        setDeleteSalesProductDialog(false);
+    const hideDeletePackageProductDialog = () => {
+        setDeletePackageProductDialog(false);
     };
 
     const deleteProductDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeletePackageProductDialog} />
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
         </>
     );
@@ -306,10 +261,11 @@ const Form = ({ productData }) => {
                 showFields={[]} onSelect={onSelection}
                 columns={[
                     {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
-                    {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
-                    {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
-                    {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
-                    {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
+                    {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
+                    {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
+                    {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
+                    {field: 'price', header: 'Trade Price', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
+                    // {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
                 ]} 
                 />
         </div>
@@ -361,7 +317,7 @@ const Form = ({ productData }) => {
                 </div>
                 <div className="field col-12 md:col-4">
                         <Controller
-                            name="packageTradePrice"
+                            name="price"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -373,7 +329,7 @@ const Form = ({ productData }) => {
                     </div>
                     <div className="field col-12 md:col-4">
                     <Controller
-                        name="dtWarehouse_id"
+                        name="warehouse_id"
                         control={control}
                         rules={{ required: 'Warehouse is required.' }}
                             render={({ field, fieldState }) => (
@@ -405,7 +361,7 @@ const Form = ({ productData }) => {
                     <div className="field col-12 md:col-6 mt-2">
                         <div className='field'>Status</div>
                         <Controller
-                            name="status"
+                            name="active"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>
@@ -420,20 +376,16 @@ const Form = ({ productData }) => {
             onAdd={(dt) => addToSaleList(dt)} 
             onEdit={(dt) => updateSalelist(dt)}
             onCancel={() => clearProductSelection()}
-            currency={selectedCustomer_currency} 
-            defaultSalesProduct={defaultSalesProduct} 
+            defaultPackageProduct={defaultPackageProduct} 
             selectedItem={selectedItem}
             selectedProduct={selectedProduct}
             />
         <PackageProductDetail products={products}
-                totalPrice={totalPrice} netAmount={netAmount} 
-                totalDiscount={totalDiscountedAmount} 
-                vat={vat} onVATChange={onVATChange}
-                onDeliveryCostChange={onDeliveryCostChange}
-                onEdit={(dt) => editSalesProduct(dt)} 
-                onDelete={(dt) => confirmDeleteSalesProduct(dt)}
+                totalPrice={totalPrice}
+                onEdit={(dt) => editPackageProduct(dt)} 
+                onDelete={(dt) => confirmDeletePackageProduct(dt)}
             />
-        <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteSalesProductDialog}>
+        <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeletePackageProductDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 <span>
@@ -441,11 +393,6 @@ const Form = ({ productData }) => {
                 </span>
             </div>
         </Dialog>
-        {/* <PaymentDialog 
-            customerCategory={customerCategory}
-            netAmount={netAmount} onPaymnetSubmit={(dt) => onPaymnetSubmit(dt)}
-            trigger={trigger} style={{ width: '450px' }} header="Payment" 
-            /> */}
     </div>     
     </div>
     );

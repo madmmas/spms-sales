@@ -6,7 +6,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 
-import { TransactionService } from '../../../services/TransactionService';
+import { RegisterService } from '../../../services/RegisterService';
 import { STOCK_IN_MODEL } from '../../../constants/models';
 
 const StockIn = () => {
@@ -17,7 +17,7 @@ const StockIn = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: [],
+        fields: ["id", "register_date", "register_details"],
         first: 0,
         rows: 10,
         page: 1,
@@ -33,7 +33,7 @@ const StockIn = () => {
     const [dtStockIn, setStockIn] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const transactionService = new TransactionService();
+    const registerService = new RegisterService();
 
     useEffect(() => {
         initFilters();
@@ -54,7 +54,7 @@ const StockIn = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setStockIn(data.rows);
@@ -89,7 +89,7 @@ const StockIn = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDate(rowData.register_date)}
             </>
         );
     };
@@ -97,7 +97,7 @@ const StockIn = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtProduct_id_shortname}
+                {rowData.register_details.product_name}
             </>
         );
     };
@@ -105,7 +105,7 @@ const StockIn = () => {
     const quantityBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.quantity}
+                {rowData.register_details.qty}
             </>
         );
     };
@@ -157,7 +157,7 @@ const StockIn = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="product_name" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         {/* <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
                         {/* <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}

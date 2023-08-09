@@ -4,8 +4,9 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+
 import { PURCHASE_MODEL } from '../../../constants/models';
+import { OrderService } from '../../../services/OrderService';
 
 const PurchaseForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "purchaseProfile" */ './Form'), "purchaseProfile"));
 
@@ -15,10 +16,8 @@ const Detail = () => {
 
     let navigate = useNavigate();
 
-    const modelName = PURCHASE_MODEL;
-
-    const hrManagementService = new HRService();
-    const [empData, setPurchaseData] = useState(null);
+    const orderService = new OrderService();
+    const [purchase, setPurchaseData] = useState({});
 
     const tabs = [
         { component: PurchaseForm },
@@ -34,7 +33,7 @@ const Detail = () => {
         if(id=="new"){
             setPurchaseData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            orderService.getById(PURCHASE_MODEL, id).then(data => {
                 setPurchaseData(data);
             });    
         }
@@ -45,12 +44,12 @@ const Detail = () => {
     };
 
     const renderPurchaseForm = () => {
-        return <PurchaseForm />;
+        return <PurchaseForm purchase={purchase} />;
     };
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel purchaseProfile={empData}/>;
+        return <TabPanel purchase={purchase}/>;
     };
 
     return (
@@ -58,9 +57,9 @@ const Detail = () => {
             <div className="col-12">
                 <div className="card">
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
-                    {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
+                    {purchase && purchase.status!='draft' && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderPurchaseForm():(empData && renderTabPanel())}
+                        {purchase && purchase.status=='draft' ? renderPurchaseForm() : (purchase && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

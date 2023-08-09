@@ -4,10 +4,12 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
-import { PACKAGE_MODEL } from '../../../constants/models';
+
+import { ProductService } from '../../../services/ProductService';
 
 const PackageForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfile" */ './Form'), "packageProfile"));
+const PackageView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfileView" */ './View'), "packageProfileView"));
+const PackageAddStock = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageAddStock" */ './AddStock'), "packageAddStock"));
 
 const Detail = () => {
     
@@ -15,18 +17,18 @@ const Detail = () => {
 
     let navigate = useNavigate();
 
-    const modelName = PACKAGE_MODEL;
-
-    const hrManagementService = new HRService();
-    const [empData, setPackageData] = useState(null);
+    const productService = new ProductService();
+    const [packageData, setPackageData] = useState(null);
 
     const tabs = [
-        { component: PackageForm },
+        { component: PackageView },
+        { component: PackageAddStock },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
-        {label: 'Edit', icon: 'pi pi-fw pi-home'},
+        {label: 'View', icon: 'pi pi-fw pi-home'},
+        {label: 'Add Stock', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {
@@ -34,7 +36,9 @@ const Detail = () => {
         if(id=="new"){
             setPackageData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            productService.getById(id).then(data => {
+                console.log("PACKAGE-DATA:::",data)
+
                 setPackageData(data);
             });    
         }
@@ -50,7 +54,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel packageProfile={empData}/>;
+        return <TabPanel packageData={packageData}/>;
     };
 
     return (
@@ -60,7 +64,7 @@ const Detail = () => {
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
                     {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderPackageForm():(empData && renderTabPanel())}
+                        {id=="new"?renderPackageForm():(packageData && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

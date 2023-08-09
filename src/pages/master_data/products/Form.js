@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -12,44 +12,88 @@ import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { TransactionService } from '../../../services/TransactionService';
 import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
-import { ON_ADD_PRODUCT, ON_UPDATE_PRODUCT } from '../../../constants/transactions';
 import { MEASUREMENT_UNITS } from '../../../constants/lookupData';
+import { ProductService } from '../../../services/ProductService';
 
 const Form = ({productData}) => {
-
-    console.log("PRODUCTDATA::", productData);
 
     let navigate = useNavigate();
 
     const toast = useRef(null);
-    const transactionService = new TransactionService();
+    const productService = new ProductService();
     const [submitted, setSubmitted] = useState(false);
 
     const {
-        register,
         control,
         formState: { errors },
-        resetField,
+        reset,
         handleSubmit
     } = useForm({
-        defaultValues: productData //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: productData
     });
 
+    const resetForm = () => {
+        reset({ 
+            id: null,
+            code: "",
+            name: "",
+            price: 0.00,
+            type: "GENERAL",
+            category_id: "",
+            warehouse_id: "",
+            bar_code: "",
+            brand_name: "",
+            model_no: "",
+            part_number: "",
+            unit: "",
+            low_stock_qty: 0,
+            remarks: "",
+            active: true
+         });
+    };
+
+    useEffect(() => {
+        if (productData) {
+            reset(productData);
+        } else {
+            resetForm();
+        }
+    }, [productData]);
+
+    const buildFormData = (data) => {
+        return {
+            id: data.id,
+            code: data.code,
+            name: data.name,
+            price: Number(data.price),
+            type: 'GENERAL',
+            category_id: data.category_id,
+            warehouse_id: data.warehouse_id,
+            bar_code: data.bar_code,
+            brand_name: data.brand_name,
+            model_no: data.model_no,
+            part_number: data.part_number,
+            unit: data.unit,
+            low_stock_qty: Number(data.low_stock_qty),
+            remarks: data.remarks,
+            items: data.items,
+            active: data.active
+        }
+    }
     const onSubmit = (formData) => {
+        let data = buildFormData(formData);
         try{
             setSubmitted(true);
-            formData.type = 'GENERAL';
             if(productData==null){
-                transactionService.processTransaction(ON_ADD_PRODUCT, formData).then(data => {
+                productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
                     navigate("/products/" + data.ID);
                 });
             }else{
-                transactionService.processTransaction(ON_UPDATE_PRODUCT, formData).then(data => {
-                    setSubmitted(false);
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                productService.update(data.id, data).then(data => {
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                    navigate("/products/" + data.ID);
                 });
             }
         }
@@ -91,7 +135,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="dtProductCategory_id"
+                            name="category_id"
                             control={control}
                             rules={{ required: 'Product Category is required.' }}
                             render={({ field, fieldState }) => (
@@ -117,7 +161,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="barCode"
+                            name="bar_code"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -129,7 +173,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="brandName"
+                            name="brand_name"
                             control={control}
                             rules={{ required: 'Brand Name is required.' }}
                             render={({ field, fieldState }) => (
@@ -142,7 +186,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="modelNo"
+                            name="model_no"
                             control={control}
                             rules={{ required: 'Model No is required.' }}
                             render={({ field, fieldState }) => (
@@ -155,7 +199,7 @@ const Form = ({productData}) => {
                     </div>                    
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="partNumber"
+                            name="part_number"
                             control={control}
                             rules={{ required: 'Part Number is required.' }}
                             render={({ field, fieldState }) => (
@@ -168,7 +212,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="measurementUnit"
+                            name="unit"
                             control={control}
                             rules={{ required: 'Measurement Unit is required.' }}
                             render={({ field, fieldState }) => (
@@ -182,7 +226,7 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="lowStockQty"
+                            name="low_stock_qty"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
@@ -192,46 +236,9 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    {/* <div className="field col-12 md:col-4">
-                        <Controller
-                            name="reorderQty"
-                            control={control}
-                            rules={{ required: 'Reorder Quantity is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Reorder Quantity</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div> */}
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="lastPurchasePrice"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Purchase Price</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-4">
-                        <Controller
-                            name="lastTradePrice"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Trade Price</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
                     <div className="field col-12 md:col-4">
                     <Controller
-                        name="dtWarehouse_id"
+                        name="warehouse_id"
                         control={control}
                         rules={{ required: 'Warehouse is required.' }}
                             render={({ field, fieldState }) => (
@@ -263,7 +270,7 @@ const Form = ({productData}) => {
                     <div className="field col-12 md:col-6 mt-2">
                         <div className='field'>Status</div>
                         <Controller
-                            name="status"
+                            name="active"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <>

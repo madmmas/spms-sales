@@ -3,7 +3,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 
-const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete}) => {
+const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, onReturnItem, editMode = true, returnMode = false}) => {
 
     const [totalCostAmountF, setTotalAmountF] = useState(0.00);
     const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
@@ -60,8 +60,9 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete}) 
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDelete(rowData)} />
+                {editMode && <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />}
+                {editMode && <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDelete(rowData)} />}
+                {returnMode && <Button icon="pi pi-minus" className="p-button-rounded p-button-warning" onClick={() => onReturnItem(rowData)} />}
             </>
         );
     };
@@ -72,28 +73,28 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete}) 
             header={footer} 
         >
             <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
-            <Column field="productName" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="barCode" header="barcode" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="lastPurchasePrice" header="Last Purchase Price" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
+            {/* <Column field="product_code" header="Code" headerStyle={{ minWidth: '10rem' }}></Column> */}
 
-            <Column field="quantity" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="unitCostF" header={`Unit Cost (${supplierCurrency})`} headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
+            {returnMode && <Column field="return_qty" header="Return Qty" headerStyle={{ minWidth: '10rem' }}></Column>}
+            <Column field="unit_cost_f" header={`Unit Cost (${supplierCurrency})`} headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="totalCostF" header={`Total Cost (${supplierCurrency})`} headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="conversionRate" header="Conversion Rate" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="unitCostBDT" header="UnitCost" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="conversion_rate" header="Conversion Rate" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="unit_cost" header="UnitCost" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="totalCostBDT" header="Total Cost" headerStyle={{ minWidth: '10rem' }}></Column>
 
             <Column field="transport" header="Transport" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="duty" header="Duty " headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="duty_vat" header="Duty " headerStyle={{ minWidth: '10rem' }}></Column>
 
             <Column field="netUnitCostBDT" header="Net Unit Cost" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="netCostBDT" header="Net Cost" headerStyle={{ minWidth: '10rem' }}></Column>
 
-            <Column field="profitPercentage" header="Profit Percentage" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="discount_profit" header="Profit Percentage" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="profit" header="Profit" headerStyle={{ minWidth: '10rem' }}></Column>
 
-            <Column field="minimumTradePrice" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="tradeUnitPriceBDT" header="Trade Price (U)" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="min_trade_price" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="trade_price" header="Trade Price (U)" headerStyle={{ minWidth: '10rem' }}></Column>
         </DataTable>
     );
 }

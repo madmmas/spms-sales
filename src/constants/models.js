@@ -21,8 +21,8 @@ export const SALES_MODEL = 'trxSales';
 export const STOCK_IN_MODEL = 'trxStockIn';
 export const STOCK_OUT_MODEL = 'trxStockOut';
 
-export const ACC_RECIEVABLE_REGISTER = 'trxACRecievable';
-export const ACC_PAYABLE_REGISTER = 'trxACPayable';
+export const ACC_RECIEVABLE = 'trxACRecievable';
+export const ACC_PAYABLE = 'trxACPayable';
 export const BANK_REGISTER = 'trxBankRegister';
 export const CASH_REGISTER = 'trxCashRegister';
 export const EXTRA_INCOME_REGISTER = 'trxExtraIncomeRegister';

@@ -20,11 +20,11 @@ const SalesProductDetail = ({sales, totalPrice, netAmount, totalDiscount, vat, o
         >
             <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
             <Column field="productName" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="brandName"  header="Brand Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="modelNo"  header="Model No"  headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="partNumber" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="brand_name"  header="Brand Name"  headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="model_no"  header="Model No"  headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="part_number" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="quantity" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="unitTradePrice" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="price" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
             {/* <Column field="totalPrice" header={`Total Price`} headerStyle={{ minWidth: '10rem' }}></Column> */}
             {/* <Column field="discount" header={`Discount (%)`} headerStyle={{ minWidth: '10rem' }}></Column> */}
             <Column field="discountedAmount" header={`Discounted Amount`} headerStyle={{ minWidth: '10rem' }}></Column>

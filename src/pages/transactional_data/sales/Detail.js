@@ -5,34 +5,32 @@ import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
-import { CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
+import { SALES_MODEL } from '../../../constants/models';
 
-import { MasterDataService } from '../../../services/MasterDataService';
-import { TransactionService } from '../../../services/TransactionService';
+import { OrderService } from '../../../services/OrderService';
 
+const SalesForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesProfile" */ './Form'), "salesProfile"));
 const SalesEditView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesEditView" */ './Edit'), "salesEditView"));
 const SalesInvoice = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesInvoice" */ './Invoice'), "salesInvoice"));
 const SalesReturn = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesReturn" */ './Return'), "salesReturn"));
 
 const Detail = () => {
-    
-    const modelName = SALES_MODEL;
 
     const [sales, setSales] = useState(null);
 
-    const transactionService = new TransactionService();
+    const orderService = new OrderService();
 
     let { id } = useParams();
 
     let navigate = useNavigate();
 
     const tabs = [
-        { component: SalesEditView },
+        { component: SalesForm },
         { component: SalesInvoice },
         { component: SalesReturn },
     ];
 
-    const [activeIndex, setActiveIndex] = useState(1);
+    const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
         {label: 'Invoice', icon: 'pi pi-fw pi-home'},
@@ -40,9 +38,9 @@ const Detail = () => {
     ];
 
     useEffect(() => {
-        transactionService.getById(modelName, id).then(data => {
+        orderService.getById(SALES_MODEL, id).then(data => {
             setSales(data);
-        });
+        });    
     }, []);
 
     const gotoList = () => {

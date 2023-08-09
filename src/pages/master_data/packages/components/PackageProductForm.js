@@ -5,8 +5,6 @@ import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { classNames } from 'primereact/utils';
 
-import { ProductService } from '../../../../services/ProductService';
-
 export default function PackageProductForm({ 
     onAdd, onEdit, onCancel, 
     selectedItem, selectedProduct, defaultPackageProduct
@@ -14,21 +12,13 @@ export default function PackageProductForm({
 
     let emptyPackageProduct = {
         dtProduct_id: "",
-        barCode: "",
-        lastTradePrice: 0.00,
-        unitTradePrice: 0.00,
-
+        code: "",
+        price: 0.00,
         quantity: 1,  
         totalPrice: 0.00,
-        discount: 0.00,
-        discountedAmount: 0.00,
-        netPrice: 0.00,
-
-        remarks: "",
     };
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -41,11 +31,9 @@ export default function PackageProductForm({
     const quantityRef = useRef(null);
 
     const [packagesProduct, setPackageProduct] = useState(defaultPackageProduct);
-    const [productName, setProductName] = useState('');
+    const [product_name, setProductName] = useState('');
     const [currentStock, setCurrentStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
-
-    const productService = new ProductService();
 
     const resetForm = () => {
         reset({ ...emptyPackageProduct });
@@ -59,7 +47,9 @@ export default function PackageProductForm({
     };
 
     useEffect(() => {
-        if (selectedItem._id) {
+        console.log("1 selectedItem=>>",selectedItem);
+        console.log("1 selectedProduct=>>",selectedProduct);
+        if (selectedItem.id) {
             setIsEdit(false);
             onProductSelect(selectedItem);
         }else{
@@ -68,11 +58,13 @@ export default function PackageProductForm({
     }, [selectedItem]);
 
     useEffect(() => {
+        console.log("2 selectedItem=>>",selectedItem);
+        console.log("2 selectedProduct=>>",selectedProduct);
         if (selectedProduct.dtProduct_id) {
             reset({ ...selectedProduct });
             setPackageProduct(selectedProduct);
             setIsEdit(true);
-            setProductAndItsStock(selectedProduct["productName"], selectedProduct["currentStock"]);
+            setProductAndItsStock(selectedProduct["product_name"], selectedProduct["current_stock"]);
             quantityRef.current.focus();
         }else{
             setIsEdit(false);
@@ -85,15 +77,11 @@ export default function PackageProductForm({
     };
 
     const calculatePrice = (_packageProduct) => {
-        _packageProduct.totalPrice = roundNumber(_packageProduct.unitTradePrice * _packageProduct.quantity);
-        // _packageProduct.discountedAmount = roundNumber(_packageProduct.totalPrice * _packageProduct.discount / 100);
-        _packageProduct.netPrice = roundNumber(_packageProduct.totalPrice);
+        _packageProduct.totalPrice = roundNumber(_packageProduct.price * _packageProduct.quantity);
 
         setPackageProduct(_packageProduct);
 
         setValue('totalPrice', _packageProduct.totalPrice);
-        // setValue('discountedAmount', _packageProduct.discountedAmount);
-        setValue('netPrice', _packageProduct.netPrice);
     };
     
     const onInputChange = (e, name) => {
@@ -106,29 +94,23 @@ export default function PackageProductForm({
     };
 
     const onProductSelect = async (productSelected) => {
-        // get product current stock
-        let productStock = await productService.getProductCurrentStock(productSelected._id);
-
         // set focus to quantity
         let _packageProduct = { ...packagesProduct };
-        _packageProduct['dtProduct_id'] = productSelected._id;
-        _packageProduct['productName'] = productSelected.name;
-        _packageProduct['brandName'] = productSelected.brandName;
-        _packageProduct['modelNo'] = productSelected.modelNo;
-        _packageProduct['partNumber'] = productSelected.partNumber;
-        // _packageProduct['barCode'] = productSelected.barCode;
-        _packageProduct['unitTradePrice'] = productSelected.unitTradePrice;
-        _packageProduct['lastTradePrice'] = productSelected.lastTradePrice;
-        _packageProduct['currentStock'] = productStock;
+        _packageProduct['dtProduct_id'] = productSelected.id;
+        _packageProduct['product_name'] = productSelected.name;
+        _packageProduct['brand_name'] = productSelected.brand_name;
+        _packageProduct['model_no'] = productSelected.model_no;
+        _packageProduct['part_number'] = productSelected.part_number;
+        _packageProduct['price'] = productSelected.price;
+        _packageProduct['code'] = productSelected.code;
         _packageProduct['quantity'] = 1;
-        _packageProduct['discount'] = 0;
         _packageProduct['remarks'] = productSelected.remarks===null ? '' : productSelected.remarks;
 
         setPackageProduct(_packageProduct);
 
         reset({ ..._packageProduct });
 
-        setProductAndItsStock(productSelected["name"], productStock);
+        setProductAndItsStock(productSelected["name"], productSelected.current_stock);
 
         quantityRef.current.focus();
         
@@ -168,7 +150,7 @@ export default function PackageProductForm({
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Add Product*</label>
-                        <InputText readonly="true" value={productName} placeholder="Select Product" />
+                        <InputText readonly="true" value={product_name} placeholder="Select Product" />
                         <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
                         {getFormErrorMessage(field.name)}
                     </>
@@ -176,11 +158,11 @@ export default function PackageProductForm({
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="barCode"
+                name="code"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Barcode</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code</label>
                         <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true} />
                         {getFormErrorMessage(field.name)}
                     </>
@@ -188,7 +170,7 @@ export default function PackageProductForm({
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="unitTradePrice"
+                name="price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>

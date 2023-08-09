@@ -107,7 +107,7 @@ const Form = ( { customerCategory, trigger, netAmount, onPaymnetSubmit }) => {
                     name="dtBankAccount_id"
                     control={control}
                     rules={{ 
-                        valipaymentDate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
+                        validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
                     }}
                     render={({ field, fieldState }) => (
                     <>
@@ -130,7 +130,7 @@ const Form = ( { customerCategory, trigger, netAmount, onPaymnetSubmit }) => {
                     name="dueAmount"
                     control={control}
                     rules={{
-                        valipaymentDate: (value) => (value > 0) || 'Enter a valid amount.'
+                        validate: (value) => (value > 0) || 'Enter a valid amount.'
                     }}
                     render={({ field, fieldState }) => (
                     <>
@@ -147,7 +147,7 @@ const Form = ( { customerCategory, trigger, netAmount, onPaymnetSubmit }) => {
                     name="paidAmount"
                     control={control}
                     rules={{
-                        valipaymentDate: (value) => (value > 0) || 'Enter a valid amount.'
+                        validate: (value) => (value > 0) || 'Enter a valid amount.'
                     }}
                     render={({ field, fieldState }) => (
                     <>

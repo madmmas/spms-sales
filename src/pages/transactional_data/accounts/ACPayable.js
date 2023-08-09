@@ -7,11 +7,11 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 
 import { TransactionService } from '../../../services/TransactionService';
-import { ACC_PAYABLE_REGISTER } from '../../../constants/models';
+import { ACC_PAYABLE } from '../../../constants/models';
 
 const ACPayable = () => {
 
-    const modelName = ACC_PAYABLE_REGISTER;
+    const modelName = ACC_PAYABLE;
 
     const toast = useRef(null);
     const dt = useRef(null);

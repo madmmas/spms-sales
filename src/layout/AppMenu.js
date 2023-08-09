@@ -45,6 +45,21 @@ const AppMenu = () => {
             ]
         },
         {
+            label: 'Reports',
+            items: [
+                {
+                    label: 'Ledger',
+                    icon: 'pi pi-fw pi-list',
+                    items: [
+                        { label: 'Purchase Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/purchase' },
+                        { label: 'A/C Payable', icon: 'pi pi-fw pi-list', to: '/ledger/accpayable' },
+                        { label: 'Bank', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
+                        { label: 'Cash', icon: 'pi pi-fw pi-list', to: '/ledger/cash' },
+                    ]
+                }
+            ]
+        },      
+        {
             label: 'Setup',
             items: [
                 {

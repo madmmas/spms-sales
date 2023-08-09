@@ -9,8 +9,9 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
-import { HRService } from '../../../services/HRService';
+
 import { PRODUCT_MODEL } from '../../../constants/models';
+import { ProductService } from '../../../services/ProductService';
 
 const List = () => {
 
@@ -22,7 +23,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['name', 'dtProductCategory_id', 'dtWarehouse_id', 'code', 'barCode', 'brandName', 'modelNo', 'partNumber', 'unitOfMeasurement', 'lowStockQty', 'reorderQty', 'lastPurchasePrice', 'lastTradePrice', 'status'],
+        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'unit', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,
@@ -32,9 +33,9 @@ const List = () => {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'brandName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'modelNo': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'partNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'part_number': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
@@ -50,7 +51,7 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    const productService = new ProductService();
 
     useEffect(() => {
         initFilters();
@@ -71,7 +72,7 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
@@ -122,7 +123,7 @@ const List = () => {
     };
 
     const editProduct = (dtProduct) => {
-        navigate("/products/" + dtProduct._id);
+        navigate("/products/" + dtProduct.id);
     };
 
     const confirmDeleteProduct = (dtProduct) => {
@@ -147,13 +148,13 @@ const List = () => {
     };
 
     const deleteProduct = () => {
-        hrManagementService.delete(modelName, dtProduct._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Product Deleted', life: 3000 });
-        });
-        setDeleteProductDialog(false);
-        setProduct(null);
+        // productService.delete(modelName, dtProduct.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Product Deleted', life: 3000 });
+        // });
+        // setDeleteProductDialog(false);
+        // setProduct(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -193,7 +194,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Product Category</span>
-                {rowData.dtProductCategory_id_shortname}
+                {rowData.category_name}
             </>
         );
     };
@@ -202,7 +203,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Warehouse</span>
-                {rowData.dtWarehouse_id_shortname}
+                {rowData.warehouse_name}
             </>
         );
     };
@@ -211,7 +212,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Brand Name </span>
-                {rowData.brandName}
+                {rowData.brand_name}
             </>
         );
     };
@@ -220,7 +221,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Model No</span>
-                {rowData.modelNo}
+                {rowData.model_no}
             </>
         );
     };
@@ -229,7 +230,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Part Number</span>
-                {rowData.partNumber}
+                {rowData.part_number}
             </>
         );
     };
@@ -238,25 +239,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Low Stock Qty</span>
-                {rowData.lowStockQty}
-            </>
-        );
-    };
-
-    const reorderQtyBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Reorder Qty</span>
-                {rowData.reorderQty}
-            </>
-        );
-    };
-
-    const lastPurchasePriceBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Last Purchase Price</span>
-                {rowData.lastPurchasePrice}
+                {rowData.lowStockQty||0}
             </>
         );
     };
@@ -265,13 +248,13 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Last Trade Price</span>
-                {rowData.lastTradePrice}
+                {rowData.price}
             </>
         );
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.active, 'text-red-500 pi-times-circle': !rowData.active })}></i>;
     };
 
     const renderHeader = () => {
@@ -317,7 +300,7 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProducts} dataKey="_id" 
+                        ref={dt} value={dtProducts} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -333,16 +316,14 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="dtProductCategory_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="brandName" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="modelNo" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="partNumber" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
-                        <Column field="lowStockQty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
-                        {/* <Column field="reorderQty" header="Reorder Qty" filter filterPlaceholder="Search by Reorder Qty" sortable body={reorderQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                               */}
-                        <Column field="lastPurchasePrice" header="Last Purchase Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastPurchasePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="lastTradePrice" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtWarehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="status" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="category_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="brand_name" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="model_no" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
+                        <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
+                        <Column field="price" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="active" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 
                     <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>

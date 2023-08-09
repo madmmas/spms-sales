@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { PDFViewer } from '@react-pdf/renderer'
-import Invoice from '../../components/reports/Invoice'
+import Invoice from '../../reports/components/invoice/Invoice'
 
 const MyDocument = ({ sales }) => {
     return (
