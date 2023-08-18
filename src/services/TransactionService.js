@@ -20,6 +20,12 @@ export class TransactionService {
         return resp.data;
     }
 
+    async commitPayment(payment) {
+        const resp = await axiosInstance.post(`/payment`, payment);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async getAll(modelName, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
 

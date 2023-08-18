@@ -81,7 +81,7 @@ const StockIn = () => {
     }
 
     const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY');
+        return moment(date).format('DD/MM/YYYY');
         // let d = new Date(parseInt(date));
         // return d.toDateString();
     }
@@ -97,7 +97,22 @@ const StockIn = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.register_details.product_name}
+                {rowData.product_name}
+            </>
+        );
+    };
+
+    const voucherNoTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.voucher_no}
+            </>
+        );
+    };
+    const operationTypeTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.operation_type}
             </>
         );
     };
@@ -105,23 +120,39 @@ const StockIn = () => {
     const quantityBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.register_details.qty}
+                {rowData.qty}
             </>
         );
     };
 
-    const totalPurchaseCostBodyTemplate = (rowData) => {
+    const unitCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalPurchaseCost}
+                {rowData.unit_cost}
             </>
         );
     };
 
-    const totalTradePriceBodyTemplate = (rowData) => {
+    const totalCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalTradePrice}
+                {rowData.unit_cost*rowData.qty}
+            </>
+        );
+    };
+
+    const tradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trade_price}
+            </>
+        );
+    };
+
+    const totalPriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trade_price*rowData.qty}
             </>
         );
     };
@@ -157,10 +188,14 @@ const StockIn = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by name" sortable body={voucherNoTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="operation_type" header="Opt" filter filterPlaceholder="Search by name" sortable body={operationTypeTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="product_name" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        {/* <Column field="totalPurchaseCost" header="totalPurchaseCost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalPurchaseCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
-                        {/* <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
+                        <Column field="unit_cost" header="Unit Cost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_unit_cost" header="Total Cost Value" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="trade_price" header="Trade Price" filter filterPlaceholder="Search by totalTradePrice" sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_trade_price" header="Total Trade Value" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>

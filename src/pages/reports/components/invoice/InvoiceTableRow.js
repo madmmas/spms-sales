@@ -84,16 +84,16 @@ const styles = StyleSheet.create({
 
 const InvoiceTableRow = ({items}) => {
     const rows = items.map( item => 
-        <View style={styles.row} key={item.index.toString()}>
-            <Text wrap={false} style={styles.sno}>{item.index}</Text>
-            <Text wrap={false} style={styles.qty}>{item.quantity}</Text>
-            <Text wordWrap={false} style={styles.product_name}>{item.productName}</Text>
-            <Text wrap={false} style={styles.brand}>{item.brandName}</Text>
-            <Text wrap={false} style={styles.part_no}>{item.partNumber}</Text>
-            <Text wrap={false} style={styles.model}>{item.modelNo}</Text>
-            <Text wrap={false} style={styles.rate}>{Number.parseFloat(item.unitTradePrice).toFixed(2)}</Text>
-            <Text wrap={false} style={styles.discount}>{item.discount}</Text>
-            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.netPrice).toFixed(2) }</Text>
+        <View style={styles.row} key={item.id}>
+            <Text wrap={false} style={styles.sno}></Text>
+            <Text wrap={false} style={styles.qty}>{item.qty}</Text>
+            <Text wordWrap={false} style={styles.product_name}>{item.product_name}</Text>
+            <Text wrap={false} style={styles.brand}>{item.product_brand_name}</Text>
+            <Text wrap={false} style={styles.part_no}>{item.product_part_number}</Text>
+            <Text wrap={false} style={styles.model}>{item.product_model_no}</Text>
+            <Text wrap={false} style={styles.rate}>{Number.parseFloat(item.trade_price).toFixed(2)}</Text>
+            <Text wrap={false} style={styles.discount}>{item.discount_profit}</Text>
+            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.trade_price-(item.trade_price*item.discount_profit/100)).toFixed(2) }</Text>
         </View>
     )
     return (<Fragment>{rows}</Fragment> )

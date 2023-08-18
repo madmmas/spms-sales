@@ -35,6 +35,7 @@ const AppMenu = () => {
                         { label: 'Bank/Cash', icon: 'pi pi-fw pi-list', to: '/cash_bank' },
                         { label: 'Expenses', icon: 'pi pi-fw pi-list', to: '/expenses' },
                         { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },
+                        { label: 'Payments', icon: 'pi pi-fw pi-list', to: '/payments' },
                         { label: 'Payroll', icon: 'pi pi-fw pi-list', to: '/payroll' },
                         { label: 'Purchases', icon: 'pi pi-fw pi-list', to: '/purchases' },
                         { label: 'Purchase-Packages', icon: 'pi pi-fw pi-list', to: '/purchase_packages' },
@@ -52,7 +53,9 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Purchase Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/purchase' },
+                        { label: 'Sales Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/sales' },
                         { label: 'A/C Payable', icon: 'pi pi-fw pi-list', to: '/ledger/accpayable' },
+                        { label: 'A/C Receiveable', icon: 'pi pi-fw pi-list', to: '/ledger/accreceivable' },
                         { label: 'Bank', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
                         { label: 'Cash', icon: 'pi pi-fw pi-list', to: '/ledger/cash' },
                     ]

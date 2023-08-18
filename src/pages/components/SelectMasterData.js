@@ -12,11 +12,17 @@ export default function SelectMasterData({ field, displayField, showFields=[], m
     const [trigger, setTrigger] = useState(0);
 
     useEffect(() => {
-        if(field.value==null || field.value=="") {
+        if(field.value===null || field.value==="") {
+            console.log("field.value is null");
             setSelectedRow("");
             return;
         }
         masterDataService.getById(modelName, field.value).then(data => {
+            if(data===null || data.length===0) {
+                console.log("data is null");
+                setSelectedRow("");
+                return;
+            }
             setSelectedRow(data[displayField]);
         });
     }, [field.value]);
@@ -41,7 +47,6 @@ export default function SelectMasterData({ field, displayField, showFields=[], m
                     className={className} columns={columns} showFields={showFields}
                     onSelect={onSelection}/>
             </div>
-            
         </>
     );
 }

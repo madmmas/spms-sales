@@ -43,13 +43,15 @@ const Form = ({bankAccountProfile}) => {
             formData.balance = formData.initBalance;
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Created', life: 3000 });
-                navigate("/bank_accounts/" + data.ID);
+                // navigate("/bank_accounts/" + data.ID);
+                navigate("/bank_accounts");
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Updated', life: 3000 });
                 setSubmitted(false);
-                navigate("/bank_accounts/" + data.ID);
+                // navigate("/bank_accounts/" + data.ID);
+                navigate("/bank_accounts");
             });
         }
         }

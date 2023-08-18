@@ -252,10 +252,15 @@ const List = () => {
         )
     }
 
+    const showInvoice = (dtProfile) => {
+        navigate("/sales/invoice/" + dtProfile.id);
+    };
+
     const actionBodyTemplate = (rowData) => {
         return (
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+                <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} />
             </>
         );
     };

@@ -46,10 +46,13 @@ export class ProductService {
         return data.currentStock
     }
 
-    async addPackageToStock(data) {
-        let res = await this.transactionService.processTransaction(ON_STOCK_IN_PACKAGE_PRODUCT, data)
-        console.log(res)
-        return res
+    async addPackageToStock(id, data) {
+        // let res = await this.transactionService.processTransaction(ON_STOCK_IN_PACKAGE_PRODUCT, data)
+        // console.log(res)
+        // return res
+        const resp = await axiosInstance.post(`/products/stock/` + id, data);
+        console.log(resp.data);
+        return resp.data;
     }
 
     async getProductCustomerLastPrice(productId, customerId) {

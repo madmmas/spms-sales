@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import { Provider } from 'react-redux'
 import { LayoutProvider } from './layout/context/layoutcontext';
 import App from './App';
@@ -10,11 +10,13 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      {/* <BrowserRouter> */}
+      <HashRouter>
         <LayoutProvider>
             <App />
         </LayoutProvider>
-      </BrowserRouter>
+      </HashRouter>
+      {/* </BrowserRouter> */}
     </Provider>
   </React.StrictMode>
 );

@@ -42,13 +42,15 @@ const Form = ({supplierProfile}) => {
             if(supplierProfile==null){
                 hrManagementService.create(modelName, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
-                    navigate("/suppliers/" + data.ID);
+                    // navigate("/suppliers/" + data.ID);
+                    navigate("/suppliers");
                 });
             }else{
                 hrManagementService.update(modelName, formData._id, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Updated', life: 3000 });
                     setSubmitted(false);
                     // navigate("/suppliers/" + data.ID);
+                    navigate("/suppliers");
                 });
             }
         }

@@ -62,7 +62,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
 
     const onGlobalFilterChange = (e) => {
         let _lazyParams = { ...lazyParams };
-        console.log(_lazyParams);
+        // console.log(_lazyParams);
 
         const value = e.target.value;
         
@@ -92,7 +92,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
     const rowClassName = (data) => (isSelectable(data) ? '' : 'p-disabled');
 
     return (
-        <div style={{minHeight: '35rem'}}>
+        <div style={{minHeight: '30rem'}}>
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
@@ -120,7 +120,6 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
                         if(e.value){
                             onSelection(e)
                         }
-                        console.log(e)
                     }} 
 
                     emptyMessage="No data found."

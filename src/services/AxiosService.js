@@ -1,4 +1,5 @@
 import axios from "axios";
+import { setupCache } from 'axios-cache-interceptor';
 import env from "react-dotenv";
 
 const getAuthToken = () => {
@@ -14,7 +15,7 @@ export const clearLocalStorage = () => {
 
 export const axiosInstance = axios.create({
    baseURL: env.APP_API_URL,
-   timeout: 1000,
+   timeout: 2000,
 });
 
 axiosInstance.interceptors.request.use(function(config) {
@@ -28,16 +29,21 @@ axiosInstance.interceptors.request.use(function(config) {
 });
 
 axiosInstance.interceptors.response.use(function(response) {
+   console.log("Is-Cached",response.cached)
    console.log(response.status)
    return response;
 }, function(error) {
    if(error.response) {
       if (error.response.status === 401 || (error.response.status === 400)) {
          clearLocalStorage();
-         window.location.href = "/login";
+         window.location.href = "#/login";
       }
    }
    return Promise.reject(error);
 });
+
+// setupCache(axiosInstance, {
+//    // debug: console.log 
+// });
 
 export default axiosInstance;

@@ -6,49 +6,44 @@ import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
 import { SALES_MODEL } from '../../../constants/models';
-
 import { OrderService } from '../../../services/OrderService';
 
-const SalesForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesProfile" */ './Form'), "salesProfile"));
-const SalesEditView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesEditView" */ './Edit'), "salesEditView"));
-const SalesInvoice = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesInvoice" */ './Invoice'), "salesInvoice"));
-const SalesReturn = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesReturn" */ './Return'), "salesReturn"));
+const SalesForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesForm" */ './Form'), "salesForm"));
 
 const Detail = () => {
 
-    const [sales, setSales] = useState(null);
-
-    const orderService = new OrderService();
-
     let { id } = useParams();
-
     let navigate = useNavigate();
+    
+    const orderService = new OrderService();
+    const [sales, setSales] = useState(null);
 
     const tabs = [
         { component: SalesForm },
-        { component: SalesInvoice },
-        { component: SalesReturn },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
-        {label: 'Invoice', icon: 'pi pi-fw pi-home'},
-        {label: 'Return', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {
-        orderService.getById(SALES_MODEL, id).then(data => {
-            setSales(data);
-        });    
+        console.log(id)
+        if(id=="new"){
+            setSales(null);
+        }else{
+            orderService.getById(SALES_MODEL, id).then(data => {
+                setSales(data);
+            });    
+        }
     }, []);
 
     const gotoList = () => {
         navigate("/sales");
     };
 
-    const renderSalesEditView = () => {
-        return <SalesEditView />;
+    const renderSalesForm = () => {
+        return <SalesForm sales={sales} />;
     };
 
     const renderTabPanel = () => {
@@ -61,9 +56,9 @@ const Detail = () => {
             <div className="col-12">
                 <div className="card">
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
-                    {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
+                    {sales && sales.status!='draft' && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderSalesEditView():renderTabPanel()}
+                        {sales && sales.status=='draft' ? renderSalesForm() : (sales && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
@@ -16,11 +16,13 @@ import SelectMasterData from '../../components/SelectMasterData';
 import { PURCHASE_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
 
 import { OrderService } from '../../../services/OrderService';
+import { MasterDataService } from '../../../services/MasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 
 import PurchaseProductForm from './components/PurchaseProductForm';
 import PurchaseProductDetail from './components/PurchaseProductDetail';
 import ReturnItemDialog from '../../components/ReturnItemDialog';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const Form = ({ purchase }) => {
 
@@ -35,13 +37,6 @@ const Form = ({ purchase }) => {
         be_no: null,
         lc_no: null,
         notes: null,
-        // status: 'draft', // draft, approved, cancelled
-        // trx_status: 'pending', // pending, completed, cancelled
-        // items: [],
-        // gross: 0.00,
-        // transport: 0.00,
-        // duty_vat: 0.00,
-        // net: 0.00
     };
 
     let defaultPurchaseProduct = {
@@ -73,16 +68,10 @@ const Form = ({ purchase }) => {
 
     const toast = useRef(null);
 
-    const [totalCostAmountF, setTotalAmountF] = useState(0.00);
-    const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
-    const [totalQuantity, setTotalQuantity] = useState(0);
-    const [totalTransport, setTotalTransport] = useState(0.00);
-    const [totalDuty, setTotalDuty] = useState(0.00);
-    const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
     const [purchases, setPurchases] = useState([]);
     const [purchaseData, setPurchaseData] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
-    const [deleteProfileDialog, setDeletePurchaseProductDialog] = useState(false);
+    const [returnDialog, setReturnDialog] = useState(false);
     const [statusChangeDialog, setStatusChangeDialogFooter] = useState(false);
     const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
     const [trxNo, setTrxNo] = useState('XXXXX');
@@ -90,26 +79,37 @@ const Form = ({ purchase }) => {
     const [status, setStatus] = useState('draft');
     const [editMode, setEditMode] = useState(true);
 
+
     const [returnMode, setReturnMode] = useState(false);
     const [selectedReturnItem, setSelectedReturnItem] = useState({});
     const [selectedReturnItems, setSelectedReturnItems] = useState([]);
     const [returnItems, setReturnItems] = useState([]);
     const [trigger, setTrigger] = useState(false);
+
+    const [defaultWarehouse, setDefaultWarehouse] = useState(null);
     
+    const [triggerRemoveItem, setTriggerRemoveItem] = useState(0);
 
     const orderService = new OrderService();
+    const masterDataService = new MasterDataService();
     const configurationService = new ConfigurationService();
 
     const {
         reset,
         control,
         formState: { errors },
+        setValue,
         handleSubmit
     } = useForm({
         defaultValues: defaultValue
     });
 
     useEffect(() => {
+        // get default warehouse
+        masterDataService.getDefaultItem('dtWarehouse').then(data => {
+            console.log("DEFAULT WAREHOUSE::", data);
+            setDefaultWarehouse(data._id);
+        });
         if (purchase===null || purchase===undefined) {
             if (trxNo === 'XXXXX') {
                 configurationService.getNextId(PURCHASE_MODEL).then(data => {
@@ -128,18 +128,11 @@ const Form = ({ purchase }) => {
                 be_no: purchase.be_no,
                 lc_no: purchase.lc_no,
                 notes: purchase.notes,
-                // status: purchase.status,
-                // trx_status: purchase.trx_status,
-                // items: purchase.items,
-                // gross: purchase.gross,
-                // transport: purchase.transport,
-                // duty_vat: purchase.duty_vat,
-                // net: purchase.net
             });
             setSelectedSupplier_currency(purchase.currency);
             setPurchases(purchase.items);
             setReturnItems(purchase.return_items);
-            calculateTotals(purchase.items);
+            // calculateTotals(purchase.items);
             setTrxNo(purchase.voucher_no);
             setEditMode(purchase.status === 'draft');
             setReturnMode(purchase.status === 'approved');
@@ -149,11 +142,19 @@ const Form = ({ purchase }) => {
         console.log("EDIT MODE::", editMode);
     }, [purchase]);
 
-    const submitReturnItems = (data) => {
+    const confirmReturnItems = () => {
+        if (selectedReturnItems.length === 0) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please select at least one item to return', life: 3000 });
+            return;
+        }
+        setReturnDialog(true);
+    };
+
+    const submitReturnItems = () => {
         console.log("COFIRM RETURN ITEMS::", selectedReturnItems);
         orderService.return(PURCHASE_MODEL, purchase.id, selectedReturnItems).then(data => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-            // navigate("/purchases");
+            navigate("/purchases");
         });
     };
 
@@ -191,12 +192,22 @@ const Form = ({ purchase }) => {
 
         formData.items = purchases;
 
+        let totalCostAmountBDT = 0;
+        let totalTransport = 0;
+        let totalDuty = 0;
+        let netCostAmountBDT = 0;
+
+        for(let i=0; i<purchases.length; i++) {
+            totalCostAmountBDT += purchases[i].totalCostBDT;
+            totalTransport += purchases[i].transport;
+            totalDuty += purchases[i].duty;
+            netCostAmountBDT += purchases[i].netCostBDT;
+        }
+
         formData.gross = totalCostAmountBDT;
         formData.transport = totalTransport;
         formData.duty_vat = totalDuty;
         formData.net = netCostAmountBDT;
-        formData.due = 0.00;
-        formData.paid = netCostAmountBDT;
 
         console.log("FORMDATA::", formData);
 
@@ -205,12 +216,12 @@ const Form = ({ purchase }) => {
                 if(status === 'approved'){
                     orderService.commit(PURCHASE_MODEL, purchase.id, formData).then(data => {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-                        // navigate("/purchases");
+                        navigate("/purchases");
                     });
                 } else {
                     orderService.update(PURCHASE_MODEL, purchase.id, formData).then(data => {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-                        // navigate("/purchases");
+                        navigate("/purchases");
                     });
                 }
             } else {
@@ -242,7 +253,7 @@ const Form = ({ purchase }) => {
         console.log("NEWPURCHASE::", newPurchases);
         setPurchases(newPurchases);
         console.log("PURCHASES::", purchases);
-        calculateTotals(newPurchases);
+        // calculateTotals(newPurchases);
     };
 
     const updatePurchaselist = (dtPurchaseProduct) => {
@@ -250,41 +261,14 @@ const Form = ({ purchase }) => {
         newPurchases[selectedProduct.index] = dtPurchaseProduct;
         console.log("EDIT::", dtPurchaseProduct);
         setPurchases(newPurchases);
-        calculateTotals(newPurchases);
+        // calculateTotals(newPurchases);
     };
 
     const removeItem = () => {
         let newPurchases = [...purchases];
         newPurchases.splice(selectedProduct.index, 1);
         setPurchases(newPurchases);
-        setDeletePurchaseProductDialog(false);
-    };
-
-    const calculateTotals = (allpurchases) => {
-        console.log("CALCULATE-PURCHASES::", allpurchases)
-        let totalCostAmountF = 0;
-        let totalCostAmountBDT = 0;
-        let totalTransport = 0;
-        let totalDuty = 0;
-        let netCostAmountBDT = 0;
-
-        if(allpurchases && allpurchases.length > 0) {
-            for(let i=0; i<allpurchases.length; i++) {
-                totalCostAmountF += allpurchases[i].totalCostF;
-                totalCostAmountBDT += allpurchases[i].totalCostBDT;
-                totalTransport += allpurchases[i].transport;
-                totalDuty += allpurchases[i].duty_vat;
-                netCostAmountBDT += allpurchases[i].netCostBDT;
-            }
-        }
-        setTotalQuantity(purchases?purchases.length:0);
-        setTotalAmountBDT(totalCostAmountBDT);
-        setTotalAmountF(totalCostAmountF);
-        setTotalTransport(totalTransport);
-        setTotalDuty(totalDuty);
-        setNetAmountBDT(netCostAmountBDT);
-        console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
-        
+        // setDeletePurchaseProductDialog(false);
     };
 
     const editPurchaseProduct = (dtPurchaseProduct) => {
@@ -293,13 +277,8 @@ const Form = ({ purchase }) => {
         console.log("SET SELECTED PRODUCT::", selectedProduct);
     };
 
-    const confirmDeletePurchaseProduct = (dtPurchaseProduct) => {
-        // setSelectedProduct(dtPurchaseProduct);
-        setDeletePurchaseProductDialog(true);
-    };
-
-    const hideDeletePurchaseProductDialog = () => {
-        setDeletePurchaseProductDialog(false);
+    const hideReturnDialog = () => {
+        setReturnDialog(false);
     };
 
     const hideStatusChangeDialog = () => {
@@ -307,10 +286,10 @@ const Form = ({ purchase }) => {
         setStatusChangeDialogFooter(false);
     };
 
-    const deleteProfileDialogFooter = (
+    const returnDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeletePurchaseProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideReturnDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={submitReturnItems} />
         </>
     );
 
@@ -362,6 +341,12 @@ const Form = ({ purchase }) => {
                 <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDeleteFromReturnList(rowData)} />
             </>
         );
+    };
+
+    const showConfirmDialog = (dlgName) => {
+        if(dlgName === 'removeItem') {
+            setTriggerRemoveItem((triggerRemoveItem) => triggerRemoveItem + 1);
+        }
     };
 
     return (
@@ -478,12 +463,13 @@ const Form = ({ purchase }) => {
                 <Button type="submit" label="Confirm Purchase" className="mt-2 m-1 p-button-warning" onClick={handleSubmit((d) => onSubmit('approve', d))}/>
                 <Button type="submit" label="Cancel Purchase" className="mt-2 m-1 p-button-outlined p-button-warning" onClick={handleSubmit((d) => onSubmit('cancel', d))}/>
             </>}
-            {returnMode && <Button type="submit" label="Return Purchases" className="mt-2 m-1 p-button-outlined p-button-warning" onClick={handleSubmit((d) => submitReturnItems(d))}/>}
+            {returnMode && <Button type="submit" label="Return Purchases" className="mt-2 m-1 p-button-outlined p-button-warning" onClick={handleSubmit((d) => confirmReturnItems())}/>}
         </div>
     </div>
     <div className="card col-9" >
         {editMode && <div className="col-12">
             <PurchaseProductForm 
+                defaultWarehouse={defaultWarehouse}
                 onAdd={(dt) => addToPurchaseList(dt)} 
                 onEdit={(dt) => updatePurchaselist(dt)}
                 currency={selectedSupplier_currency} 
@@ -497,7 +483,7 @@ const Form = ({ purchase }) => {
                 returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}
                 purchases={purchases} supplierCurrency={selectedSupplier_currency}
                 onEdit={(dt) => editPurchaseProduct(dt)} 
-                onDelete={(dt) => confirmDeletePurchaseProduct(dt)}
+                onDelete={() => showConfirmDialog('removeItem')}
             />}
         </div>
 
@@ -521,14 +507,21 @@ const Form = ({ purchase }) => {
             </DataTable>
         </div>}
 
-        <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeletePurchaseProductDialog}>
+        <ConfirmDialog 
+            message="Are you sure you want to delete?"
+            trigger={triggerRemoveItem}
+            onConfirm={removeItem}
+            />
+
+        <Dialog visible={returnDialog} style={{ width: '450px' }} header="Confirm" modal footer={returnDialogFooter} onHide={hideReturnDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                 <span>
-                    Are you sure you want to delete?
+                    Are you sure you want to return these products?
                 </span>
             </div>
         </Dialog>
+
         <Dialog visible={statusChangeDialog} style={{ width: '450px' }} header="Confirm" modal footer={statusChangeDialogFooter} onHide={hideStatusChangeDialog}>
             <div className="flex align-items-center justify-content-center">
                 <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
@@ -537,6 +530,7 @@ const Form = ({ purchase }) => {
                 </span>
             </div>
         </Dialog>
+
         <ReturnItemDialog 
             trigger={trigger} 
             selectedReturnItem={selectedReturnItem}

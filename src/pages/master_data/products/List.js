@@ -23,7 +23,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'unit', 'price', 'active'],
+        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'unit', 'cost', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,
@@ -244,7 +244,16 @@ const List = () => {
         );
     };
 
-    const lastTradePriceBodyTemplate = (rowData) => {
+    const unitCostBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Last Trade Price</span>
+                {rowData.cost}
+            </>
+        );
+    };
+
+    const tradePriceBodyTemplate = (rowData) => {
         return (
             <>
                 <span className="p-column-title">Last Trade Price</span>
@@ -320,9 +329,10 @@ const List = () => {
                         <Column field="brand_name" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="model_no" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
-                        <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
-                        <Column field="price" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                     */}
+                        <Column field="cost" header="Unit Cost" filter filterPlaceholder="Search by Last Purchase Price" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="price" header="Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
                         <Column field="active" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 

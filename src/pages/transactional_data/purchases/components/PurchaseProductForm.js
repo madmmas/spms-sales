@@ -11,7 +11,7 @@ import SelectMasterDataOL from '../../../components/SelectMasterDataOL';
 
 import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../../constants/models';
 
-export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedProduct, defaultPurchaseProduct }) {
+export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedProduct, defaultPurchaseProduct, defaultWarehouse }) {
 
     let emptyPurchaseProduct = {
         product_id: "", // select product
@@ -56,9 +56,14 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     const [purchaseProduct, setPurchaseProduct] = useState(defaultPurchaseProduct);
     const [submitted, setSubmitted] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    // const [defaultWarehouse, setDefaultWarehouse] = useState(defaultWarehouse);
 
     useEffect(() => {
-        if (selectedProduct.product_id) {
+        setValue('warehouse_id', defaultWarehouse);
+    }, [defaultWarehouse]);
+
+    useEffect(() => {
+        if (selectedProduct.product_id) {    
             // showDialog();
             reset({ ...selectedProduct });
             setPurchaseProduct(selectedProduct);
@@ -71,6 +76,30 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
         return Math.round((num + Number.EPSILON) * 100) / 100;
     };
 
+    const resetForm = () => {
+        reset({
+            'product_id': '',
+            'warehouse_id': defaultWarehouse,
+            'bar_code': '',
+            'last_purchase_price': 0.00,
+            'qty': 1,
+            'unit_cost_f': 0.00,
+            'totalCostF': 0.00,
+            'conversion_rate': 1,
+            'unit_cost': 0.00,
+            'totalCostBDT': 0.00,
+            'transport': 0.00,
+            'duty_vat': 0.00,
+            'netUnitCostBDT': 0.00,
+            'netCostBDT': 0.00,
+            'discount_profit': 0,
+            'profit': 0.00,
+            'trade_price': 0.00,
+            'min_trade_price': 0.00,
+        });
+        setPurchaseProduct({});
+        setIsEdit(false);
+    };
     const calculateCost = (_purchaseProduct) => {
         _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unit_cost_f * _purchaseProduct.qty);
         _purchaseProduct.unit_cost = roundNumber(_purchaseProduct.unit_cost_f * _purchaseProduct.conversion_rate);
@@ -145,28 +174,32 @@ export default function PurchaseProductForm({ onAdd, onEdit, currency, selectedP
     const onProductSelect = (selectedRow) => {
         // set focus to qty
         quantityRef.current.focus();
-        console.log("PRODUCT SELECTED::", selectedRow)
-        let _purchaseProduct = { ...purchaseProduct };
-        console.log(selectedRow.bar_code)
-        console.log(selectedRow.last_purchase_price)
+        console.log("PRODUCT SELECTED::", selectedRow);
+        console.log("DEFAULT PURCHASE PRODUCT:::=>>", defaultPurchaseProduct);
+        let _purchaseProduct = { ...defaultPurchaseProduct };
+        // console.log(selectedRow.bar_code)
+        // console.log(selectedRow.last_purchase_price)
         _purchaseProduct['product_id'] = selectedRow.id;
         _purchaseProduct['product_name'] = selectedRow.name;
         _purchaseProduct['bar_code'] = selectedRow.bar_code;
         _purchaseProduct['last_purchase_price'] = selectedRow.last_purchase_price;
         setPurchaseProduct(_purchaseProduct);
-
+        console.log("SELECTED __PRODUCT:::=>>", _purchaseProduct)
+        console.log("SELECTED PRODUCT:::=>>", purchaseProduct)
+        console.log("SELECTED PRODUCT ID :::=>>", selectedRow.id)
         setValue('product_id', selectedRow.id);
-        setValue('bar_code', selectedRow.bar_code);
+        // setValue('bar_code', selectedRow.bar_code);
         setValue('product_name', selectedRow.name);
-        setValue('last_purchase_price', selectedRow.last_purchase_price);
-        setValue('warehouse_id', selectedRow.warehouse_id);
+        // setValue('last_purchase_price', selectedRow.last_purchase_price);
+        setValue('warehouse_id', defaultWarehouse);
     };
 
     const onAddItem = (dt) => {
         console.log(dt);
+        // resetForm();
+        reset({ ...emptyPurchaseProduct });
         onAdd(dt);
         // setPurchaseProduct(emptyPurchaseProduct);
-        reset({ ...emptyPurchaseProduct });
     };
 
     const onEditItem = (dt) => {

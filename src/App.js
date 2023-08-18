@@ -69,11 +69,10 @@ function App() {
   const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
 
   const Ledger = React.lazy(() => import("./pages/reports/ReportLedger"));
-  // const PurchaseLedger = React.lazy(() => import("./pages/reports/PurchaseLedger"));
-  // const AccountsPayable = React.lazy(() => import("./pages/reports/AccountsPayable"));
-  // const BankLedger = React.lazy(() => import("./pages/reports/BankLedger"));
-  // const CashLedger = React.lazy(() => import("./pages/reports/CashLedger"));
+  const Invoice = React.lazy(() => import("./pages/transactional_data/sales/Invoice"));
 
+  const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
+  
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
@@ -104,7 +103,9 @@ function App() {
 
         <Route path="/ledger">
           <Route path="purchase" element={<RouteAuth pageComponent={<Ledger type="purchase" header="Purchase Ledger" />} />} />
+          <Route path="sales" element={<RouteAuth pageComponent={<Ledger type="sales" header="Sales Ledger" />} />} />
           <Route path="accpayable" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="A/C Payable"/>} />} />
+          <Route path="accreceivable" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="A/C Receivable"/>} />} />
           <Route path="bank" element={<RouteAuth pageComponent={<Ledger type="bank" header="Bank Ledger"/>} />} />
           <Route path="cash" element={<RouteAuth pageComponent={<Ledger type="cash" header="Cash Ledger"/>} />} />
         </Route>
@@ -117,11 +118,13 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<SupplierList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<SupplierForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<SupplierDetail />} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="Supplier Ledger"/>} />} />
         </Route>
         <Route path="/customers">
           <Route index element={<RouteAuth pageComponent={<CustomerList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<CustomerForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<CustomerDetail />} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="Customer Ledger"/>} />} />
         </Route>
         <Route path="/products">
           <Route index element={<RouteAuth pageComponent={<ProductList />} />} />
@@ -140,21 +143,14 @@ function App() {
         </Route>
         <Route path="/sales">
           <Route index element={<RouteAuth pageComponent={<SaleList />} />} />
-          {/* <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />
-          <Route path=":id" element={<RouteAuth pageComponent={<SaleDetail />} />} /> */}
+          <Route path="invoice/:id" element={<RouteAuth pageComponent={<Invoice />} />} />
         </Route>
         <Route path="/purchases">
           <Route index element={<RouteAuth pageComponent={<PurchaseList />} />} />
-          {/* <Route path="new" element={<RouteAuth pageComponent={<PurchaseForm />} />} />
-          <Route path=":id" element={<RouteAuth pageComponent={<PurchaseDetail />} />} /> */}
         </Route>
-        {/* <Route path="/purchase_packages">
-          <Route index element={<RouteAuth pageComponent={<PurchasePackageList />} />} />
-          <Route path="new" element={<RouteAuth pageComponent={<PurchasePackageForm />} />} />
-          <Route path=":id" element={<RouteAuth pageComponent={<PurchasePackageDetail />} />} />
-        </Route> */}
         <Route path="/accounts" element={<RouteAuth pageComponent={<Accounts />} />} />
         <Route path="/stocks" element={<RouteAuth pageComponent={<StockStatus />} />} />
+        <Route path="/payments" element={<RouteAuth pageComponent={<PaymentDetail />} />} />
         <Route path="/expenses" element={<RouteAuth pageComponent={<Expenses />} />} />
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
         <Route path="/cash_bank" element={<RouteAuth pageComponent={<CashBank />} />} />

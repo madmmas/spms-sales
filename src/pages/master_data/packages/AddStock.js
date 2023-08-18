@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
 import { Chip } from 'primereact/chip';
 import { Button } from 'primereact/button';
@@ -9,6 +10,7 @@ import { ProductService } from '../../../services/ProductService';
 
 const AddStock = ({ packageData }) => {
 
+    let navigate = useNavigate();
 
     const toast = useRef(null);
 
@@ -26,7 +28,7 @@ const AddStock = ({ packageData }) => {
                     return product;
                 })
             )
-        //   console.log(response)
+          console.log("PRODUCTS:::",response);
           setProducts(response);
         } catch (error) {
           return products;
@@ -41,25 +43,37 @@ const AddStock = ({ packageData }) => {
     }, [packageData]);
 
     const addToStock = () => {
+        let pgkQty = Number(packageQuantity);
         let data = {
-            dtProduct_id: packageData._id,
-            quantity: packageQuantity,
+            quantity: pgkQty,
             items: [],
         }
         products.map((product) => {
             data.items.push({
-                dtProduct_id: product.dtProduct_id,
-                quantity: product.quantity * packageQuantity,
+                product_id: product.dtProduct_id,
+                quantity: product.quantity * pgkQty,
             })
         })
+        let id = packageData.id;
         // validate if package quantity is greater than 0
-        if(packageQuantity > 0){
-            productService.addPackageToStock(data).then((response) => {
+
+        if(pgkQty > 0){
+            // valid each product quantity
+            console.log("DATA:::",products);
+            for(let i=0; i<products.length; i++){
+                console.log("ITEM::",products[i].quantity * pgkQty > products[i].current_stock);
+                if((products[i].quantity * pgkQty) > products[i].current_stock){
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product quantity must be greater than 0', life: 3000 });
+                    return;
+                }
+            }
+            productService.addPackageToStock(id, data).then((response) => {
                 toast.current.show({ severity: 'success', summary: 'Success', detail: 'Stock Added', life: 3000 });
                 // reset package quantity
-                setPackageQuantity(0);
+                // setPackageQuantity(0);
                 // reset products
-                fetchData(packageData.products);
+                // fetchData(packageData.products);
+                navigate("/packages");
             }).catch((error) => {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 3000 });
             })

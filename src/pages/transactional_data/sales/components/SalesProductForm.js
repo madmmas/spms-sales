@@ -1,31 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
+import { roundNumber } from '../../../../utils';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { classNames } from 'primereact/utils';
 
+import SalesProductDetail from './SalesProductDetail';
+
 import { ProductService } from '../../../../services/ProductService';
 
-export default function SalesProductForm({ 
-    onAdd, onEdit, onCancel, 
-    selectedItem, selectedProduct, defaultSalesProduct
+export default function SalesProductForm({
+    salesItems,
+    selectedItem,
+    addSalesItem, updateSalesItem, removeSalesItem, 
+    selectProductFromList, deselectProductFromList 
 }) {
-
-    let emptySalesProduct = {
-        dtProduct_id: "",
-        barCode: "",
-        lastTradePrice: 0.00,
-        price: 0.00,
-
-        quantity: 1,  
-        totalPrice: 0.00,
-        discount: 0.00,
-        discountedAmount: 0.00,
-        netPrice: 0.00,
-
-        remarks: "",
-    };
 
     const {
         register,
@@ -35,58 +25,64 @@ export default function SalesProductForm({
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: emptySalesProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: {}
     });
 
     const quantityRef = useRef(null);
 
-    const [salesProduct, setSalesProduct] = useState(defaultSalesProduct);
+    const [salesProduct, setSalesProduct] = useState(null);
     const [productName, setProductName] = useState('');
     const [current_stock, setCurrentStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
-    const productService = new ProductService();
+    const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
     const resetForm = () => {
-        reset({ ...emptySalesProduct });
-        setSalesProduct(emptySalesProduct);
+        reset({ 
+            "product_id": "",
+            "bar_code": "",
+            "qty": 1,
+            "trade_price": 0.00,
+            "remarks": "",
+            "totalPrice": 0.00,
+            "discount_profit": 0.00,
+            "discountedAmount": 0.00,
+            "netPrice": 0.00,
+         });
+        setSalesProduct(null);
         setProductAndItsStock('', 0);
     };
 
     const setProductAndItsStock = (name, stock) => {
+        console.log('setProductAndItsStock', name, stock)
         setProductName(name);
         setCurrentStock(stock);
     };
 
     useEffect(() => {
-        if (selectedItem.id) {
+        console.log("salesItems-UPDATED::",salesItems);
+        if(salesItems && salesItems.length > 0){
+            let _total = 0.00;
+            salesItems.forEach((item) => {
+                _total += Number(item.netPrice);
+            });
+            console.log("_total::", _total)
+            // setTotalAmount(_total);
+        }
+    }, [salesItems]);
+
+    useEffect(() => {
+        if (selectedItem && selectedItem.id) {
             setIsEdit(false);
-            onProductSelect(selectedItem);
+            selectProduct(selectedItem);
         }else{
             resetForm();
         }
     }, [selectedItem]);
 
-    useEffect(() => {
-        if (selectedProduct.dtProduct_id) {
-            reset({ ...selectedProduct });
-            setSalesProduct(selectedProduct);
-            setIsEdit(true);
-            setProductAndItsStock(selectedProduct["productName"], selectedProduct["current_stock"]);
-            quantityRef.current.focus();
-        }else{
-            setIsEdit(false);
-            resetForm();
-        }
-    }, [selectedProduct]);
-
-    const roundNumber = (num) => {
-        return Math.round((num + Number.EPSILON) * 100) / 100;
-    };
-
     const calculatePrice = (_saleProduct) => {
-        _saleProduct.totalPrice = roundNumber(_saleProduct.price * _saleProduct.quantity);
-        _saleProduct.discountedAmount = roundNumber(_saleProduct.totalPrice * _saleProduct.discount / 100);
+        _saleProduct.totalPrice = roundNumber(Number(_saleProduct.trade_price) * Number(_saleProduct.qty));
+        _saleProduct.discountedAmount = roundNumber(_saleProduct.totalPrice * Number(_saleProduct.discount_profit) / 100);
         _saleProduct.netPrice = roundNumber(_saleProduct.totalPrice -  _saleProduct.discountedAmount);
 
         setSalesProduct(_saleProduct);
@@ -105,54 +101,74 @@ export default function SalesProductForm({
         setValue(name, val);
     };
 
-    const onProductSelect = async (productSelected) => {
+    const selectProduct = async item => {
+        console.log("selectProduct::", item)
         // get product current stock
-        // let productStock = await productService.getProductCurrentStock(productSelected.id);
-        let productStock = productSelected.current_stock;
+        let _productStock = item.current_stock;
 
-        // set focus to quantity
+        // set focus to qty
         let _saleProduct = { ...salesProduct };
-        _saleProduct['dtProduct_id'] = productSelected.id;
-        _saleProduct['productName'] = productSelected.name;
-        _saleProduct['brand_name'] = productSelected.brand_name;
-        _saleProduct['model_no'] = productSelected.model_no;
-        _saleProduct['part_number'] = productSelected.part_number;
-        // _saleProduct['barCode'] = productSelected.barCode;
-        _saleProduct['price'] = productSelected.price;
-        // _saleProduct['lastTradePrice'] = productSelected.lastTradePrice;
-        _saleProduct['current_stock'] = productStock;
-        _saleProduct['quantity'] = 1;
-        _saleProduct['discount'] = 0;
-        _saleProduct['remarks'] = productSelected.remarks===null ? '' : productSelected.remarks;
+        _saleProduct['product_id'] = item.id;
+        _saleProduct['product_name'] = item.name;
+        _saleProduct['trade_price'] = item.trade_price;
+        _saleProduct['current_stock'] = _productStock;
+        _saleProduct['qty'] = item.qty || 1;
+        _saleProduct['discount_profit'] = item.discount_profit || 0.00;
+        _saleProduct['remarks'] = item.remarks || '';
 
         setSalesProduct(_saleProduct);
 
         reset({ ..._saleProduct });
 
-        setProductAndItsStock(productSelected["name"], productStock);
+        setProductAndItsStock(item["name"], _productStock);
 
         quantityRef.current.focus();
         
         calculatePrice(_saleProduct);
     };
 
-    const onAddItem = (dt) => {
-        onAdd(dt);
+    const addItem = item => {
         resetForm();
+
+        addSalesItem(item);
     };
 
-    const onEditItem = (dt) => {
-        onEdit(dt);
+    const updateItem = item => {
         setIsEdit(false);
         resetForm();
+
+        updateSalesItem(item, selectedItemIndex);
+    };
+
+    const removeItem = (index) => {
+        removeSalesItem(index);
     };
 
     const onCancelEditItem = () => {
-        onCancel();
         setIsEdit(false);
         resetForm();
+        deselectProductFromList();
     };
 
+    ///// Events -- PRODUCT-LIST /////
+    const editSalesProduct = item => {
+        console.log("editSalesProduct::", item)
+        setIsEdit(true);
+        setSelectedItemIndex(item.index);
+
+        selectProduct({
+            "id": item.product_id,
+            "name": item.product_name,
+            "trade_price": item.trade_price,
+            "current_stock": item.current_stock,
+            "qty": item.qty,
+            "discount_profit": item.discount_profit,
+            "remarks": item.remarks,
+        });
+
+        selectProductFromList(item.product_id);
+    };
+    
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
@@ -162,26 +178,26 @@ export default function SalesProductForm({
         <div className="card p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
             <Controller
-                name="dtProduct_id"
+                name="product_id"
                 control={control}
                 rules={{ required: 'Product is required.' }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Add Product*</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Name*</label>
                         <InputText readonly="true" value={productName} placeholder="Select Product" />
-                        <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
+                        <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })}/>
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="barCode"
+                name="bar_code"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Barcode</label>
-                        <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true} />
+                        <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true}  className={classNames({ 'p-invalid': fieldState.error })}/>
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
@@ -203,7 +219,7 @@ export default function SalesProductForm({
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="price"
+                name="trade_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -221,7 +237,7 @@ export default function SalesProductForm({
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="quantity"
+                name="qty"
                 control={control}
                 rules={{ 
                     required: 'Quantity is required.', 
@@ -233,7 +249,7 @@ export default function SalesProductForm({
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'quantity')} min={1} max={10000000} />
+                    onValueChange={(e) => onInputChange(e, 'qty')} min={1} max={10000000} />
                     </>
                 )}/>
             </div>
@@ -253,7 +269,7 @@ export default function SalesProductForm({
 
             <div className="field col-12 md:col-2">
             <Controller
-                name="discount"
+                name="discount_profit"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -261,7 +277,7 @@ export default function SalesProductForm({
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'discount')} min={0.00} maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'discount_profit')} min={0.00} maxFractionDigits={2} />
                     </>
                 )}/>
             </div>
@@ -288,18 +304,25 @@ export default function SalesProductForm({
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Remarks</label>
                 <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
-                    onChange={(e) => onInputChange(e, 'remarks')} disabled={true} />
+                    onChange={(e) => onInputChange(e, 'remarks')} disabled={true} 
+                    className={classNames({ 'p-invalid': fieldState.error })}
+                    />
                     </>
                 )}/>
             </div>
 
             <div className=" field col-12 md:col-2 align-items-center">
-                {isEdit && <Button  label="Update" className="p-button-primary mr-2" onClick={handleSubmit((d) => onEditItem(d))}></Button>}
+                {isEdit && <Button  label="Update" className="p-button-primary mr-2" onClick={handleSubmit((d) => updateItem(d))}></Button>}
 
-                {!isEdit && <Button type="submit" label="Add" className="p-button-primary" onClick={handleSubmit((d) => onAddItem(d))}/>}                
+                {!isEdit && <Button type="submit" label="Add" className="p-button-primary" onClick={handleSubmit((d) => addItem(d))}/>}                
                 <Button label="Cancel" className="p-button-outlined p-button-warning mt-2" onClick={() => onCancelEditItem()}></Button>
             </div>
         </div>
+
+        <SalesProductDetail salesItems={salesItems}
+                onEdit={(dt) => editSalesProduct(dt)}
+                onDelete={(index) => removeItem(index)}
+            />
     </>
     );
 }

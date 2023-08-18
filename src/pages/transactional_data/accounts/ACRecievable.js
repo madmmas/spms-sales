@@ -7,11 +7,11 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 
 import { TransactionService } from '../../../services/TransactionService';
-import { ACC_RECIEVABLE } from '../../../constants/models';
+import { ACC_RECEIVABLE } from '../../../constants/models';
 
 const ACRecievable = () => {
 
-    const modelName = ACC_RECIEVABLE;
+    const modelName = ACC_RECEIVABLE;
 
     const toast = useRef(null);
     const dt = useRef(null);

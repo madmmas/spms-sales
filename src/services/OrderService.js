@@ -32,6 +32,12 @@ export class OrderService {
         return resp.data;
     }
 
+    async cancel(orderType, id) {
+        const resp = await axiosInstance.patch(`/orders/${orderType}/cancel/` + id);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async return(orderType, id, data) {
         const resp = await axiosInstance.post(`/orders/${orderType}/returns/` + id, data);
         console.log(resp.data);

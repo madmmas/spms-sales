@@ -1,6 +1,17 @@
 import axiosInstance from "./AxiosService";
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
 
 export class MasterDataService {
+
+    async getDefaultItem(modelName) {
+        let filters = {
+            '_default': { "operator": FilterOperator.AND, "constraints": [{ "value": true, "matchMode": FilterMatchMode.EQUALS }] },
+        }
+
+        let data = await this.getByFilters(modelName, filters)
+        console.log(data)
+        return data
+    }
 
     async getById(modelName, id) {
         const resp = await axiosInstance.get(`/data/${modelName}/` + id);

@@ -115,6 +115,10 @@ const List = () => {
         navigate("/suppliers/" + dtProfile._id);
     };
 
+    const showLedger = (dtProfile) => {
+        navigate("/suppliers/ledger/" + dtProfile._id);
+    };
+
     const confirmDeleteProfile = (dtProfile) => {
         setProfile(dtProfile);
         setDeleteProfileDialog(true);
@@ -262,6 +266,7 @@ const List = () => {
         return (
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+                <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showLedger(rowData)} />
                 <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
             </>
         );

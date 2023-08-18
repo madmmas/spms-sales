@@ -6,7 +6,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 
-import { TransactionService } from '../../../services/TransactionService';
+import { RegisterService } from '../../../services/RegisterService';
 import { STOCK_OUT_MODEL } from '../../../constants/models';
 
 const StockIn = () => {
@@ -17,7 +17,7 @@ const StockIn = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: [],
+        fields: ["id", "register_date", "register_details"],
         first: 0,
         rows: 10,
         page: 1,
@@ -33,7 +33,7 @@ const StockIn = () => {
     const [dtStockIn, setStockIn] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const transactionService = new TransactionService();
+    const registerService = new RegisterService();
 
     useEffect(() => {
         initFilters();
@@ -54,7 +54,7 @@ const StockIn = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setStockIn(data.rows);
@@ -81,13 +81,15 @@ const StockIn = () => {
     }
 
     const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY hh:mm:ss');
+        return moment(date).format('DD/MM/YYYY');
+        // let d = new Date(parseInt(date));
+        // return d.toDateString();
     }
 
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDate(rowData.register_date)}
             </>
         );
     };
@@ -95,17 +97,15 @@ const StockIn = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtProduct_id_shortname}
+                {rowData.product_name}
             </>
         );
     };
 
-    const trxSales_idBodyTemplate = (rowData) => {
+    const voucherNoTemplate = (rowData) => {
         return (
             <>
-            <a href={`#/transactional_data/sales/${rowData.trxSales_id}`}>
-                {rowData.trxSales_id}
-            </a>
+                {rowData.voucher_no}
             </>
         );
     };
@@ -113,31 +113,56 @@ const StockIn = () => {
     const quantityBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.quantity}
+                {rowData.qty}
             </>
         );
     };
 
-    const totalPurchaseCostBodyTemplate = (rowData) => {
+    const unitCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalPurchaseCost}
+                {rowData.unit_cost}
             </>
         );
     };
 
-    const totalTradePriceBodyTemplate = (rowData) => {
+    const totalCostBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.totalTradePrice}
+                {rowData.unit_cost*rowData.qty}
             </>
         );
     };
+
+    const tradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trade_price}
+            </>
+        );
+    };
+
+    const totalPriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trade_price*rowData.qty}
+            </>
+        );
+    };
+
+    const operationTypeTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.operation_type}
+            </>
+        );
+    };
+
 
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Stock Out</h5>
+                <h5 className="m-0">Stock In</h5>
                 <div className="p-toolbar-group-right">
                     <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
                     <Button label="Export" icon="pi pi-upload" className="p-button-help m-2" onClick={exportCSV} />
@@ -164,11 +189,15 @@ const StockIn = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column field="date" header="Transaction Datetime" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="trxSales_id" header="Sales Ref" filter filterPlaceholder="Search by Sales Ref" sortable body={trxSales_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="date" header="Transaction Date" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by name" sortable body={voucherNoTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="operation_type" header="Opt" filter filterPlaceholder="Search by name" sortable body={operationTypeTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="product_name" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        {/* <Column field="totalTradePrice" header="totalTradePrice" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
+                        <Column field="unit_cost" header="Unit Cost" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_unit_cost" header="Total Cost Value" filter filterPlaceholder="Search by totalPurchaseCost" sortable body={totalCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="trade_price" header="Trade Price" filter filterPlaceholder="Search by totalTradePrice" sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="total_trade_price" header="Total Trade Value" filter filterPlaceholder="Search by totalTradePrice" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>

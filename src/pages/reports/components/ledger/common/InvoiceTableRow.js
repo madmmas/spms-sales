@@ -1,6 +1,6 @@
 import React, {Fragment} from 'react';
 import {Text, View, StyleSheet } from '@react-pdf/renderer';
-import { getDate, getDatetime } from '../../../../../utils';
+import { getDateFormatted } from '../../../../../utils';
 
 const borderColor = '#000'
 const styles = StyleSheet.create({
@@ -90,7 +90,7 @@ const InvoiceTableRow = ({items}) => {
     console.log('InvoiceTableRow:::', items)
     const rows = items.map( (item, index) => 
         <View style={styles.row} key={index.toString()}>
-            <Text wrap={false} style={styles.fifteen}>{getDate(item.created_at)}</Text>
+            <Text wrap={false} style={styles.fifteen}>{getDateFormatted(item.created_at)}</Text>
             <Text wrap={false} style={styles.fifteen}>{item.voucher_no}</Text>
             <Text wrap={false} style={styles.twenty}>{item.particular}</Text>
             <Text wrap={false} style={styles.twenty}>{item.shortname}</Text>

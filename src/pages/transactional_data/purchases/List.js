@@ -82,7 +82,7 @@ const List = () => {
     }
 
     const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY');
+        return moment(date).format('DD/MM/YYYY');
         // let d = new Date(parseInt(date));
         // return d.toDateString();
     }

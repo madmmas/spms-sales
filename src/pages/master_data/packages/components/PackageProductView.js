@@ -6,7 +6,7 @@ const PackageProductView = ({products, packageQuantity, showCurrentStock=false})
 
     const rowClass = (data) => {
         return {
-            'bg-red-100 text-red-900': (data.quantity * packageQuantity) > data.currentStock,
+            'bg-red-100 text-red-900': (data.quantity * Number(packageQuantity)) > data.current_stock,
         };
     };
 

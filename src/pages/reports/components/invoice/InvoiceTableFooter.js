@@ -47,24 +47,24 @@ const InvoiceTableFooter = ({invoice}) => {
                 <Text style={styles.description}>Net Amount</Text>
                 <Text style={styles.total}>{ Number.parseFloat(invoice.netAmount).toFixed(2)}</Text>
             </View>
-            {(invoice.customerCategory!=="WALKIN") && (<View>
+            {(invoice.customer_category!=="WALKIN") && (<View>
             <View style={styles.row2}>
                 <Text style={styles.description}>(+) B/F Balance</Text>
                 <Text style={styles.total}>{ Number.parseFloat(invoice.balanceForward).toFixed(2)}</Text>
             </View>
             <View style={styles.row2}>
                 <Text style={styles.description}>(-) Received Amount</Text>
-                <Text style={styles.total}>{ Number.parseFloat(invoice.payment.paidAmount).toFixed(2)}</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.payment?invoice.payment.paidAmount:0.00).toFixed(2)}</Text>
             </View>
             <View style={styles.row2}>
                 <Text style={styles.description}>Net Balance</Text>
                 <Text style={styles.total}>{ Number.parseFloat(invoice.netBalance).toFixed(2)}</Text>
             </View>
             </View>)}
-            {(invoice.customerCategory==="WALKIN") && (
+            {(invoice.customer_category==="WALKIN") && (
             <View style={styles.row2}>
                 <Text style={styles.description}>Paid Amount</Text>
-                <Text style={styles.total}>{ Number.parseFloat(invoice.payment.paidAmount).toFixed(2)}</Text>
+                <Text style={styles.total}>{ Number.parseFloat(invoice.payment?invoice.payment.paidAmount:0.00).toFixed(2)}</Text>
             </View>)}
         </View>
     )

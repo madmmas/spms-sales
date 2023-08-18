@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react';
+import { useParams } from 'react-router-dom';
 import { PDFViewer } from '@react-pdf/renderer'
 import Ledger from './components/ledger/common/Ledger'
 
@@ -8,12 +9,15 @@ import {
     PURCHASE_MODEL,
     SALES_MODEL,
     ACC_PAYABLE,
-    ACC_RECIEVABLE,
+    ACC_RECEIVABLE,
     CASH_MODEL,
-    BANK_MODEL
+    BANK_MODEL,
+    SUPPLIER_MODEL
 } from '../../constants/models';
 
 const ReportLedger = ({ type, header }) => {
+
+    let { id } = useParams();
 
     const [ledger, setLedger] = useState(null);
 
@@ -21,10 +25,18 @@ const ReportLedger = ({ type, header }) => {
 
     useEffect(() => {
         let partyType = getPartyModel(type);
-        transactionService.getLedgerByParty(partyType).then(data => {
-            setLedger( data.rows );
-            console.log(ledger);
-        });
+        if (id != null) {
+            transactionService.getLedgerByPartyId(partyType, id).then(data => {
+                setLedger( data.rows );
+                console.log(ledger);
+            });
+            return;
+        } else {
+            transactionService.getLedgerByParty(partyType).then(data => {
+                setLedger( data.rows );
+                console.log(ledger);
+            });
+        }
     }, [type]);
 
     const getPartyModel = (type) => {
@@ -36,11 +48,13 @@ const ReportLedger = ({ type, header }) => {
             case 'accpayable':
                 return ACC_PAYABLE;
             case 'accreceivable':
-                return ACC_RECIEVABLE;
+                return ACC_RECEIVABLE;
             case 'cash':
                 return CASH_MODEL;
             case 'bank':
                 return BANK_MODEL;
+            case 'supplier':
+                return SUPPLIER_MODEL;
             default:
                 return PURCHASE_MODEL;
         }

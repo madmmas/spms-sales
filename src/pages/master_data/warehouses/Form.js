@@ -37,13 +37,15 @@ const Form = ({warehouseProfile}) => {
         if(warehouseProfile==null){
             hrManagementService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Created', life: 3000 });
-                navigate("/warehouses/" + data.ID);
+                // navigate("/warehouses/" + data.ID);
+                navigate("/warehouses");
             });
         }else{
             hrManagementService.update(modelName, formData._id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/warehouses/" + data.ID);
+                navigate("/warehouses");
             });
         }
     };

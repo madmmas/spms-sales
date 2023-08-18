@@ -41,12 +41,12 @@ const Form = ({productData}) => {
             price: 0.00,
             type: "GENERAL",
             category_id: "",
-            warehouse_id: "",
+            // warehouse_id: "",
             bar_code: "",
             brand_name: "",
             model_no: "",
             part_number: "",
-            unit: "",
+            unit: MEASUREMENT_UNITS[0].id,
             low_stock_qty: 0,
             remarks: "",
             active: true
@@ -69,7 +69,7 @@ const Form = ({productData}) => {
             price: Number(data.price),
             type: 'GENERAL',
             category_id: data.category_id,
-            warehouse_id: data.warehouse_id,
+            // warehouse_id: data.warehouse_id,
             bar_code: data.bar_code,
             brand_name: data.brand_name,
             model_no: data.model_no,
@@ -88,12 +88,14 @@ const Form = ({productData}) => {
             if(productData==null){
                 productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    navigate("/products/" + data.ID);
+                    // navigate("/products/" + data.ID);
+                    navigate("/products");
                 });
             }else{
                 productService.update(data.id, data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    navigate("/products/" + data.ID);
+                    // navigate("/products/" + data.ID);
+                    navigate("/products");
                 });
             }
         }
@@ -236,7 +238,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-4">
+                    {/* <div className="field col-12 md:col-4">
                     <Controller
                         name="warehouse_id"
                         control={control}
@@ -253,7 +255,7 @@ const Form = ({productData}) => {
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                    </div>
+                    </div> */}
                     <div className="field col-12 md:col-8">
                         <Controller
                             name="remarks"

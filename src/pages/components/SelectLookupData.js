@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import { ConfigurationService } from '../../services/ConfigurationService';
 
-export default function SelectLookupData( { field, className, model, placeholder = "" }) {
+export default function SelectLookupData( { field, className, model, onChangeItem, placeholder = "" }) {
 
     const [data, setData] = useState([]);
 
@@ -11,11 +11,15 @@ export default function SelectLookupData( { field, className, model, placeholder
     useEffect(() => {
         configurationService.getAllWithoutParams(model).then(data => {
             setData(data);
+            if(data.length > 0) { field.onChange(data[0]._id); }
         });
     }, []);
 
     const onChange = (e) => {
         field.onChange(e.value);
+        if(onChange){
+            onChangeItem(e.value);
+        }
     }
 
     return (
