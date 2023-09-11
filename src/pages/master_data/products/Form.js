@@ -233,7 +233,7 @@ const Form = ({productData}) => {
                         <Controller
                             name="part_number"
                             control={control}
-                            rules={{ required: 'Part Number is required.' }}
+                            // rules={{ required: 'Part Number is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number</label>

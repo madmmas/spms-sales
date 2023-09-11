@@ -1,5 +1,5 @@
 import { axiosInstance } from "./AxiosService";
-
+import moment from 'moment';
 
 const loadAllProducts = async () => {
     let allProducts = [];
@@ -21,19 +21,81 @@ const loadAllProducts = async () => {
     } while (fetched == pageSize);
 
     window['__all_products'] = allProducts;
-    // load all brands
+    localStorage.setItem("products", JSON.stringify(allProducts));
+}
 
-    // load all models
+const loadAllProductsFromLocalStorage = async () => {
+    let products = JSON.parse(localStorage.getItem("products"));
+    if (products) {        
+        window['__all_products'] = products;
+    } else {
+        await loadAllProducts();
+    }
+}    
+
+const loadUpdatedProducts = async (productCacheUpdatedTime) => {
+    let resp = {data: {rows: []}};
+    resp = await axiosInstance.get(`/allproducts/` + productCacheUpdatedTime, {
+        timeout: 15000,
+        cache: {
+            ttl: 1000 * 20 // 1 minute.
+        }
+    });        
+    return resp.data;
+}
+
+const checkAndLoadAllProducts = async (products) => {
+    let productCacheUpdatedTime = JSON.parse(localStorage.getItem("productCacheUpdatedTime"));
+    if (!productCacheUpdatedTime && (!products || products.length == 0)) {
+        productCacheUpdatedTime = 0;
+    } else {
+        if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
+            console.log("product cache is updated less than 1 minutes ago")
+            return [];
+        }    
+    }
+
+    let data = await loadUpdatedProducts(productCacheUpdatedTime);
+
+    if(productCacheUpdatedTime == 0) {
+        window['__all_products'] = data.rows;
+        localStorage.setItem("products", JSON.stringify(data.rows));
+        return data.rows;
+    }
+
+    let rows = data.rows;
+    if (rows && rows.length > 0) {
+        for (var i = 0; i < rows.length; i++) {
+            let found = false;
+            for (var j = 0; j < products.length; j++) {
+                if (rows[i].id == products[j].id) {
+                    products[j] = rows[i];
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                products.push(rows[i]);
+            }
+        }
+        localStorage.setItem("products", JSON.stringify(products));
+    }
+    // get momentjs datetime in yyyy-MM-dd HH:mm:ss format
+    let updatedTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    localStorage.setItem("productCacheUpdatedTime", JSON.stringify(updatedTime));
+
+    return products;
 }
 
 const getAllProducts = async (limit, offset) => {
-    let products = window['__all_products'];
 
+    let products = window['__all_products'];
+    products = await checkAndLoadAllProducts(products);
     // if products undefined or empty load all from server limit 1000 until no more
-    if (!products || products.length == 0) {
-        await loadAllProducts();
-        products = window['__all_products'];
-    }
+    // if (!products || products.length == 0) {
+    //     await loadAllProductsFromLocalStorage();
+    //     products = window['__all_products'];
+    // }
 
     // if products still undefined or empty return empty array
     if (!products || products.length == 0) {
@@ -107,4 +169,5 @@ export default {
     getAllProducts,
     getProductById,
     getProductByIds,
+    loadAllProductsFromLocalStorage,
 };

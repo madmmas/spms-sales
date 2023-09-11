@@ -85,7 +85,7 @@ function App() {
 
     // if products undefined or empty load all from server limit 1000 until no more
     if (!products || products.length == 0) {
-      RProductService.loadAllProducts();
+      RProductService.loadAllProductsFromLocalStorage();
     }
   }, []);
 
