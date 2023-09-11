@@ -1,6 +1,7 @@
 import React from 'react';
 import { Page, Document, Text, StyleSheet } from '@react-pdf/renderer';
 import ReportTitle from '../../common/ReportTitle'
+import PartyInfo from '../../common/PartyInfo'
 import ItemsTable from '../common/ItemsTable'
 
 const styles = StyleSheet.create({
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
             <Document>
                 <Page size="A4" style={styles.page}>
                     <ReportTitle title={header} />
+                    {data.party && <PartyInfo party={data.party} />}
                     <ItemsTable data={data} />
                     <Text style={styles.pageNumber} render={({ pageNumber, totalPages }) => (
                         `Page No: ${pageNumber} / ${totalPages}`

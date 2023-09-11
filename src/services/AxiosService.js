@@ -33,17 +33,18 @@ axiosInstance.interceptors.response.use(function(response) {
    console.log(response.status)
    return response;
 }, function(error) {
+   console.log("AXIOS-ERROR:::", error)
    if(error.response) {
       if (error.response.status === 401 || (error.response.status === 400)) {
          clearLocalStorage();
          window.location.href = "#/login";
       }
    }
-   return Promise.reject(error);
+   return error
 });
 
-// setupCache(axiosInstance, {
-//    // debug: console.log 
-// });
+setupCache(axiosInstance, {
+   // debug: console.log 
+});
 
 export default axiosInstance;

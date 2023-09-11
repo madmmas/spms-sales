@@ -16,7 +16,6 @@ const ReturnItemDialog = ({ selectedReturnItem, trigger, onAddReturnItem }) => {
     };
 
     const [returnItemDialog, setReturnItemDialog] = useState(false);
-    const [bankCash, setBankCash] = useState("CASH");
     const [validReturnQty, setValidReturnQty] = useState(0);
 
     const {
@@ -109,9 +108,7 @@ const ReturnItemDialog = ({ selectedReturnItem, trigger, onAddReturnItem }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="reason">Reason*</label>
-                        <InputTextarea inputId={field.name} value={field.value} inputRef={field.payRef} keyfilter="text" 
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                        <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>

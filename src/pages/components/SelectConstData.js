@@ -6,7 +6,9 @@ export default function SelectConstData( { field, className, data, onSelectChang
     const onChange = (e) => {
         field.onChange(e.value);
         console.log(e.value);
-        onSelectChange(e.value);
+        if(onSelectChange){
+            onSelectChange(e.value);
+        }
     }
 
     return (

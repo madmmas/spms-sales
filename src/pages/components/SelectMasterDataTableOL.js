@@ -22,7 +22,8 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
     const loadLazyData = () => {
         setLoading(true);
 
-        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll(lazyParams).then(data => {
+        // productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             setTotalRecords(data.total);
             setTmpData(data.rows);
             setLoading(false);

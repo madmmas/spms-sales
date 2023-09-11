@@ -93,7 +93,7 @@ const InvoiceTableRow = ({items}) => {
             <Text wrap={false} style={styles.model}>{item.product_model_no}</Text>
             <Text wrap={false} style={styles.rate}>{Number.parseFloat(item.trade_price).toFixed(2)}</Text>
             <Text wrap={false} style={styles.discount}>{item.discount_profit}</Text>
-            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.trade_price-(item.trade_price*item.discount_profit/100)).toFixed(2) }</Text>
+            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</Text>
         </View>
     )
     return (<Fragment>{rows}</Fragment> )

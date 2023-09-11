@@ -4,6 +4,7 @@ import { PDFViewer } from '@react-pdf/renderer'
 import Ledger from './components/ledger/common/Ledger'
 
 import { TransactionService } from '../../services/TransactionService';
+import { MasterDataService } from '../../services/MasterDataService';
 
 import { 
     PURCHASE_MODEL,
@@ -12,7 +13,8 @@ import {
     ACC_RECEIVABLE,
     CASH_MODEL,
     BANK_MODEL,
-    SUPPLIER_MODEL
+    SUPPLIER_MODEL,
+    CUSTOMER_MODEL
 } from '../../constants/models';
 
 const ReportLedger = ({ type, header }) => {
@@ -22,18 +24,51 @@ const ReportLedger = ({ type, header }) => {
     const [ledger, setLedger] = useState(null);
 
     const transactionService = new TransactionService();
+    const masterDataService = new MasterDataService();
 
     useEffect(() => {
         let partyType = getPartyModel(type);
         if (id != null) {
-            transactionService.getLedgerByPartyId(partyType, id).then(data => {
-                setLedger( data.rows );
-                console.log(ledger);
-            });
+            if(partyType === ACC_PAYABLE || partyType === ACC_RECEIVABLE){
+                transactionService.getLedgerByPartyTypeAndId(partyType, id).then(data => {
+                    // get party info
+                    let modelName = partyType === ACC_PAYABLE ? SUPPLIER_MODEL : CUSTOMER_MODEL;
+                    masterDataService.getById(modelName, id).then(party => {
+                        let ledger = {
+                            "party": {
+                                "line1": party.shopName||party.name,
+                                "line2": party.address,
+                                "line3": party.phone,
+                            },
+                            "data": data.rows
+                        };
+                        setLedger( ledger );
+                        console.log(ledger);
+                    });
+                });
+            } else {
+                transactionService.getLedgerByPartyId(id).then(data => {
+                    masterDataService.getById(partyType, id).then(party => {
+                        let ledger = {
+                            "party": {
+                                "line1": party.shopName||party.name,
+                                "line2": party.address,
+                                "line3": party.phone,
+                            },
+                            "data": data.rows
+                        };
+                        setLedger( ledger );
+                        console.log(ledger);
+                    });
+                });
+            }
             return;
         } else {
             transactionService.getLedgerByParty(partyType).then(data => {
-                setLedger( data.rows );
+                let ledger = {
+                    "data": data.rows
+                };
+                setLedger( ledger );
                 console.log(ledger);
             });
         }
@@ -53,6 +88,8 @@ const ReportLedger = ({ type, header }) => {
                 return CASH_MODEL;
             case 'bank':
                 return BANK_MODEL;
+            case 'customer':
+                return CUSTOMER_MODEL;
             case 'supplier':
                 return SUPPLIER_MODEL;
             default:

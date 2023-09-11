@@ -3,15 +3,28 @@ import axiosInstance from "./AxiosService";
 export class OrderService {
 
     async getById(orderType, id) {
-        const resp = await axiosInstance.get(`/orders/${orderType}/${id}`);
+        let uri = `/orders/${orderType}/${id}`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
         console.log(resp.data);
         return resp.data;
     }
 
     async getAll(orderType, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
-
-        return axiosInstance.get(`/orders/${orderType}?` + queryParams).then(res => res.data);
+        let uri = `/orders/${orderType}?` + queryParams;
+        return axiosInstance.get(uri,{
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        }).then(res => res.data);
     }
 
     async create(orderType, data) {
@@ -32,14 +45,46 @@ export class OrderService {
         return resp.data;
     }
 
-    async cancel(orderType, id) {
-        const resp = await axiosInstance.patch(`/orders/${orderType}/cancel/` + id);
+    async confirmPayment(id, data) {
+        const resp = await axiosInstance.patch(`/confirm_order/` + id, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async cancel(orderType, id, data) {
+        const resp = await axiosInstance.patch(`/orders/${orderType}/cancel/` + id, data);
         console.log(resp.data);
         return resp.data;
     }
 
     async return(orderType, id, data) {
         const resp = await axiosInstance.post(`/orders/${orderType}/returns/` + id, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async getOrderProductLastPrice(orderType, productId, customerId) {
+        let uri = `/last_product_price/${orderType}/${customerId}/${productId}`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data? resp.data.last_price : 0;
+    }
+
+    async getLedgerBalance(ledgerType, partyId) {
+        let uri = `/ledger_balance/${ledgerType}/${partyId}`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
         console.log(resp.data);
         return resp.data;
     }

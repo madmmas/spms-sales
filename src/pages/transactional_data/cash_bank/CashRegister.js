@@ -16,7 +16,7 @@ import { Toast } from 'primereact/toast';
 
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
-import { ON_BANK_TO_CASH, ON_CASH_TO_BANK } from '../../../constants/transactions';
+import { RegisterService } from '../../../services/RegisterService';
 import { CASH_REGISTER, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
 const CashRegister = () => {
@@ -24,8 +24,8 @@ const CashRegister = () => {
     const modelName = CASH_REGISTER;
 
     let emptyCashRegister = {
-        dtBankAccount_id: null,
-        date: null,
+        bank_account_id: null,
+        trx_date: null,
         amount: 0,
         remarks: '',
     };
@@ -48,18 +48,14 @@ const CashRegister = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        // fields: ["date", "dtBankAccount_id", "amount", "balance",  "remarks"],
+        fields: ["id", "register_date", "register_details"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
-        filters: {            
-            'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'ref_type': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
-            'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'balance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
-            'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        filters: {
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
         }
     };
 
@@ -71,6 +67,7 @@ const CashRegister = () => {
     const [addOrWithdraw, setAddOrWithdraw] = useState(false);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
+    const registerService = new RegisterService();
     const transactionService = new TransactionService();
 
     useEffect(() => {
@@ -92,7 +89,7 @@ const CashRegister = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll("trxCashRegister", { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setCashRegister(data.rows);
@@ -145,7 +142,7 @@ const CashRegister = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {moment(rowData.date).format('DD/MM/YYYY')}
+                {moment(rowData.trx_date).format('DD/MM/YYYY')}
             </>
         );
     };
@@ -204,19 +201,11 @@ const CashRegister = () => {
 
     const saveCashRegister = (formData) => {
         setSubmitted(true);
-        if (addOrWithdraw) {
-            transactionService.processTransaction(ON_CASH_TO_BANK, formData).then(data => {            
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Cash Register on Cash to Bank Created', life: 3000 });
-            });
-        } else {
-            transactionService.processTransaction(ON_BANK_TO_CASH, formData).then(data => {            
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Cash Register on Bank to Cash Created', life: 3000 });
-            });
-        }
+        transactionService.bankToCash(formData).then(data => {            
+            console.log(data);
+            loadLazyData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Register Updated', life: 3000 });
+        });
 
         setCashRegisterDialog(false);
         reset(emptyCashRegister)
@@ -225,8 +214,8 @@ const CashRegister = () => {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button onClick={() => addToCash()} className="p-button p-button-primary mr-2" label="Add to Cash" />
-                <Button onClick={() => withdrawFromCash()} className="p-button p-button-success mr-2" label="Withdraw from Cash" />
+                <Button onClick={() => addToCash()} className="p-button p-button-primary mr-2" label="Bank to Cash" />
+                {/* <Button onClick={() => withdrawFromCash()} className="p-button p-button-success mr-2" label="Withdraw from Cash" /> */}
             </React.Fragment>
         );
     };
@@ -268,18 +257,17 @@ const CashRegister = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >                       
-                        <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
-                        <Column field="particularType" header="Particular Type" filter filterElement={particularTypeFilterTemplate} sortable body={particularTypeBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
-                        <Column field="ref_id" header="Particular Name" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>                        
-                        <Column field="balance" header="Balance" filter filterPlaceholder="Search by Balance" sortable body={balanceBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>                        
-                        <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }}
+                            body={dateBodyTemplate}></Column>
+                        <Column field="amount" header="Payment Amount" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="bank_name" header="Bank Account" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${addOrWithdraw?"Add To":"Withdraw From"} Cash`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         <div className="p-fluid formgrid grid">
                         <div className="field col-12 md:col-6">
                             <Controller
-                                name="date"
+                                name="trx_date"
                                 control={control}
                                 rules={{ required: 'Date is required.' }}
                                 render={({ field, fieldState }) => (
@@ -293,7 +281,7 @@ const CashRegister = () => {
                             </div>
                             <div className="field col-12 md:col-6">                  
                                 <Controller
-                                    name="dtBankAccount_id"
+                                    name="bank_account_id"
                                     control={control}
                                     rules={{ required: 'Bank Account is required.' }}
                                     render={({ field, fieldState }) => (
@@ -337,9 +325,7 @@ const CashRegister = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks*</label>
-                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
-                                        className={classNames({ 'p-invalid': fieldState.error })} 
-                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>

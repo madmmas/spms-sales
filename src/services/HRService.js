@@ -3,15 +3,28 @@ import axiosInstance from "./AxiosService";
 export class HRService {
 
     async getById(modelName, id) {
-        const resp = await axiosInstance.get(`/data/${modelName}/` + id);
+        let uri = `/data/${modelName}/` + id;
+        const resp = await axiosInstance.get(uri,{
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 60 seconds.
+            }
+        });
         console.log(resp.data);
         return resp.data;
     }
 
     async getAll(modelName, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
-
-        return axiosInstance.get(`/data/${modelName}?` + queryParams).then(res => res.data);
+        let uri = `/data/${modelName}?` + queryParams;
+        return axiosInstance.get(uri,{
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 60 seconds.
+            }
+        }).then(res => res.data);
     }
 
     async create(modelName, data) {

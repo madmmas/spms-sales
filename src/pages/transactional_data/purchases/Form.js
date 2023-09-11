@@ -10,6 +10,7 @@ import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
+import { InputNumber } from 'primereact/inputnumber';
 
 import SelectMasterData from '../../components/SelectMasterData';
 
@@ -63,7 +64,7 @@ const Form = ({ purchase }) => {
 
         trade_price: 0.00,
 
-        min_trade_price: 0.00,
+        min_price: 0.00,
     };
 
     const toast = useRef(null);
@@ -73,12 +74,14 @@ const Form = ({ purchase }) => {
     const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
     const [returnDialog, setReturnDialog] = useState(false);
     const [statusChangeDialog, setStatusChangeDialogFooter] = useState(false);
+    const [supplierId, setSupplierId] = useState(null);
     const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
     const [trxNo, setTrxNo] = useState('XXXXX');
     const [dialogMsg, setDialogMsg] = useState('');
     const [status, setStatus] = useState('draft');
     const [editMode, setEditMode] = useState(true);
 
+    const [conversionRate, setConversionRate] = useState(1);
 
     const [returnMode, setReturnMode] = useState(false);
     const [selectedReturnItem, setSelectedReturnItem] = useState({});
@@ -107,8 +110,10 @@ const Form = ({ purchase }) => {
     useEffect(() => {
         // get default warehouse
         masterDataService.getDefaultItem('dtWarehouse').then(data => {
-            console.log("DEFAULT WAREHOUSE::", data);
-            setDefaultWarehouse(data._id);
+            if(data){
+                console.log("DEFAULT WAREHOUSE::", data);
+                setDefaultWarehouse(data._id);    
+            }
         });
         if (purchase===null || purchase===undefined) {
             if (trxNo === 'XXXXX') {
@@ -119,11 +124,13 @@ const Form = ({ purchase }) => {
             }
         } else {
             console.log("FETCHED-PURCHASE::", purchase);
+            let conversionRate = purchase.conversion_rate || 1;
             reset({
                 id: purchase.id,
                 party_type: purchase.party_type,
                 party_id: purchase.party_id,
                 currency: purchase.currency,
+                conversion_rate: conversionRate,
                 cnf: purchase.cnf,
                 be_no: purchase.be_no,
                 lc_no: purchase.lc_no,
@@ -133,6 +140,7 @@ const Form = ({ purchase }) => {
             setPurchases(purchase.items);
             setReturnItems(purchase.return_items);
             // calculateTotals(purchase.items);
+            setConversionRate(conversionRate);
             setTrxNo(purchase.voucher_no);
             setEditMode(purchase.status === 'draft');
             setReturnMode(purchase.status === 'approved');
@@ -200,7 +208,7 @@ const Form = ({ purchase }) => {
         for(let i=0; i<purchases.length; i++) {
             totalCostAmountBDT += purchases[i].totalCostBDT;
             totalTransport += purchases[i].transport;
-            totalDuty += purchases[i].duty;
+            totalDuty += purchases[i].duty_vat;
             netCostAmountBDT += purchases[i].netCostBDT;
         }
 
@@ -246,7 +254,17 @@ const Form = ({ purchase }) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    const addToPurchaseList = (addedItem) => {
+    const addToPurchaseList = async (addedItem) => {
+        // check if already added
+        console.log("OOO-PURCHASES::", purchases);
+        for(let i=0; i<purchases.length; i++) {
+            console.log("PURCHASES::", purchases[i]);
+            if(purchases[i].product_id === addedItem.product_id) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Item already added!', life: 3000 });
+                return;
+            }
+        }
+
         let newPurchases = [...purchases];
         addedItem['index'] = purchases.length;
         newPurchases.push(addedItem);
@@ -301,7 +319,8 @@ const Form = ({ purchase }) => {
     );
 
     const onSupplierSelect = (selectedRow) => {
-        console.log("SELECTED SUPPLIER::", selectedRow);
+        console.log("SELECTED SUPPLIER::", selectedRow, selectedRow._id);
+        setSupplierId(selectedRow._id);
         setSelectedSupplier_currency(selectedRow.currency);
     };
 
@@ -389,6 +408,26 @@ const Form = ({ purchase }) => {
                         <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
                     </div>
                     <div className="field col-12">
+                    <Controller
+                        name="conversion_rate"
+                        control={control}
+                        rules={{ required: 'Conversion Rate is required.' }}
+                        render={({ field, fieldState }) => (
+                            <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Conversion Rate</label>
+                        <InputNumber 
+                            inputId={field.name} value={field.value} inputRef={field.ref} 
+                            className={classNames({ 'p-invalid': fieldState.error })}
+                            onChange={(e) => {
+                                setConversionRate(e.value);
+                                field.onChange(e.value)
+                            }}
+                            min={1} maxFractionDigits={2}
+                            />
+                            </>
+                        )}/>
+                    </div>   
+                    <div className="field col-12">
                         {!editMode && <>
                             <label>CnF</label>
                             <InputText readonly="true" value={purchase.cnf} placeholder="empty" />
@@ -472,7 +511,9 @@ const Form = ({ purchase }) => {
                 defaultWarehouse={defaultWarehouse}
                 onAdd={(dt) => addToPurchaseList(dt)} 
                 onEdit={(dt) => updatePurchaselist(dt)}
-                currency={selectedSupplier_currency} 
+                currency={selectedSupplier_currency}
+                conversionRate={conversionRate}
+                supplierId={supplierId}
                 defaultPurchaseProduct={defaultPurchaseProduct} 
                 selectedProduct={selectedProduct}
                 />
@@ -481,7 +522,8 @@ const Form = ({ purchase }) => {
             {purchases && <PurchaseProductDetail 
                 editMode={editMode} 
                 returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}
-                purchases={purchases} supplierCurrency={selectedSupplier_currency}
+                purchases={purchases} 
+                supplierCurrency={selectedSupplier_currency} conversion_rate={conversionRate}
                 onEdit={(dt) => editPurchaseProduct(dt)} 
                 onDelete={() => showConfirmDialog('removeItem')}
             />}

@@ -74,10 +74,12 @@ const List = () => {
         setLoading(true);
 
         await orderService.getAll(PURCHASE_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
-            setTotalRecords(data.total);
-            setProfiles(data.rows);
-            setLoading(false);
+            if(data) {
+                console.log(data)
+                setTotalRecords(data.total);
+                setProfiles(data.rows);
+                setLoading(false);    
+            }
         });
     }
 
@@ -159,7 +161,7 @@ const List = () => {
     const voucherNoBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.voucher_no}
+                <a href={"#/purchases/"+rowData.id}>{rowData.voucher_no}</a>
             </>
         );
     };

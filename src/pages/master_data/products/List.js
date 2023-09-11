@@ -23,7 +23,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'unit', 'cost', 'price', 'active'],
+        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_id', 'model_id', 'part_number', 'unit', 'cost', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,
@@ -31,7 +31,7 @@ const List = () => {
         sortOrder: null,
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
+            // 'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
@@ -72,7 +72,7 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getAll(lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
@@ -325,15 +325,15 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="category_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="brand_name" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="model_no" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="category_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        <Column field="brand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="model_id" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
                         {/* <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                     */}
-                        <Column field="cost" header="Unit Cost" filter filterPlaceholder="Search by Last Purchase Price" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="price" header="Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="cost" header="Unit Cost" filter filterPlaceholder="Search by Last Purchase Price" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        {/* <Column field="price" header="Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
                         {/* <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
-                        <Column field="active" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        {/* <Column field="active" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                               */}
                     </DataTable>
 
                     <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>

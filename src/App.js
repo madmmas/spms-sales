@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from 'react-router-dom';
 
 import 'primeflex/primeflex.css';
@@ -15,7 +15,10 @@ import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
 import POS from "./pages/POS";
 
+import RProductService from "./services/RProductService";
+
 function App() {
+
   const Crud = React.lazy(() => import("./pages/Crud"));
   const DemoData = React.lazy(() => import("./pages/Demo"));
   const Form1 = React.lazy(() => import("./pages/Form1"));
@@ -65,6 +68,8 @@ function App() {
   const Designation = React.lazy(() => import("./pages/configurations/Designation"));
   const Grade = React.lazy(() => import("./pages/configurations/Grade"));
   const Group = React.lazy(() => import("./pages/configurations/Group"));
+  const ProdBrand = React.lazy(() => import("./pages/configurations/ProdBrand"));
+  const ProdModel = React.lazy(() => import("./pages/configurations/ProdModel"));
   const OfficeTime = React.lazy(() => import("./pages/configurations/OfficeTime"));
   const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
 
@@ -73,6 +78,17 @@ function App() {
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
   
+  // load the product data here
+  useEffect(() => {
+    // load the product data here
+    let products = window['__all_products'];
+
+    // if products undefined or empty load all from server limit 1000 until no more
+    if (!products || products.length == 0) {
+      RProductService.loadAllProducts();
+    }
+  }, []);
+
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
@@ -108,6 +124,8 @@ function App() {
           <Route path="accreceivable" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="A/C Receivable"/>} />} />
           <Route path="bank" element={<RouteAuth pageComponent={<Ledger type="bank" header="Bank Ledger"/>} />} />
           <Route path="cash" element={<RouteAuth pageComponent={<Ledger type="cash" header="Cash Ledger"/>} />} />
+          <Route path="customer" element={<RouteAuth pageComponent={<CustomerList ledger={true} />} />} />
+          <Route path="supplier" element={<RouteAuth pageComponent={<SupplierList ledger={true} />} />} />
         </Route>
         <Route path="/employees">
           <Route index element={<RouteAuth pageComponent={<EmpList />} />} />
@@ -166,6 +184,8 @@ function App() {
         <Route path="/office_time" element={<RouteAuth pageComponent={<OfficeTime />} />} />
         <Route path="/payment_type" element={<RouteAuth pageComponent={<PaymentType />} />} />
         <Route path="/product_category" element={<RouteAuth pageComponent={<ProductCategory />} />} />
+        <Route path="/product_brand" element={<RouteAuth pageComponent={<ProdBrand />} />} />
+        <Route path="/product_model" element={<RouteAuth pageComponent={<ProdModel />} />} />
         <Route path="/route" element={<RouteAuth pageComponent={<BusinessRoute />} />} />
         <Route path="/supplier_category" element={<RouteAuth pageComponent={<SupplierCategory />} />} />
 

@@ -70,10 +70,12 @@ const List = () => {
         setLoading(true);
 
         await orderService.getAll(SALES_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
-            setTotalRecords(data.total);
-            setProfiles(data.rows);
-            setLoading(false);
+            if(data){
+                console.log(data)
+                setTotalRecords(data.total);
+                setProfiles(data.rows);
+                setLoading(false);
+            }
         });
     }
 
@@ -158,15 +160,48 @@ const List = () => {
     const voucherNoBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.voucher_no}
+                <a href={"#/sales/"+rowData.id}>{rowData.voucher_no}</a>
             </>
         );
     };
 
+    const getSeverityColor = (status) => {
+        let severity = "info";
+        if(status==="draft"){
+            severity = "info";
+        } else if(status==="pending"){
+            severity = "warning";
+        } else if(status==="completed" || status==="approved"){
+            severity = "success";
+        } else if(status==="cancelled"){
+            severity = "danger";
+        }
+        return severity;
+    };
+
     const statusNoBodyTemplate = (rowData) => {
+        let status = "";
+        if(rowData.customer_category==="CONDITIONAL"){
+            status = rowData.trx_status;
+        } else {
+            status = rowData.status;
+        }
+        let severity = getSeverityColor(status);
         return (
             <>
-                {<Tag severity="warning" value={rowData.status}></Tag>}
+                {<Tag severity={severity} value={status}></Tag>}
+            </>
+        );
+    };
+
+    const trxStatusNoBodyTemplate = (rowData) => {
+        let trxStatus = "";
+        if(rowData.customer_category==="CONDITIONAL"){
+            trxStatus = rowData.trx_status;
+        }
+        return (
+            <>
+                {trxStatus!=="" && <Tag severity="info" value={trxStatus}></Tag>}
             </>
         );
     };
@@ -302,6 +337,7 @@ const List = () => {
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        {/* <Column field="trx_status" header="Trx Status" filter filterPlaceholder="Search by status" sortable body={trxStatusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column> */}
                         <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

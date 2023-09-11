@@ -66,8 +66,8 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
         if(onPaymnetCallback) {
             let payment = {
                 ...data,
-                party_id: initPayment.party_id,
-                party_type: initPayment.party_type,
+                ref_id: initPayment.ref_id,
+                ref_type: initPayment.ref_type,
                 payment_type: initPayment.payment_type,
             }
             console.log("PAYMENT-1:::", initPayment);
@@ -91,7 +91,7 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
     return (
         <Dialog visible={paymentDialog} style={{ width: '450px' }} header={`Payment`} modal className="p-fluid" footer={paymentDialogFooter} onHide={hidePaymentDialog}>                    
             <div className="p-fluid formgrid grid">
-                <div className="field col-12 md:col-12">
+                {/* <div className="field col-12 md:col-12">
                     <Controller
                         name="payment_method"
                         control={control}
@@ -105,41 +105,109 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
-                </div>
-                <div hidden={bankCash !== "BANK"} className="field col-12 md:col-12">
+                </div> */}
+                <div className="field col-12 md:col-12">
                 <Controller
-                    name="bank_account_id"
+                    name="current_balance"
                     control={control}
-                    rules={{ 
-                        validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
-                    }}
+                    // rules={{
+                    //     validate: (value) => (value > 0) || 'Enter a valid amount.'
+                    // }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
-                        <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                            displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
-                            onSelect={(e) => {console.log(e);}}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
-                                {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
-                                {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                            ]} />
+                        <label htmlFor="current_balance">Current Balance*</label>
+                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                            onValueChange={(e) => field.onChange(e)} 
+                            className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
                 </div>
+                <div className="grid">
+                    <div className="field col-7 md:col-7">
+                    <Controller
+                        name="bank_account_id"
+                        control={control}
+                        // rules={{ 
+                        //     validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
+                        // }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                            <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                onSelect={(e) => {console.log(e);}}
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                columns={[
+                                    {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                    {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                    {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                ]} />
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                    </div>
+                    <div className="field col-5 md:col-5">
+                    <Controller
+                        name="bank_amount"
+                        control={control}
+                        rules={{
+                            validate: (value) => (value > 0) || 'Enter a valid amount.'
+                        }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor="amount">Bank Amount</label>
+                            <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                onValueChange={(e) => field.onChange(e)} 
+                                className={classNames({ 'p-invalid': fieldState.error })} />
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                    </div>      
+                </div>
+                <div className='p-fluid formgrid grid'>
+                    <div className="field col-12 md:col-7">
+                    <Controller
+                        name="reference"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor="reference">MFS Ref</label>
+                            <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                    </div>
+                    <div className="field col-12 md:col-5">
+                    <Controller
+                        name="mfs_amount"
+                        control={control}
+                        rules={{
+                            validate: (value) => (value > 0) || 'Enter a valid amount.'
+                        }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor="amount">MFS Amount</label>
+                            <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                onValueChange={(e) => field.onChange(e)} 
+                                className={classNames({ 'p-invalid': fieldState.error })} />
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                    </div>                            
+
+                </div>
                 <div className="field col-12 md:col-12">
                 <Controller
-                    name="current_balance"
+                    name="cash_amount"
                     control={control}
                     rules={{
                         validate: (value) => (value > 0) || 'Enter a valid amount.'
                     }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor="current_balance">Current Balance*</label>
-                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                        <label htmlFor="amount">Cash Amount</label>
+                        <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
@@ -163,18 +231,6 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                     </>
                 )}/>
                 </div>                            
-                <div className="field col-12 md:col-12">
-                <Controller
-                    name="reference"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                    <>
-                        <label htmlFor="reference">Reference</label>
-                        <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
-                        {getFormErrorMessage(field.name)}
-                    </>
-                )}/>
-                </div>
                 <div className="field col-12 md:col-12">
                 <Controller
                     name="remarks"

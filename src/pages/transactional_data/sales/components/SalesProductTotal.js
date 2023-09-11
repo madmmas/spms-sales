@@ -40,6 +40,17 @@ const SalesProductTotal = ({sales, totalPrice, netAmount, totalDiscount, vat, on
                         onValueChange={(e) => onDeliveryCostChange(e.value)} 
                         />
                 </td>
+                <td><b>Discount (Opt):</b>
+                </td>
+                <td class="vatInput">
+                    <InputNumber value="0" 
+                        placeholder="Additional"
+                        max={100} min={0}
+                        className="mx-2"
+                        style={{"width": "fit-content(20em)"}}
+                        // onValueChange={(e) => onDeliveryCostChange(e.value)} 
+                        />
+                </td>
             </tr>
         </tbody></table>
     );

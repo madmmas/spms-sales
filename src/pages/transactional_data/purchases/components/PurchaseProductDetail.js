@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { roundNumber } from '../../../../utils.js';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 
-const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, onReturnItem, editMode = true, returnMode = false}) => {
+const PurchaseProductDetail = ({
+    purchases, supplierCurrency, conversion_rate,
+    onEdit, onDelete, onReturnItem, 
+    editMode = true, returnMode = false
+}) => {
 
     const [totalCostAmountF, setTotalAmountF] = useState(0.00);
     const [totalCostAmountBDT, setTotalAmountBDT] = useState(0.00);
@@ -11,6 +16,8 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, o
     const [totalTransport, setTotalTransport] = useState(0.00);
     const [totalDuty, setTotalDuty] = useState(0.00);
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
+
+    const [purchaseRows, setPurchaseRows] = useState([]);
 
     const calculateTotals = (allpurchases) => {
         console.log("CALCULATE-PURCHASES::", allpurchases)
@@ -22,11 +29,11 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, o
 
         if(allpurchases && allpurchases.length > 0) {
             for(let i=0; i<allpurchases.length; i++) {
-                totalCostAmountF += allpurchases[i].totalCostF;
-                totalCostAmountBDT += allpurchases[i].totalCostBDT;
-                totalTransport += allpurchases[i].transport;
-                totalDuty += allpurchases[i].duty;
-                netCostAmountBDT += allpurchases[i].netCostBDT;
+                totalCostAmountF += Number(allpurchases[i].totalCostF);
+                totalCostAmountBDT += Number(allpurchases[i].totalCostBDT);
+                totalTransport += Number(allpurchases[i].transport);
+                totalDuty += Number(allpurchases[i].duty_vat);
+                netCostAmountBDT += Number(allpurchases[i].netCostBDT);
             }
         }
         setTotalQuantity(purchases.length);
@@ -37,18 +44,39 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, o
         setNetAmountBDT(netCostAmountBDT);
         console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
     };
+    
+    const recalculateAllRows = (allpurchases) => {
+        if(allpurchases && allpurchases.length > 0) {
+            for(let i=0; i<allpurchases.length; i++) {
+                let unit_cost_f = roundNumber(Number(allpurchases[i].unit_cost_f));
+                let qty = roundNumber(Number(allpurchases[i].qty));
+                let unit_cost = roundNumber(Number(allpurchases[i].unit_cost));
+                let transport = roundNumber(Number(allpurchases[i].transport));
+                let duty_vat = roundNumber(Number(allpurchases[i].duty_vat));
+                allpurchases[i].totalCostF = roundNumber(unit_cost_f * qty);
+                allpurchases[i].totalCostBDT = roundNumber(unit_cost * qty);
+                allpurchases[i].netUnitCostBDT = roundNumber(unit_cost + (transport / qty) + (duty_vat / qty));
+                allpurchases[i].netCostBDT = roundNumber(allpurchases[i].netUnitCostBDT * qty);
+
+                let discount_profit = Number(allpurchases[i].discount_profit);
+                let profit = allpurchases[i].netUnitCostBDT * discount_profit / 100;
+                allpurchases[i].profit = roundNumber(profit);
+            }
+        }
+        setPurchaseRows(allpurchases);
+    };
 
     useEffect(() => {
-        console.log("HELOO:::",purchases);
+        recalculateAllRows(purchases);
         calculateTotals(purchases);
     }, [purchases]);
 
     const footer = (
         <table  className="col-12"><tbody>
             <tr>
-                <td><b>Total Quantity:</b></td><td>{purchases ? purchases.length : 0} products.</td>
                 <td><b>Total Cost ({supplierCurrency}):</b></td><td>{totalCostAmountF}</td>
-                <td><b>Total Cost:</b></td><td>{totalCostAmountBDT}</td>
+                <td><b>Conversion Rate ({supplierCurrency} to BDT):</b></td><td>{conversion_rate}</td>
+                <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
             </tr><tr>
                 <td><b>Total Transport Cost:</b></td><td>{totalTransport}</td>
                 <td><b>Total Duty:</b></td><td>{totalDuty}</td>
@@ -68,7 +96,7 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, o
     };
 
     return (
-        <DataTable value={purchases} 
+        <DataTable value={purchaseRows} 
             stripedRows showGridlines scrollable scrollHeight="25rem" 
             header={footer} 
         >
@@ -93,7 +121,7 @@ const PurchaseProductDetail = ({purchases, supplierCurrency, onEdit, onDelete, o
             <Column field="discount_profit" header="Profit Percentage" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="profit" header="Profit" headerStyle={{ minWidth: '10rem' }}></Column>
 
-            <Column field="min_trade_price" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="min_price" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="trade_price" header="Trade Price (U)" headerStyle={{ minWidth: '10rem' }}></Column>
         </DataTable>
     );

@@ -12,7 +12,7 @@ import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import SelectMasterData from '../../components/SelectMasterData';
 
-import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
+import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 import { MEASUREMENT_UNITS } from '../../../constants/lookupData';
 import { ProductService } from '../../../services/ProductService';
 
@@ -45,6 +45,8 @@ const Form = ({productData}) => {
             bar_code: "",
             brand_name: "",
             model_no: "",
+            brand_id: "",
+            model_id: "",
             part_number: "",
             unit: MEASUREMENT_UNITS[0].id,
             low_stock_qty: 0,
@@ -73,6 +75,8 @@ const Form = ({productData}) => {
             bar_code: data.bar_code,
             brand_name: data.brand_name,
             model_no: data.model_no,
+            brand_id: data.brand_id,
+            model_id: data.model_id,
             part_number: data.part_number,
             unit: data.unit,
             low_stock_qty: Number(data.low_stock_qty),
@@ -173,7 +177,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-4">
+                    {/* <div className="field col-12 md:col-4">
                         <Controller
                             name="brand_name"
                             control={control}
@@ -185,8 +189,34 @@ const Form = ({productData}) => {
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
+                    </div> */}
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="brand_id"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Brand</label>
+                                <SelectLookupData field={field} model={PRODBRAND_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
                     </div>
                     <div className="field col-12 md:col-4">
+                        <Controller
+                            name="model_id"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Model</label>
+                                <SelectLookupData field={field} model={PRODMODEL_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    {/* <div className="field col-12 md:col-4">
                         <Controller
                             name="model_no"
                             control={control}
@@ -198,7 +228,7 @@ const Form = ({productData}) => {
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                    </div>                    
+                    </div>                     */}
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="part_number"

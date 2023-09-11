@@ -54,6 +54,8 @@ const AppMenu = () => {
                     items: [
                         { label: 'Purchase Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/purchase' },
                         { label: 'Sales Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/sales' },
+                        { label: 'Supplier Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/supplier' },
+                        { label: 'Customer Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/customer' },
                         { label: 'A/C Payable', icon: 'pi pi-fw pi-list', to: '/ledger/accpayable' },
                         { label: 'A/C Receiveable', icon: 'pi pi-fw pi-list', to: '/ledger/accreceivable' },
                         { label: 'Bank', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
@@ -80,6 +82,8 @@ const AppMenu = () => {
                         { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
                         { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
+                        { label: 'Product Brand', icon: 'pi pi-fw pi-list', to: '/product_brand' },
+                        { label: 'Product Model', icon: 'pi pi-fw pi-list', to: '/product_model' },
                         { label: 'Route', icon: 'pi pi-fw pi-list', to: '/route' },
                         { label: 'Supplier Category', icon: 'pi pi-fw pi-list', to: '/supplier_category' },
                     ]

@@ -12,9 +12,12 @@ import { ProductService } from '../../../../services/ProductService';
 
 export default function SalesProductForm({
     salesItems,
+    editMode, returnMode, onReturnItem,
     selectedItem,
     addSalesItem, updateSalesItem, removeSalesItem, 
-    selectProductFromList, deselectProductFromList 
+    selectProductFromList, deselectProductFromList,
+    onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
+    vat, deliveryCost, addDiscount
 }) {
 
     const {
@@ -32,6 +35,7 @@ export default function SalesProductForm({
 
     const [salesProduct, setSalesProduct] = useState(null);
     const [productName, setProductName] = useState('');
+    const [min_price, setMinPrice] = useState(0);
     const [current_stock, setCurrentStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
@@ -42,14 +46,17 @@ export default function SalesProductForm({
             "product_id": "",
             "bar_code": "",
             "qty": 1,
+            "min_price": 0.00,
             "trade_price": 0.00,
             "remarks": "",
             "totalPrice": 0.00,
             "discount_profit": 0.00,
             "discountedAmount": 0.00,
             "netPrice": 0.00,
+            "lastTradePrice": 0.00,
          });
         setSalesProduct(null);
+        setMinPrice(0);
         setProductAndItsStock('', 0);
     };
 
@@ -110,16 +117,18 @@ export default function SalesProductForm({
         let _saleProduct = { ...salesProduct };
         _saleProduct['product_id'] = item.id;
         _saleProduct['product_name'] = item.name;
+        _saleProduct['min_price'] = item.min_price;
         _saleProduct['trade_price'] = item.trade_price;
         _saleProduct['current_stock'] = _productStock;
         _saleProduct['qty'] = item.qty || 1;
         _saleProduct['discount_profit'] = item.discount_profit || 0.00;
         _saleProduct['remarks'] = item.remarks || '';
+        _saleProduct['lastTradePrice'] = item.lastTradePrice;
 
         setSalesProduct(_saleProduct);
 
         reset({ ..._saleProduct });
-
+        setMinPrice(item.min_price);
         setProductAndItsStock(item["name"], _productStock);
 
         quantityRef.current.focus();
@@ -159,11 +168,13 @@ export default function SalesProductForm({
         selectProduct({
             "id": item.product_id,
             "name": item.product_name,
+            "min_price": item.min_price,
             "trade_price": item.trade_price,
             "current_stock": item.current_stock,
             "qty": item.qty,
             "discount_profit": item.discount_profit,
             "remarks": item.remarks,
+            "lastTradePrice": item.lastTradePrice,
         });
 
         selectProductFromList(item.product_id);
@@ -173,9 +184,9 @@ export default function SalesProductForm({
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    return (
-        <>
-        <div className="card p-fluid formgrid grid">
+    const renderForm = () => {
+        return (
+            <div className="card p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
             <Controller
                 name="product_id"
@@ -186,18 +197,6 @@ export default function SalesProductForm({
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Name*</label>
                         <InputText readonly="true" value={productName} placeholder="Select Product" />
                         <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })}/>
-                        {getFormErrorMessage(field.name)}
-                    </>
-                )}/>
-            </div>
-            <div className="field col-12 md:col-2">
-            <Controller
-                name="bar_code"
-                control={control}
-                render={({ field, fieldState }) => (
-                    <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Barcode</label>
-                        <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true}  className={classNames({ 'p-invalid': fieldState.error })}/>
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
@@ -216,18 +215,53 @@ export default function SalesProductForm({
                     </>
                 )}/>
             </div>            
-
             <div className="field col-12 md:col-2">
+            <Controller
+                name="min_price"
+                control={control}
+                render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Min Trade Price</label>
+                        <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true}  className={classNames({ 'p-invalid': fieldState.error })}/>
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
+            </div>
+
+            {/* <div className="field col-12 md:col-2">
             <Controller
                 name="trade_price"
                 control={control}
+                rules={{ 
+                    required: 'Trade Price is required.', 
+                    min: { value: min_price, message: 'Must be greater than or equal to min price.' } 
+                }}
+
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
                 <InputNumber
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })}
-                    disabled={true} />
+                    disabled={false} />
+                    </>
+                )}/>
+            </div> */}
+            <div className="field col-12 md:col-2">
+            <Controller
+                name="trade_price"
+                control={control}
+                rules={{ 
+                    required: 'Trade Price is required.', 
+                    min: { value: min_price, message: 'Must be less than or equal to current stock.' } 
+                }}
+                render={({ field, fieldState }) => (
+                    <>
+                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
+                <InputNumber ref={quantityRef}
+                    onFocus={(e) => e.target.select()}
+                    inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
+                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_price} max={10000000} />
                     </>
                 )}/>
             </div>
@@ -318,11 +352,22 @@ export default function SalesProductForm({
                 <Button label="Cancel" className="p-button-outlined p-button-warning mt-2" onClick={() => onCancelEditItem()}></Button>
             </div>
         </div>
+        );
+    };
 
-        <SalesProductDetail salesItems={salesItems}
-                onEdit={(dt) => editSalesProduct(dt)}
-                onDelete={(index) => removeItem(index)}
-            />
-    </>
+    return (
+        <>    
+            {editMode && renderForm()}
+            <SalesProductDetail salesItems={salesItems}
+                    editMode={editMode} 
+                    returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}        
+                    onEdit={(dt) => editSalesProduct(dt)}
+                    onDelete={(index) => removeItem(index)}
+                    onChangeVat={(e) => onChangeVat(e)}
+                    onChangeDeliveryCost={(e) => onChangeDeliveryCost(e)}
+                    onChangeAdditionalDiscount={(e) => onChangeAdditionalDiscount(e)}
+                    vat={vat} deliveryCost={deliveryCost} addDiscount={addDiscount}
+                />
+        </>
     );
 }

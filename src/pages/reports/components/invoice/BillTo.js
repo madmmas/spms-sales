@@ -13,13 +13,23 @@ const styles = StyleSheet.create({
   });
 
   const BillTo = ({invoice}) => (
-    <View style={styles.headerContainer}>
-        <Text style={styles.billTo}>Bill To:</Text>
-        <Text>{invoice.partyCode?invoice.partyCode:'NA'}</Text>
-        <Text>{invoice.customerName}</Text>
-        <Text>{invoice.customerAddress?invoice.customerAddress:''}</Text>
-        <Text>{invoice.customerMobileNumber}</Text>
-    </View>
+    <>
+    {invoice.party && 
+        <View style={styles.headerContainer}>
+            <Text style={styles.billTo}>Bill To:</Text>
+            <Text>{invoice.party.line1}</Text>
+            <Text>{invoice.party.line2}</Text>
+            <Text>{invoice.party.line3}</Text>
+        </View>
+    }
+    {!invoice.party && 
+        <View style={styles.headerContainer}>
+            <Text style={styles.billTo}>Bill To:</Text>
+            <Text>{invoice.customer_name}</Text>
+            <Text>{invoice.customer_phone}</Text>
+        </View>
+    }
+    </>
   );
   
   export default BillTo

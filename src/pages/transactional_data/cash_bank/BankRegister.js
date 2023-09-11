@@ -16,7 +16,7 @@ import { Toast } from 'primereact/toast';
 
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
-import { ON_CASH_TO_BANK, ON_BANK_TO_CASH } from '../../../constants/transactions';
+import { RegisterService } from '../../../services/RegisterService';
 import { BANK_REGISTER, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
 const BankRegister = () => {
@@ -24,10 +24,9 @@ const BankRegister = () => {
     const modelName = BANK_REGISTER;
 
     let emptyBankRegister = {
-        dtBankAccount_id: null,
-        date: null,
+        bank_account_id: null,
+        trx_date: null,
         amount: 0,
-        balance: 0,
         remarks: '',
     };
 
@@ -49,18 +48,14 @@ const BankRegister = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        // fields: ["date", "dtBankAccount_id", "amount", "balance", "remarks"],
+        fields: ["id", "register_date", "register_details"],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
-        filters: { 
-            'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },           
-            'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
-            'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'balance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
-            'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+        filters: {
+            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
         }
     };
 
@@ -72,6 +67,7 @@ const BankRegister = () => {
     const [addWithdraw, setAddWithdraw] = useState(false);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
+    const registerService = new RegisterService();
     const transactionService = new TransactionService();
 
     useEffect(() => {
@@ -93,7 +89,7 @@ const BankRegister = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll("trxBankRegister", { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setBankRegister(data.rows);
@@ -218,19 +214,11 @@ const BankRegister = () => {
     const saveBankRegister = (formData) => {
         setSubmitted(true);
         console.debug(formData);
-        if (addWithdraw) {
-            transactionService.processTransaction(ON_CASH_TO_BANK, formData).then(data => {            
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Register Updated', life: 3000 });
-            });
-        } else {
-            transactionService.processTransaction(ON_BANK_TO_CASH, formData).then(data => {            
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Register Created', life: 3000 });
-            });
-        }
+        transactionService.cashToBank(formData).then(data => {            
+            console.log(data);
+            loadLazyData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Register Updated', life: 3000 });
+        });
 
         setBankRegisterDialog(false);
         reset(emptyBankRegister)
@@ -239,8 +227,8 @@ const BankRegister = () => {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button onClick={() => addToBank()} className="p-button p-button-primary mr-2" label="Add to Bank" />
-                <Button onClick={() => withdrawFromBank()} className="p-button p-button-success mr-2" label="Withdraw from Bank" />
+                <Button onClick={() => addToBank()} className="p-button p-button-primary mr-2" label="Cash to Bank" />
+                {/* <Button onClick={() => withdrawFromBank()} className="p-button p-button-success mr-2" label="Withdraw from Bank" /> */}
             </React.Fragment>
         );
     };
@@ -282,19 +270,17 @@ const BankRegister = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >                        
-                        <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
-                        <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="particularType" header="Particular Type" filter filterElement={particularTypeFilterTemplate} sortable body={particularTypeBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>
-                        <Column field="ref_id" header="Particular Name" filter filterElement={refFilterTemplate} sortable body={refBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>                        
-                        <Column field="balance" header="Balance" filter filterPlaceholder="Search by Balance" sortable body={balanceBodyTemplate} headerStyle={{ minWidth: '8rem' }}></Column>                        
-                        <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }}
+                            body={dateBodyTemplate}></Column>
+                        <Column field="amount" header="Payment Amount" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="bank_name" header="Bank Account" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${addWithdraw?"Add To":"Withdraw From"} Bank`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         <div className="p-fluid formgrid grid">
                         <div className="field col-12 md:col-6">
                             <Controller
-                                name="date"
+                                name="trx_date"
                                 control={control}
                                 rules={{ required: 'Date is required.' }}
                                 render={({ field, fieldState }) => (
@@ -308,7 +294,7 @@ const BankRegister = () => {
                             </div>
                             <div className="field col-12 md:col-6">
                                 <Controller
-                                    name="dtBankAccount_id"
+                                    name="bank_account_id"
                                     control={control}
                                     rules={{ required: 'Bank Account is required.' }}
                                     render={({ field, fieldState }) => (
@@ -352,15 +338,13 @@ const BankRegister = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks*</label>
-                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
-                                        className={classNames({ 'p-invalid': fieldState.error })} 
-                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
                             </div>
                         </div>
-                    </Dialog>  
+                    </Dialog>
                 </div>
             </div>
         </div>

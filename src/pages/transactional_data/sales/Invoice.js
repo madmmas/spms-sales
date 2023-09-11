@@ -3,14 +3,16 @@ import { useParams } from 'react-router-dom';
 import { PDFViewer } from '@react-pdf/renderer'
 import Invoice from '../../reports/components/invoice/Invoice'
 
-import { SALES_MODEL } from '../../../constants/models';
+import { SALES_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
 import { OrderService } from '../../../services/OrderService';
+import { MasterDataService } from '../../../services/MasterDataService';
 
 const MyDocument = () => {
 
     let { id } = useParams();
     
     const orderService = new OrderService();
+    const masterDataService = new MasterDataService();
     const [sales, setSales] = useState(null);
 
     useEffect(() => {
@@ -18,24 +20,32 @@ const MyDocument = () => {
             setSales(null);
         }else{
             orderService.getById(SALES_MODEL, id).then(data => {
-                calculateInvoice(data);
+                if(data && data.customer_category!=="WALKIN"){
+                    masterDataService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
+                        data.party = {
+                            "line1": party.shopName,
+                            "line2": party.address,
+                            "line3": party.phone,
+                        };
+                        orderService.getLedgerBalance("trxACReceivable", data.party_id).then(party_balance => {
+                            let dr_amount = Number(party_balance.dr_amount)||0;
+                            let cr_amount = Number(party_balance.cr_amount)||0;
+                            let balance = dr_amount - cr_amount;
+                            console.log("balance::", party_balance);
+                            data.balance = balance;
+                            setSales(data);
+                        });
+                    }); 
+                }else{
+                    setSales(data);
+                }
             });    
         }
     }, []);
 
-    const calculateInvoice = (data) => {
-        let total = 0;
-        let totalDiscountedAmount = 0;
-        let netAmount = 0;
-
-        data.items.forEach(item => {
-            total += item.quantity * item.price;
-            totalDiscountedAmount += item.quantity * item.discountedPrice;
-        });
-        netAmount = total - totalDiscountedAmount;
-
-        setSales(sales);
-    }
+    useEffect(() => {
+        console.log("sales::", sales);
+    }, [sales]);
 
     return (
         <div className="grid h-screen">

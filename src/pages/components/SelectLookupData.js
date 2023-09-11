@@ -11,7 +11,7 @@ export default function SelectLookupData( { field, className, model, onChangeIte
     useEffect(() => {
         configurationService.getAllWithoutParams(model).then(data => {
             setData(data);
-            if(data.length > 0) { field.onChange(data[0]._id); }
+            // if(data.length > 0) { field.onChange(data[0]._id); }
         });
     }, []);
 
@@ -23,7 +23,7 @@ export default function SelectLookupData( { field, className, model, onChangeIte
     }
 
     return (
-        <Dropdown value={field.value} onChange={(e) => onChange(e)} 
+        <Dropdown value={field.value} onChange={(e) => onChange(e)} filter
             options={data} optionValue="_id" optionLabel="name" placeholder={placeholder}
             className={className} />
     )

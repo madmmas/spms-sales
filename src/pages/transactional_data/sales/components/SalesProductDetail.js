@@ -6,16 +6,29 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Badge } from 'primereact/badge';
 import { Dialog } from 'primereact/dialog';
 
-const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
+import RProductService from '../../../../services/RProductService';
+import { all } from 'axios';
+import { get, set } from 'react-hook-form';
+
+const SalesProductDetail = ({
+    salesItems, 
+    editMode, returnMode, onReturnItem,
+    onEdit, onDelete,
+    onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
+    vat, deliveryCost, addDiscount
+}) => {
 
     const [totalPrice, setTotalPrice] = useState(0.00);
     const [totalDiscount, setTotalDiscount] = useState(0.00);
     const [totalDiscountedAmount, setTotalDiscountedAmount] = useState(0.00);
+    const [additionalDiscount, setAdditionalDiscount] = useState(0.00);
     const [totalQuantity, setTotalQuantity] = useState(0);
-    const [vat, setVat] = useState(0.00);
-    const [deliveryCost, setDeliveryCost] = useState(0.00);
+    const [vatVal, setVatVal] = useState(0.00);
+    const [delivery, setDelivery] = useState(0.00);
     const [vatPercentage, setVatPercentage] = useState(0.00);
     const [netAmount, setNetAmount] = useState(0.00);
+
+    const [salesRows, setSalesRows] = useState([]);
 
     const [selectedProductIndex, setSelectedProductIndex] = useState(null);
 
@@ -25,9 +38,13 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
     useEffect(() => {
         console.log("HELOO:::",salesItems);
         if(salesItems) {
+            setVatPercentage(vat);
+            setDelivery(deliveryCost);
+            setAdditionalDiscount(addDiscount);
+            recalculateAllRows(salesItems);
             calculateTotals(salesItems);
         }
-    }, [salesItems]);
+    }, [salesItems, vat, deliveryCost]);
 
     const roundNumber = (num) => {
         return Math.round((num + Number.EPSILON) * 100) / 100;
@@ -37,12 +54,22 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
         setVatPercentage(vatPercentage);
         let newSales = [...salesItems];
         calculateTotals(newSales);
+        onChangeVat(vatPercentage);
     };
 
     const onDeliveryCostChange = (deliveryCost) => {
-        setDeliveryCost(deliveryCost);
+        setDelivery(deliveryCost);
         let newSales = [...salesItems];
         calculateTotals(newSales);
+        onChangeDeliveryCost(deliveryCost);
+    };
+
+    const onDiscountChange = (discount) => {
+        setTotalDiscountedAmount(totalDiscount + discount);
+        setAdditionalDiscount(discount);
+        let newSales = [...salesItems];
+        calculateTotals(newSales);
+        onChangeAdditionalDiscount(discount);        
     };
 
     const calculateTotals = (allsales) => {
@@ -54,23 +81,36 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
         let netAmount = 0.00;
         allsales.forEach(sale => {
             console.log("ALLSALES::",sale);
-            // total += sale.totalPrice;
-            total += sale.trade_price * sale.qty;
-            // discount += sale.discount;
-            discount += sale.discount_profit;
-            // discountedAmount += sale.discount_profit ;
-            quantity += sale.qty;
+            total += Number(sale.trade_price) * Number(sale.qty);
+            discountedAmount += Number(sale.trade_price) * Number(sale.qty) * Number(sale.discount_profit) / 100;
+            quantity += Number(sale.qty);
         });
-        vat = (total - discountedAmount) * (vatPercentage / 100);
-        netAmount = total - discountedAmount + vat + deliveryCost;
+        vat = (total - discountedAmount - additionalDiscount) * (vatPercentage / 100);
+        netAmount = total - discountedAmount - additionalDiscount + vat + delivery;
         setTotalPrice(total);
-        setTotalDiscount(discount);
-        setTotalDiscountedAmount(discountedAmount);
+        setTotalDiscount(discountedAmount);
+        setTotalDiscountedAmount(discountedAmount + additionalDiscount);
         setTotalQuantity(quantity);
-        setVat(vat);
         setNetAmount(netAmount);
+        setVatVal(vat);
     };
 
+    const recalculateAllRows = async (allsales) => {
+        if(allsales && allsales.length > 0) {
+            for(let i=0; i<allsales.length; i++) {
+                allsales[i].product_name = await getProductName(allsales[i].product_id);
+                let trade_price = roundNumber(Number(allsales[i].trade_price));
+                let qty = roundNumber(Number(allsales[i].qty));
+                let discount_profit = roundNumber(Number(allsales[i].discount_profit));
+                let discountedAmount = roundNumber(trade_price * qty * discount_profit / 100);
+                let netPrice = roundNumber(trade_price * qty - discountedAmount);
+                allsales[i].totalPrice = roundNumber(trade_price * qty);
+                allsales[i].discountedAmount = discountedAmount;
+                allsales[i].netPrice = netPrice;
+            }
+        }
+        setSalesRows(allsales);
+    };
     const hideDeleteSalesProductDialog = () => {
         setSelectedProductIndex(null);
         setDeleteSalesProductDialog(false);
@@ -82,10 +122,12 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
     };
 
     const actionBodyTemplate = (rowData) => {
+        let returnFlg = returnMode? rowData.qty - rowData.return_qty > 0 : false;
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteSalesProduct(rowData)} />
+                {editMode && <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />}
+                {editMode && <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => onDelete(rowData)} />}
+                {returnFlg && <Button icon="pi pi-minus" className="p-button-rounded p-button-warning" onClick={() => onReturnItem(rowData)} />}
             </>
         );
     };
@@ -102,17 +144,25 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
         </>
     );
 
+    const getProductName = async (product_id) => {
+
+        let product = await RProductService.getProductById(product_id);
+        return product ? product.name : "";
+    }
+
     return (
         <>
             <table  className="col-12"><tbody>
                 <tr>
                     <td><b>Total Quantity:</b></td><td>{salesItems ? salesItems.length : 0}</td>
                     <td><b>Gross Amount:</b></td><td>{roundNumber(totalPrice)}</td>
-                    <td><b>Total Discount :</b></td><td>{roundNumber(totalDiscount)}</td>                
+                    <td><b>Total Discount :</b></td><td>{roundNumber(totalDiscountedAmount)}</td>                
                     <td><b>Net Amount:</b></td><td><Badge value={roundNumber(netAmount)} size="large" severity="success"></Badge></td>
                 </tr><tr>
                     <td class="vatInput"><b>Vat %</b>
-                        <InputNumber value="0" 
+                        <InputNumber 
+                            readOnly={!editMode}
+                            value={vat}
                             placeholder="VAT %"
                             max={100} min={0}
                             className="mx-2"
@@ -122,12 +172,14 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
                         <b>:</b>
                     </td>
                     <td>
-                        {roundNumber(vat)}
+                        {roundNumber(vatVal)}
                     </td>
                     <td><b>Delivery Cost:</b>
                     </td>
                     <td class="vatInput">
-                        <InputNumber value="0" 
+                        <InputNumber 
+                            readOnly={!editMode}
+                            value={deliveryCost} 
                             placeholder="Delivery Cost %"
                             max={100} min={0}
                             className="mx-2"
@@ -135,9 +187,20 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
                             onValueChange={(e) => onDeliveryCostChange(e.value)} 
                             />
                     </td>
+                    <td><b>Discount:</b>
+                    </td>
+                    <td class="vatInput">
+                        <InputNumber value={addDiscount}
+                            placeholder=""
+                            max={100} min={0}
+                            className="mx-2"
+                            style={{"width": "fit-content(20em)"}}
+                            onValueChange={(e) => onDiscountChange(e.value)} 
+                            />
+                    </td>
                 </tr>
             </tbody></table>
-            <DataTable value={salesItems} 
+            <DataTable value={salesRows} 
                 stripedRows showGridlines scrollable scrollHeight="25rem" 
             >
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
@@ -146,12 +209,13 @@ const SalesProductDetail = ({salesItems, onEdit, onDelete}) => {
                 <Column field="product_model_no"  header="Model No"  headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="product_part_number" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column> */}
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="return_qty" header="Returned" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="trade_price" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="totalPrice" header={`Total Price`} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="discount_profit" header={`Discount (%)`} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="discountedAmount" header={`Discounted Amount`} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="netPrice" header="Net Cost" headerStyle={{ minWidth: '10rem' }}></Column>
-                {/* <Column field="lastSalePrice" header="Last Sale Price" headerStyle={{ minWidth: '10rem' }}></Column> */}
+                <Column field="lastTradePrice" header="Last Sale Price" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="remarks" header="Remarks" headerStyle={{ minWidth: '10rem' }}></Column>
             </DataTable>
 

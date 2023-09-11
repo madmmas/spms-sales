@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import {Text, View, StyleSheet } from '@react-pdf/renderer';
-import { getDate, getDatetime } from '../../../../utils';
+import { getDateFormatted, getTimeFormatted } from '../../../../utils';
 
 const styles = StyleSheet.create({
     invoiceContainer: {
@@ -30,19 +30,19 @@ const styles = StyleSheet.create({
         <Fragment>
             <View style={styles.entry}>
                 <Text style={styles.label}>Served By: </Text>
-                <Text >{invoice.servedBy?invoice.servedBy:''}</Text>
+                <Text >{invoice.created_by?invoice.created_by:''}</Text>
             </View >
             <View style={styles.entry}>
                 <Text style={styles.label}>Entry Time: </Text>
-                <Text >{getDatetime(invoice.entryTime)}</Text>
+                <Text >{getTimeFormatted(invoice.created_at)}</Text>
             </View >
             <View style={styles.invoiceContainer}>
                 <Text style={styles.label}>Invoice Date:</Text>
-                <Text >{getDate(invoice.invoiceDate)}</Text>
+                <Text >{getDateFormatted(invoice.created_at)}</Text>
             </View >
             <View style={styles.invoiceContainer}>
                 <Text style={styles.label}>Invoice No:</Text>
-                <Text style={styles.invoiceNo}>{invoice.voucherNo}</Text>
+                <Text style={styles.invoiceNo}>{invoice.voucher_no}</Text>
             </View >
         </Fragment>
   );
