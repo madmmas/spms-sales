@@ -22,7 +22,6 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
     
     const loadLazyData = () => {
         setLoading(true);
-
         productService.getAll(lazyParams).then(data => {
         // productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
@@ -97,7 +96,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
-                    onClick={(e) => {op.current.show(e)}}
+                    // onClick={(e) => {op.current.show(e)}}
                     onFocus={(e) => {e.target.select()}}
                     placeholder="Search" />
             </span>

@@ -4,7 +4,21 @@ import SelectMasterDataTable from './SelectMasterDataTable';
 
 import { MasterDataService } from '../../services/MasterDataService';
 
-export default function SelectMasterData({ field, displayField, showFields=[], modelName, className, columns, caption="Select", onSelect }) {
+export default function SelectMasterData({ 
+    field, displayField, showFields=[], modelName, className, 
+    columns, caption="Select", onSelect, 
+    defaultFilters={
+        fields: [],
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {
+            global: { value: null, matchMode: 'contains' }
+        }
+    }
+}) {
 
     const masterDataService = new MasterDataService();
 
@@ -42,6 +56,7 @@ export default function SelectMasterData({ field, displayField, showFields=[], m
                     />
                 <InputText hidden inputId={field.name} value={field.value} inputRef={field.ref} />
                 <SelectMasterDataTable displayField={displayField} trigger={trigger}
+                    defaultFilters={defaultFilters}
                     fieldName={field.name} fieldValue={field.value} fieldRef={field.ref}
                     modelName={modelName} caption={caption}
                     className={className} columns={columns} showFields={showFields}

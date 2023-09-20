@@ -17,7 +17,8 @@ export default function SalesProductForm({
     addSalesItem, updateSalesItem, removeSalesItem, 
     selectProductFromList, deselectProductFromList,
     onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
-    vat, deliveryCost, addDiscount
+    onChangeGross, onChangeDiscount, onChangeNet,
+    vat, deliveryCost, addDiscount, gross, net, discount
 }) {
 
     const {
@@ -366,7 +367,11 @@ export default function SalesProductForm({
                     onChangeVat={(e) => onChangeVat(e)}
                     onChangeDeliveryCost={(e) => onChangeDeliveryCost(e)}
                     onChangeAdditionalDiscount={(e) => onChangeAdditionalDiscount(e)}
+                    onChangeGross={(e) => onChangeGross(e)}
+                    onChangeDiscount={(e) => onChangeDiscount(e)}
+                    onChangeNet={(e) => onChangeNet(e)}
                     vat={vat} deliveryCost={deliveryCost} addDiscount={addDiscount}
+                    gross={gross} net={net} discount={discount}
                 />
         </>
     );

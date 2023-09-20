@@ -24,21 +24,33 @@ export class ProductService {
         return resp.data;
     }
 
+    async getStockStatus(params) {
+        console.log("PARAMS::", params);
+        // params = { params: JSON.stringify(params) };
+
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+
+        return axiosInstance.get(`/products?` + queryParams).then(res => res.data);
+    }
+
     async getAll(params) {
-        console.log(params);
+        console.log("PARAMS::", params);
         // params = { params: JSON.stringify(params) };
 
         // const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
 
         // return axiosInstance.get(`/products?` + queryParams).then(res => res.data);
+        // let globalFilter = params ? params.filters.global : null;
+        // let nameFilter = params ? params.filters.name.constraints[0] : null;
 
         let limit = params ? params.rows : 1000;
         let offset = params ? params.first : 0;
         console.log(limit, offset);
-        const resp = await RProductService.getAllProducts(limit, offset);
+        const resp = await RProductService.getAllProducts(params.filters, limit, offset);
         console.log(resp);
         return resp;
     }
+
 
     async create(data) {
         const resp = await axiosInstance.post(`/products`, data);

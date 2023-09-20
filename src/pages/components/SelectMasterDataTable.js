@@ -6,27 +6,33 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
+import { set } from 'react-hook-form';
 
-export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, modelName, columns, showFields=[], caption="Select", dialogHeight='70vh', dialogWidth='80vw'}) {
+export default function SelectMasterDataTable({ 
+    trigger, fieldValue, onSelect, modelName, 
+    columns, defaultFilters,
+    showFields=[], caption="Select", 
+    dialogHeight='70vh', dialogWidth='80vw'
+}) {
 
     const dt = useRef(null);
 
-    let defaultFilters = {
-        fields: showFields,
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-        filters: {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS }            
-        }
-    };
+    // let defaultFilters = {
+    //     fields: showFields,
+    //     first: 0,
+    //     rows: 10,
+    //     page: 1,
+    //     sortField: null,
+    //     sortOrder: null,
+    //     filters: {
+    //         global: { value: null, matchMode: FilterMatchMode.CONTAINS }            
+    //     }
+    // };
 
     const [loading, setLoading] = useState(false);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
     const [totalRecords, setTotalRecords] = useState(0);
-    const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [lazyParams, setLazyParams] = useState({});
     const [tmpData, setTmpData] = useState([]);
     const [selectedRow, setSelectedRow] = useState({});
     const [tableDialog, setTableDialog] = useState(false);
@@ -36,12 +42,14 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
     const loadLazyData = () => {
         setLoading(true);
 
-        masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
-            setTotalRecords(data.total);
-            setTmpData(data.rows);
-            setLoading(false);
-        });
+        if(lazyParams!==null && lazyParams!==undefined){
+            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+                console.log(data)
+                setTotalRecords(data.total);
+                setTmpData(data.rows);
+                setLoading(false);
+            });    
+        }
     }
 
     const hideDialog = () => {
@@ -55,6 +63,10 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
     useEffect(() => {
         loadLazyData();
     }, [lazyParams]);
+
+    useEffect(() => {
+        setLazyParams(defaultFilters);
+    }, [defaultFilters]);
 
     useEffect(() => {
         if (trigger) {
@@ -78,22 +90,31 @@ export default function SelectMasterDataTable({ trigger, fieldValue, onSelect, m
     };
 
     const onPage = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        setLazyParams(_lazyParams);
+        if(lazyParams!==null && lazyParams!==undefined){
+            let _lazyParams = { ...lazyParams, ...event };
+            setLazyParams(_lazyParams);
+        }
     }
 
     const onSort = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        setLazyParams(_lazyParams);
+        if(lazyParams!==null && lazyParams!==undefined){
+            let _lazyParams = { ...lazyParams, ...event };
+            setLazyParams(_lazyParams);
+        }
     }
 
     const onFilter = (event) => {
-        let _lazyParams = { ...lazyParams, ...event };
-        _lazyParams['first'] = 0;
-        setLazyParams(_lazyParams);
+        if(lazyParams!==null && lazyParams!==undefined){
+            let _lazyParams = { ...lazyParams, ...event };
+            _lazyParams['first'] = 0;
+            setLazyParams(_lazyParams);
+        }
     }
 
     const onGlobalFilterChange = (e) => {
+        if(lazyParams!==null && lazyParams!==undefined){
+            return
+        }
         let _lazyParams = { ...lazyParams };
         console.log(_lazyParams);
 

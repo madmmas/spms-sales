@@ -51,7 +51,7 @@ const checkAndLoadAllProducts = async (products) => {
     } else {
         if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
             console.log("product cache is updated less than 1 minutes ago")
-            return [];
+            return products;
         }    
     }
 
@@ -87,22 +87,64 @@ const checkAndLoadAllProducts = async (products) => {
     return products;
 }
 
-const getAllProducts = async (limit, offset) => {
+const filterProducts = (products, filters) => {
+// apply global filter on all columns
+    // product fields are: name, brand_name, model_no, part_number, code
+    let globalFilter = filters ? filters.global.value : null;
+    if (globalFilter) {
+        products = products.filter((product) => {
+            return product.name && product.name.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                product.brand_name && product.brand_name.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                product.model_no && product.model_no.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                product.part_number && product.part_number.toLowerCase().includes(globalFilter.toLowerCase()) ||
+                product.code && product.code.toLowerCase().includes(globalFilter.toLowerCase());
+        });
+    }
+    // apply filters on specific columns and null check
+    let nameFilter = filters && filters.name ? filters.name.value : null;
+    if (nameFilter) {
+        products = products.filter((product) => {
+            return product.name && product.name.toLowerCase().includes(nameFilter.toLowerCase());
+        });
+    }
+    let brandNameFilter = filters && filters.brand_name ? filters.brand_name.value : null;
+    if (brandNameFilter) {
+        products = products.filter((product) => {
+            return product.brand_name && product.brand_name.toLowerCase().includes(brandNameFilter.toLowerCase());
+        });
+    }
+    let modelNoFilter = filters && filters.model_no ? filters.model_no.value : null;
+    if (modelNoFilter) {
+        products = products.filter((product) => {
+            return product.model_no && product.model_no.toLowerCase().includes(modelNoFilter.toLowerCase());
+        });
+    }
+    let partNumberFilter = filters && filters.part_number ? filters.part_number.value : null;
+    if (partNumberFilter) {
+        products = products.filter((product) => {
+            return product.part_number && product.part_number.toLowerCase().includes(partNumberFilter.toLowerCase());
+        });
+    }
+    let typeFilter = filters && filters.type ? filters.type.value : null;
+    if (typeFilter) {
+        products = products.filter((product) => {
+            return product.type && product.type.toLowerCase().includes(typeFilter.toLowerCase());
+        });
+    }
+
+    return products;
+}
+const getAllProducts = async (filters, limit, offset) => {
 
     let products = window['__all_products'];
     products = await checkAndLoadAllProducts(products);
-    // if products undefined or empty load all from server limit 1000 until no more
-    // if (!products || products.length == 0) {
-    //     await loadAllProductsFromLocalStorage();
-    //     products = window['__all_products'];
-    // }
 
-    // if products still undefined or empty return empty array
     if (!products || products.length == 0) {
         return [];
     }
 
-    // if products found return products based on limit and offset
+    products = filterProducts(products, filters);
+    
     let data = products.slice(offset, offset + limit);
     return {
         rows: data,

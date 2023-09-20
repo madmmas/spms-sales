@@ -326,10 +326,10 @@ const List = ({ ledger = false }) => {
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         
                         {!ledger && <Column field="dtCustomerCategory_id" header="Customer Category" filter filterElement={customerCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        {!ledger && <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="phone" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        {!ledger && <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="district" header="District" filter filterElement={districtFilterTemplate} sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="route" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}

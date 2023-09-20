@@ -15,7 +15,9 @@ const SalesProductDetail = ({
     editMode, returnMode, onReturnItem,
     onEdit, onDelete,
     onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
-    vat, deliveryCost, addDiscount
+    vat, deliveryCost, addDiscount, 
+    onChangeGross, onChangeDiscount, onChangeNet,
+    gross, net, discount
 }) => {
 
     const [totalPrice, setTotalPrice] = useState(0.00);
@@ -93,6 +95,9 @@ const SalesProductDetail = ({
         setTotalQuantity(quantity);
         setNetAmount(netAmount);
         setVatVal(vat);
+        onChangeGross(total);
+        onChangeDiscount(discountedAmount + additionalDiscount);
+        onChangeNet(netAmount);
     };
 
     const recalculateAllRows = async (allsales) => {

@@ -27,7 +27,12 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'type': { operator: FilterOperator.AND, constraints: [{ value: "PACKAGE", matchMode: FilterMatchMode.EQUALS }] },
+            type: { value: "PACKAGE", matchMode: FilterMatchMode.EQUALS },
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     };
 

@@ -12,7 +12,9 @@ import { classNames } from 'primereact/utils';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-
+import { InputSwitch } from 'primereact/inputswitch';
+        
+        
 import ConfirmDialog from '../../components/ConfirmDialog';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
@@ -42,11 +44,19 @@ const Form = React.memo(({ sales }) => {
     const [trxStatus, setTrxStatus] = useState('draft');
 
     // STATES FOR SALE ITEMS
+
     const [salesItems, setSalesItems] = useState([]);
     const [salesData, setSalesData] = useState([]);
     const [vat, setVat] = useState(0.00);
     const [deliveryCost, setDeliveryCost] = useState(0.00);
     const [additionalDiscount, setAdditionalDiscount] = useState(0.00);
+
+    // need to add gross, net, discount, due, paid
+    const [salesGross, setSalesGross] = useState(0.00);
+    const [salesDiscount, setSalesDiscount] = useState(0.00);
+    const [salesNet, setSalesNet] = useState(0.00);
+    const [salesDue, setSalesDue] = useState(0.00);
+    const [salesPaid, setSalesPaid] = useState(0.00);
 
     // STATES FOR PRODUCT SELECT TABLE
     const [selectProductTableItem, setSelectProductTableItem] = useState({});
@@ -99,9 +109,9 @@ const Form = React.memo(({ sales }) => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     }
 
@@ -162,6 +172,13 @@ const Form = React.memo(({ sales }) => {
             setVat(Number(sales.duty_vat));
             setDeliveryCost(Number(sales.transport));
             setAdditionalDiscount(Number(sales.additional_discount));
+            // need to add gross, net, discount, due, paid
+            setSalesGross(Number(sales.gross));
+            setSalesDiscount(Number(sales.discount));
+            setSalesNet(Number(sales.net));
+            setSalesDue(Number(sales.due));
+            setSalesPaid(Number(sales.paid));
+
             // get customer balance
             getPartyBalance(sales.party_id);
             reset({
@@ -197,6 +214,7 @@ const Form = React.memo(({ sales }) => {
     }
 
     const prepareSalesData = formData => {
+        console.log("prepareSalesData::", formData);
         let _salesItems = [];
         for(let item of salesItems) {
             _salesItems.push(prepareSalesItem(item));
@@ -217,8 +235,14 @@ const Form = React.memo(({ sales }) => {
             "duty_vat": vat,
             "transport": deliveryCost,
             "additional_discount": additionalDiscount,
+            "gross": salesGross,
+            "discount": salesDiscount,
+            "net": salesNet,
+            "due": salesDue,
+            "paid": salesPaid,
         };
 
+        console.log("WHAT SALES:::", _sales);
         return _sales;
     }
         
@@ -235,25 +259,25 @@ const Form = React.memo(({ sales }) => {
                         orderService.confirmPayment(sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
                             // navigate("/sales");
-                            navigate("/sales/invoice/" + sales.id);
+                            // navigate("/sales/invoice/" + sales.id);
                         });                                                
                     } else {
                         orderService.commit(SALES_MODEL, sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
                             // navigate("/sales");
-                            navigate("/sales/invoice/" + sales.id);
+                            // navigate("/sales/invoice/" + sales.id);
                         });
                     }
                 } else {
                     orderService.update(SALES_MODEL, sales.id, _sales).then(data => {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Updated', life: 3000 });
-                        navigate("/sales");
+                        // navigate("/sales");
                     });
                 }
             } else {
                 orderService.create(SALES_MODEL, _sales).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Created', life: 3000 });
-                    navigate("/sales");
+                    // navigate("/sales");
                 });
             }
         }
@@ -383,7 +407,8 @@ const Form = React.memo(({ sales }) => {
 
     const onCustomerSelect = item => {
         console.log("onCustomerSelect::", item);
-        setCustomerLastOrder(item.last_trx_id);
+        let _voucher_no = item.last_trx_id?item.last_trx_id:"";
+        setCustomerLastOrder(_voucher_no);
         setSelectedCustomer(item);
         getPartyBalance(item._id);
     };
@@ -490,7 +515,8 @@ const Form = React.memo(({ sales }) => {
             ...{
                 "ref_type": "dtCustomer",
                 "ref_id": sales.party_id,
-                "current_balance": data.net,
+                "previous_balance": customerBalance,
+                "current_balance": data.net + customerBalance,
                 "amount": data.net,
             }
         });
@@ -501,31 +527,33 @@ const Form = React.memo(({ sales }) => {
     const showPaymentDialog = formData => {
         console.log("customerCategory::", customerCategory);
         setSalesData(formData);
-        if (customerCategory === "REGISTERED") {
-            // setShowPaymentDialog(true);
-            // sumbitFormData();
-            onSubmit('approve', formData)
-        } else if (customerCategory === "WALKIN") {
-            // console.log("salesData:::", salesData)
+
+        if (customerCategory === "WALKIN" || withPayment) {
             let data = getCalculatedValues()
             console.log("DATA::", data)
             setInitPayment({
                 ...emptyPayment,
                 ...{
-                    "current_balance": data.net,
-                    "amount": data.net,
+                    "previous_balance": customerBalance,
+                    "current_balance": data.net + customerBalance,
+                    "cash_amount": 0,
+                    "bank_amount": 0,
+                    "mfs_amount": 0,
+                    "amount": 0,
                 }
             });
+        
             console.log("InitPayment::", initPayment);
             setPaymentDlgTrigger(paymentDlgTrigger + 1);
-        } else if(customerCategory === "CONDITIONAL") {
-            // sumbitFormData();
-            onSubmit('approve', formData);
+        } else {
+            onSubmit('approve', formData)
         }
     }
 
     const onPaymnetCallback = (data) => {
         console.log("onPaymnetCallback", data);
+        setSalesDue(Number(data.current_balance)-Number(data.amount))
+        setSalesPaid(Number(data.amount))
         setPaymentData(data);
         if(customerCategory === "CONDITIONAL") {
             onSubmit('confirm_payment', salesData);
@@ -543,7 +571,7 @@ const Form = React.memo(({ sales }) => {
         console.log("COFIRM RETURN ITEMS::", selectedReturnItems);
         orderService.return(SALES_MODEL, sales.id, selectedReturnItems).then(data => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-            navigate("/sales");
+            // navigate("/sales");
         });
     };
 
@@ -684,6 +712,13 @@ const Form = React.memo(({ sales }) => {
         </>
         )
     }
+    
+    const [withPayment, setWithPayment] = useState(false);
+
+
+    const [includeDueAmount, setIncludeDueAmount] = useState(false);
+
+
     const renderForm = () => {
         let readOnly = false;
         if(sales && sales.status !== 'draft') {
@@ -765,8 +800,23 @@ const Form = React.memo(({ sales }) => {
                             onSelect={onCustomerSelect}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
-                                {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'}
-                            ]} />
+                                {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'},
+                                {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'}
+                            ]}
+                            defaultFilters= {{
+                                fields: ["name", "shopName", "last_trx_id"],
+                                first: 0,
+                                rows: 10,
+                                page: 1,
+                                sortField: null,
+                                sortOrder: null,
+                                filters: {
+                                    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                    name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                    shopName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                }
+                            }}
+                             />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>}
@@ -778,6 +828,14 @@ const Form = React.memo(({ sales }) => {
                 <div className="field col-12 md:col-3">
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
+                </div>
+                <div className="field col-12 md:col-6">
+                    <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
+                    <label htmlFor="withPayment">With Payment</label>
+                </div>
+                <div className="field col-12 md:col-6">
+                    <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
+                    <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>
                 </div>)}
             </>
@@ -856,9 +914,15 @@ const Form = React.memo(({ sales }) => {
             onChangeVat={(value) => setVat(value)}
             onChangeDeliveryCost={(value) => setDeliveryCost(value)}
             onChangeAdditionalDiscount={(value) => setAdditionalDiscount(value)}
+            onChangeGross={(value)=> setSalesGross(value)}
+            onChangeDiscount={(value)=> setSalesDiscount(value)}
+            onChangeNet={(value)=> setSalesNet(value)}
             vat={sales===undefined?0:sales.duty_vat} 
             deliveryCost={sales===undefined?0:sales.transport}
             addDiscount={sales===undefined?0:sales.additional_discount}
+            gross={sales===undefined?0:sales.gross} 
+            net={sales===undefined?0:sales.net} 
+            discount={sales===undefined?0:sales.discount}
             />
 
         <ConfirmDialog 
@@ -868,7 +932,7 @@ const Form = React.memo(({ sales }) => {
             />
 
         <PaymentDialog 
-            trigger={paymentDlgTrigger} 
+            trigger={paymentDlgTrigger}
             initPayment={initPayment}
             readOnly={customerCategory==="WALKIN"}
             onPaymnetCallback={onPaymnetCallback}

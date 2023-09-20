@@ -10,7 +10,6 @@ import { classNames } from 'primereact/utils';
 
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
-import SelectMasterData from '../../components/SelectMasterData';
 
 import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 import { MEASUREMENT_UNITS } from '../../../constants/lookupData';

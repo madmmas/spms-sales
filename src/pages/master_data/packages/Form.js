@@ -12,9 +12,11 @@ import { Dialog } from 'primereact/dialog';
 
 import SelectMasterData from '../../components/SelectMasterData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
+import SelectLookupData from '../../components/SelectLookupData';
+
+import { PRODUCT_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 
 import { ProductService } from '../../../services/ProductService';
-import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
@@ -307,6 +309,45 @@ const Form = ({ productData }) => {
                     name="code"
                     control={control}
                     rules={{ required: 'Code is required.' }}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>
+                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                    {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>
+                <div className="field col-12 md:col-4">
+                        <Controller
+                            name="brand_id"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Brand</label>
+                                <SelectLookupData field={field} model={PRODBRAND_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="model_id"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Model</label>
+                                <SelectLookupData field={field} model={PRODMODEL_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                <div className="field col-12 md:col-2">
+                <Controller
+                    name="part_number"
+                    control={control}
+                    // rules={{ required: 'Code is required.' }}
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>

@@ -16,6 +16,7 @@ import RouteAuth from "./auth/RouteAuth";
 import POS from "./pages/POS";
 
 import RProductService from "./services/RProductService";
+import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
 
 function App() {
 
@@ -93,6 +94,8 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/pos" element={<POS />} />
+
+      <Route path="/invoice/:id" element={<PrintInvoice />} />
 
       <Route path="/sales">
         <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />

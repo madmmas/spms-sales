@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useEffect, useState, useRef } from 'react';
+import { useForm, Controller, set } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
-import { Calendar } from 'primereact/calendar';
+import { Toast } from 'primereact/toast';
 
-import SelectConstData from './SelectConstData';
 import SelectMasterData from './SelectMasterData';
 
-import { PAYMENT_TYPES } from '../../constants/lookupData';
 import { BANK_ACCOUNT_MODEL } from '../../constants/models';
 
-const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = false }) => {
+const PaymentDialog = ( { 
+    trigger, initPayment, onPaymnetCallback, 
+    readOnly = false 
+}) => {
 
+    const toast = useRef(null);
     const [submitted, setSubmitted] = useState(false);
     const [paymentDialog, setPaymentDialog] = useState(false);
-    const [bankCash, setBankCash] = useState("CASH");
+    // const [bankCash, setBankCash] = useState("CASH");
+    const [amount, setAmount] = useState(0);
+    const [prevBalance, setPrevBalance] = useState(0);
+    const [amountCash, setAmountCash] = useState(0);
+    const [amountBank, setAmountBank] = useState(0);
+    const [amountMFS, setAmountMFS] = useState(0);
+
 
     const {
         control,
@@ -39,6 +47,10 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
             // setValue('current_balance', initPayment.current_balance);
             // setValue('amount', initPayment.amount);
             // setValue('payment_date', initPayment.payment_date);
+            setAmountCash(initPayment.cash_amount);
+            setAmountBank(initPayment.bank_amount);
+            setAmountMFS(initPayment.mfs_amount);
+            setPrevBalance(initPayment.previous_balance)
         }
     }, [initPayment]);
 
@@ -48,6 +60,10 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
         }
     }, [trigger]);
 
+    useEffect(() => {
+        changeAmount();
+    }, [amountCash, amountBank, amountMFS]);
+
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
@@ -56,11 +72,33 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
         setPaymentDialog(false);
     };
 
-    const onInputChange = (e) => {
+    const changeAmount = () => {
+        console.log("changeAmount:::", amountCash, amountBank, amountMFS);
+        let _amount = Number(amountCash) + Number(amountBank) + Number(amountMFS);
+        setAmount(_amount);
+        setValue('amount', _amount);
+    };
+
+    const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || 0;
+
+        if(name === "cash_amount") {
+            setAmountCash(val);
+        } else if(name === "bank_amount") {
+            setAmountBank(val);
+        } else if(name === "mfs_amount") {
+            setAmountMFS(val);
+        }
+        setValue(`${name}`, val);
     };
 
     const onPaymentSubmit = (data) => {
+        // check if the current_balance is equal to amount if customer_category is WALKIN
+        if(readOnly && data.current_balance !== data.amount) {
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Amount is not equal to current balance.', life: 3000 });
+            return;
+        }
+
         setSubmitted(false);
         hidePaymentDialog();
         if(onPaymnetCallback) {
@@ -90,22 +128,8 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
 
     return (
         <Dialog visible={paymentDialog} style={{ width: '450px' }} header={`Payment`} modal className="p-fluid" footer={paymentDialogFooter} onHide={hidePaymentDialog}>                    
+            <Toast ref={toast} />
             <div className="p-fluid formgrid grid">
-                {/* <div className="field col-12 md:col-12">
-                    <Controller
-                        name="payment_method"
-                        control={control}
-                        rules={{ required: 'Payment Type is required.' }}
-                        render={({ field, fieldState }) => (
-                        <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Payment Method</label>
-                            <SelectConstData field={field} data={PAYMENT_TYPES}
-                                onSelectChange={(value) => {console.log(value); setBankCash(value)}}
-                                className={classNames({ 'p-invalid': fieldState.error })} /> 
-                            {getFormErrorMessage(field.name)}
-                        </>
-                    )}/>
-                </div> */}
                 <div className="field col-12 md:col-12">
                 <Controller
                     name="current_balance"
@@ -115,7 +139,7 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                     // }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor="current_balance">Current Balance*</label>
+                        <label htmlFor="current_balance">Current Balance + Previous Balanace ({prevBalance})</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
@@ -131,12 +155,21 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                         // rules={{ 
                         //     validate: (value) => ((bankCash === "CASH") || (bankCash === "BANK" && value !== null) ) || 'Bank Account is required.'
                         // }}
+                        // rules={{
+                        //     validate: () => (amountBank == 0) || 'This field is required.'
+                        // }}
+
                         render={({ field, fieldState }) => (
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                             <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
-                                onSelect={(e) => {console.log(e);}}
+                                displayField="accName" showFields={["_id", "accNumber", "accName"]}
+                                onSelect={(e) => {
+                                    console.log(e);
+                                    // console.log("amountBank:::", amountBank);
+                                    // console.log(field);
+                                    // setValue('bank_account_id', e._id);
+                                }}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
                                 columns={[
                                     {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
@@ -152,14 +185,16 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                         name="bank_amount"
                         control={control}
                         rules={{
-                            validate: (value) => (value > 0) || 'Enter a valid amount.'
+                            validate: (value) => (value >= 0) || 'Enter a valid amount.'
                         }}
                         render={({ field, fieldState }) => (
                         <>
                             <label htmlFor="amount">Bank Amount</label>
                             <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                                onValueChange={(e) => field.onChange(e)} 
-                                className={classNames({ 'p-invalid': fieldState.error })} />
+                                onValueChange={(e) => onInputChange(e, "bank_amount")} 
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                min={0}
+                                />
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
@@ -170,6 +205,9 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                     <Controller
                         name="reference"
                         control={control}
+                        // rules={{
+                        //     validate: () => (amountMFS == 0) || 'Enter a valid reference.'
+                        // }}
                         render={({ field, fieldState }) => (
                         <>
                             <label htmlFor="reference">MFS Ref</label>
@@ -183,14 +221,16 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                         name="mfs_amount"
                         control={control}
                         rules={{
-                            validate: (value) => (value > 0) || 'Enter a valid amount.'
+                            validate: (value) => (value >= 0) || 'Enter a valid amount.'
                         }}
                         render={({ field, fieldState }) => (
                         <>
                             <label htmlFor="amount">MFS Amount</label>
                             <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                                onValueChange={(e) => field.onChange(e)} 
-                                className={classNames({ 'p-invalid': fieldState.error })} />
+                                onValueChange={(e) => onInputChange(e, "mfs_amount")} 
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                min={0}
+                                />
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
@@ -202,14 +242,16 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                     name="cash_amount"
                     control={control}
                     rules={{
-                        validate: (value) => (value > 0) || 'Enter a valid amount.'
+                        validate: (value) => (value >= 0) || 'Enter a valid amount.'
                     }}
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="amount">Cash Amount</label>
                         <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                            onValueChange={(e) => field.onChange(e)} 
-                            className={classNames({ 'p-invalid': fieldState.error })} />
+                            onValueChange={(e) => onInputChange(e, "cash_amount")} 
+                            className={classNames({ 'p-invalid': fieldState.error })} 
+                            min={0}
+                            />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
@@ -219,12 +261,12 @@ const PaymentDialog = ( { trigger, initPayment, onPaymnetCallback, readOnly = fa
                     name="amount"
                     control={control}
                     rules={{
-                        validate: (value) => (value > 0) || 'Enter a valid amount.'
+                        validate: (value) => (value >= 0) || 'Enter a valid amount.'
                     }}
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="amount">Pay Amount*</label>
-                        <InputNumber readOnly={readOnly} inputId={field.name} value={field.value} inputRef={field.ref} 
+                        <InputNumber readOnly={false} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}

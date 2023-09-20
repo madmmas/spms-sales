@@ -30,12 +30,19 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
+            type: { value: "GENERAL", matchMode: FilterMatchMode.EQUALS },
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
+
             // 'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'part_number': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            // 'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            // 'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            // 'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            // 'part_number': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };

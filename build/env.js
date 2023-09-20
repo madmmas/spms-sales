@@ -9,7 +9,7 @@ window.env = {
   "TMPDIR": "/var/folders/h6/qdcvmf_528zfgcjf4lnt59fc0000gn/T/",
   "CPPFLAGS": "-I/usr/local/opt/openjdk@19/include",
   "npm_config_global_prefix": "/usr/local",
-  "TERM_PROGRAM_VERSION": "1.81.1",
+  "TERM_PROGRAM_VERSION": "1.82.1",
   "MallocNanoZone": "0",
   "ORIGINAL_XDG_CURRENT_DESKTOP": "undefined",
   "ZDOTDIR": "/Users/moinuddinmasud",
@@ -35,9 +35,9 @@ window.env = {
   "npm_config_init_module": "/Users/moinuddinmasud/.npm-init.js",
   "USER_ZDOTDIR": "/Users/moinuddinmasud",
   "__CFBundleIdentifier": "com.microsoft.VSCode",
-  "npm_command": "run-script",
+  "npm_command": "start",
   "PWD": "/Users/moinuddinmasud/Dev/reactjs/spms-sales",
-  "npm_lifecycle_event": "build",
+  "npm_lifecycle_event": "start",
   "EDITOR": "vi",
   "npm_package_name": "spms-app",
   "LANG": "en_US.UTF-8",
@@ -54,7 +54,7 @@ window.env = {
   "npm_config_cache": "/Users/moinuddinmasud/.npm",
   "LESS": "-R",
   "LOGNAME": "moinuddinmasud",
-  "npm_lifecycle_script": "react-dotenv && craco build",
+  "npm_lifecycle_script": "react-dotenv && craco start",
   "VSCODE_GIT_IPC_HANDLE": "/var/folders/h6/qdcvmf_528zfgcjf4lnt59fc0000gn/T/vscode-git-6b916900b0.sock",
   "GOPATH": "/Users/moinuddinmasud/go",
   "npm_config_user_agent": "npm/9.8.0 node/v18.12.0 darwin x64 workspaces/false",
@@ -64,6 +64,6 @@ window.env = {
   "npm_config_prefix": "/usr/local",
   "COLORTERM": "truecolor",
   "PUBLIC_URL": "/",
-  "AUTH_API_URL": "http://35.90.185.130/auth/test",
-  "APP_API_URL": "http://35.90.185.130/api/test"
+  "AUTH_API_URL": "http://localhost:4000/auth/test",
+  "APP_API_URL": "http://localhost:5000/api/test"
 };

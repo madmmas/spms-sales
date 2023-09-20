@@ -55,8 +55,7 @@ const StockStatus = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        productService.getAll(lazyParams).then(data => {
-        // productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
+        productService.getStockStatus({ params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setStockStatus(data.rows);
