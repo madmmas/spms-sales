@@ -64,6 +64,6 @@ window.env = {
   "npm_config_prefix": "/usr/local",
   "COLORTERM": "truecolor",
   "PUBLIC_URL": "/",
-  "AUTH_API_URL": "http://localhost:4000/auth/test",
+  "AUTH_API_URL": "http://35.90.185.130/auth/test",
   "APP_API_URL": "http://localhost:5000/api/test"
 };

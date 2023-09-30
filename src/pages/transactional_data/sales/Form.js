@@ -258,33 +258,31 @@ const Form = React.memo(({ sales }) => {
                     if(customerCategory === "CONDITIONAL" && _sales.trx_status === 'completed') {
                         orderService.confirmPayment(sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-                            // navigate("/sales");
-                            // navigate("/sales/invoice/" + sales.id);
+                            navigate("/sales/invoice/" + sales.id);
                         });                                                
                     } else {
                         orderService.commit(SALES_MODEL, sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-                            // navigate("/sales");
-                            // navigate("/sales/invoice/" + sales.id);
+                            navigate("/sales/invoice/" + sales.id);
                         });
                     }
                 } else {
                     orderService.update(SALES_MODEL, sales.id, _sales).then(data => {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Updated', life: 3000 });
-                        // navigate("/sales");
+                        navigate("/sales");
                     });
                 }
             } else {
                 orderService.create(SALES_MODEL, _sales).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Created', life: 3000 });
-                    // navigate("/sales");
+                    navigate("/sales");
                 });
             }
         }
         catch (err){
             console.log(err)
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to create Sales Record!', life: 3000 });
-            // navigate("/sales");  
+            navigate("/sales");  
         }
     }
 
@@ -444,7 +442,7 @@ const Form = React.memo(({ sales }) => {
         if(action === 'cancel'){
             orderService.cancel(SALES_MODEL, sales.id, cancelData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Cancelled', life: 3000 });
-                // navigate("/sales");
+                navigate("/sales");
             });
         } else {
             console.log("onConfirmClick::", selAction, selFormData);
@@ -571,7 +569,7 @@ const Form = React.memo(({ sales }) => {
         console.log("COFIRM RETURN ITEMS::", selectedReturnItems);
         orderService.return(SALES_MODEL, sales.id, selectedReturnItems).then(data => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
-            // navigate("/sales");
+            navigate("/sales");
         });
     };
 
