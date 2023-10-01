@@ -35,7 +35,7 @@ const LoginPage = () => {
       <div className={containerClassName}>
           <div className="flex flex-column align-items-center justify-content-center">
               <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)' }}>
-                  <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
+                  <form className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
                       <div className="text-center mb-5">
                           <img src={`/demo/images/login/avatar.png`} alt="Image" height="50" className="mb-3" />
                           <div className="text-900 text-3xl font-medium mb-3">Welcome to SPMS-APP!</div>
@@ -56,7 +56,7 @@ const LoginPage = () => {
                           <div className="flex align-items-center justify-content-between mb-5 gap-5"></div>
                           <Button label="Sign In" className="w-full p-3 text-xl" onClick={(e) => handleLogin(e)}></Button>
                       </div>
-                  </div>
+                  </form>
               </div>
           </div>
       </div>
