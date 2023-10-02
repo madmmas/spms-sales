@@ -258,12 +258,14 @@ const Form = React.memo(({ sales }) => {
                     if(customerCategory === "CONDITIONAL" && _sales.trx_status === 'completed') {
                         orderService.confirmPayment(sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-                            navigate("/sales/invoice/" + sales.id);
+                            navigate("/sales");
+                            window.open("#/invoice/" + sales.id, "_blank");
                         });                                                
                     } else {
                         orderService.commit(SALES_MODEL, sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-                            navigate("/sales/invoice/" + sales.id);
+                            navigate("/sales");
+                            window.open("#/invoice/" + sales.id, "_blank");
                         });
                     }
                 } else {
@@ -276,6 +278,7 @@ const Form = React.memo(({ sales }) => {
                 orderService.create(SALES_MODEL, _sales).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Created', life: 3000 });
                     navigate("/sales");
+                    window.open("#/invoice/" + data.id, "_blank");
                 });
             }
         }

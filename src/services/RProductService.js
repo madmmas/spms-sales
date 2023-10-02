@@ -49,10 +49,10 @@ const checkAndLoadAllProducts = async (products) => {
     if (!productCacheUpdatedTime && (!products || products.length == 0)) {
         productCacheUpdatedTime = 0;
     } else {
-        if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
-            console.log("product cache is updated less than 1 minutes ago")
-            return products;
-        }    
+        // if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
+        //     console.log("product cache is updated less than 1 minutes ago")
+        //     return products;
+        // }    
     }
 
     let data = await loadUpdatedProducts(productCacheUpdatedTime);

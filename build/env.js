@@ -65,5 +65,5 @@ window.env = {
   "COLORTERM": "truecolor",
   "PUBLIC_URL": "/",
   "AUTH_API_URL": "http://35.90.185.130/auth/test",
-  "APP_API_URL": "http://localhost:5000/api/test"
+  "APP_API_URL": "http://35.90.185.130/api/test"
 };
