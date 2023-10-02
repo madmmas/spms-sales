@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { getDate, getDatetime } from '../../../utils';
+import { getDate, getDateFormatted, getDatetime } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
@@ -209,7 +209,7 @@ const List = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.created_at)}
+                {getDateFormatted(rowData.created_at)}
             </>
         );
     };
