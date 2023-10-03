@@ -180,6 +180,7 @@ function App() {
         <Route path="/designation" element={<RouteAuth pageComponent={<Designation />} />} />
         <Route path="/department" element={<RouteAuth pageComponent={<Department />} />} />
         <Route path="/banks" element={<RouteAuth pageComponent={<Banks />} />} />
+        {/* <Route path="/mfs_acc" element={<RouteAuth pageComponent={<MFSAcc />} />} /> */}
         <Route path="/expense_type" element={<RouteAuth pageComponent={<ExpenseType />} />} />
         <Route path="/extra_income_type" element={<RouteAuth pageComponent={<ExtraIncomeType />} />} />
         <Route path="/grade" element={<RouteAuth pageComponent={<Grade />} />} />

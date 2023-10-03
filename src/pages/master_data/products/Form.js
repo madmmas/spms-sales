@@ -41,7 +41,7 @@ const Form = ({productData}) => {
             type: "GENERAL",
             category_id: "",
             // warehouse_id: "",
-            bar_code: "",
+            // bar_code: "",
             brand_name: "",
             model_no: "",
             brand_id: "",
@@ -71,7 +71,7 @@ const Form = ({productData}) => {
             type: 'GENERAL',
             category_id: data.category_id,
             // warehouse_id: data.warehouse_id,
-            bar_code: data.bar_code,
+            // bar_code: data.bar_code,
             brand_name: data.brand_name,
             model_no: data.model_no,
             brand_id: data.brand_id,
@@ -84,8 +84,47 @@ const Form = ({productData}) => {
             active: data.active
         }
     }
+
+    const validateData = (data) => {
+        console.log("validateData:::", data);
+        let valid = true;
+        // check if product name exist
+        let isExist = productService.isProductNameExist(data.id, data.name);
+        if(isExist){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Name already exist', life: 3000 });
+            valid = false;
+        }
+        // check if product code exist
+        isExist = productService.isProductCodeExist(data.id, data.code);
+        if(isExist){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Code already exist', life: 3000 });
+            valid = false;
+        }
+        
+        // // // check if product barcode exist
+        // isExist = productService.isProductBarcodeExist(data.id, data.bar_code);
+        // if(isExist){
+        //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Barcode already exist', life: 3000 });
+        //     valid = false;
+        // }
+
+        // // check if product part number exist
+        isExist = productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
+        if(isExist){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
+            valid = false;
+        }
+        return valid;
+    }
+
     const onSubmit = (formData) => {
+
         let data = buildFormData(formData);
+        let valid = validateData(data);
+        if(!valid){
+            return;
+        }
+
         try{
             setSubmitted(true);
             if(productData==null){
@@ -164,7 +203,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    <div className="field col-12 md:col-4">
+                    {/* <div className="field col-12 md:col-4">
                         <Controller
                             name="bar_code"
                             control={control}
@@ -175,7 +214,7 @@ const Form = ({productData}) => {
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                    </div>
+                    </div> */}
                     {/* <div className="field col-12 md:col-4">
                         <Controller
                             name="brand_name"

@@ -49,10 +49,10 @@ const checkAndLoadAllProducts = async (products) => {
     if (!productCacheUpdatedTime && (!products || products.length == 0)) {
         productCacheUpdatedTime = 0;
     } else {
-        // if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
-        //     console.log("product cache is updated less than 1 minutes ago")
-        //     return products;
-        // }    
+        if (productCacheUpdatedTime && moment(productCacheUpdatedTime).isAfter(moment().subtract(10, 'seconds'))) {
+            // console.log("product cache is updated less than 10 seconds ago")
+            return products;
+        }    
     }
 
     let data = await loadUpdatedProducts(productCacheUpdatedTime);
@@ -85,6 +85,13 @@ const checkAndLoadAllProducts = async (products) => {
     localStorage.setItem("productCacheUpdatedTime", JSON.stringify(updatedTime));
 
     return products;
+}
+
+// clear cache and load products from server
+const clearCacheAndLoadAllProducts = async () => {
+    localStorage.removeItem("products");
+    localStorage.removeItem("productCacheUpdatedTime");
+    await loadAllProducts();
 }
 
 const filterProducts = (products, filters) => {
@@ -134,6 +141,33 @@ const filterProducts = (products, filters) => {
 
     return products;
 }
+
+const getProducts = () => {
+
+    let products = window['__all_products'];
+
+    if (!products || products.length == 0) {
+        return [];
+    }
+
+    return products;
+}
+
+const getProductsByBrandId = (brandId) => {
+    
+    let products = window['__all_products'];
+
+    if (!products || products.length == 0) {
+        return [];
+    }
+
+    products = products.filter((product) => {
+        return product.brand_id == brandId;
+    });
+
+    return products;
+}
+
 const getAllProducts = async (filters, limit, offset) => {
 
     let products = window['__all_products'];
@@ -207,9 +241,12 @@ const getProductByIds = async (ids) => {
 }
 
 export default {
-    loadAllProducts,
+    getProducts,
     getAllProducts,
     getProductById,
     getProductByIds,
+    loadAllProducts,
+    getProductsByBrandId,
+    clearCacheAndLoadAllProducts,
     loadAllProductsFromLocalStorage,
 };

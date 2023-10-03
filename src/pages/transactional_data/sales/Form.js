@@ -100,7 +100,7 @@ const Form = React.memo(({ sales }) => {
     
     ///// Default Values -- Start /////
     let defaultProductFilters = {
-        fields: ['id', 'name', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'min_price', 'price'],
+        fields: ['id', 'name', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'min_trade_price', 'price'],
         first: 0,
         rows: 10,
         page: 1,
@@ -259,13 +259,17 @@ const Form = React.memo(({ sales }) => {
                         orderService.confirmPayment(sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
                             navigate("/sales");
-                            window.open("#/invoice/" + sales.id, "_blank");
+                            if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
+                                window.open("#/invoice/" + sales.id, "_blank");
+                            }
                         });                                                
                     } else {
                         orderService.commit(SALES_MODEL, sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
                             navigate("/sales");
-                            window.open("#/invoice/" + sales.id, "_blank");
+                            if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
+                                window.open("#/invoice/" + sales.id, "_blank");
+                            }
                         });
                     }
                 } else {
@@ -278,7 +282,9 @@ const Form = React.memo(({ sales }) => {
                 orderService.create(SALES_MODEL, _sales).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Created', life: 3000 });
                     navigate("/sales");
-                    window.open("#/invoice/" + data.id, "_blank");
+                    if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
+                        window.open("#/invoice/" + data.id, "_blank");
+                    }
                 });
             }
         }
@@ -341,7 +347,7 @@ const Form = React.memo(({ sales }) => {
         let data = await productService.getById(_productSelected.id);
         _productSelected['current_stock'] = data.current_stock;
         _productSelected['price'] = data.price;
-        _productSelected['min_price'] = data.min_price;
+        _productSelected['min_trade_price'] = data.min_trade_price;
         console.log("productSelected::", _productSelected);
         console.log("selectedCustomer::", selectedCustomer);
         if(selectedCustomer!==null || customerCategory==="WALKIN") {
@@ -371,7 +377,7 @@ const Form = React.memo(({ sales }) => {
                 ..._productSelected,
                 "trade_price": Number(_productSelected.price),
                 "current_stock": Number(_productSelected.current_stock),
-                "min_price": Number(_productSelected.min_price),
+                "min_trade_price": Number(_productSelected.min_trade_price),
                 "lastTradePrice": Number(lastTradePrice),
             };
             console.log("setSelectedProductItem::", _product)
@@ -499,7 +505,16 @@ const Form = React.memo(({ sales }) => {
             setTriggerConfirmDialog(triggerConfirmDialog+1);
         } else if(action == 'confirm_payment') {
             setStatus('approved');
-            setTrxStatus("completed");
+            if (customerCategory === "CONDITIONAL") {
+                if(sales && sales.trx_status === 'pending') {
+                    setTrxStatus("completed");
+                } else {
+                    setTrxStatus("pending");
+                }
+            } else {
+                setTrxStatus("completed");
+            }    
+    
             console.log("confirm_payment::", formData);
             setConfirmDialogMessage("Are you sure you want to complete this order?");
             setTriggerConfirmDialog(triggerConfirmDialog+1);
@@ -603,7 +618,8 @@ const Form = React.memo(({ sales }) => {
         // add index to return item
         returnItem['index'] = selectedReturnItems.length;
         // add timestamp
-        returnItem['created_at'] = new Date();
+        // returnItem['created_at'] = new Date();
+        returnItem['created_at'] = moment();
         // check if already added
         for(let i=0; i<selectedReturnItems.length; i++) {
             if(selectedReturnItems[i].product_id === returnItem.product_id) {
@@ -701,7 +717,7 @@ const Form = React.memo(({ sales }) => {
                 />
             </div>}
             {isConditionalPending && <div className="field col-12 md:col-4">
-                <Button type="submit" label="Confirm Payment" className="p-button p-button-info" 
+                <Button type="submit" label="Confirm Sales" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => confirmPayment(d) )}
                 />
             </div>}

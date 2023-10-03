@@ -13,6 +13,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
@@ -171,7 +172,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtBank_id_shortname}
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id)}
             </>
         );
     };

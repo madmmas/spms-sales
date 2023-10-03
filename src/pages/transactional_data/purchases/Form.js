@@ -24,6 +24,7 @@ import PurchaseProductForm from './components/PurchaseProductForm';
 import PurchaseProductDetail from './components/PurchaseProductDetail';
 import ReturnItemDialog from '../../components/ReturnItemDialog';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import moment from 'moment';
 
 const Form = ({ purchase }) => {
 
@@ -64,7 +65,7 @@ const Form = ({ purchase }) => {
 
         trade_price: 0.00,
 
-        min_price: 0.00,
+        min_trade_price: 0.00,
     };
 
     const toast = useRef(null);
@@ -335,7 +336,8 @@ const Form = ({ purchase }) => {
         // add index to return item
         returnItem['index'] = selectedReturnItems.length;
         // add timestamp
-        returnItem['created_at'] = new Date();
+        // returnItem['created_at'] = new Date();
+        returnItem['created_at'] = moment();
         // check if already added
         for(let i=0; i<selectedReturnItems.length; i++) {
             if(selectedReturnItems[i].product_id === returnItem.product_id) {

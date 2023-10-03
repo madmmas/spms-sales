@@ -1,5 +1,6 @@
 import axiosInstance from "./AxiosService";
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import CacheMasterDataService from './CacheMasterDataService';
 
 export class MasterDataService {
 
@@ -40,6 +41,8 @@ export class MasterDataService {
     }
 
     async getAll(modelName, params) {
+        await CacheMasterDataService.checkAndLoadAllMasterData();
+        
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
         let uri = `/data/${modelName}?` + queryParams;
         return axiosInstance.get(uri, {

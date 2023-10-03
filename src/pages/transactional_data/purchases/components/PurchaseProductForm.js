@@ -42,7 +42,7 @@ export default function PurchaseProductForm({
 
         trade_price: 0.00,
 
-        min_price: 0.00,
+        min_trade_price: 0.00,
     };
 
     const {
@@ -116,7 +116,7 @@ export default function PurchaseProductForm({
             'discount_profit': 0,
             'profit': 0.00,
             'trade_price': 0.00,
-            'min_price': 0.00,
+            'min_trade_price': 0.00,
         });
         setIsEdit(false);
         calculateCost(emptyPurchaseProduct);
@@ -130,7 +130,7 @@ export default function PurchaseProductForm({
         _purchaseProduct.netCostBDT = roundNumber(_purchaseProduct.netUnitCostBDT * _purchaseProduct.qty);
 
         _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.min_price = _purchaseProduct.min_price;
+        _purchaseProduct.min_trade_price = _purchaseProduct.min_trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('totalCostF', _purchaseProduct.totalCostF);
@@ -139,7 +139,7 @@ export default function PurchaseProductForm({
         setValue('netUnitCostBDT', _purchaseProduct.netUnitCostBDT);
         setValue('netCostBDT', _purchaseProduct.netCostBDT);
         setValue('trade_price', _purchaseProduct.trade_price);
-        setValue('min_price', _purchaseProduct.min_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
     const onProfitPercentageChange = (discount_profit) => {
@@ -147,13 +147,13 @@ export default function PurchaseProductForm({
         _purchaseProduct.discount_profit = roundNumber(discount_profit);
         _purchaseProduct.profit = _purchaseProduct.netUnitCostBDT * roundNumber(discount_profit) / 100;
         _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.min_price = _purchaseProduct.min_price;
+        _purchaseProduct.min_trade_price = _purchaseProduct.min_trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('profit', _purchaseProduct.profit);
         setValue('discount_profit', _purchaseProduct.discount_profit);
         setValue('trade_price', _purchaseProduct.trade_price);
-        setValue('min_price', _purchaseProduct.min_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
     const onProfitChange = (profit) => {
@@ -161,13 +161,13 @@ export default function PurchaseProductForm({
         _purchaseProduct.profit = roundNumber(profit);
         _purchaseProduct.discount_profit =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
         _purchaseProduct.trade_price = roundNumber(_purchaseProduct.netUnitCostBDT + _purchaseProduct.profit);
-        _purchaseProduct.min_price = _purchaseProduct.min_price;
+        _purchaseProduct.min_trade_price = _purchaseProduct.min_trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('profit', _purchaseProduct.profit);
         setValue('discount_profit', _purchaseProduct.discount_profit);
         setValue('trade_price', _purchaseProduct.trade_price);
-        setValue('min_price', _purchaseProduct.min_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
 
     const onTradePriceChange = (trade_price) => {
@@ -175,13 +175,13 @@ export default function PurchaseProductForm({
         _purchaseProduct.trade_price = roundNumber(trade_price);
         _purchaseProduct.profit = roundNumber(_purchaseProduct.trade_price - _purchaseProduct.netUnitCostBDT);
         _purchaseProduct.discount_profit =  roundNumber(_purchaseProduct.profit / _purchaseProduct.netUnitCostBDT * 100);
-        _purchaseProduct.min_price = _purchaseProduct.min_price;
+        _purchaseProduct.min_trade_price = _purchaseProduct.min_trade_price;
         setPurchaseProduct(_purchaseProduct);
 
         setValue('trade_price', _purchaseProduct.trade_price);
         setValue('profit', _purchaseProduct.profit);
         setValue('discount_profit', _purchaseProduct.discount_profit);
-        setValue('min_price', _purchaseProduct.min_price);
+        setValue('min_trade_price', _purchaseProduct.min_trade_price);
     };
     
     const onInputChange = (e, name) => {
@@ -524,15 +524,15 @@ export default function PurchaseProductForm({
             
             <div className="field col-12 md:col-2">
             <Controller
-                name="min_price"
+                name="min_trade_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
-                <label htmlFor="min_price">Min Trade Price (U)</label>
+                <label htmlFor="min_trade_price">Min Trade Price (U)</label>
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'min_price')}  maxFractionDigits={2} />
+                    onValueChange={(e) => onInputChange(e, 'min_trade_price')}  maxFractionDigits={2} />
                     </>
                 )}/>
             </div>

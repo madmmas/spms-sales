@@ -64,6 +64,11 @@ const List = () => {
         initFilters();
     }, []);
     
+    const clearCache = async () => {
+        await productService.clearCache();
+        loadLazyData();
+    }
+
     const clearFilter = () => {
         initFilters();
     }
@@ -281,6 +286,7 @@ const List = () => {
                     <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                 </span>
                 <h5 className="m-0 ">Manage Products</h5>                
+                <Button type="button" icon="pi pi-filter-slash" label="Clear Cache" onClick={clearCache} />
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
             </div>
         );

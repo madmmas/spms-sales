@@ -9,7 +9,7 @@ window.env = {
   "TMPDIR": "/var/folders/h6/qdcvmf_528zfgcjf4lnt59fc0000gn/T/",
   "CPPFLAGS": "-I/usr/local/opt/openjdk@19/include",
   "npm_config_global_prefix": "/usr/local",
-  "TERM_PROGRAM_VERSION": "1.82.1",
+  "TERM_PROGRAM_VERSION": "1.82.2",
   "MallocNanoZone": "0",
   "ORIGINAL_XDG_CURRENT_DESKTOP": "undefined",
   "ZDOTDIR": "/Users/moinuddinmasud",
@@ -65,5 +65,5 @@ window.env = {
   "COLORTERM": "truecolor",
   "PUBLIC_URL": "/",
   "AUTH_API_URL": "http://35.90.185.130/auth/test",
-  "APP_API_URL": "http://35.90.185.130/api/test"
+  "APP_API_URL": "http://localhost:5000/api/test"
 };

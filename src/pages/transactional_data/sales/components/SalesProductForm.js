@@ -36,7 +36,7 @@ export default function SalesProductForm({
 
     const [salesProduct, setSalesProduct] = useState(null);
     const [productName, setProductName] = useState('');
-    const [min_price, setMinPrice] = useState(0);
+    const [min_trade_price, setMinPrice] = useState(0);
     const [current_stock, setCurrentStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
@@ -47,7 +47,7 @@ export default function SalesProductForm({
             "product_id": "",
             "bar_code": "",
             "qty": 1,
-            "min_price": 0.00,
+            "min_trade_price": 0.00,
             "trade_price": 0.00,
             "remarks": "",
             "totalPrice": 0.00,
@@ -118,7 +118,7 @@ export default function SalesProductForm({
         let _saleProduct = { ...salesProduct };
         _saleProduct['product_id'] = item.id;
         _saleProduct['product_name'] = item.name;
-        _saleProduct['min_price'] = item.min_price;
+        _saleProduct['min_trade_price'] = item.min_trade_price;
         _saleProduct['trade_price'] = item.trade_price;
         _saleProduct['current_stock'] = _productStock;
         _saleProduct['qty'] = item.qty || 1;
@@ -129,7 +129,7 @@ export default function SalesProductForm({
         setSalesProduct(_saleProduct);
 
         reset({ ..._saleProduct });
-        setMinPrice(item.min_price);
+        setMinPrice(item.min_trade_price);
         setProductAndItsStock(item["name"], _productStock);
 
         quantityRef.current.focus();
@@ -169,7 +169,7 @@ export default function SalesProductForm({
         selectProduct({
             "id": item.product_id,
             "name": item.product_name,
-            "min_price": item.min_price,
+            "min_trade_price": item.min_trade_price,
             "trade_price": item.trade_price,
             "current_stock": item.current_stock,
             "qty": item.qty,
@@ -218,7 +218,7 @@ export default function SalesProductForm({
             </div>            
             <div className="field col-12 md:col-2">
             <Controller
-                name="min_price"
+                name="min_trade_price"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
@@ -235,7 +235,7 @@ export default function SalesProductForm({
                 control={control}
                 rules={{ 
                     required: 'Trade Price is required.', 
-                    min: { value: min_price, message: 'Must be greater than or equal to min price.' } 
+                    min: { value: min_trade_price, message: 'Must be greater than or equal to min price.' } 
                 }}
 
                 render={({ field, fieldState }) => (
@@ -254,7 +254,7 @@ export default function SalesProductForm({
                 control={control}
                 rules={{ 
                     required: 'Trade Price is required.', 
-                    min: { value: min_price, message: 'Must be less than or equal to current stock.' } 
+                    min: { value: min_trade_price, message: 'Must be less than or equal to current stock.' } 
                 }}
                 render={({ field, fieldState }) => (
                     <>
@@ -262,7 +262,7 @@ export default function SalesProductForm({
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_price} max={10000000} />
+                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_trade_price} max={10000000} />
                     </>
                 )}/>
             </div>

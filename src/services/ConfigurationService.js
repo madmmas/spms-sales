@@ -1,4 +1,5 @@
 import axiosInstance from "./AxiosService";
+import CacheMasterDataService from './CacheMasterDataService';
 
 export class ConfigurationService {
 
@@ -23,6 +24,8 @@ export class ConfigurationService {
     }
 
     async getAll(modelName, params) {
+        await CacheMasterDataService.checkAndLoadAllMasterData();
+
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
         let uri = `/data/${modelName}?` + queryParams;
         return axiosInstance.get(uri,{

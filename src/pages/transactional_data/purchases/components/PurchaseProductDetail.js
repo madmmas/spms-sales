@@ -121,7 +121,7 @@ const PurchaseProductDetail = ({
             <Column field="discount_profit" header="Profit Percentage" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="profit" header="Profit" headerStyle={{ minWidth: '10rem' }}></Column>
 
-            <Column field="min_price" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="min_trade_price" header="Minimum Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="trade_price" header="Trade Price (U)" headerStyle={{ minWidth: '10rem' }}></Column>
         </DataTable>
     );

@@ -17,7 +17,7 @@ export default function SelectLookupData( { field, className, model, onChangeIte
 
     const onChange = (e) => {
         field.onChange(e.value);
-        if(onChange){
+        if(onChangeItem){
             onChangeItem(e.value);
         }
     }
