@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
+import { InputText } from 'primereact/inputtext';
 
 
 import { ProductService } from '../../../services/ProductService';
@@ -25,7 +26,9 @@ const StockStatus = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
+             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                        
+                
         }
     };
 
@@ -33,6 +36,7 @@ const StockStatus = () => {
     const [totalRecords, setTotalRecords] = useState(0);
     const [dtStockStatus, setStockStatus] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [globalFilterValue, setGlobalFilterValue] = useState(''); 
 
     const productService = new ProductService();
 
@@ -59,6 +63,8 @@ const StockStatus = () => {
             console.log(data)
             setTotalRecords(data.total);
             setStockStatus(data.rows);
+            console.log(Object.keys(data.rows));
+            console.log(Object.values(data.rows));
             setLoading(false);
         });
     }
@@ -79,6 +85,24 @@ const StockStatus = () => {
         let _lazyParams = { ...lazyParams, ...event };
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
+    }
+
+    const onGlobalFilterChange = (e) => {  
+        let _lazyParams = { ...lazyParams};
+        console.log(_lazyParams);
+
+        const value = e.target.value;
+
+        setGlobalFilterValue(value);
+
+        if(value === null || value === undefined) {
+            return;
+        }
+
+        _lazyParams['filters']['global'].value = value;
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+        console.log("onGlobal Clicked")
     }
 
     const productNameBodyTemplate = (rowData) => {
@@ -169,11 +193,14 @@ const StockStatus = () => {
         );
     };
 
+    
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
                 <h5 className="m-0">Current Stock</h5>
                 <div className="p-toolbar-group-right">
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" className="m-2"/>
                     <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
                     <Button label="Export" icon="pi pi-upload" className="p-button-help m-2" onClick={exportCSV} />
                 </div>
@@ -198,6 +225,7 @@ const StockStatus = () => {
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="name" header="Product Name" filter filterPlaceholder="Search by Product Name" sortable body={productNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
