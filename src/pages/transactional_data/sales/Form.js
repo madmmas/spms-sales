@@ -111,7 +111,8 @@ const Form = React.memo(({ sales }) => {
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     }
 
@@ -670,7 +671,7 @@ const Form = React.memo(({ sales }) => {
                         {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
                         {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                         {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                        {field: 'category_name', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                        {field: 'code', header: 'Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'}
                     ]} 
                     />
                 </div>}
