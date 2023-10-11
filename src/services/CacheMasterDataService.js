@@ -15,7 +15,7 @@ const loadUpdatedMasterData = async (masterDataCacheUpdatedTime) => {
 const checkAndLoadAllMasterData = async () => {
     let masterData = window['__all_masterData'];
     if (masterData===undefined) {
-        masterData = [];
+        masterData = JSON.parse(localStorage.getItem("masterData"));
     }
 
     let masterDataCacheUpdatedTime = JSON.parse(localStorage.getItem("masterDataCacheUpdatedTime"));
@@ -23,7 +23,7 @@ const checkAndLoadAllMasterData = async () => {
         masterDataCacheUpdatedTime = 0;
     } else {
         if (masterDataCacheUpdatedTime && moment(masterDataCacheUpdatedTime).isAfter(moment().subtract(1, 'minutes'))) {
-            console.log("masterData cache is updated less than 1 minutes ago")
+            console.log("masterData cache is updated less than 1 minutes ago");
             return masterData;
         }    
     }
@@ -64,7 +64,7 @@ const getShortnameById = (id) => {
 
     // update the cache
     let masterData = window['__all_masterData'];
-
+    console.log("masterData retrived my getShortnameById:: ", masterData);
     if (masterData) {
         console.log("masterData", masterData);
         console.log("id", id);

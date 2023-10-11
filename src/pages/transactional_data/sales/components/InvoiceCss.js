@@ -109,8 +109,8 @@ const InvoiceCss = () => {
             }
             .total {
                 font-size: 13px;
-                border-top:1px dashed black !important;
-                border-bottom:1px dashed black !important;
+                // border-top:1px dashed black !important;
+                // border-bottom:1px dashed black !important;
             }
             .total.text, .total.price {
                 text-align: right;

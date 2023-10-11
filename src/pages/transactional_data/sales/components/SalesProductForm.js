@@ -18,7 +18,7 @@ export default function SalesProductForm({
     selectProductFromList, deselectProductFromList,
     onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
     onChangeGross, onChangeDiscount, onChangeNet,
-    vat, deliveryCost, addDiscount, gross, net, discount
+    vat, deliveryCost, addDiscount, gross, net, discount, lastTradePrice
 }) {
 
     const {
@@ -45,7 +45,7 @@ export default function SalesProductForm({
     const resetForm = () => {
         reset({ 
             "product_id": "",
-            "bar_code": "",
+            "code": "",
             "qty": 1,
             "min_trade_price": 0.00,
             "trade_price": 0.00,
@@ -88,6 +88,15 @@ export default function SalesProductForm({
         }
     }, [selectedItem]);
 
+    useEffect(() => {
+        console.log("lastTradePrice::", lastTradePrice)
+        let _saleProduct = { ...salesProduct };
+        _saleProduct['lastTradePrice'] = lastTradePrice;
+        setSalesProduct(_saleProduct);
+
+        setValue('lastTradePrice', lastTradePrice);
+    }, [lastTradePrice]);
+
     const calculatePrice = (_saleProduct) => {
         _saleProduct.totalPrice = roundNumber(Number(_saleProduct.trade_price) * Number(_saleProduct.qty));
         _saleProduct.discountedAmount = roundNumber(_saleProduct.totalPrice * Number(_saleProduct.discount_profit) / 100);
@@ -124,7 +133,7 @@ export default function SalesProductForm({
         _saleProduct['qty'] = item.qty || 1;
         _saleProduct['discount_profit'] = item.discount_profit || 0.00;
         _saleProduct['remarks'] = item.remarks || '';
-        _saleProduct['lastTradePrice'] = item.lastTradePrice;
+        // _saleProduct['lastTradePrice'] = item.lastTradePrice;
 
         setSalesProduct(_saleProduct);
 
@@ -175,7 +184,7 @@ export default function SalesProductForm({
             "qty": item.qty,
             "discount_profit": item.discount_profit,
             "remarks": item.remarks,
-            "lastTradePrice": item.lastTradePrice,
+            // "lastTradePrice": item.lastTradePrice,
         });
 
         selectProductFromList(item.product_id);

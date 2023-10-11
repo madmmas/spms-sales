@@ -41,7 +41,6 @@ const Form = ({productData}) => {
             type: "GENERAL",
             category_id: "",
             // warehouse_id: "",
-            // bar_code: "",
             brand_name: "",
             model_no: "",
             brand_id: "",
@@ -71,7 +70,6 @@ const Form = ({productData}) => {
             type: 'GENERAL',
             category_id: data.category_id,
             // warehouse_id: data.warehouse_id,
-            // bar_code: data.bar_code,
             brand_name: data.brand_name,
             model_no: data.model_no,
             brand_id: data.brand_id,
@@ -100,13 +98,6 @@ const Form = ({productData}) => {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Code already exist', life: 3000 });
             valid = false;
         }
-        
-        // // // check if product barcode exist
-        // isExist = productService.isProductBarcodeExist(data.id, data.bar_code);
-        // if(isExist){
-        //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Barcode already exist', life: 3000 });
-        //     valid = false;
-        // }
 
         // // check if product part number exist
         isExist = productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
@@ -203,31 +194,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    {/* <div className="field col-12 md:col-4">
-                        <Controller
-                            name="bar_code"
-                            control={control}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bar Code</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div> */}
-                    {/* <div className="field col-12 md:col-4">
-                        <Controller
-                            name="brand_name"
-                            control={control}
-                            rules={{ required: 'Brand Name is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Brand Name</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div> */}
+
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="brand_id"
@@ -254,19 +221,6 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    {/* <div className="field col-12 md:col-4">
-                        <Controller
-                            name="model_no"
-                            control={control}
-                            rules={{ required: 'Model No is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Model No</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>                     */}
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="part_number"
@@ -306,24 +260,7 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-                    {/* <div className="field col-12 md:col-4">
-                    <Controller
-                        name="warehouse_id"
-                        control={control}
-                        rules={{ required: 'Warehouse is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
-                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
-                                    displayField="name"
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}, 
-                                    ]} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div> */}
+                    
                     <div className="field col-12 md:col-8">
                         <Controller
                             name="remarks"

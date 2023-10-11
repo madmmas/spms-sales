@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
 import * as moment from 'moment';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -63,6 +63,9 @@ const Form = React.memo(({ sales }) => {
     const [selectedProductItem, setSelectedProductItem] = useState(null);
     const [selectedAddedProduct, setSelectedAddedProduct] = useState(null);
 
+    const [lastTradePrice, setLastTradePrice] = useState(0.00);
+    const [lastTradePriceTrigger, setLastTradePriceTrigger] = useState(0);
+
     // STATES FOR PRODUCT FORM
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
     const [resetTrigger, setResetTrigger] = useState(0);
@@ -100,7 +103,7 @@ const Form = React.memo(({ sales }) => {
     
     ///// Default Values -- Start /////
     let defaultProductFilters = {
-        fields: ['id', 'name', 'code', 'bar_code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'min_trade_price', 'price'],
+        fields: ['id', 'name', 'code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'min_trade_price', 'price'],
         first: 0,
         rows: 10,
         page: 1,
@@ -123,6 +126,7 @@ const Form = React.memo(({ sales }) => {
         ref_type: '', // CUSTOMER, SUPPLIER, EMPLOYEE, OTHER
         ref_id: null,
         bank_account_id: null,
+        mfs_account_id: null,
         current_balance: 0,
         amount: 0,
         reference: '',
@@ -147,6 +151,27 @@ const Form = React.memo(({ sales }) => {
     ///// Initialization -- End /////
     
     ///// SIDE-EFFECTS -- Start /////
+    useEffect(() => {
+        console.log("lastTradePriceTrigger => selectedProductItem::", selectedProductItem);
+        if(selectedProductItem!==null) {
+            if(selectedCustomer===null){
+                // lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id);
+                orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id).then(data => {
+                    console.log("lastTradePrice::", data);
+                    setLastTradePrice(data);
+                });
+            }else{
+                // lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id);
+                orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id).then(data => {
+                    console.log("lastTradePrice::", data);
+                    setLastTradePrice(data);
+                });
+            }
+        } else {
+            setLastTradePrice(0.00);
+        }
+    }, [lastTradePriceTrigger, selectedProductItem]);
+
     useEffect(() => {
         resetAll();
     }, []);
@@ -240,7 +265,12 @@ const Form = React.memo(({ sales }) => {
             "net": salesNet,
             "due": salesDue,
             "paid": salesPaid,
+            "balance_forward": -99999999,
         };
+        
+        if(includeDueAmount) {
+            _sales['balance_forward'] = customerBalance || -99999999;
+        }
 
         console.log("WHAT SALES:::", _sales);
         return _sales;
@@ -328,6 +358,7 @@ const Form = React.memo(({ sales }) => {
     ///// Events -- Start /////
     ///// Events -- PRODUCT /////
     const resetProductSelection = () => {
+        setLastTradePrice(0.00);
         setSelectedProductItem(null);
         setSelectedAddedProduct(null);
         setSelectProductTableItem(null);
@@ -342,6 +373,7 @@ const Form = React.memo(({ sales }) => {
     };
 
     const onSelectProductFromTable = async (e) => {
+        
         let _productSelected = e.value;
         // fetch current stock
         let data = await productService.getById(_productSelected.id);
@@ -365,12 +397,12 @@ const Form = React.memo(({ sales }) => {
                 }
             };
 
-            let lastTradePrice = 0
-            if(selectedCustomer!==null){
-                // crash here
-                lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", _productSelected.id, selectedCustomer._id);
-            }
-
+            // let lastTradePrice = 0
+            // if(selectedCustomer===null){
+            //     lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", _productSelected.id);
+            // }else{
+            //     lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", _productSelected.id, selectedCustomer._id);
+            // }
             selectProductFromList(_productSelected.id);
             
             let _product = { 
@@ -378,7 +410,7 @@ const Form = React.memo(({ sales }) => {
                 "trade_price": Number(_productSelected.price),
                 "current_stock": Number(_productSelected.current_stock),
                 "min_trade_price": Number(_productSelected.min_trade_price),
-                "lastTradePrice": Number(lastTradePrice),
+                // "lastTradePrice": Number(lastTradePrice),
             };
             console.log("setSelectedProductItem::", _product)
             setSelectedProductItem(_product);
@@ -394,6 +426,9 @@ const Form = React.memo(({ sales }) => {
         setCustomerLastOrder(null);
         setCustomerBalance(null);
         setValue("customer_category", value);
+
+        // need to reload lastTradePrice
+        setLastTradePriceTrigger(lastTradePriceTrigger+1);
     };
 
     const getPartyBalance = (partyId) => {
@@ -418,6 +453,7 @@ const Form = React.memo(({ sales }) => {
         setCustomerLastOrder(_voucher_no);
         setSelectedCustomer(item);
         getPartyBalance(item._id);
+        setLastTradePriceTrigger(lastTradePriceTrigger+1);
     };
 
     ///// Events -- PRODUCT-FORM /////
@@ -532,6 +568,7 @@ const Form = React.memo(({ sales }) => {
                 "ref_type": "dtCustomer",
                 "ref_id": sales.party_id,
                 "previous_balance": customerBalance,
+                "invoice_amount": data.net,
                 "current_balance": data.net + customerBalance,
                 "amount": data.net,
             }
@@ -551,6 +588,7 @@ const Form = React.memo(({ sales }) => {
                 ...emptyPayment,
                 ...{
                     "previous_balance": customerBalance,
+                    "invoice_amount": data.net,
                     "current_balance": data.net + customerBalance,
                     "cash_amount": 0,
                     "bank_amount": 0,
@@ -940,6 +978,7 @@ const Form = React.memo(({ sales }) => {
             gross={sales===undefined?0:sales.gross} 
             net={sales===undefined?0:sales.net} 
             discount={sales===undefined?0:sales.discount}
+            lastTradePrice={lastTradePrice}
             />
 
         <ConfirmDialog 

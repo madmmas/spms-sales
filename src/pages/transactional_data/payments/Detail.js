@@ -17,7 +17,7 @@ import { TransactionService } from '../../../services/TransactionService';
 
 import { lazyRetry } from '../../components/LazyWithRetry';
 
-import PaymentDialog from '../../components/PaymentDialog';
+import PaymentDialog2 from '../../components/PaymentDialog2';
 
 const DispatchPayment = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "dispatchPayment" */ './DispatchPayment'), "dispatchPayment"));
 const ReceivePayment = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "receivePayment" */ './ReceivePayment'), "receivePayment"));
@@ -276,7 +276,7 @@ const Detail = () => {
                 </div>
             </div>
 
-            <PaymentDialog 
+            <PaymentDialog2 
                 trigger={dlgTrigger} 
                 initPayment={initPayment}
                 onPaymnetCallback={onPaymnetCallback}

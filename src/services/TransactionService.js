@@ -54,14 +54,20 @@ export class TransactionService {
         return resp.data;
     }
 
-    async bankToCash(payment) {
-        const resp = await axiosInstance.post(`/bank_cash/trxCashRegister`, payment);
+    async transferCash(to, data) {
+        const resp = await axiosInstance.post(`/transfer/CASH/`+to, data);
         console.log(resp.data);
         return resp.data;
     }
 
-    async cashToBank(payment) {
-        const resp = await axiosInstance.post(`/bank_cash/trxBankRegister`, payment);
+    async transferBank(to, data) {
+        const resp = await axiosInstance.post(`/transfer/BANK/`+to, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async transferMFS(to, data) {
+        const resp = await axiosInstance.post(`/transfer/MFS/`+to, data);
         console.log(resp.data);
         return resp.data;
     }

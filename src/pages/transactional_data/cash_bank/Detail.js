@@ -1,23 +1,24 @@
 import React, { useState, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
 const CashRegister = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "allCashRegister" */ './CashRegister'), "allCashRegister"));
 const BankRegister = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "allBankRegister" */ './BankRegister'), "allBankRegister"));
+const MFSRegister = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "allMFSRegister" */ './MFSRegister'), "allMFSRegister"));
 
 const Detail = () => {
 
     const tabs = [
         { component: CashRegister },
         { component: BankRegister },
+        { component: MFSRegister },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
-        {label: 'Cash Register', icon: 'pi pi-fw pi-home'},
-        {label: 'Bank Register', icon: 'pi pi-fw pi-home'},
+        {label: 'Cash Transfer', icon: 'pi pi-fw pi-home'},
+        {label: 'Bank Transfer', icon: 'pi pi-fw pi-home'},
+        {label: 'MFS Transfer', icon: 'pi pi-fw pi-home'},
     ];
 
     const renderTabPanel = () => {

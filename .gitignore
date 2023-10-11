@@ -71,4 +71,4 @@ public/index.html
 
 .DS_Store
 .vscode/settings.json
-build
+build/

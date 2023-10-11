@@ -21,7 +21,7 @@ export default function PurchaseProductForm({
     let emptyPurchaseProduct = {
         product_id: "", // select product
         warehouse_id: "", // select warehouse
-        bar_code: "", // fetch from selected product
+        code: "", // fetch from selected product
         last_purchase_price: 0.00, // fetch from selected product
 
         qty: 1,  
@@ -101,7 +101,7 @@ export default function PurchaseProductForm({
         reset({
             'product_id': '',
             'warehouse_id': defaultWarehouse,
-            'bar_code': '',
+            'code': '',
             'last_purchase_price': 0.00,
             'qty': 1,
             'unit_cost_f': 0.00,
@@ -196,6 +196,12 @@ export default function PurchaseProductForm({
 
         console.log("supplierId::", selSupplierId)
         let lastTradePrice = 0
+        if(selSupplierId===null){
+            alert("Select a supplier first.")
+            // toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Please select a supplier first.', life: 3000 });
+            return;
+        }
+
         if(selSupplierId!==null){
             // crash here
             lastTradePrice = await orderService.getOrderProductLastPrice("trxPurchase", selectedRow.id, selSupplierId);
@@ -207,18 +213,18 @@ export default function PurchaseProductForm({
         console.log("PRODUCT SELECTED::", selectedRow);
         console.log("DEFAULT PURCHASE PRODUCT:::=>>", defaultPurchaseProduct);
         let _purchaseProduct = { ...defaultPurchaseProduct };
-        // console.log(selectedRow.bar_code)
+        // console.log(selectedRow.code)
         // console.log(selectedRow.last_purchase_price)
         _purchaseProduct['product_id'] = selectedRow.id;
         _purchaseProduct['product_name'] = selectedRow.name;
-        _purchaseProduct['bar_code'] = selectedRow.bar_code;
+        _purchaseProduct['code'] = selectedRow.code;
         _purchaseProduct['last_purchase_price'] = lastTradePrice;
         setPurchaseProduct(_purchaseProduct);
         console.log("SELECTED __PRODUCT:::=>>", _purchaseProduct)
         console.log("SELECTED PRODUCT:::=>>", purchaseProduct)
         console.log("SELECTED PRODUCT ID :::=>>", selectedRow.id)
         setValue('product_id', selectedRow.id);
-        // setValue('bar_code', selectedRow.bar_code);
+        setValue('code', selectedRow.code);
         setValue('product_name', selectedRow.name);
         setValue('last_purchase_price', lastTradePrice);
         setValue('warehouse_id', defaultWarehouse);
@@ -311,11 +317,11 @@ export default function PurchaseProductForm({
             </div>
             <div className="field col-12 md:col-2">
             <Controller
-                name="bar_code"
+                name="code"
                 control={control}
                 render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Barcode</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code</label>
                         <InputText inputId={field.name} value={field.value} inputRef={field.ref} disabled={true} />
                         {getFormErrorMessage(field.name)}
                     </>

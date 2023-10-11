@@ -23,7 +23,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'bar_code', 'brand_id', 'model_id', 'part_number', 'unit', 'cost', 'price', 'active'],
+        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'brand_id', 'model_id', 'part_number', 'unit', 'cost', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,

@@ -17,6 +17,7 @@ import POS from "./pages/POS";
 
 import RProductService from "./services/RProductService";
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
+import CacheMasterDataService from "./services/CacheMasterDataService";
 
 function App() {
 
@@ -27,6 +28,9 @@ function App() {
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
   const BankAccountDetail = React.lazy(() => import("./pages/master_data/bank_accounts/Detail"));
   const BankAccountForm = React.lazy(() => import("./pages/master_data/bank_accounts/Form"));
+  const MFSAccountList = React.lazy(() => import("./pages/master_data/mfs_accounts/List"));
+  const MFSAccountDetail = React.lazy(() => import("./pages/master_data/mfs_accounts/Detail"));
+  const MFSAccountForm = React.lazy(() => import("./pages/master_data/mfs_accounts/Form"));
   const EmpList = React.lazy(() => import("./pages/master_data/employees/List"));
   const EmpDetail = React.lazy(() => import("./pages/master_data/employees/Detail"));
   const EmpForm = React.lazy(() => import("./pages/master_data/employees/Form"));
@@ -62,6 +66,7 @@ function App() {
   const SupplierCategory = React.lazy(() => import("./pages/configurations/SupplierCategory"));
   const ProductCategory = React.lazy(() => import("./pages/configurations/ProductCategory"));
   const Banks = React.lazy(() => import("./pages/configurations/Banks"));
+  const MFSs = React.lazy(() => import("./pages/configurations/MFS"));
   const ExtraIncomeType = React.lazy(() => import("./pages/configurations/ExtraIncomeType"));
   const ExpenseType = React.lazy(() => import("./pages/configurations/ExpenseType"));
   const PaymentType = React.lazy(() => import("./pages/configurations/PaymentType"));
@@ -83,10 +88,18 @@ function App() {
   useEffect(() => {
     // load the product data here
     let products = window['__all_products'];
-
+    
     // if products undefined or empty load all from server limit 1000 until no more
     if (!products || products.length == 0) {
       RProductService.loadAllProductsFromLocalStorage();
+    }
+
+    let masterData = window['__all_masterData'];
+
+    // if masterData undefined or empty load all from server limit 1000 until no more
+    if (masterData === undefined || masterData.length == 0) {
+      console.log("masterData is undefined or empty");
+      CacheMasterDataService.checkAndLoadAllMasterData();
     }
   }, []);
 
@@ -118,6 +131,12 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<BankAccountList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<BankAccountForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<BankAccountDetail />} />} />
+        </Route>
+
+        <Route path="/mfs_accounts">
+          <Route index element={<RouteAuth pageComponent={<MFSAccountList />} />} />
+          <Route path="new" element={<RouteAuth pageComponent={<MFSAccountForm />} />} />
+          <Route path=":id" element={<RouteAuth pageComponent={<MFSAccountDetail />} />} />
         </Route>
 
         <Route path="/ledger">
@@ -174,13 +193,13 @@ function App() {
         <Route path="/payments" element={<RouteAuth pageComponent={<PaymentDetail />} />} />
         <Route path="/expenses" element={<RouteAuth pageComponent={<Expenses />} />} />
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
-        <Route path="/cash_bank" element={<RouteAuth pageComponent={<CashBank />} />} />
+        <Route path="/transfer" element={<RouteAuth pageComponent={<CashBank />} />} />
 
         <Route path="/customer_category" element={<RouteAuth pageComponent={<CustomerCategory />} />} />
         <Route path="/designation" element={<RouteAuth pageComponent={<Designation />} />} />
         <Route path="/department" element={<RouteAuth pageComponent={<Department />} />} />
         <Route path="/banks" element={<RouteAuth pageComponent={<Banks />} />} />
-        {/* <Route path="/mfs_acc" element={<RouteAuth pageComponent={<MFSAcc />} />} /> */}
+        <Route path="/mfs_types" element={<RouteAuth pageComponent={<MFSs />} />} />
         <Route path="/expense_type" element={<RouteAuth pageComponent={<ExpenseType />} />} />
         <Route path="/extra_income_type" element={<RouteAuth pageComponent={<ExtraIncomeType />} />} />
         <Route path="/grade" element={<RouteAuth pageComponent={<Grade />} />} />

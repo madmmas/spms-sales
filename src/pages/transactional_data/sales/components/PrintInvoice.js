@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import { useParams } from 'react-router-dom';
-
-import { getDateFormatted, getTimeFormatted } from '../../../../utils';
+import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataService } from '../../../../services/MasterDataService';
@@ -44,6 +43,7 @@ export const PrintInvoice = () => {
                     });
                 }); 
             }else{
+                data.balance = 0;
                 setInvoice(data);
             }
         });  
@@ -71,6 +71,18 @@ export const PrintInvoice = () => {
         setTrigger(trigger+1);
     }
 
+    const getBillTo = (customer_category) => {
+        if(customer_category==="WALKIN"){
+            return "Walk-in Customer";
+        }else if(customer_category==="REGISTERED"){
+            return "Registered Customer";
+        }else if(customer_category==="CONDITIONAL"){
+            return "Conditional Sales";
+        }else{
+            return "";
+        }
+    }
+
     return (
       <div>
         <InvoiceCss />
@@ -89,7 +101,7 @@ export const PrintInvoice = () => {
             <p>Invoice Date : {getTimeFormatted(invoice.created_at)}</p>
             <table className="bill-details">
                 <tbody>
-                    <tr><td class="line">Bill To:</td></tr>
+                    <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>
                     {invoice.party && <tr>
                         <td  class="line"><span>{invoice.party.line1}</span><br/>
                             <span>{invoice.party.line2}</span><br/>
@@ -137,17 +149,21 @@ export const PrintInvoice = () => {
                         <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td colSpan="7" className="sum-up">Total Discount</td>
+                        <td colSpan="7" className="sum-up">(-) Discount</td>
                         <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td colSpan="7" className="sum-up">Net Amount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</td>
+                        <th colSpan="7" className="total text line">Net Amount</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
                     <tr>
-                        <th colSpan="7" className="total text">Net Balance</th>
-                        <th className="total price right-align">{ Number.parseFloat(invoice.balance).toFixed(2)}</th>
+                        <td colSpan="7" className="sum-up">(-) Payment</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>
                     </tr>
+                    {invoice.balance_forward!==-99999999 && <tr>
+                        <th colSpan="7" className="total text line">(+) B/F Balance</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
+                    </tr>}
                 </tbody>
             </table>}
             {printmePos && <table className="lineitems">            
@@ -168,18 +184,24 @@ export const PrintInvoice = () => {
                         <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td className="sum-up">Net Amount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</td>
+                        <th className="sum-up">Net Amount</th>
+                        <th className="total price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
-                    <tr>
-                        <th className="total text">Net Balance</th>
-                        <th className="total price right-align">{ Number.parseFloat(invoice.balance).toFixed(2)}</th>
-                    </tr>
+                    {invoice.balance_forward!==-99999999 && <tr>
+                        <th className="total text">(+) B/F Balance</th>
+                        <th className="total price right-align">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
+                    </tr>}
                 </tbody>
             </table>}
             <section>
                 <p>
+                    <b>In Words :</b> <i>{getNumToWords(123.87)} Taka</i>
+                </p>
+                {/* <p>
                     Paid by : <span>CASH</span>
+                </p> */}
+                <p> 
+                    <b>Remarks :</b> <span>{invoice.notes}</span>
                 </p>
             </section>
             <footer>

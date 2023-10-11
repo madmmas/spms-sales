@@ -63,8 +63,21 @@ export class OrderService {
         return resp.data;
     }
 
-    async getOrderProductLastPrice(orderType, productId, customerId) {
+    async getOrderProductLastPriceByParty(orderType, productId, customerId) {
         let uri = `/last_product_price/${orderType}/${customerId}/${productId}`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data? resp.data.last_price : 0;
+    }
+
+    async getOrderProductLastPrice(orderType, productId) {
+        let uri = `/last_product_price/${orderType}/${productId}`;
         const resp = await axiosInstance.get(uri, {
             timeout: 15000,
             id: uri,

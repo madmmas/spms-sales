@@ -44,7 +44,6 @@ const Form = ({ purchase }) => {
     let defaultPurchaseProduct = {
         product_id: "", // select product
         warehouse_id: "", // select warehouse
-        bar_code: "", // fetch from selected product
         last_purchase_price: 0.00, // fetch from selected product
 
         quantity: 1,  

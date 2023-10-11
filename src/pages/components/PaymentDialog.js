@@ -10,7 +10,7 @@ import { Toast } from 'primereact/toast';
 
 import SelectMasterData from './SelectMasterData';
 
-import { BANK_ACCOUNT_MODEL } from '../../constants/models';
+import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
 
 const PaymentDialog = ( { 
     trigger, initPayment, onPaymnetCallback, 
@@ -22,7 +22,7 @@ const PaymentDialog = ( {
     const [paymentDialog, setPaymentDialog] = useState(false);
     // const [bankCash, setBankCash] = useState("CASH");
     const [amount, setAmount] = useState(0);
-    const [prevBalance, setPrevBalance] = useState(0);
+    const [currentBalance, setCurrentBalance] = useState(0);
     const [amountCash, setAmountCash] = useState(0);
     const [amountBank, setAmountBank] = useState(0);
     const [amountMFS, setAmountMFS] = useState(0);
@@ -43,14 +43,10 @@ const PaymentDialog = ( {
             reset({
                 ...initPayment
             })
-            // setValue('payment_method', initPayment.payment_method);
-            // setValue('current_balance', initPayment.current_balance);
-            // setValue('amount', initPayment.amount);
-            // setValue('payment_date', initPayment.payment_date);
             setAmountCash(initPayment.cash_amount);
             setAmountBank(initPayment.bank_amount);
             setAmountMFS(initPayment.mfs_amount);
-            setPrevBalance(initPayment.previous_balance)
+            setCurrentBalance(initPayment.current_balance);
         }
     }, [initPayment]);
 
@@ -77,6 +73,7 @@ const PaymentDialog = ( {
         let _amount = Number(amountCash) + Number(amountBank) + Number(amountMFS);
         setAmount(_amount);
         setValue('amount', _amount);
+        setValue('current_balance', currentBalance - _amount);
     };
 
     const onInputChange = (e, name) => {
@@ -93,9 +90,23 @@ const PaymentDialog = ( {
     };
 
     const onPaymentSubmit = (data) => {
-        // check if the current_balance is equal to amount if customer_category is WALKIN
-        if(readOnly && data.current_balance !== data.amount) {
+        // check if the invoice_amount is equal to amount if customer_category is WALKIN
+        let valid = true;
+        // if bank_amount is not equal to 0 then bank_account_id is required
+        if(data.bank_amount !== 0 && data.bank_account_id === null) {
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Bank Account is required.', life: 3000 });
+            valid = false;
+        }
+        // if mfs_amount is not equal to 0 then mfs_account_id is required
+        if(data.mfs_amount !== 0 && data.mfs_account_id === null) {
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'MFS Account is required.', life: 3000 });
+            valid = false;
+        }
+        if(readOnly && data.invoice_amount !== data.amount) {
             toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Amount is not equal to current balance.', life: 3000 });
+            valid = false;
+        }
+        if(!valid){
             return;
         }
 
@@ -130,16 +141,27 @@ const PaymentDialog = ( {
         <Dialog visible={paymentDialog} style={{ width: '450px' }} header={`Payment`} modal className="p-fluid" footer={paymentDialogFooter} onHide={hidePaymentDialog}>                    
             <Toast ref={toast} />
             <div className="p-fluid formgrid grid">
-                <div className="field col-12 md:col-12">
+                <div className="field col-12 md:col-6">
                 <Controller
-                    name="current_balance"
+                    name="previous_balance"
                     control={control}
-                    // rules={{
-                    //     validate: (value) => (value > 0) || 'Enter a valid amount.'
-                    // }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor="current_balance">Current Balance + Previous Balanace ({prevBalance})</label>
+                        <label htmlFor="previous_balance">Previous Balance</label>
+                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                            onValueChange={(e) => field.onChange(e)} 
+                            className={classNames({ 'p-invalid': fieldState.error })} />
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
+                </div>
+                <div className="field col-12 md:col-6">
+                <Controller
+                    name="invoice_amount"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor="invoice_amount">Invoice Amount</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
@@ -161,7 +183,7 @@ const PaymentDialog = ( {
 
                         render={({ field, fieldState }) => (
                         <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                             <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
                                 displayField="accName" showFields={["_id", "accNumber", "accName"]}
                                 onSelect={(e) => {
@@ -193,7 +215,7 @@ const PaymentDialog = ( {
                             <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                                 onValueChange={(e) => onInputChange(e, "bank_amount")} 
                                 className={classNames({ 'p-invalid': fieldState.error })} 
-                                min={0}
+                                min={0} maxFractionDigits={2}
                                 />
                             {getFormErrorMessage(field.name)}
                         </>
@@ -201,17 +223,24 @@ const PaymentDialog = ( {
                     </div>      
                 </div>
                 <div className='p-fluid formgrid grid'>
-                    <div className="field col-12 md:col-7">
+                    <div className="field col-7 md:col-7">
                     <Controller
-                        name="reference"
+                        name="mfs_account_id"
                         control={control}
-                        // rules={{
-                        //     validate: () => (amountMFS == 0) || 'Enter a valid reference.'
-                        // }}
                         render={({ field, fieldState }) => (
                         <>
-                            <label htmlFor="reference">MFS Ref</label>
-                            <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
+                            <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                displayField="accName" showFields={["_id", "refNumber", "accName"]}
+                                onSelect={(e) => {
+                                    console.log(e);
+                                }}
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                columns={[
+                                    {field: 'dtMFS_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                    {field: 'refNumber', header: 'Account Number', filterPlaceholder: 'Filter by Reference Number'},
+                                    {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                ]} />
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
@@ -229,7 +258,7 @@ const PaymentDialog = ( {
                             <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                                 onValueChange={(e) => onInputChange(e, "mfs_amount")} 
                                 className={classNames({ 'p-invalid': fieldState.error })} 
-                                min={0}
+                                min={0} maxFractionDigits={2}
                                 />
                             {getFormErrorMessage(field.name)}
                         </>
@@ -237,7 +266,7 @@ const PaymentDialog = ( {
                     </div>                            
 
                 </div>
-                <div className="field col-12 md:col-12">
+                <div className="field col-12 md:col-6">
                 <Controller
                     name="cash_amount"
                     control={control}
@@ -250,13 +279,13 @@ const PaymentDialog = ( {
                         <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => onInputChange(e, "cash_amount")} 
                             className={classNames({ 'p-invalid': fieldState.error })} 
-                            min={0}
+                            min={0} maxFractionDigits={2}
                             />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
                 </div>                            
-                <div className="field col-12 md:col-12">
+                <div className="field col-12 md:col-6">
                 <Controller
                     name="amount"
                     control={control}
@@ -265,8 +294,22 @@ const PaymentDialog = ( {
                     }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor="amount">Pay Amount*</label>
-                        <InputNumber readOnly={false} inputId={field.name} value={field.value} inputRef={field.ref} 
+                        <label htmlFor="amount">Pay Amount</label>
+                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                            onValueChange={(e) => field.onChange(e)} 
+                            className={classNames({ 'p-invalid': fieldState.error })} />
+                        {getFormErrorMessage(field.name)}
+                    </>
+                )}/>
+                </div>                            
+                <div className="field col-12 md:col-6">
+                <Controller
+                    name="current_balance"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                    <>
+                        <label htmlFor="current_balance">Current Balance</label>
+                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}

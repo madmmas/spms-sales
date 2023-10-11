@@ -18,6 +18,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Bank Accounts', icon: 'pi pi-fw pi-list', to: '/bank_accounts' },
+                        { label: 'MFS Accounts', icon: 'pi pi-fw pi-list', to: '/mfs_accounts' },
                         { label: 'Customers', icon: 'pi pi-fw pi-list', to: '/customers' },
                         { label: 'Employees', icon: 'pi pi-fw pi-list', to: '/employees' },
                         { label: 'Package-Products', icon: 'pi pi-fw pi-list', to: '/packages' },
@@ -32,7 +33,6 @@ const AppMenu = () => {
                     items: [
                         { label: 'Accounts', icon: 'pi pi-fw pi-list', to: '/accounts' },
                         { label: 'Attendance', icon: 'pi pi-fw pi-list', to: '/attendance' },
-                        { label: 'Bank/Cash', icon: 'pi pi-fw pi-list', to: '/cash_bank' },
                         { label: 'Expenses', icon: 'pi pi-fw pi-list', to: '/expenses' },
                         { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },
                         { label: 'Payments', icon: 'pi pi-fw pi-list', to: '/payments' },
@@ -41,6 +41,7 @@ const AppMenu = () => {
                         { label: 'Purchase-Packages', icon: 'pi pi-fw pi-list', to: '/purchase_packages' },
                         { label: 'Sales', icon: 'pi pi-fw pi-list', to: '/sales' },
                         { label: 'Stock', icon: 'pi pi-fw pi-list', to: '/stocks' },
+                        { label: 'Transfer Money', icon: 'pi pi-fw pi-list', to: '/transfer' },
                     ]
                 },
             ]
@@ -79,6 +80,7 @@ const AppMenu = () => {
                         { label: 'Extra Income Type', icon: 'pi pi-fw pi-list', to: '/extra_income_type' },
                         { label: 'Grade', icon: 'pi pi-fw pi-list', to: '/grade' },
                         { label: 'Group', icon: 'pi pi-fw pi-list', to: '/group' },
+                        { label: 'MFS Companies', icon: 'pi pi-fw pi-list', to: '/mfs_types' },
                         { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
                         { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },

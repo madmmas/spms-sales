@@ -3,6 +3,7 @@ import { Toolbar } from 'primereact/toolbar';
 import * as moment from 'moment';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
+import { RadioButton } from "primereact/radiobutton";
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { useForm, Controller } from 'react-hook-form';
@@ -17,14 +18,13 @@ import { Toast } from 'primereact/toast';
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import { CASH_REGISTER, BANK_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
 
 const CashRegister = () => {
 
-    const modelName = CASH_REGISTER;
-
     let emptyCashRegister = {
-        bank_account_id: null,
+        transfer_to: null,
+        ref_id: null,
         trx_date: null,
         amount: 0,
         remarks: '',
@@ -35,6 +35,7 @@ const CashRegister = () => {
         control,
         formState: { errors },
         reset,
+        setValue,
         handleSubmit
     } = useForm({
         defaultValues: emptyCashRegister
@@ -64,8 +65,8 @@ const CashRegister = () => {
     const [dtCashRegister, setCashRegister] = useState(null);
     const [empProfileDialog, setCashRegisterDialog] = useState(false);
     const [submitted, setSubmitted] = useState(false);    
-    const [addOrWithdraw, setAddOrWithdraw] = useState(false);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [transferTo, setTransferTo] = useState("BANK");
 
     const registerService = new RegisterService();
     const transactionService = new TransactionService();
@@ -115,30 +116,6 @@ const CashRegister = () => {
         setLazyParams(_lazyParams);
     }
 
-    const bankAccountBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.ref_id_shortname}
-            </>
-        );
-    };
-
-    const particularTypeBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.particularType}
-            </>
-        );
-    };
-
-    const bankAccountFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={CashRegister} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-
-    const particularTypeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={CashRegister} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-
     const dateBodyTemplate = (rowData) => {
         return (
             <>
@@ -147,41 +124,7 @@ const CashRegister = () => {
         );
     };
 
-    const amountBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.amount}
-            </>
-        );
-    };
-
-    const balanceBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.balance}
-            </>
-        );
-    };
-
-    const remarksBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.remarks}
-            </>
-        );
-    };
-
-    const addToCash = () => {
-        // transfer bank to cash
-        setAddOrWithdraw(true);
-        reset({ ...emptyCashRegister });        
-        setSubmitted(false);
-        setCashRegisterDialog(true);
-    };
-
-    const withdrawFromCash = () => {
-        // transfer cash to bank
-        setAddOrWithdraw(false);
+    const transferCash = () => {
         reset({ ...emptyCashRegister });        
         setSubmitted(false);
         setCashRegisterDialog(true);
@@ -201,7 +144,7 @@ const CashRegister = () => {
 
     const saveCashRegister = (formData) => {
         setSubmitted(true);
-        transactionService.bankToCash(formData).then(data => {            
+        transactionService.transferCash(transferTo, formData).then(data => {            
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Register Updated', life: 3000 });
@@ -211,11 +154,14 @@ const CashRegister = () => {
         reset(emptyCashRegister)
     };
 
+    const onSelectTransferTo = (value) => {
+        setTransferTo(value);
+    }
+
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button onClick={() => addToCash()} className="p-button p-button-primary mr-2" label="Bank to Cash" />
-                {/* <Button onClick={() => withdrawFromCash()} className="p-button p-button-success mr-2" label="Withdraw from Cash" /> */}
+                <Button onClick={() => transferCash()} className="p-button p-button-primary mr-2" label="Transfer" />
             </React.Fragment>
         );
     };
@@ -231,7 +177,7 @@ const CashRegister = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Cash Register</h5>
+                <h5 className="m-0">Cash Transfer</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -261,11 +207,100 @@ const CashRegister = () => {
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }}
                             body={dateBodyTemplate}></Column>
                         <Column field="amount" header="Payment Amount" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="bank_name" header="Bank Account" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="trx_type" header="Transfer To" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="ref_name" header="Account Name" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${addOrWithdraw?"Add To":"Withdraw From"} Cash`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={"Cash Transfer"} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         <div className="p-fluid formgrid grid">
-                        <div className="field col-12 md:col-6">
+                        <div className="field col-12 md:col-12">
+                            <div>Transfer to:</div>
+                            <Controller
+                                name="transfer_to"
+                                control={control}
+                                rules={{ required: 'Value is required.' }}
+                                render={({ field }) => (
+                                    <>
+                                        <div className="flex align-items-center">
+                                            <RadioButton inputId="f5" {...field} inputRef={field.ref} value="BANK" 
+                                                checked={transferTo === 'BANK'}
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    onSelectTransferTo(e.value);
+                                                }}
+                                                />
+                                            <label htmlFor="f5" className="ml-1 mr-3">
+                                                Bank
+                                            </label>
+
+                                            <RadioButton inputId="f6" {...field} value="MFS"
+                                                checked={transferTo === 'MFS'}
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    onSelectTransferTo(e.value);
+                                                }}
+                                            />
+                                            <label htmlFor="f6" className="ml-1 mr-3">
+                                                MFS
+                                            </label>
+                                        </div>
+                                        {getFormErrorMessage(field.name)}
+                                    </>
+                                )}
+                            />
+                            </div>
+
+                            <div hidden={transferTo !== "BANK"} className="field col-12 md:col-12">
+                            <Controller
+                                name="ref_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((transferTo === "MFS" ) || (transferTo === "BANK" && value !== null) ) || 'Bank Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                                    <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        onSelect={(e) => {
+                                            console.log(e);
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div hidden={transferTo !== "MFS"} className="field col-12 md:col-12">
+                            <Controller
+                                name="ref_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((transferTo === "BANK" ) || (transferTo === "MFS" && value !== null) ) || 'Bank Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                                    <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        onSelect={(e) => {
+                                            console.log(e);
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>
+                            <div className="field col-12 md:col-6">
                             <Controller
                                 name="trx_date"
                                 control={control}
@@ -278,28 +313,7 @@ const CashRegister = () => {
                                     {getFormErrorMessage(field.name)}
                                 </>                                
                             )}/>
-                            </div>
-                            <div className="field col-12 md:col-6">                  
-                                <Controller
-                                    name="bank_account_id"
-                                    control={control}
-                                    rules={{ required: 'Bank Account is required.' }}
-                                    render={({ field, fieldState }) => (
-                                    <>
-                                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
-                                        <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                            displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
-                                            onSelect={(e) => {console.log(e);}}
-                                            className={classNames({ 'p-invalid': fieldState.error })} 
-                                            columns={[
-                                                {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
-                                                {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
-                                                {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                            ]} />
-                                        {getFormErrorMessage(field.name)}
-                                    </>
-                                )}/>
-                            </div>
+                            </div>                            
                             <div className="field col-12 md:col-6">
                             <Controller
                                 name="amount"
@@ -321,10 +335,10 @@ const CashRegister = () => {
                             <Controller
                                 name="remarks"
                                 control={control}
-                                rules={{ required: 'Remarks is required.' }}
+                                // rules={{ required: 'Remarks is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor="remarks">Remarks*</label>
+                                    <label htmlFor="remarks">Remarks</label>
                                     <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
