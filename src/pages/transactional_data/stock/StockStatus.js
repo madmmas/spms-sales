@@ -75,7 +75,7 @@ const StockStatus = () => {
             }
             setTotalStockPriceTrade(total_stock_price_trade)
             setTotalStockPriceCost(total_stock_price_cost);
-    },[dtStockStatus]);
+    },[dtStockStatus])
 
     const exportCSV = () => {
         dt.current.exportCSV();
