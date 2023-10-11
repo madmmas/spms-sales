@@ -34,10 +34,7 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            /* 'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }, */
-             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-             status: { value: null, matchMode: FilterMatchMode.CONTAINS },
-             customer_category: { value: null, matchMode: FilterMatchMode.CONTAINS }
+             global: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     };
 
@@ -177,6 +174,7 @@ const List = () => {
 
         _lazyParams['filters']['global'].value = value;
         _lazyParams['first'] = 0;
+        console.log(_lazyParams)
         setLazyParams(_lazyParams);
         console.log("onGlobal Clicked")
     }
@@ -306,7 +304,7 @@ const List = () => {
         return (
             <div className="flex justify-content-between">
                 <h5 className="m-0">Manage Sales</h5>
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" className="mr-5"/>
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" className="ml-0"/>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
