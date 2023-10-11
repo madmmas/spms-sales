@@ -10,6 +10,7 @@ import { DataTable } from 'primereact/datatable';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { InputText } from 'primereact/inputtext';
 
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
@@ -33,7 +34,10 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            /* 'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }, */
+             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+             status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+             customer_category: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     };
 
@@ -46,6 +50,7 @@ const List = () => {
     const [selectedProfiles, setSelectedProfiles] = useState(null);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const hrManagementService = new HRService();
     const orderService = new OrderService();
@@ -74,6 +79,7 @@ const List = () => {
                 console.log(data)
                 setTotalRecords(data.total);
                 setProfiles(data.rows);
+                console.log(data.rows)
                 setLoading(false);
             }
         });
@@ -156,6 +162,24 @@ const List = () => {
             </React.Fragment>
         );
     };
+
+    const onGlobalFilterChange = (e) => {  
+        let _lazyParams = { ...lazyParams};
+        console.log(_lazyParams);
+
+        const value = e.target.value;
+
+        setGlobalFilterValue(value);
+
+        if(value === null || value === undefined) {
+            return;
+        }
+
+        _lazyParams['filters']['global'].value = value;
+        _lazyParams['first'] = 0;
+        setLazyParams(_lazyParams);
+        console.log("onGlobal Clicked")
+    }
 
     const voucherNoBodyTemplate = (rowData) => {
         return (
@@ -282,6 +306,7 @@ const List = () => {
         return (
             <div className="flex justify-content-between">
                 <h5 className="m-0">Manage Sales</h5>
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" className="mr-5"/>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -331,7 +356,7 @@ const List = () => {
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
+                        
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
