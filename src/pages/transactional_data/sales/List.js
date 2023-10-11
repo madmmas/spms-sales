@@ -10,7 +10,7 @@ import { DataTable } from 'primereact/datatable';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
+import { InputText } from 'primereact/inputtext'
 
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
