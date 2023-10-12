@@ -96,7 +96,7 @@ const InvoiceTableRow = ({items}) => {
             <Text wrap={false} style={styles.twenty}>{item.shortname}</Text>
             <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.dr_amount).toFixed(2)}</Text>
             <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.cr_amount).toFixed(2)}</Text>
-            <Text wrap={false} style={styles.amount}>{Number.parseFloat(0).toFixed(2) }</Text>
+            <Text wrap={false} style={styles.amount}>{Number.parseFloat(item.cr_amount).toFixed(2) - Number.parseFloat(item.dr_amount).toFixed(2)}</Text>
         </View>
     )
     return (<Fragment>{rows}</Fragment> )
