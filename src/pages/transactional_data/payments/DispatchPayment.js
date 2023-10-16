@@ -147,6 +147,9 @@ const DispatchPayment = () => {
                         <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_method" header="Payment Method" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="cash_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="mfs_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="bank_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="party_name" header="Party" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="bank_name" header="Bank Account" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>

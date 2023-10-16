@@ -63,6 +63,19 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
     const onPaymentSubmit = (data) => {
         setSubmitted(false);
         hidePaymentDialog();
+        if(data.payment_method === "BANK") {
+            data.bank_amount = data.amount;
+            data.mfs_amount = 0;
+            data.cash_amount = 0;
+        } else if(data.payment_method === "MFS") {
+            data.bank_amount = 0;
+            data.mfs_amount = data.amount;
+            data.cash_amount = 0;
+        } else {
+            data.bank_amount = 0;
+            data.mfs_amount = 0;
+            data.cash_amount = data.amount;
+        }
         if(onPaymnetCallback) {
             let payment = {
                 ...data,
@@ -187,7 +200,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     </>
                 )}/>
                 </div>                            
-                <div className="field col-12 md:col-12">
+                {/* <div className="field col-12 md:col-12">
                 <Controller
                     name="reference"
                     control={control}
@@ -198,7 +211,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
-                </div>
+                </div> */}
                 <div className="field col-12 md:col-12">
                 <Controller
                     name="remarks"
