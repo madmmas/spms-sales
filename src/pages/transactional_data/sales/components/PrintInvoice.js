@@ -195,7 +195,7 @@ export const PrintInvoice = () => {
             </table>}
             <section>
                 <p>
-                    <b>In Words :</b> <i>{getNumToWords(123.87)} Taka</i>
+                    <b>In Words :</b> <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i>
                 </p>
                 {/* <p>
                     Paid by : <span>CASH</span>
