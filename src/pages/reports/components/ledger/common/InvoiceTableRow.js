@@ -99,6 +99,19 @@ const InvoiceTableRow = ({items}) => {
             <Text wrap={false} style={styles.amount}>{Number.parseFloat(0).toFixed(2) }</Text>
         </View>
     )
+
+    rows.sort((date1,date2)=>{
+        date1 = date1.props.children[0].props.children.split('/').reverse().join('/');
+        date2 = date2.props.children[0].props.children.split('/').reverse().join('/');
+        if (date2 < date1) {
+              return -1;
+        } else if (date2 > date1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    })
+    
     return (<Fragment>{rows}</Fragment> )
 };
   
