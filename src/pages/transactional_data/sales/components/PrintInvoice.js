@@ -98,7 +98,7 @@ export const PrintInvoice = () => {
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
             <p  class="line">Invoice Number : {invoice.voucher_no}</p>
-            <p>Invoice Date : {getTimeFormatted(invoice.created_at)}</p>
+            <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
             <table className="bill-details">
                 <tbody>
                     <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>
