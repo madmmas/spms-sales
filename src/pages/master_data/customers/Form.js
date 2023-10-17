@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -26,11 +26,18 @@ const Form = ({customerProfile}) => {
         register,
         control,
         formState: { errors },
+        setValue,
         resetField,
         handleSubmit
     } = useForm({
         defaultValues: customerProfile //async () =>  hrManagementService.getById(modelName, CustomerProfile)
       });
+
+    useEffect(() => {
+        if(customerProfile===undefined){
+            setValue("status", true);
+        }
+    }, []);
 
     const onSubmit = (formData) => {
         if(customerProfile==null){

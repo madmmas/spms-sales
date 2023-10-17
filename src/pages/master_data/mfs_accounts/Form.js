@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -33,7 +33,13 @@ const Form = ({mfsAccountProfile}) => {
         handleSubmit
     } = useForm({
         defaultValues: mfsAccountProfile
-      });
+    });
+
+    useEffect(() => {
+        if(mfsAccountProfile===undefined){
+            setValue("status", true);
+        }
+    }, []);
 
     const onSubmit = (formData) => {
         try{

@@ -38,7 +38,7 @@ const AppMenu = () => {
                         { label: 'Payments', icon: 'pi pi-fw pi-list', to: '/payments' },
                         { label: 'Payroll', icon: 'pi pi-fw pi-list', to: '/payroll' },
                         { label: 'Purchases', icon: 'pi pi-fw pi-list', to: '/purchases' },
-                        { label: 'Purchase-Packages', icon: 'pi pi-fw pi-list', to: '/purchase_packages' },
+                        // { label: 'Purchase-Packages', icon: 'pi pi-fw pi-list', to: '/purchase_packages' },
                         { label: 'Sales', icon: 'pi pi-fw pi-list', to: '/sales' },
                         { label: 'Stock', icon: 'pi pi-fw pi-list', to: '/stocks' },
                         { label: 'Transfer Money', icon: 'pi pi-fw pi-list', to: '/transfer' },

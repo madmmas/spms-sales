@@ -16,7 +16,7 @@ export class ConfigurationService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 60 seconds.
+                ttl: 1000 * 10 // 10 seconds.
             }
         });
         console.log(resp.data);
@@ -32,7 +32,7 @@ export class ConfigurationService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 60 seconds.
+                ttl: 1000 * 10 // 10 seconds.
             }
         }).then(res => res.data);
     }
@@ -47,7 +47,7 @@ export class ConfigurationService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 60 seconds.
+                ttl: 1000 * 10 // 10 seconds.
             }
         }).then(res => res.data.rows);
     }

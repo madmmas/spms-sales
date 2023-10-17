@@ -16,6 +16,7 @@ const checkAndLoadAllMasterData = async () => {
     let masterData = window['__all_masterData'];
     if (masterData===undefined) {
         masterData = JSON.parse(localStorage.getItem("masterData"));
+        window['__all_masterData'] = masterData;
     }
 
     let masterDataCacheUpdatedTime = JSON.parse(localStorage.getItem("masterDataCacheUpdatedTime"));

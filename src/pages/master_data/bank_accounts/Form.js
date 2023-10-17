@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -33,7 +33,13 @@ const Form = ({bankAccountProfile}) => {
         handleSubmit
     } = useForm({
         defaultValues: bankAccountProfile
-      });
+    });
+
+    useEffect(() => {
+        if(bankAccountProfile===undefined){
+            setValue("status", true);
+        }
+    }, []);
 
     const onSubmit = (formData) => {
         try{
@@ -86,8 +92,7 @@ const Form = ({bankAccountProfile}) => {
                             control={control}
                             rules={{ required: 'Bank Account is required.' }}
                             render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                            <>                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                                 <SelectLookupData field={field} model={BANK_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}

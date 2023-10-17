@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
@@ -26,11 +26,18 @@ const Form = ({warehouseProfile}) => {
         register,
         control,
         formState: { errors },
+        setValue,
         resetField,
         handleSubmit
     } = useForm({
         defaultValues: warehouseProfile
-      });
+    });
+
+    useEffect(() => {
+        if(warehouseProfile===undefined){
+            setValue("status", true);
+        }
+    }, []);
 
     const onSubmit = (formData) => {
         setSubmitted(true);

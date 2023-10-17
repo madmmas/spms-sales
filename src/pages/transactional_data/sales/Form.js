@@ -14,11 +14,12 @@ import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { InputSwitch } from 'primereact/inputswitch';
         
-        
 import ConfirmDialog from '../../components/ConfirmDialog';
+
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectMasterData from '../../components/SelectMasterData';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { PRODUCT_MODEL, CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
@@ -705,10 +706,10 @@ const Form = React.memo(({ sales }) => {
                     showFields={[]} onSelect={onSelectProductFromTable}
                     columns={[
                         {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
+                        {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
                         {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
                         {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                         {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                        {field: 'category_name', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
                     ]} 
                     />
                 </div>}
@@ -841,7 +842,7 @@ const Form = React.memo(({ sales }) => {
                 <div className="field col-12 md:col-6">
                 {readOnly && <>
                     <label>Customer</label>
-                    <InputText readonly="true" value={sales.party_id} placeholder="empty" />
+                    <InputText readonly="true" value={CacheMasterDataService.getShortnameById(sales.party_id)} placeholder="empty" />
                 </>}
                 {!readOnly && <Controller
                     name="party_id"

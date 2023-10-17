@@ -29,7 +29,7 @@ const List = ({ ledger = false }) => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','route'],
+        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','route', 'status'],
         first: 0,
         rows: 10,
         page: 1,
@@ -256,7 +256,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status, 'text-red-500 pi-times-circle': !rowData.status })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
     };
     const statusFilterTemplate = (options) => {
         return (
