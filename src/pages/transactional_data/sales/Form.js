@@ -943,10 +943,14 @@ const Form = React.memo(({ sales }) => {
     <div className="grid h-screen">    
     <Toast ref={toast} />    
     <div className="card col-5">
-        {!sales && <Button className="p-button-outlined" label="Go to Sales List" 
-                        onClick={() => navigate("/sales")}/>}
-        <h5>Sale Detail :: VoucherNo ({trxNo}) 
-            {sales && <Tag severity="warning" value={sales.status}></Tag>}</h5>
+        <div style={{marginBottom:"1rem"}}>
+            {!sales && <Button className="p-button-outlined" label="Go to Sales List" 
+                            onClick={() => navigate("/sales")}/>}
+            <div style={{textAlign:"center",display:"inline-block"}}>
+                <h5 style={{marginLeft:"0.5rem"}}>Sale Detail :: VoucherNo ({trxNo}) 
+                    {sales && <Tag severity="warning" value={sales.status}></Tag>}</h5>
+            </div>
+        </div>
         {renderProductSelectionTable()}
 
         <div className="card col-12 md:col-12">
