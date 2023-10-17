@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
-import { MasterDataService } from '../../../../services/MasterDataService';
+import { MasterDataService } from '../../../../services/MasterDataService'
 
 import InvoiceCss from './InvoiceCss'
 
@@ -40,6 +40,7 @@ export const PrintInvoice = () => {
                         console.log("balance::", party_balance);
                         data.balance = balance;
                         setInvoice(data);
+                        console.log(data)
                     });
                 }); 
             }else{
@@ -156,14 +157,59 @@ export const PrintInvoice = () => {
                         <th colSpan="7" className="total text line">Net Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
-                    <tr>
-                        <td colSpan="7" className="sum-up">(-) Payment</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>
-                    </tr>
-                    {invoice.balance_forward!==-99999999 && <tr>
+                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
                         <th colSpan="7" className="total text line">(+) B/F Balance</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
                     </tr>}
+                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
+                       <th colSpan="7" className="total text line">Total Amount</th>
+                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2))}</th>
+                    </tr>}
+                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
+                       <th colSpan="7" className="total text line">Total Amount</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2) }</th>
+                    </tr>}
+                    <tr>
+                        <td colSpan="7" className="sum-up">
+                              <span>
+                                [
+                                    Bank : <span className="price">{invoice.payment.bank_amount} </span>
+                                    Cash : <span className="price">{invoice.payment.cash_amount} </span>
+                                    MFS : <span className="price">{invoice.payment.mfs_amount} </span>
+                                ]
+                              </span>
+                            (-) Payment
+
+                        </td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>
+                    </tr>
+                    
+                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
+                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
+                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
+                    </tr>}
+                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward === -99999999 && <tr>
+                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
+                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
+                    </tr>}
+                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
+                       <th colSpan="7" className="total text line">B/F Balance</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2) }</th>
+                    </tr>}
+                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
+                       <th colSpan="7" className="total text line">Total Receivable (Ledger)</th>
+                        <th className="total price right-align line">{ Number.parseFloat((Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) }</th>
+                    </tr>}
+
+                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
+                        <th colSpan="7" className="total text line">(+) Balance</th>
+                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2)) }</th>
+                    </tr>}
+                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward !==-99999999 && <tr>
+                        <th colSpan="7" className="total text line">(+) Balance</th>
+                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) -  Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
+                    </tr>}
+                   
                 </tbody>
             </table>}
             {printmePos && <table className="lineitems">            
@@ -187,6 +233,10 @@ export const PrintInvoice = () => {
                         <th className="sum-up">Net Amount</th>
                         <th className="total price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
+                    <tr>
+                        <th className="sum-up">Total Amount</th>
+                        <th className="total price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
+                    </tr>
                     {invoice.balance_forward!==-99999999 && <tr>
                         <th className="total text">(+) B/F Balance</th>
                         <th className="total price right-align">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
@@ -194,9 +244,34 @@ export const PrintInvoice = () => {
                 </tbody>
             </table>}
             <section>
-                <p>
-                    <b>In Words :</b> <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i>
-                </p>
+                { invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
+                    <p>
+                      <b>In Words :</b> <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i>
+                   </p>
+                }
+                { invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
+                    <p>
+                      <b>In Words :</b> <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka</i>
+                   </p>
+                }
+                { invoice.customer_category === "WALKIN" &&
+                    <p>
+                      <b>In Words :</b> <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i>
+                   </p>
+                }
+                { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 &&
+                    <p>
+                      <b>In Words :</b> <br></br>
+                      Conditional Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka</i> <br></br>
+                      Ledger Balance : <i>{getNumToWords(((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka</i> 
+                   </p>
+                }
+                { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward===-99999999 &&
+                    <p>
+                      <b>In Words :</b> <br></br>
+                      Total Recievable : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka</i>
+                   </p>
+                }
                 {/* <p>
                     Paid by : <span>CASH</span>
                 </p> */}
