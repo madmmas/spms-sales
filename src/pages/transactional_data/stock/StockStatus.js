@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
+import { InputText } from 'primereact/inputtext';
 
 
 import { ProductService } from '../../../services/ProductService';
@@ -31,8 +32,10 @@ const StockStatus = () => {
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [dtStockStatus, setStockStatus] = useState(null);
+    const [dtStockStatus, setStockStatus] = useState([]);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [totalStockPriceTrade, setTotalStockPriceTrade] = useState([]);
+    const [totalStockPriceCost, setTotalStockPriceCost] = useState([]);
 
     const productService = new ProductService();
 
@@ -62,6 +65,17 @@ const StockStatus = () => {
             setLoading(false);
         });
     }
+
+    useEffect(()=>{
+        let total_stock_price_cost = 0;
+        let total_stock_price_trade = 0;
+        for(let i = 0; i < dtStockStatus.length; i++){
+            total_stock_price_cost = total_stock_price_cost + dtStockStatus[i].cost * dtStockStatus[i].current_stock; 
+            total_stock_price_trade = total_stock_price_trade + dtStockStatus[i].price * dtStockStatus[i].current_stock; 
+        }
+        setTotalStockPriceTrade(total_stock_price_trade)
+        setTotalStockPriceCost(total_stock_price_cost);
+     },[dtStockStatus])
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -185,6 +199,15 @@ const StockStatus = () => {
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
+                    <label>Total Stock Price (Trade) : </label>
+                    <InputText readOnly="true" value={totalStockPriceTrade}/>
+                    <br></br>
+                    <br></br>
+                    <label>Total Stock Price (Cost) : </label>
+                    <InputText readOnly="true" value={totalStockPriceCost}/>
+                    <br></br>
+                    <br></br>
+
                     <Toast ref={toast} />
 
                     <DataTable
