@@ -5,6 +5,7 @@ import { ConfigurationService } from '../../services/ConfigurationService';
 export default function SelectLookupData( { field, className, model, onChangeItem, placeholder = "" }) {
 
     const [data, setData] = useState([]);
+    const [defaultValue] = useState("General");
 
     const configurationService = new ConfigurationService();
 
@@ -15,6 +16,10 @@ export default function SelectLookupData( { field, className, model, onChangeIte
         });
     }, []);
 
+    useEffect(() => {
+       field.value = defaultValue;
+    }, [defaultValue]);
+
     const onChange = (e) => {
         field.onChange(e.value);
         if(onChangeItem){
@@ -24,7 +29,7 @@ export default function SelectLookupData( { field, className, model, onChangeIte
 
     return (
         <Dropdown value={field.value} onChange={(e) => onChange(e)} filter
-            options={data} optionValue="_id" optionLabel="name" placeholder={placeholder}
+            options={data} optionValue="name" optionLabel="name" placeholder={placeholder}
             className={className} />
     )
 }
