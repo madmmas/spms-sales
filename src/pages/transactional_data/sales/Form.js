@@ -856,11 +856,14 @@ const Form = React.memo(({ sales }) => {
                             onSelect={onCustomerSelect}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
+                                {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
+                                {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
+                                {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
+                                {field: 'phone', header: 'Phone', filterPlaceholder: 'Filter by Phone'},
                                 {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'},
-                                {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'}
                             ]}
                             defaultFilters= {{
-                                fields: ["name", "shopName", "last_trx_id"],
+                                fields: ["name", "shopName", "last_trx_id", "address", "route", "phone"],
                                 first: 0,
                                 rows: 10,
                                 page: 1,
