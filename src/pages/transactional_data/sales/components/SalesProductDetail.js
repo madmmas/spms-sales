@@ -145,6 +145,30 @@ const SalesProductDetail = ({
                {rowData.index + 1}
             </>
         )
+    } 
+
+    const brandNameBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.brand_name}
+            </>
+        )
+    }
+
+    const partNumberBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.part_number}
+            </>
+        )
+    }
+
+    const modelNumberBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.model_no}
+            </>
+        )
     }
 
     const confirmDeleteSalesProduct = item => {
@@ -219,15 +243,15 @@ const SalesProductDetail = ({
                 stripedRows showGridlines scrollable scrollHeight="25rem" 
             >
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
-                <Column field="index" frozen header="SI"  body={serialBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="index" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
                 {/* <Column field="product_brand_name"  header="Brand Name"  headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="product_model_no"  header="Model No"  headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="product_part_number" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column> */}
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="brand_name" header="Brand Name" headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="model_no" header="Model No." headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="part_number" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="return_qty" header="Returned" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="trade_price" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="totalPrice" header={`Total Price`} headerStyle={{ minWidth: '10rem' }}></Column>
