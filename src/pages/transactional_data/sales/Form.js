@@ -807,7 +807,7 @@ const Form = React.memo(({ sales }) => {
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                    <InputTextarea readOnly={readOnly} inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                         </>
                     )}/>
                 </div>
