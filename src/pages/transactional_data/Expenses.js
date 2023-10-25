@@ -45,7 +45,8 @@ const Expenses = () => {
         control,
         formState: { errors },
         reset,
-        handleSubmit
+        handleSubmit,
+        setValue
     } = useForm({
         defaultValues: emptyExpenses
     });
@@ -126,6 +127,7 @@ const Expenses = () => {
         setCreateEdit(true);
         reset({ ...emptyExpenses });
         setBankCash("CASH");
+        setValue('date', new Date());
         setSubmitted(false);
         setExpensesDialog(true);
     };
@@ -273,6 +275,8 @@ const Expenses = () => {
             </>
         );
     };
+
+    
 
     // const renderHeader = () => {
     //     return (
