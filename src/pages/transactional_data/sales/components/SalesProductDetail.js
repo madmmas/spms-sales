@@ -231,7 +231,7 @@ const SalesProductDetail = ({
                     <td class="vatInput">
                         <InputNumber value={addDiscount}
                             placeholder=""
-                            max={100} min={0}
+                            min={0}
                             className="mx-2"
                             style={{"width": "fit-content(20em)"}}
                             onValueChange={(e) => onDiscountChange(e.value)} 
