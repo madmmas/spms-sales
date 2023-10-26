@@ -45,6 +45,7 @@ const Form = React.memo(({ sales }) => {
     const [trxStatus, setTrxStatus] = useState('draft');
 
     const [latestSaleVoucher, setLatestSaleVoucher] = useState('');
+    const [Id, setId] = useState('');
 
     // STATES FOR SALE ITEMS
 
@@ -160,14 +161,20 @@ const Form = React.memo(({ sales }) => {
             if(selectedCustomer===null){
                 // lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id);
                 orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id).then(data => {
-                    console.log("lastTradePrice::", data);
-                    setLastTradePrice(data);
+                    if(data){
+                        console.log("lastTradePrice::", data);
+                        setLastTradePrice(data.last_price);
+                        setId(data.order_id);    
+                    }
                 });
             }else{
                 // lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id);
                 orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id).then(data => {
-                    console.log("lastTradePrice::", data);
-                    setLastTradePrice(data);
+                    if(data){
+                        console.log("lastTradePrice::", data);
+                        setLastTradePrice(data.last_price);
+                        setId(data.order_id);    
+                    }
                 });
             }
         } else {
@@ -1002,6 +1009,7 @@ const Form = React.memo(({ sales }) => {
             net={sales===undefined?0:sales.net} 
             discount={sales===undefined?0:sales.discount}
             lastTradePrice={lastTradePrice}
+            Id={Id}
             />
 
         <ConfirmDialog 

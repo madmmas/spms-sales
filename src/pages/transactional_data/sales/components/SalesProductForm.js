@@ -18,7 +18,7 @@ export default function SalesProductForm({
     selectProductFromList, deselectProductFromList,
     onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
     onChangeGross, onChangeDiscount, onChangeNet,
-    vat, deliveryCost, addDiscount, gross, net, discount, lastTradePrice
+    vat, deliveryCost, addDiscount, gross, net, discount, lastTradePrice, Id
 }) {
 
     const {
@@ -218,10 +218,10 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Trade Price</label>
-                <InputNumber 
+                <a href={"#/invoice/"+Id} target="_blank"><InputNumber 
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })} 
-                    disabled={true} />
+                    disabled={true} /></a>
                     </>
                 )}/>
             </div>            

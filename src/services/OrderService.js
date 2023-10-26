@@ -86,7 +86,8 @@ export class OrderService {
             }
         });
         console.log(resp.data);
-        return resp.data? resp.data.last_price : 0;
+        // return resp.data? resp.data.last_price : 0;
+        return resp.data;
     }
 
     async getOrderProductLastPrice(orderType, productId) {
@@ -99,7 +100,8 @@ export class OrderService {
             }
         });
         console.log(resp.data);
-        return resp.data? resp.data.last_price : 0;
+        // return resp.data? resp.data.last_price : 0;
+        return resp.data;
     }
 
     async getLedgerBalance(ledgerType, partyId) {
