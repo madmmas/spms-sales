@@ -44,6 +44,8 @@ const Form = React.memo(({ sales }) => {
     const [status, setStatus] = useState('draft');
     const [trxStatus, setTrxStatus] = useState('draft');
 
+    const [latestSaleVoucher, setLatestSaleVoucher] = useState('');
+
     // STATES FOR SALE ITEMS
 
     const [salesItems, setSalesItems] = useState([]);
@@ -239,8 +241,21 @@ const Form = React.memo(({ sales }) => {
         return _item;
     }
 
+    const loadLazyData = async () => {
+        await orderService.getLastOrder().then(data => {
+            if(data){
+                console.log(data)
+                setLatestSaleVoucher(data.voucher_no)
+            }
+        });
+    }
+
+    useEffect(()=>{
+         loadLazyData()
+    },[])
+
     const prepareSalesData = formData => {
-        console.log("prepareSalesData::", formData);
+        console.log("prepareSalesData::", formData)
         let _salesItems = [];
         for(let item of salesItems) {
             _salesItems.push(prepareSalesItem(item));
@@ -882,7 +897,7 @@ const Form = React.memo(({ sales }) => {
                 </div>
                 <div className="field col-12 md:col-3">
                     <label>Last Voucher</label>
-                    <InputText value={customerLastOrder} readOnly={true}/>
+                    <InputText value={latestSaleVoucher} readOnly={true}/>
                 </div>
                 <div className="field col-12 md:col-3">
                     <label>Balance</label>

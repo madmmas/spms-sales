@@ -15,6 +15,19 @@ export class OrderService {
         return resp.data;
     }
 
+    async getLastOrder() {
+        let uri = `/orders/last_order`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async getAll(orderType, params) {
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
         let uri = `/orders/${orderType}?` + queryParams;
