@@ -20,6 +20,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
+import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
 import { ON_EXPENSE_FROM_CASH, ON_EXPENSE_FROM_BANK } from '../../constants/transactions';
 import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
@@ -36,7 +37,7 @@ const Expenses = () => {
         date: null,
         amount: 0,
         remarks: '',
-        bankOrCash: 'CASH',
+        expense_from: 'CASH',
     };
     
     const {
@@ -56,7 +57,7 @@ const Expenses = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["dtBankAccount_id","dtExpenseType_id","expensePeriod","date","amount","remarks","bankOrCash"],
+        fields: ["dtBankAccount_id","dtExpenseType_id","expensePeriod","date","amount","remarks","expense_from"],
         first: 0,
         rows: 10,
         page: 1,
@@ -70,7 +71,7 @@ const Expenses = () => {
             'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'amount': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'remarks': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'bankOrCash': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'expense_from': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
@@ -88,6 +89,7 @@ const Expenses = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const transactionService = new TransactionService();
+    const registerService = new RegisterService();
     const configurationService = new ConfigurationService();
 
     useEffect(() => {
@@ -112,7 +114,7 @@ const Expenses = () => {
     const loadLazyData = async () => {
         setLoading(true);
 
-        await transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setExpenseData(data.rows);
@@ -136,21 +138,14 @@ const Expenses = () => {
     const saveExpenses = (formData) => {
         setSubmitted(true);
         console.debug(formData);
-        if (formData.bankOrCash == 'BANK') {
-            transactionService.processTransaction(ON_EXPENSE_FROM_BANK, formData).then(data => {
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Updated', life: 3000 });
-            });
-        } else if (formData.bankOrCash == 'CASH') {
-            transactionService.processTransaction(ON_EXPENSE_FROM_CASH, formData).then(data => {
-                console.log(data);
-                loadLazyData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
-            });
-        }
+        transactionService.generaleExpenses(formData).then(data => {
+            console.log(data);
+            setExpensesDialog(false);
+            loadLazyData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
+        });
 
-        setExpensesDialog(false);
+        // setExpensesDialog(false);
         reset(emptyExpenses)
     };
 
@@ -266,7 +261,7 @@ const Expenses = () => {
     const bankorcashBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.bankOrCash}
+                {rowData.expense_from}
             </>
         );
     };
@@ -331,7 +326,7 @@ const Expenses = () => {
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="bankOrCash" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="expense_from" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
@@ -398,7 +393,7 @@ const Expenses = () => {
                             </div>
                             <div className="field col-12 md:col-6">
                             <Controller
-                                name="bankOrCash"
+                                name="expense_from"
                                 control={control}
                                 render={({ field, fieldState }) => (
                                 <>
@@ -437,13 +432,10 @@ const Expenses = () => {
                             <Controller
                                 name="remarks"
                                 control={control}
-                                rules={{ required: 'Remarks is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks*</label>
-                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
-                                        className={classNames({ 'p-invalid': fieldState.error })} 
-                                        onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>

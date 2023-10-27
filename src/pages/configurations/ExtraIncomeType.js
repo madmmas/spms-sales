@@ -11,11 +11,11 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
-import { EXTRA_INCOME_TYPE_MODEL } from '../../constants/models';
+import { INCOME_TYPE_MODEL } from '../../constants/models';
 
 const ExtraIncomeType = () => {
 
-    const modelName = EXTRA_INCOME_TYPE_MODEL;
+    const modelName = INCOME_TYPE_MODEL;
 
     const toast = useRef(null);
     const dt = useRef(null);

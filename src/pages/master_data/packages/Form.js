@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
@@ -341,27 +342,41 @@ const Form = ({ productData }) => {
                             </>
                         )}/>
                     </div>
-                <div className="field col-12 md:col-2">
-                <Controller
-                    name="part_number"
-                    control={control}
-                    // rules={{ required: 'Code is required.' }}
-                    render={({ field, fieldState }) => (
+                    <div className="field col-12 md:col-2">
+                    <Controller
+                        name="part_number"
+                        control={control}
+                        // rules={{ required: 'Part_number is required.' }}
+                        render={({ field, fieldState }) => (
+                            <>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number*</label>
+                        <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
+                        {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                    <Controller
+                        name="price"
+                        control={control}
+                        render={({ field, fieldState }) => (
                         <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>
-                    <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
-                    {getFormErrorMessage(field.name)}
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Price</label>
+                            <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} minFractionDigits={2} />
+                            {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
+                            {getFormErrorMessage(field.name)}
                         </>
                     )}/>
-                </div>
-                <div className="field col-12 md:col-4">
+                    </div>
+                    <div className="field col-12 md:col-4">
                         <Controller
-                            name="price"
+                            name="low_stock_qty"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Price</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} minFractionDigits={2} />
+                                {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

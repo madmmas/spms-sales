@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
@@ -24,11 +25,12 @@ const CustomerCategory = () => {
     let emptyCustomerCategory = {
         _id: null,
         description: '',
-        name: ''
+        name: '',
+        _default: false,
     };
 
     let defaultFilters = {
-        fields: ['name', 'description'],
+        fields: ['name', 'description', '_default'],
         first: 0,
         rows: 10,
         page: 1,
@@ -161,7 +163,7 @@ const CustomerCategory = () => {
         const val = (e.target && e.target.value) || '';
         let _empProfile = { ...CustomerCategory };
         _empProfile[`${name}`] = val;
-
+        console.log(_empProfile);
         setCustomerCategory(_empProfile);
     };
 
@@ -215,6 +217,10 @@ const CustomerCategory = () => {
                 {rowData.description}
             </>
         );
+    };
+
+    const defaultBodyTemplate = (rowData) => {
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default=="true", 'text-red-500 pi-times-circle': rowData._default!=="true" })}></i>;
     };
 
     const actionBodyTemplate = (rowData) => {
@@ -278,6 +284,7 @@ const CustomerCategory = () => {
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="_default" header="Default" body={defaultBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Customer Category`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                        
@@ -289,7 +296,11 @@ const CustomerCategory = () => {
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={CustomerCategory.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={CustomerCategory.description} onChange={(e) => onInputChange(e, 'description')} rows={3} cols={20} />
+                        </div>
+                        <div className="field">
+                            <label htmlFor="default">Default</label>
+                            <InputSwitch id="default" checked={CustomerCategory._default==="true"} onChange={(e) => onInputChange(e, '_default')} />
                         </div>
                     </Dialog>
 

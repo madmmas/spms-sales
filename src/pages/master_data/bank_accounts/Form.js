@@ -155,7 +155,7 @@ const Form = ({bankAccountProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>
-                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
+                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

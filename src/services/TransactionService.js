@@ -54,6 +54,18 @@ export class TransactionService {
         return resp.data;
     }
 
+    async generaleExpenses(data) {
+        const resp = await axiosInstance.post(`/expenses`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async generaleIncome(data) {
+        const resp = await axiosInstance.post(`/income`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async transferCash(to, data) {
         const resp = await axiosInstance.post(`/transfer/CASH/`+to, data);
         console.log(resp.data);
