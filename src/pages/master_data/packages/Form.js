@@ -18,6 +18,7 @@ import SelectLookupData from '../../components/SelectLookupData';
 import { PRODUCT_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 
 import { ProductService } from '../../../services/ProductService';
+import { MasterDataService } from '../../../services/MasterDataService';
 
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
@@ -50,8 +51,10 @@ const Form = ({ productData }) => {
 
     const [updateSaleItemMode, setUpdateSaleItemMode] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [defaultWarehouse, setDefaultWarehouse] = useState(null);
 
     const productService = new ProductService();
+    const masterDataService = new MasterDataService();
 
     const {
         control,
@@ -77,6 +80,20 @@ const Form = ({ productData }) => {
             active: true
          });
     };
+
+    useEffect(() => {
+        // get default warehouse
+        masterDataService.getDefaultItem('dtWarehouse').then(data => {
+            if(data){
+                console.log("DEFAULT WAREHOUSE::", data);
+                setDefaultWarehouse(data._id);    
+            }
+        });
+    },[])
+
+    useEffect(() => {
+        setValue('warehouse_id', defaultWarehouse);
+    }, [defaultWarehouse]);
 
     useEffect(() => {
         if (productData) {
