@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import PackageProductView from './components/PackageProductView';
 
 import { ProductService } from '../../../services/ProductService';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
 const AddStock = ({ packageData }) => {
 
@@ -103,7 +104,7 @@ const AddStock = ({ packageData }) => {
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>Warehouse:</div>
-                    <Chip label={packageData.warehouse_id} />
+                    <Chip label={CacheMasterDataService.getShortnameById(packageData.warehouse_id+"-dtWarehouse")} />
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>remarks:</div>
