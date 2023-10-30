@@ -268,30 +268,30 @@ export const PrintInvoice = () => {
             <section>
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i></b>
+                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka</i> </b>
+                      <b>In Words : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "WALKIN" &&
                     <p>
-                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka</i></b>
+                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 &&
                     <p>
                       <b>In Words : <br></br>
-                      Conditional Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka</i> <br></br>
-                      Ledger Balance : <i>{getNumToWords(((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka</i> </b>
+                      Conditional Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> <br></br>
+                      Ledger Balance : <i>{getNumToWords(((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward===-99999999 &&
                     <p>
                       <b>In Words : <br></br>
-                      Total Recievable : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka</i> </b>
+                      Total Recievable : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 {/* <p>

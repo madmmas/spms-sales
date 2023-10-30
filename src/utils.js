@@ -28,6 +28,10 @@ export const getNumToWords = (num) => {
     let num1 = num.split(".")[0];
     // get the number after dicimal
     let num2 = num.split(".")[1];
+    
+    if(Number(num2)===0){
+      return numWords(num1);
+    }
 
     return numWords(num1) + " point " + numToDigits(num2);
 }
