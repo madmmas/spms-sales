@@ -215,6 +215,9 @@ const List = () => {
     };
 
     const nameBodyTemplate = (rowData) => {
+        if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
+            rowData.customer_name = rowData.party_name;
+        }
         return (
             <>
                 {rowData.customer_name}
