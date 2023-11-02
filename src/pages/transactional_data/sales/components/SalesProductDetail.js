@@ -103,7 +103,11 @@ const SalesProductDetail = ({
     const recalculateAllRows = async (allsales) => {
         if(allsales && allsales.length > 0) {
             for(let i=0; i<allsales.length; i++) {
-                allsales[i].product_name = await getProductName(allsales[i].product_id);
+                let product = await getProductName(allsales[i].product_id);
+                allsales[i].product_name = product.name;
+                allsales[i].brand_name = product.brand_name;
+                allsales[i].model_no = product.model_no;
+                allsales[i].part_number = product.part_number;
                 let trade_price = roundNumber(Number(allsales[i].trade_price));
                 let qty = roundNumber(Number(allsales[i].qty));
                 let discount_profit = roundNumber(Number(allsales[i].discount_profit));
@@ -186,7 +190,8 @@ const SalesProductDetail = ({
     const getProductName = async (product_id) => {
 
         let product = await RProductService.getProductById(product_id);
-        return product ? product.name : "";
+        // return product ? product.name : "";
+        return product;
     }
 
     return (
@@ -245,9 +250,6 @@ const SalesProductDetail = ({
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
                 <Column field="index" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-                {/* <Column field="product_brand_name"  header="Brand Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="product_model_no"  header="Model No"  headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="product_part_number" header="Part Number" headerStyle={{ minWidth: '10rem' }}></Column> */}
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
