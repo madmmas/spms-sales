@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { getDate, getDateFormatted, getDatetime } from '../../../utils';
+import { getDateFormatted } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
@@ -13,7 +13,6 @@ import { Toolbar } from 'primereact/toolbar';
 
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
-
 import { SALES_MODEL } from '../../../constants/models';
 
 const List = () => {
@@ -107,11 +106,6 @@ const List = () => {
         navigate("/sales/" + dtProfile.id);
     };
 
-    const confirmDeleteProfile = (dtProfile) => {
-        setProfile(dtProfile);
-        setDeleteProfileDialog(true);
-    };
-
     const hideDeleteProfileDialog = () => {
         setDeleteProfileDialog(false);
     };
@@ -194,18 +188,6 @@ const List = () => {
         );
     };
 
-    const trxStatusNoBodyTemplate = (rowData) => {
-        let trxStatus = "";
-        if(rowData.customer_category==="CONDITIONAL"){
-            trxStatus = rowData.trx_status;
-        }
-        return (
-            <>
-                {trxStatus!=="" && <Tag severity="info" value={trxStatus}></Tag>}
-            </>
-        );
-    };
-
     const dateBodyTemplate = (rowData) => {
         return (
             <>
@@ -225,18 +207,18 @@ const List = () => {
         );
     };
 
+    const shopNameBodyTemplate = (rowData) =>{
+        return (
+            <>
+                {rowData.shopName}
+            </>
+        );
+    }
+
     const customerCategoryBodyTemplate = (rowData) => {
         return (
             <>
                 {rowData.customer_category}
-            </>
-        );
-    };
-
-    const totalQuantityBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.totalQuantity}
             </>
         );
     };
@@ -340,6 +322,7 @@ const List = () => {
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProfile} />
         </>
     );
+
     const deleteProfilesDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
@@ -353,34 +336,29 @@ const List = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
-
                     <DataTable
                         ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
-
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        {/* <Column field="trx_status" header="Trx Status" filter filterPlaceholder="Search by status" sortable body={trxStatusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column> */}
                         <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by shop name" sortable body={shopNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="gross" header="Total Price" filter filterPlaceholder="Search by gross" sortable body={totalPriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by Net Amount" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        {/* <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
-                        
+                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="duty_vat" header="VAT" filter filterPlaceholder="Search by Vat Amount" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -404,7 +382,6 @@ const List = () => {
                             {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
-
                 </div>
             </div>
         </div>
