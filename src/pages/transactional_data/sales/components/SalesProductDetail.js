@@ -248,13 +248,12 @@ const SalesProductDetail = ({
                 stripedRows showGridlines scrollable scrollHeight="25rem" 
             >
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
-                <Column field="index" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="index" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
+                <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '18rem' }}></Column>
+                <Column field="qty" header="Quantity" headerStyle={{ minWidth: '3rem' }}></Column>
                 <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
                 <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                <Column field="return_qty" header="Returned" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="trade_price" header="Trade Price" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="totalPrice" header={`Total Price`} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="discount_profit" header={`Discount (%)`} headerStyle={{ minWidth: '10rem' }}></Column>
