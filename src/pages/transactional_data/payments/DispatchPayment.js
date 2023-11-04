@@ -12,7 +12,7 @@ const DispatchPayment = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["id", "register_date", "register_details"],
+        fields: ["id", "register_date", "register_details", "address"],
         first: 0,
         rows: 10,
         page: 1,
@@ -146,12 +146,12 @@ const DispatchPayment = () => {
                     >
                         <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="payment_method" header="Payment Method" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="cash_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="mfs_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="bank_amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="shopName" header="Shop Name" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="party_name" header="Party" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="address" header="Address" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="payment_method" header="Payment Method" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        
                         <Column field="bank_name" header="Bank Account" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
                 </div>
