@@ -228,9 +228,29 @@ const Detail = () => {
                                         console.log("selected Party:::", e);
                                         getPartyBalance(e._id);
                                     }}
+                                    defaultFilters={{
+                                        fields: ["shopName","address","route","phone","name"],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: 'contains' },
+                                            shopName: { value: null, matchMode: 'contains' },
+                                            address: { value: null, matchMode: 'contains' },
+                                            route: { value: null, matchMode: 'contains' },
+                                            phone: { value: null, matchMode: 'contains' },
+                                            name: { value: null, matchMode: 'contains' },
+                                        }
+                                    }}
                                     className={classNames({ 'p-invalid': fieldState.error })} 
                                     columns={[
-                                        {field: 'name', header: 'Party Name', filterPlaceholder: 'Filter by Party Name'}
+                                        {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
+                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
+                                        {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
+                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
+                                        {field: 'name', header: 'Party Name', filterPlaceholder: 'Filter by Party Name'},
                                     ]} />
                                 {getFormErrorMessage(field.name)}
                             </>

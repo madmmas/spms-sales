@@ -15,7 +15,7 @@ export default function SelectMasterData({
         sortField: null,
         sortOrder: null,
         filters: {
-            global: { value: null, matchMode: 'contains' }
+            global: { value: null, matchMode: 'contains' },
         }
     }
 }) {
