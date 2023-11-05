@@ -819,17 +819,10 @@ const Form = React.memo(({ sales }) => {
                     </>
                 )}/>}
                 </div>
-                <div className="field col-12 md:col-8">
-                <Controller
-                    name="notes"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                        <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
-                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
-                        </>
-                    )}/>
-                </div>
+                {customerCategory === "WALKIN" && <div className="field col-12 md:col-5">
+                    <label>Last Voucher</label>
+                    <InputText value={latestSaleVoucher} readOnly={true}/>
+                </div>}
 
                 {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-12">
                 <div className="field col-12 md:col-6">
@@ -857,6 +850,17 @@ const Form = React.memo(({ sales }) => {
                     )}/>
                 </div>
                 </div>)}
+                <div className="field col-12 md:col-12">
+                <Controller
+                    name="notes"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Notes</label>
+                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                        </>
+                    )}/>
+                </div>
                 {(customerCategory !== "WALKIN") && (<div className="grid col-12 md:col-12">
                 <div className="field col-12 md:col-6">
                 {readOnly && <>
