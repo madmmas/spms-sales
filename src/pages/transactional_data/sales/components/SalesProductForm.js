@@ -264,24 +264,7 @@ export default function SalesProductForm({
                     </>
                 )}/>
             </div> */}
-            <div className="field col-12 md:col-2">
-            <Controller
-                name="trade_price"
-                control={control}
-                rules={{ 
-                    required: 'Trade Price is required.', 
-                    min: { value: min_trade_price, message: 'Must be less than or equal to current stock.' } 
-                }}
-                render={({ field, fieldState }) => (
-                    <>
-                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
-                <InputNumber ref={quantityRef}
-                    onFocus={(e) => e.target.select()}
-                    inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_trade_price} max={10000000} />
-                    </>
-                )}/>
-            </div>
+            
             <div className="field col-12 md:col-2">
                 <label>Current Stock</label>
                 <InputText readonly="true" value={current_stock} placeholder="Current Stock" />
@@ -301,6 +284,24 @@ export default function SalesProductForm({
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'qty')} min={1} max={10000000} />
+                    </>
+                )}/>
+            </div>
+            <div className="field col-12 md:col-2">
+            <Controller
+                name="trade_price"
+                control={control}
+                rules={{ 
+                    required: 'Trade Price is required.', 
+                    min: { value: min_trade_price, message: 'Must be less than or equal to current stock.' } 
+                }}
+                render={({ field, fieldState }) => (
+                    <>
+                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
+                <InputNumber ref={quantityRef}
+                    onFocus={(e) => e.target.select()}
+                    inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
+                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_trade_price} max={10000000} />
                     </>
                 )}/>
             </div>
