@@ -22,7 +22,7 @@ import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
-import { INCOME_MODEL, INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
+import { INCOME_MODEL, INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
 
 const Income = () => {
 
@@ -31,6 +31,7 @@ const Income = () => {
     let emptyIncome = {
         _id: null,
         dtBankAccount_id: null,
+        dtMFSAccount_id : null,
         dtIncomeType_id: null,
         incomePeriod: null,
         date: null,
@@ -56,7 +57,7 @@ const Income = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["dtBankAccount_id","dtIncomeType_id","incomePeriod","date","amount","remarks","income_to"],
+        fields: ["dtBankAccount_id","dtMFSAccount_id","dtIncomeType_id","incomePeriod","date","amount","remarks","income_to"],
         first: 0,
         rows: 10,
         page: 1,
@@ -65,6 +66,7 @@ const Income = () => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtMFSAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'dtIncomeType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'incomePeriod': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
@@ -325,7 +327,7 @@ const Income = () => {
                         <Column field="incomePeriod" header="Income Period" filter filterPlaceholder="Search by Income Period" sortable body={incomePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="income_to" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="income_to" header="Bank or Cash or MFS" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
@@ -396,7 +398,7 @@ const Income = () => {
                                 control={control}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Or Cash</label>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank or Cash or MFS</label>
                                     <SelectConstData field={field} data={BANK_CASH}
                                         onSelectChange={(value) => {console.log(value); setBankCash(value)}}
                                         className={classNames({ 'p-invalid': fieldState.error })} /> 
@@ -404,7 +406,8 @@ const Income = () => {
                                 </>
                             )}/>
                             </div>
-                            <div hidden={bankCash !== "BANK"} className="field col-12 md:col-6">
+                            
+                            {bankCash === "BANK" && <div className="field col-12 md:col-6">
                             <Controller
                                 name="dtBankAccount_id"
                                 control={control}
@@ -418,6 +421,17 @@ const Income = () => {
                                         displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {console.log(e);}}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
+                                        defaultFilters={{
+                                            fields: ['dtBank_id', 'accNumber', 'accName'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}
                                         columns={[
                                             {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
@@ -426,7 +440,42 @@ const Income = () => {
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
-                            </div>
+                            </div>}
+                            {bankCash === "MFS" && <div className="field col-12 md:col-6">
+                            <Controller
+                                name="dtMFSAccount_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((bankCash === "CASH") || (bankCash === "MFS" && value !== null) ) || 'MFS Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                                    <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        onSelect={(e) => {console.log(e);}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        defaultFilters={{
+                                            fields: ['dtMFS_id', 'accName', 'refNumber'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}
+                                        columns={[
+                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'refNumber', header: 'MFS Number', filterPlaceholder: 'Filter by MFS Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>}
+
                             <div className="field col-12 md:col-12">
                             <Controller
                                 name="remarks"
