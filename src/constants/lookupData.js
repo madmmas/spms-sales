@@ -1,6 +1,7 @@
 export const BANK_CASH = [
     { id: 'BANK', name: 'BANK' },
-    { id: 'CASH', name: 'CASH' }
+    { id: 'CASH', name: 'CASH' },
+    { id: 'MFS', name: 'MFS' },
 ];
 
 export const BLOOD_GROUP = [

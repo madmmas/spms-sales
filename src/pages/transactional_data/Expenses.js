@@ -18,12 +18,12 @@ import SelectLookupData from '../components/SelectLookupData';
 import SelectMasterData from '../components/SelectMasterData';
 import React, { useEffect, useRef, useState } from 'react';
 
+import CacheMasterDataService from '../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
-import { ON_EXPENSE_FROM_CASH, ON_EXPENSE_FROM_BANK } from '../../constants/transactions';
-import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
+import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL, BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
 
 const Expenses = () => {
 
@@ -32,6 +32,7 @@ const Expenses = () => {
     let emptyExpenses = {
         _id: null,
         dtBankAccount_id: null,
+        dtMFSAccount_id: null,
         dtExpenseType_id: null,
         expensePeriod: null,
         date: null,
@@ -58,7 +59,7 @@ const Expenses = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["dtBankAccount_id","dtExpenseType_id","expensePeriod","date","amount","remarks","expense_from"],
+        fields: ["dtBankAccount_id","dtMFSAccount_id","dtExpenseType_id","expensePeriod","date","amount","remarks","expense_from"],
         first: 0,
         rows: 10,
         page: 1,
@@ -67,6 +68,7 @@ const Expenses = () => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             'dtBankAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'dtMFSAccount_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'dtExpenseType_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'expensePeriod': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'date': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
@@ -142,7 +144,7 @@ const Expenses = () => {
         console.debug(formData);
         transactionService.generaleExpenses(formData).then(data => {
             console.log(data);
-            // setExpensesDialog(false);
+            setExpensesDialog(false);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
         });
@@ -219,7 +221,7 @@ const Expenses = () => {
     const expenseBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtExpenseType_id_shortname}
+                {CacheMasterDataService.getShortnameById(rowData.dtExpenseType_id+"-dtExpenseType")}
             </>
         );
     };
@@ -330,7 +332,7 @@ const Expenses = () => {
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="expense_from" header="Bank Or Cash" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="expense_from" header="Bank or Cash or MFS" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
@@ -401,7 +403,7 @@ const Expenses = () => {
                                 control={control}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Or Cash</label>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank or Cash or MFS</label>
                                     <SelectConstData field={field} data={BANK_CASH}
                                         onSelectChange={(value) => {console.log(value); setBankCash(value)}}
                                         className={classNames({ 'p-invalid': fieldState.error })} /> 
@@ -409,7 +411,7 @@ const Expenses = () => {
                                 </>
                             )}/>
                             </div>
-                            <div hidden={bankCash !== "BANK"} className="field col-12 md:col-6">
+                            {bankCash === "BANK" && <div className="field col-12 md:col-6">
                             <Controller
                                 name="dtBankAccount_id"
                                 control={control}
@@ -423,6 +425,17 @@ const Expenses = () => {
                                         displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {console.log(e);}}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
+                                        defaultFilters={{
+                                            fields: ['dtBank_id', 'accNumber', 'accName'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}
                                         columns={[
                                             {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
@@ -431,7 +444,41 @@ const Expenses = () => {
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
-                            </div>
+                            </div>}
+                            {bankCash === "MFS" && <div className="field col-12 md:col-6">
+                            <Controller
+                                name="dtMFSAccount_id"
+                                control={control}
+                                rules={{ 
+                                    validate: (value) => ((bankCash === "CASH") || (bankCash === "MFS" && value !== null) ) || 'MFS Account is required.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                                    <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        onSelect={(e) => {console.log(e);}}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        defaultFilters={{
+                                            fields: ['dtMFS_id', 'accName', 'refNumber'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}
+                                        columns={[
+                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'refNumber', header: 'MFS Number', filterPlaceholder: 'Filter by MFS Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} />
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>}
                             <div className="field col-12 md:col-12">
                             <Controller
                                 name="remarks"
