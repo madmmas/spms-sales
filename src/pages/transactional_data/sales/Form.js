@@ -104,6 +104,7 @@ const Form = React.memo(({ sales }) => {
     // STATES FOR CANCELLATION FEE DIALOG
     const [cancelData, setCancelData] = useState(null);
     const [cancellationFeeDlgTrigger, setCancellationFeeDlgTrigger] = useState(0);
+    const [totalReturnedAmount, setTotalReturnedAmount] = useState('');
     
     ///// Default Values -- Start /////
     let defaultProductFilters = {
@@ -199,7 +200,23 @@ const Form = React.memo(({ sales }) => {
             setStatus(sales.status);
             setTrxNo(sales.voucher_no);
             setSalesItems(sales.items);
-            setReturnItems(sales.return_items);
+            let totalReturnedPrice = 0;
+            let arrayOfSalesReturnItems = sales?.return_items?.map((item)=>{
+                for (let i = 0; i < sales.items.length; i++){
+                    if(item.product_id === sales.items[i].product_id){
+                        totalReturnedPrice = totalReturnedPrice + item.return_qty * sales.items[i].trade_price;
+                        return {
+                           ...item,
+                           brand_name : sales.items[i].brand_name,
+                           model_no : sales.items[i].model_no,
+                           part_number : sales.items[i].part_number,
+                           trade_price : sales.items[i].trade_price
+                        }
+                    }
+                }
+            })
+            setTotalReturnedAmount(totalReturnedPrice)
+            setReturnItems(arrayOfSalesReturnItems);
             setEditMode(sales.status === 'draft');
             setCustomerCategory(sales.customer_category);
             setCustomerLastOrder(sales.last_trx_id);
@@ -925,6 +942,14 @@ const Form = React.memo(({ sales }) => {
         )
     }
 
+    const totalPriceBodyTemplate = (rowData) => {
+        return (
+           <>
+               {rowData.return_qty * rowData.trade_price}
+           </>
+        )
+   }
+
     const renderActionBodyTemplate = (rowData) => {
         return (
             <>
@@ -950,10 +975,18 @@ const Form = React.memo(({ sales }) => {
             <h5>Returned Items:</h5>
             <DataTable value={returnItems} stripedRows showGridlines scrollable scrollHeight="25rem" >
                 <Column field="product_name" header="Product Name" sortable></Column>
+                <Column field="brand_name" header="Brand Name" sortable></Column>
+                <Column field="model_no" header="Model No." sortable></Column>
+                <Column field="part_number" header="Part Number" sortable></Column>
                 <Column field="return_qty" header="Returned Qty" sortable></Column>
+                <Column field="trade_price" header="Trade Price" sortable></Column>
+                <Column field="" header="Total Price" body={totalPriceBodyTemplate} sortable></Column>
                 <Column field="reason" header="Reason" sortable></Column>
                 <Column field="created_at" header="Returned Date" sortable></Column>
             </DataTable>
+            <br></br>
+            <label><b>Total Returned Price : </b></label>
+            <InputText readOnly="true" value={totalReturnedAmount}/>
         </div>}
         <ReturnItemDialog 
             trigger={returnDlgTrigger} 
