@@ -17,10 +17,14 @@ export const CashFlow = () => {
 
     useEffect(() => {
         if(cashFlowData.length === 0){
-            // transactionService.getReport('cashflow').then(data => {
-            //     setCashFlowData(data);
-            //     console.log(data);
-            // });
+
+            transactionService.getReport('cashflow', {
+                "ondate": getDateWithFormat(new Date(), "YYYY-MM-DD"),
+                // "ondate": getDateWithFormat('2023-11-09', "YYYY-MM-DD"),
+            }).then(data => {
+                setCashFlowData(data);
+                console.log(data);
+            });
         }
     }, [cashFlowData]);
 
@@ -148,15 +152,15 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align">New Sales</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["new_sales"]).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Advance Payment Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(1500.00).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["advance_payment_conditional_sales"]).toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Cash Collection Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(1500.00).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["cash_collection_conditional_sales"]).toFixed(2)}</td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -164,7 +168,7 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align"><b>TOTAL ----</b></td>
-                                        <td className="right-align qty">{Number.parseFloat(40000.00).toFixed(2)}</td>
+                                        <td className="right-align qty"><b>{Number.parseFloat(40000.00).toFixed(2)}</b></td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -176,7 +180,8 @@ export const CashFlow = () => {
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
-                                        <td>= 3245678.00 + 49689.00 + 233423.00</td>
+                                        <td>= {Number.parseFloat(cashFlowData["opening_cash_balance"]).toFixed(2)} + 
+                                                49689.00 + 233423.00</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
@@ -237,7 +242,7 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align"><b>TOTAL ----</b></td>
-                                        <td className="right-align qty">{Number.parseFloat(40000.00).toFixed(2)}</td>
+                                        <td className="right-align qty"><b>{Number.parseFloat(40000.00).toFixed(2)}</b></td>
                                     </tr>
                                 </tbody>
                             </table>

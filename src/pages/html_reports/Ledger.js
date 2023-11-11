@@ -43,7 +43,6 @@ export const HtmlLedger = ({type, header}) => {
             if(partyType === null || partyType === ""){
                 return;
             }                
-            params["partyid"] = id;
             masterDataService.getById(partyType, id).then(party => {
                 setPartyData({
                     "line1": party.shopName||party.name,
@@ -51,14 +50,18 @@ export const HtmlLedger = ({type, header}) => {
                     "line3": party.phone,
                 });
             });
+            params["partyid"] = id;
+            params["partytype"] = partyType;
             transactionService.getReportBy('ledger', params).then(data => {
-                setLedgerData(data);
-                console.log(data);
+                let dataWithBalance = calculateBalance(data);
+                setLedgerData(dataWithBalance);
+                console.log("LEDGER DATA::=>>>", dataWithBalance);
             });
         } else {
             transactionService.getReportBy('ledger', params).then(data => {
-                setLedgerData(data);
-                console.log("LEDGER DATA::=>>>", data);
+                let dataWithBalance = calculateBalance(data);
+                setLedgerData(dataWithBalance);
+                console.log("LEDGER DATA::=>>>", dataWithBalance);
             });
         }
     }, [type, id]);
@@ -68,6 +71,33 @@ export const HtmlLedger = ({type, header}) => {
             window.print();
         }
     }, [trigger]);
+
+    const calculateBalance = (data) => {
+        let dataMap = new Map();
+        data.forEach(item => {
+            let balance = item.dr_amount - item.cr_amount;
+            item.balance = balance;
+            dataMap.set(item.sl, {balance: balance});
+        });
+
+        let balance = 0;
+        for(let i=1; i<=data.length; i++){
+            let dataItem = dataMap.get(i);
+            dataMap.set(i, {balance: balance + dataItem.balance});
+        }
+
+        for(let i=0; i<data.length; i++){
+            let dataItem = dataMap.get(i+1);
+            for(let j=0; j<data.length; j++){
+                if(data[j].sl === i+1){
+                    data[j].balance = dataItem.balance;
+                    break;
+                }
+            }
+        }
+
+        return data;
+    }
 
     const getCACode = (type) => {
         switch (type) {
@@ -140,12 +170,12 @@ export const HtmlLedger = ({type, header}) => {
         }
         let particular = item.particular;
         
-        if(item.reg_type !== null && item.reg_type !== undefined && item.reg_type !== ""){
-            particular = particular + " (" + item.reg_type + ")";
-        }
-        if(item.shortname !== null && item.shortname !== undefined && item.shortname !== ""){
-            particular = particular + " (" + item.shortname + ")";
-        }
+        // if(item.reg_type !== null && item.reg_type !== undefined && item.reg_type !== ""){
+        //     particular = particular + " (" + item.reg_type + ")";
+        // }
+        // if(item.shortname !== null && item.shortname !== undefined && item.shortname !== ""){
+        //     particular = particular + " (" + item.shortname + ")";
+        // }
             
         return particular;
     }
@@ -181,8 +211,8 @@ export const HtmlLedger = ({type, header}) => {
                     <tr>
                         <th className="heading qty left-align">Sl</th>
                         <th className="heading qty left-align">Date</th>
-                        <th className="heading name left-align">Voucher No</th>
-                        <th className="heading brand left-align">Description</th>
+                        <th className="heading brand left-align">Voucher No</th>
+                        <th className="heading name left-align">Description</th>
                         <th className="heading brand left-align">Dr</th>
                         <th className="heading brand left-align">Cr</th>
                         <th className="heading brand left-align">Balance</th>
@@ -196,9 +226,9 @@ export const HtmlLedger = ({type, header}) => {
                         <td className="left-align">{getDateFormatted(moment(item.created_at).format('DD/MM/YYYY'))}</td>
                         <td className="left-align">{item.voucher_no}</td>
                         <td className="left-align">{getParticular(item)}</td>
-                        <td className="right-align">{Number.parseFloat(item.dr_amount).toFixed(2)}</td>
-                        <td className="right-align">{Number.parseFloat(item.cr_amount).toFixed(2)}</td>
-                        <td className="right-align">{Number.parseFloat(item.balance).toFixed(2)}</td>
+                        <td className="right-align"><b>{Number.parseFloat(item.dr_amount).toFixed(2)}</b></td>
+                        <td className="right-align"><b>{Number.parseFloat(item.cr_amount).toFixed(2)}</b></td>
+                        <td className="right-align"><b>{Number.parseFloat(item.balance).toFixed(2)}</b></td>
                     </tr>)}
                 {ledgerData.length === 0 && <tr>
                         <td className="left-align" colSpan="7">No Data Found</td>

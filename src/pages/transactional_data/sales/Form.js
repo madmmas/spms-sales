@@ -382,10 +382,6 @@ const Form = React.memo(({ sales }) => {
         }
     }
 
-    const sumbitFormData = () => {
-        // console.log("sumbitFormData::", salesData);
-        submitSalesData(salesData);
-    };
     ///// Functions -- End /////
 
     ///// Events -- Start /////
@@ -402,7 +398,6 @@ const Form = React.memo(({ sales }) => {
     };
     const deselectProductFromList = () => {
         resetProductSelection();
-        // setUpdateSaleItemMode(false);
     };
 
     const onSelectProductFromTable = async (e) => {
@@ -430,12 +425,6 @@ const Form = React.memo(({ sales }) => {
                 }
             };
 
-            // let lastTradePrice = 0
-            // if(selectedCustomer===null){
-            //     lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", _productSelected.id);
-            // }else{
-            //     lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", _productSelected.id, selectedCustomer._id);
-            // }
             selectProductFromList(_productSelected.id);
             
             let _product = { 
@@ -443,7 +432,6 @@ const Form = React.memo(({ sales }) => {
                 "trade_price": Number(_productSelected.price),
                 "current_stock": Number(_productSelected.current_stock),
                 "min_trade_price": Number(_productSelected.min_trade_price),
-                // "lastTradePrice": Number(lastTradePrice),
             };
             console.log("setSelectedProductItem::", _product)
             setSelectedProductItem(_product);
@@ -523,6 +511,13 @@ const Form = React.memo(({ sales }) => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Cancelled', life: 3000 });
                 navigate("/sales");
             });
+        } else if (action === 'confirm_conditional_sales') {
+            orderService.confirmOrder(sales.id).then(data => {
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
+                navigate("/sales");
+                window.open("#/invoice/" + sales.id, "_blank");
+            });
+
         } else {
             console.log("onConfirmClick::", selAction, selFormData);
             let formData = selFormData;
@@ -593,36 +588,9 @@ const Form = React.memo(({ sales }) => {
 
     ///// Events -- PAYMENT DIALOG /////
     const confirmPayment = () => {
-
-        // console.log("confirmPayment::", paymentData);
-        // let data = getCalculatedValues()
-        // console.log("DATA::", data)
-
-        orderService.confirmOrder(sales.id).then(data => {
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-            navigate("/sales");
-            // if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
-            //     window.open("#/invoice/" + sales.id, "_blank");
-            // }
-        });                                                
-
-        // let _customerBalance = 0;
-        // if(includeDueAmount) {
-        //     _customerBalance = customerBalance;
-        // }
-        // setInitPayment({
-        //     ...emptyPayment,
-        //     ...{
-        //         "ref_type": "dtCustomer",
-        //         "ref_id": sales.party_id,
-        //         "previous_balance": _customerBalance,
-        //         "invoice_amount": data.net,
-        //         "current_balance": data.net + _customerBalance,
-        //         "amount": data.net,
-        //     }
-        // });
-        // console.log("InitPayment::", initPayment);
-        // setPaymentDlgTrigger(paymentDlgTrigger + 1);
+        setSelAction('confirm_conditional_sales');
+        setConfirmDialogMessage("Are you sure you want to complete this order?");
+        setTriggerConfirmDialog(triggerConfirmDialog+1);
     }
 
     const showPaymentDialog = formData => {

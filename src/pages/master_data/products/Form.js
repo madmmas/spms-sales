@@ -64,7 +64,7 @@ const Form = ({productData}) => {
     const buildFormData = (data) => {
         return {
             id: data.id,
-            code: data.code,
+            // code: data.code,
             name: data.name,
             price: Number(data.price),
             type: 'GENERAL',
@@ -189,7 +189,7 @@ const Form = ({productData}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Code</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputText readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
