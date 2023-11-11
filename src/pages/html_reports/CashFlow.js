@@ -189,6 +189,41 @@ export const CashFlow = () => {
                                     </tr>
                                 </tbody>
                             </table> 
+                            <table className="lineitems">
+                                <tbody>
+                                    <tr>
+                                        <th colSpan="5" className="bottom-line left-align">Customer's Payment Through Bank</th>
+                                    </tr>
+                                    <tr>
+                                        <th className="left-align">SI</th>
+                                        <th className="left-align">Customer Name (Shop Name)</th>
+                                        <th className="left-align">Bank Name</th>
+                                        <th className="left-align">Acc. Number</th>
+                                        <th className="left-align">Amount</th>   
+                                    </tr>
+                                    <tr>
+                                        <td className="left-align">1</td>  
+                                        <td className="left-align">Shop 1</td>  
+                                        <td className="left-align">Bank 1</td>  
+                                        <td className="left-align">2802309876</td>  
+                                        <td className="left-align">10,000</td>  
+                                    </tr>
+                                    <tr>
+                                        <td className="left-align">2</td>  
+                                        <td className="left-align">Shop 2</td>  
+                                        <td className="left-align">Bank 2</td>  
+                                        <td className="left-align">2802309878</td>  
+                                        <td className="left-align">20,000</td>  
+                                    </tr>
+                                    <tr>
+                                        <td className="left-align">3</td>  
+                                        <td className="left-align">Shop 3</td>  
+                                        <td className="left-align">Bank 3</td>  
+                                        <td className="left-align">2802309879</td>  
+                                        <td className="left-align">30,000</td>  
+                                    </tr>
+                                </tbody>
+                            </table> 
                         </td>
                         <td className="left-align">
                             <table className="lineitems">
@@ -200,6 +235,27 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align">Bank name</td>
+                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table className="lineitems">
+                                <thead>
+                                    <tr>
+                                        <th colSpan="2" className="bottom-line left-align">Cash Payments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="left-align">Suppier's Payment</td>
+                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="left-align">Sales Return</td>
+                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="left-align">Dispatch Amount</td>
                                         <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
                                     </tr>
                                 </tbody>
