@@ -193,13 +193,21 @@ export const PrintInvoice = () => {
                     </tr>}
                     {invoice.payment && <tr>
                         <td colSpan="7" className="sum-up">
-                              <span>
+                              {invoice.customer_category !== "CONDITIONAL" && <span>
                                 [
                                     Bank : <span className="price">{invoice.payment.bank_amount} </span>
                                     Cash : <span className="price">{invoice.payment.cash_amount} </span>
                                     MFS : <span className="price">{invoice.payment.mfs_amount} </span>
                                 ]
-                              </span>
+                              </span>}
+                              {invoice.customer_category === "CONDITIONAL" && <span>
+                                [
+                                    <>Bank : <span className="price">{invoice.advance_payment.bank_amount} </span></>
+                                    {invoice.trx_status === "pending" && <>Cash : <span className="price">{invoice.advance_payment.cash_amount} </span></>}
+                                    {invoice.trx_status === "completed" && <>Cash : <span className="price">{invoice.advance_payment.cash_amount} </span> + <span className="price">{invoice.advance_payment.current_balance} </span></>}
+                                    <>MFS : <span className="price">{invoice.advance_payment.mfs_amount} </span></>
+                                ]
+                              </span>}
                             (-) Payment
 
                         </td>
