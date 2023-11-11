@@ -15,9 +15,11 @@ import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
 import POS from "./pages/POS";
 
-import RProductService from "./services/RProductService";
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
-import CacheMasterDataService from "./services/CacheMasterDataService";
+import { PrintReport } from "./pages/html_reports/PrintReport";
+import { HtmlLedger } from "./pages/html_reports/Ledger";
+import { CashFlow } from "./pages/html_reports/CashFlow";
+
 
 function App() {
 
@@ -83,25 +85,6 @@ function App() {
   const Invoice = React.lazy(() => import("./pages/transactional_data/sales/Invoice"));
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
-  
-  // load the product data here
-  useEffect(() => {
-    // load the product data here
-    let products = window['__all_products'];
-    
-    // if products undefined or empty load all from server limit 1000 until no more
-    if (!products || products.length == 0) {
-      RProductService.loadAllProductsFromLocalStorage();
-    }
-
-    let masterData = window['__all_masterData'];
-
-    // if masterData undefined or empty load all from server limit 1000 until no more
-    if (masterData === undefined || masterData.length == 0) {
-      console.log("masterData is undefined or empty");
-      CacheMasterDataService.checkAndLoadAllMasterData();
-    }
-  }, []);
 
   return (
     <Routes>
@@ -122,6 +105,7 @@ function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
         <Route path="/about" element={<RequireAuth><About /></RequireAuth>} />
+        <Route path="/report/:id" element={<PrintReport />} />
 
         <Route path="/crud" element={<RouteAuth pageComponent={<Crud />} />} />
         <Route path="/demodata" element={<RouteAuth pageComponent={<DemoData />} />} />
@@ -131,21 +115,34 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<BankAccountList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<BankAccountForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<BankAccountDetail />} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="bank" header="Bank Ledger"/>} />} />
         </Route>
 
         <Route path="/mfs_accounts">
           <Route index element={<RouteAuth pageComponent={<MFSAccountList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<MFSAccountForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<MFSAccountDetail />} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="mfs" header="MFS Ledger"/>} />} />
         </Route>
 
+        <Route path="/report">
+          <Route path="cashflow" element={<RouteAuth pageComponent={<CashFlow />} />} />
+        </Route>
         <Route path="/ledger">
-          <Route path="purchase" element={<RouteAuth pageComponent={<Ledger type="purchase" header="Purchase Ledger" />} />} />
-          <Route path="sales" element={<RouteAuth pageComponent={<Ledger type="sales" header="Sales Ledger" />} />} />
-          <Route path="accpayable" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="A/C Payable"/>} />} />
-          <Route path="accreceivable" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="A/C Receivable"/>} />} />
-          <Route path="bank" element={<RouteAuth pageComponent={<Ledger type="bank" header="Bank Ledger"/>} />} />
-          <Route path="cash" element={<RouteAuth pageComponent={<Ledger type="cash" header="Cash Ledger"/>} />} />
+          {/* <Route path="purchase" element={<RouteAuth pageComponent={<Ledger type="purchase" header="Purchase Ledger" />} />} /> */}
+          <Route path="purchase" element={<RouteAuth pageComponent={<HtmlLedger type="purchase" header="Purchase Ledger" />} />} />
+          {/* <Route path="sales" element={<RouteAuth pageComponent={<Ledger type="sales" header="Sales Ledger" />} />} /> */}
+          <Route path="sales" element={<RouteAuth pageComponent={<HtmlLedger type="sales" header="SALES LEDGER" />} />} />
+          {/* <Route path="accpayable" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="A/C Payable"/>} />} /> */}
+          <Route path="accpayable" element={<RouteAuth pageComponent={<HtmlLedger type="accpayable" header="A/C Payable"/>} />} />
+          {/* <Route path="accreceivable" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="A/C Receivable"/>} />} /> */}
+          <Route path="accreceivable" element={<RouteAuth pageComponent={<HtmlLedger type="accreceivable" header="A/C Receivable"/>} />} />
+          {/* <Route path="bank" element={<RouteAuth pageComponent={<Ledger type="bank" header="Bank Ledger"/>} />} /> */}
+          {/* <Route path="bank" element={<RouteAuth pageComponent={<HtmlLedger type="bank" header="Bank Ledger"/>} />} /> */}
+          {/* <Route path="cash" element={<RouteAuth pageComponent={<Ledger type="cash" header="Cash Ledger"/>} />} /> */}
+          <Route path="cash" element={<RouteAuth pageComponent={<HtmlLedger type="cash" header="Cash Ledger"/>} />} />
+          <Route path="bank" element={<RouteAuth pageComponent={<BankAccountList ledger={true} />} />} />
+          <Route path="mfs" element={<RouteAuth pageComponent={<MFSAccountList ledger={true} />} />} />
           <Route path="customer" element={<RouteAuth pageComponent={<CustomerList ledger={true} />} />} />
           <Route path="supplier" element={<RouteAuth pageComponent={<SupplierList ledger={true} />} />} />
         </Route>
@@ -158,13 +155,15 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<SupplierList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<SupplierForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<SupplierDetail />} />} />
-          <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="Supplier Ledger"/>} />} />
+          {/* <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="Supplier Ledger"/>} />} /> */}
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="accpayable" header="Supplier Ledger"/>} />} />
         </Route>
         <Route path="/customers">
           <Route index element={<RouteAuth pageComponent={<CustomerList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<CustomerForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<CustomerDetail />} />} />
-          <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="Customer Ledger"/>} />} />
+          {/* <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="Customer Ledger"/>} />} /> */}
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="accreceivable" header="Customer Ledger"/>} />} />
         </Route>
         <Route path="/products">
           <Route index element={<RouteAuth pageComponent={<ProductList />} />} />

@@ -12,6 +12,7 @@ import { InputText } from 'primereact/inputtext';
 
 import { PRODUCT_MODEL } from '../../../constants/models';
 import { ProductService } from '../../../services/ProductService';
+import db from '../../../db';
 
 const List = () => {
 
@@ -81,9 +82,13 @@ const List = () => {
         loadLazyData();
     }, [lazyParams]);
 
-    const loadLazyData = () => {
+    const loadLazyData = async () => {
         setLoading(true);
-
+        // let [rows, total] = await db.getProducts(lazyParams.first, lazyParams.rows);
+        // console.log(total);
+        // setTotalRecords(total);
+        // setProducts(rows);
+        // setLoading(false);
         productService.getAll(lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);

@@ -49,6 +49,7 @@ const AppMenu = () => {
         {
             label: 'Reports',
             items: [
+                { label: 'Cash flow', icon: 'pi pi-fw pi-list', to: '/report/cashflow' },
                 {
                     label: 'Ledger',
                     icon: 'pi pi-fw pi-list',
@@ -59,8 +60,9 @@ const AppMenu = () => {
                         { label: 'Customer Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/customer' },
                         { label: 'A/C Payable', icon: 'pi pi-fw pi-list', to: '/ledger/accpayable' },
                         { label: 'A/C Receiveable', icon: 'pi pi-fw pi-list', to: '/ledger/accreceivable' },
-                        { label: 'Bank', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
-                        { label: 'Cash', icon: 'pi pi-fw pi-list', to: '/ledger/cash' },
+                        { label: 'Bank Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
+                        { label: 'MFS Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/mfs' },
+                        { label: 'Cash Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/cash' },
                     ]
                 }
             ]

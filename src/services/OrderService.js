@@ -58,8 +58,8 @@ export class OrderService {
         return resp.data;
     }
 
-    async confirmPayment(id, data) {
-        const resp = await axiosInstance.patch(`/confirm_order/` + id, data);
+    async confirmOrder(id) {
+        const resp = await axiosInstance.patch(`/confirm_order/` + id);
         console.log(resp.data);
         return resp.data;
     }
@@ -82,7 +82,7 @@ export class OrderService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 20 seconds.
+                ttl: 1000 * 10 // 20 seconds.
             }
         });
         console.log(resp.data);
@@ -96,7 +96,7 @@ export class OrderService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 20 seconds.
+                ttl: 1000 * 10 // 20 seconds.
             }
         });
         console.log(resp.data);
@@ -110,7 +110,7 @@ export class OrderService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 20 seconds.
+                ttl: 1000 * 10 // 20 seconds.
             }
         });
         console.log(resp.data);

@@ -21,11 +21,12 @@ export class ComponentToPrint extends React.PureComponent {
                 size: A4;
                 margin: 0;
               }
-              .layout-topbar, .layout-footer { display: none; height: 0px!important;}
+              .layout-topbar, .layout-footer { display: none;}
               .no-printme  { display: none;}
               .printme  { 
                 display: block; 
-                margin: .5in !important; 
+                margin: .5in !important;
+                margin-top: 0px !important;
                 padding: 0px !important; 
               }
             }

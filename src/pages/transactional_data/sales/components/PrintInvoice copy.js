@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 
 export class PrintInvoice extends Component {
-    
-  render() {
 
+    render() {
+        
+
+        
     return (
       <div>
         <style>{`
@@ -16,8 +18,9 @@ export class PrintInvoice extends Component {
                 padding: 20px !important;
             }
             @media print { 
+                .layout-topbar, .layout-footer { display: none; }
                 .no-printme  { display: none;}
-                .printme  { display: block; margin: 0px !important; padding: 0px !important; }
+                    .printme  { display: block; margin: 0px !important; padding: 0px !important; }
                 body {
                     margin: 0;
                     padding: 0;
@@ -146,8 +149,8 @@ export class PrintInvoice extends Component {
                 }
             }
         `}</style>
-        <button className = "no-printme" onClick={() => window.print()}>PRINT</button>
-        <div className='printme'>
+        <button className = "no-printme" onClick={() => PrintElem(printme)}>PRINT</button>
+        <div className='printme' ref={printme}>
             <p>Invoice Number : 4910487129047124</p>
             <table className="bill-details">
                 <tbody>

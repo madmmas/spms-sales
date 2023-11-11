@@ -15,6 +15,51 @@ export class TransactionService {
         return resp.data;
     }
 
+    async getReport(report_name, params) {
+        // conver json into query string
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+        let uri = `/report/${report_name}?` + queryParams;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async getReportBy(report_name, params) {
+        // conver json into query string
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+        let uri = `/report/${report_name}/by?` + queryParams;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async getReportByQueryName(report_name, query_name, params) {
+        // conver json into query string
+        const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';
+        let uri = `/report/${report_name}/${query_name}?` + queryParams;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 20 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async getLedgerByParty(partyType) {
         let uri = `/ledger/${partyType}`;
         const resp = await axiosInstance.get(uri, {

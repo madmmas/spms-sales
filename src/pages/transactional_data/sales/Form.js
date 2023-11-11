@@ -163,7 +163,7 @@ const Form = React.memo(({ sales }) => {
                 orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
-                        setLastTradePrice(data.last_price);
+                        setLastTradePrice(data.prev_price);
                         setId(data.order_id);    
                     }
                 });
@@ -172,7 +172,7 @@ const Form = React.memo(({ sales }) => {
                 orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
-                        setLastTradePrice(data.last_price);
+                        setLastTradePrice(data.prev_price);
                         setId(data.order_id);    
                     }
                 });
@@ -196,6 +196,7 @@ const Form = React.memo(({ sales }) => {
             setEditMode(true);
         } else {
             console.log("FETCHED-SALES::", sales);
+            setStatus(sales.status);
             setTrxNo(sales.voucher_no);
             setSalesItems(sales.items);
             setReturnItems(sales.return_items);
@@ -258,7 +259,7 @@ const Form = React.memo(({ sales }) => {
     }
 
     useEffect(()=>{
-         loadLazyData()
+        loadLazyData()
     },[])
 
     const prepareSalesData = formData => {
@@ -267,11 +268,19 @@ const Form = React.memo(({ sales }) => {
         for(let item of salesItems) {
             _salesItems.push(prepareSalesItem(item));
         }
-        let _payment = paymentData;
+        let party_id = formData.party_id==""?null:formData.party_id;
+
+        let _payment = {};
+        let _advance_payment = {};
+        if(formData.customer_category === "CONDITIONAL") {
+            _advance_payment = paymentData;
+        } else {
+            _payment = paymentData;
+        }
         let _sales = {
             "voucher_no": trxNo,
             "customer_category": formData.customer_category,
-            "party_id": formData.party_id,
+            "party_id": party_id,
             "customer_name": formData.customer_name,
             "last_trx_id": customerLastOrder,
             "customer_phone": formData.customer_phone,
@@ -280,6 +289,7 @@ const Form = React.memo(({ sales }) => {
             "trx_status": trxStatus,
             "items": _salesItems,
             "payment": _payment,
+            "advance_payment": _advance_payment,
             "duty_vat": vat,
             "transport": deliveryCost,
             "additional_discount": additionalDiscount,
@@ -292,7 +302,7 @@ const Form = React.memo(({ sales }) => {
         };
         
         if(includeDueAmount) {
-            _sales['balance_forward'] = customerBalance || -99999999;
+            _sales['balance_forward'] = customerBalance;
         }
 
         console.log("WHAT SALES:::", _sales);
@@ -309,13 +319,13 @@ const Form = React.memo(({ sales }) => {
             if (sales && sales.id) {
                 if(_sales.status === 'approved'){
                     if(customerCategory === "CONDITIONAL" && _sales.trx_status === 'completed') {
-                        orderService.confirmPayment(sales.id, _sales).then(data => {
-                            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
-                            navigate("/sales");
-                            if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
-                                window.open("#/invoice/" + sales.id, "_blank");
-                            }
-                        });                                                
+                        // orderService.confirmOrder(sales.id, _sales).then(data => {
+                        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
+                        //     navigate("/sales");
+                        //     if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
+                        //         window.open("#/invoice/" + sales.id, "_blank");
+                        //     }
+                        // });                                                
                     } else {
                         orderService.commit(SALES_MODEL, sales.id, _sales).then(data => {
                             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
@@ -447,7 +457,8 @@ const Form = React.memo(({ sales }) => {
         setSelectedCustomer(null);
         setCustomerCategory(value);
         setCustomerLastOrder(null);
-        setCustomerBalance(null);
+        setCustomerBalance(0.00);
+        setIncludeDueAmount(false);
         setValue("customer_category", value);
 
         // need to reload lastTradePrice
@@ -582,22 +593,36 @@ const Form = React.memo(({ sales }) => {
 
     ///// Events -- PAYMENT DIALOG /////
     const confirmPayment = () => {
-        console.log("confirmPayment::", paymentData);
-        let data = getCalculatedValues()
-        console.log("DATA::", data)
-        setInitPayment({
-            ...emptyPayment,
-            ...{
-                "ref_type": "dtCustomer",
-                "ref_id": sales.party_id,
-                "previous_balance": customerBalance,
-                "invoice_amount": data.net,
-                "current_balance": data.net + customerBalance,
-                "amount": data.net,
-            }
-        });
-        console.log("InitPayment::", initPayment);
-        setPaymentDlgTrigger(paymentDlgTrigger + 1);
+
+        // console.log("confirmPayment::", paymentData);
+        // let data = getCalculatedValues()
+        // console.log("DATA::", data)
+
+        orderService.confirmOrder(sales.id).then(data => {
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Record Committed', life: 3000 });
+            navigate("/sales");
+            // if(_sales.status === 'approved' && _sales.trx_status === 'completed') {
+            //     window.open("#/invoice/" + sales.id, "_blank");
+            // }
+        });                                                
+
+        // let _customerBalance = 0;
+        // if(includeDueAmount) {
+        //     _customerBalance = customerBalance;
+        // }
+        // setInitPayment({
+        //     ...emptyPayment,
+        //     ...{
+        //         "ref_type": "dtCustomer",
+        //         "ref_id": sales.party_id,
+        //         "previous_balance": _customerBalance,
+        //         "invoice_amount": data.net,
+        //         "current_balance": data.net + _customerBalance,
+        //         "amount": data.net,
+        //     }
+        // });
+        // console.log("InitPayment::", initPayment);
+        // setPaymentDlgTrigger(paymentDlgTrigger + 1);
     }
 
     const showPaymentDialog = formData => {
@@ -607,12 +632,16 @@ const Form = React.memo(({ sales }) => {
         if (customerCategory === "WALKIN" || withPayment) {
             let data = getCalculatedValues()
             console.log("DATA::", data)
+            let _customerBalance = 0;
+            if(includeDueAmount) {
+                _customerBalance = customerBalance;
+            }    
             setInitPayment({
                 ...emptyPayment,
                 ...{
-                    "previous_balance": customerBalance,
+                    "previous_balance": _customerBalance,
                     "invoice_amount": data.net,
-                    "current_balance": data.net + customerBalance,
+                    "current_balance": data.net + _customerBalance,
                     "cash_amount": 0,
                     "bank_amount": 0,
                     "mfs_amount": 0,
@@ -629,7 +658,7 @@ const Form = React.memo(({ sales }) => {
 
     const onPaymnetCallback = (data) => {
         console.log("onPaymnetCallback", data);
-        setSalesDue(Number(data.current_balance)-Number(data.amount))
+        setSalesDue(Number(data.current_balance))
         setSalesPaid(Number(data.amount))
         setPaymentData(data);
         if(customerCategory === "CONDITIONAL") {
@@ -910,14 +939,15 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                <div className="field col-12 md:col-6">
+                {(status==="draft") && <div className="field col-12 md:col-6">
                     <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
-                </div>
+                </div>}
+                {(customerCategory === "REGISTERED" && status==="draft") && 
                 <div className="field col-12 md:col-6">
                     <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
-                </div>
+                </div>}
                 </div>)}
             </>
         )

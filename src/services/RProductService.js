@@ -1,6 +1,8 @@
 import { axiosInstance } from "./AxiosService";
 import moment from 'moment';
 
+import db from "../db";
+
 const loadAllProducts = async () => {
     let allProducts = [];
     let page = 0;
@@ -28,6 +30,7 @@ const loadAllProductsFromLocalStorage = async () => {
     let products = JSON.parse(localStorage.getItem("products"));
     if (products) {        
         window['__all_products'] = products;
+        // await db.addProducts(products);
     } else {
         await loadAllProducts();
     }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
@@ -18,10 +18,10 @@ export const PrintInvoice = () => {
     const masterDataService = new MasterDataService();
 
     const [invoice, setInvoice] = useState(null);
-
     const [printme, setPrintme] = useState(true)
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
+    const divPrint = useRef(null);
 
     useEffect(() => {
         console.log("ID CHANGED::", id)
@@ -61,13 +61,34 @@ export const PrintInvoice = () => {
         }
     }, [trigger]);
 
+    const PrintElem = (elem) => {
+        // window.print();
+        var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+        mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+        mywindow.document.write('</head><body >');
+        mywindow.document.write('<h1>' + document.title  + '</h1>');
+        mywindow.document.write(document.getElementById(elem).innerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close(); // necessary for IE >= 10
+        mywindow.focus(); // necessary for IE >= 10*/
+
+        mywindow.print();
+        mywindow.close();
+
+        return true;
+    }
     const handlePrint = () => {
         setPrintme(true);
         setPrintmePos(false);
         setTrigger(trigger+1);
+        // PrintElem("printme");
     }
 
     const handlePrintPOS = () => {
+        let elHeight = document.getElementById('printme').clientHeight
+        alert(elHeight);
         setPrintme(false);
         setPrintmePos(true);
         setTrigger(trigger+1);
@@ -93,7 +114,7 @@ export const PrintInvoice = () => {
         {printmePos && <PrintPOS />}
         {printme && <ComponentToPrint />}
         
-        {invoice && <div className='printme'>
+        {invoice && <div className='printme' id='printme' ref={divPrint}>
             <header>
                 <p>M/S JONONI MOTORS</p>
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
@@ -170,7 +191,7 @@ export const PrintInvoice = () => {
                        <th colSpan="7" className="total text line">Total Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2) }</th>
                     </tr>}
-                    <tr>
+                    {invoice.payment && <tr>
                         <td colSpan="7" className="sum-up">
                               <span>
                                 [
@@ -183,7 +204,7 @@ export const PrintInvoice = () => {
 
                         </td>
                         <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>
-                    </tr>
+                    </tr>}
                     
                     {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
                        <th colSpan="7" className="total text line">Receivable (Conditional)</th>

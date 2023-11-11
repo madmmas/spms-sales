@@ -32,6 +32,10 @@ export const getNumToWords = (num) => {
     return numWords(num1) + " point " + numToDigits(num2);
 }
 
+export const getDateWithFormat = (date, format) => {
+    return moment(date).format(format);
+}
+
 export const getDateFormatted = (date) => {
     return moment(date).format('DD/MM/YYYY');
 }
