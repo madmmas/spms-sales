@@ -57,12 +57,6 @@ export const ADJUSTMENT_TYPE = [
     { id: 'REDUCE', name: 'Reduction' }
 ];
 
-export const DISTRICT = [
-    { id: 'DHAKA', name: 'DHAKA', default: true},
-    { id: 'CUMILLA', name: 'CUMILLA' },
-    { id: 'KHULNA', name: 'KHULNA' }
-];
-
 export const GENDER = [
     { id: 'MALE', name: 'Male', default: true},
     { id: 'FEMALE', name: 'Female' }

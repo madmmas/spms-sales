@@ -11,7 +11,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { Dropdown } from 'primereact/dropdown';
 import { HRService } from '../../../services/HRService';
-import { CITIES,DISTRICT } from '../../../constants/lookupData';
+import { CITIES } from '../../../constants/lookupData';
+import { DISTRICT } from '../../../constants/districts';
 
 import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 import { ConfigurationService } from '../../../services/ConfigurationService';
