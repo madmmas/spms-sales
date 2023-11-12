@@ -15,6 +15,7 @@ import {
     SUPPLIER_MODEL,
     CUSTOMER_MODEL
 } from '../../constants/models';
+import { set } from 'react-hook-form';
 
 export const HtmlLedger = ({type, header}) => {
     
@@ -22,7 +23,11 @@ export const HtmlLedger = ({type, header}) => {
 
     const [ledgerData, setLedgerData] = useState([]);
     const [partyData, setPartyData] = useState(null);
-    const [trigger, setTrigger] = useState(0)
+    const [trigger, setTrigger] = useState(0);
+
+    const [closingBalance, setClosingBalance] = useState(0);
+    const [drTotal, setDrTotal] = useState(0);
+    const [crTotal, setCrTotal] = useState(0);
 
     const transactionService = new TransactionService();
     const masterDataService = new MasterDataService();
@@ -74,18 +79,26 @@ export const HtmlLedger = ({type, header}) => {
 
     const calculateBalance = (data) => {
         let dataMap = new Map();
+        let drTotal = 0;
+        let crTotal = 0;
         data.forEach(item => {
-            let balance = item.dr_amount - item.cr_amount;
+            drTotal = drTotal + Number.parseFloat(item.dr_amount);
+            crTotal = crTotal + Number.parseFloat(item.cr_amount);
+            let balance = Number.parseFloat(item.dr_amount) - Number.parseFloat(item.cr_amount);
             item.balance = balance;
             dataMap.set(item.sl, {balance: balance});
         });
-
+        console.log("DR TOTAL::=>>>", drTotal);
+        console.log("CR TOTAL::=>>>", crTotal);
+        // console.log("DATA MAP - 1::=>>>", dataMap);
         let balance = 0;
         for(let i=1; i<=data.length; i++){
             let dataItem = dataMap.get(i);
-            dataMap.set(i, {balance: balance + dataItem.balance});
+            // console.log("DATA ITEM::=>>>", i, dataItem);
+            balance = Number.parseFloat(balance) + Number.parseFloat(dataItem.balance);
+            dataMap.set(i, {balance: balance});
         }
-
+        // console.log("DATA MAP - 2 ::=>>>", dataMap);
         for(let i=0; i<data.length; i++){
             let dataItem = dataMap.get(i+1);
             for(let j=0; j<data.length; j++){
@@ -95,7 +108,10 @@ export const HtmlLedger = ({type, header}) => {
                 }
             }
         }
-
+        console.log("DATA MAP - 3 ::=>>>", data);
+        setDrTotal(drTotal);
+        setCrTotal(crTotal);
+        setClosingBalance(balance);
         return data;
     }
 
@@ -234,10 +250,12 @@ export const HtmlLedger = ({type, header}) => {
                         <td className="left-align" colSpan="7">No Data Found</td>
                     </tr>}
 
-                    {/* <tr>
-                        <th colSpan="6" className="total text line">Net Amount</th>
-                        <th className="total price right-align line">{ Number.parseFloat(ledgerData.net).toFixed(2)}</th>
-                    </tr> */}
+                    <tr>
+                        <th colSpan="4" className="text right-align line">Closing Balance:</th>
+                        <th className="total price right-align line">{ Number.parseFloat(drTotal).toFixed(2)}</th>
+                        <th className="total price right-align line">{ Number.parseFloat(crTotal).toFixed(2)}</th>
+                        <th className="total price right-align line">{ Number.parseFloat(closingBalance).toFixed(2)}</th>
+                    </tr>
                 </tbody>
             </table>
             

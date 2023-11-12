@@ -172,7 +172,7 @@ const List = ({ ledger = false }) => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id)}
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
             </>
         );
     };

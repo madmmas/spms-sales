@@ -861,7 +861,7 @@ const Form = React.memo(({ sales }) => {
                 <div className="field col-12 md:col-6">
                 {readOnly && <>
                     <label>Customer</label>
-                    <InputText readonly="true" value={CacheMasterDataService.getShortnameById(sales.party_id)} placeholder="empty" />
+                    <InputText readonly="true" value={CacheMasterDataService.getShortnameById(sales.party_id+"-dtCustomer")} placeholder="empty" />
                 </>}
                 {!readOnly && <Controller
                     name="party_id"

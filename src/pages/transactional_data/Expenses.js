@@ -142,7 +142,7 @@ const Expenses = () => {
         console.debug(formData);
         transactionService.generaleExpenses(formData).then(data => {
             console.log(data);
-            setExpensesDialog(false);
+            // setExpensesDialog(false);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
         });

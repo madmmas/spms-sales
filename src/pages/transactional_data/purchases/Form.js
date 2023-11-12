@@ -385,7 +385,7 @@ const Form = ({ purchase }) => {
                     <div className="field col-12">
                         {!editMode && <>
                             <label>Supplier Name</label>
-                            <InputText readonly="true" value={CacheMasterDataService.getShortnameById(purchase.party_id)} placeholder="empty" />
+                            <InputText readonly="true" value={CacheMasterDataService.getShortnameById(purchase.party_id+"-dtSupplier")} placeholder="empty" />
                         </>}
                         {editMode && <Controller
                             name="party_id"

@@ -176,7 +176,7 @@ const List = ({ ledger = false }) => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id)}
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
             </>
         );
     };
