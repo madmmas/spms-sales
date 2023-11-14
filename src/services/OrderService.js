@@ -8,7 +8,7 @@ export class OrderService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 20 seconds.
+                ttl: 1000 * 10 // 20 seconds.
             }
         });
         console.log(resp.data);
@@ -21,7 +21,7 @@ export class OrderService {
             timeout: 15000,
             id: uri,
             cache: {
-                ttl: 1000 * 20 // 20 seconds.
+                ttl: 1000 * 10 // 20 seconds.
             }
         });
         console.log(resp.data);
