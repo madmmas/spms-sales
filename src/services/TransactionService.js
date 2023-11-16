@@ -132,6 +132,8 @@ export class TransactionService {
     async commitPayment(paymentType, payment) {
         const resp = await axiosInstance.post(`/payment/${paymentType}`, payment);
         console.log(resp.data);
+        // delayed response
+        await new Promise(resolve => setTimeout(resolve, 5000));
         return resp.data;
     }
 

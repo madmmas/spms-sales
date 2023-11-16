@@ -43,6 +43,8 @@ export class OrderService {
     async create(orderType, data) {
         const resp = await axiosInstance.post(`/orders/${orderType}`, data);
         console.log(resp.data);
+        // add a delay of 5 seconds
+        // await new Promise(resolve => setTimeout(resolve, 5000));
         return resp.data;
     }
 

@@ -214,7 +214,7 @@ export const HtmlLedger = ({type, header}) => {
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
             </header>}
-            <p class="line">Date : {getDateFormatted(moment(new Date()).format('DD/MM/YYYY'))}</p>
+            <p class="line">Date : {getDateFormatted(new Date())}</p>
             <table className="bill-details">
                 <tbody>
                     <tr>
@@ -239,7 +239,7 @@ export const HtmlLedger = ({type, header}) => {
                 {ledgerData.map( item => 
                     <tr>
                         <td className="left-align">{Number.parseFloat(item.sl).toFixed(0)}</td>
-                        <td className="left-align">{getDateFormatted(moment(item.created_at).format('DD/MM/YYYY'))}</td>
+                        <td className="left-align">{getDateFormatted(item.created_at)}</td>
                         <td className="left-align">{item.voucher_no}</td>
                         <td className="left-align">{getParticular(item)}</td>
                         <td className="right-align"><b>{Number.parseFloat(item.dr_amount).toFixed(2)}</b></td>
