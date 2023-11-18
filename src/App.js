@@ -19,6 +19,7 @@ import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintI
 import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
 import { CashFlow } from "./pages/html_reports/CashFlow";
+import { PurchaseReport } from "./pages/html_reports/PurchaseReport";
 
 
 function App() {
@@ -127,6 +128,7 @@ function App() {
 
         <Route path="/report">
           <Route path="cashflow" element={<RouteAuth pageComponent={<CashFlow />} />} />
+          <Route path="purchase" element={<RouteAuth pageComponent={<PurchaseReport />} />} />
         </Route>
         <Route path="/ledger">
           {/* <Route path="purchase" element={<RouteAuth pageComponent={<Ledger type="purchase" header="Purchase Ledger" />} />} /> */}

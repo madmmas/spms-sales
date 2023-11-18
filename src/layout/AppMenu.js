@@ -50,6 +50,7 @@ const AppMenu = () => {
             label: 'Reports',
             items: [
                 { label: 'Cash flow', icon: 'pi pi-fw pi-list', to: '/report/cashflow' },
+                { label: 'purchase', icon: 'pi pi-fw pi-list', to: '/report/purchase' },
                 {
                     label: 'Ledger',
                     icon: 'pi pi-fw pi-list',
