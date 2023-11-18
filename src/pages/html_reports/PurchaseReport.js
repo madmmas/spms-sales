@@ -70,24 +70,20 @@ export const PurchaseReport = () => {
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
-            <p style={{textAlign:"center"}}>Vat Regd. No::</p>
-            <p style={{textAlign:"center"}}>Total Sale {getDateWithFormat(new Date(), "DD-MMM-YYYY")}</p>
+            <p style={{textAlign:"center"}}>Purchase {getDateWithFormat(new Date(), "DD-MMM-YYYY")}</p>
             <table className="bill-details">
                 <tbody>
                     <tr>
-                        <th style={{textAlign:"left"}} className="line" colSpan="2"><span className="receipt">Sales Report</span></th>
+                        <th style={{textAlign:"left"}} className="line" colSpan="2"><span className="receipt">Purchase Report</span></th>
                     </tr>
                     <tr>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise total sale (Sale & Replacement Sale)'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Detail Sale Voucher '></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Seller wise sales'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Item Wise Sales History '></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Client wise sale history'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Vouchers waiting for approval '></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise sales on condition'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise collection of sales on condition'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='All due of sales on condition '></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise return of sales on condition'></input> 
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise Purchase'></input>
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Detail Voucher (Received)'></input>
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Item Wise Purchase History'></input>
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Supplier wise Purchase'></input>
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Vouchers canceled'></input>
+                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Vouchers waiting for approval'></input>
+                    
                     </tr>
                     <br></br>
                     {/* <tr>
@@ -104,141 +100,83 @@ export const PurchaseReport = () => {
                                 <tbody>
                                     
                                     <tr>
-                                            <th className="left-align contentHeading">Showroom</th>
-                                            <th className="left-align contentHeading">Date</th>
                                             <th className="left-align contentHeading">Voucher</th>
-                                            <th className="left-align contentHeading">Client/Party</th>
-                                            <th className="left-align contentHeading">Total Amount</th>   
-                                            <th className="left-align contentHeading">Vat</th>   
+                                            <th className="left-align contentHeading">Supplier</th>
+                                            <th className="left-align contentHeading">CNF</th>
+                                            <th className="left-align contentHeading">Total Amount</th>
+                                            <th className="left-align contentHeading">Foreign Currency</th>   
+                                            <th className="left-align contentHeading">Cur. Unit</th>   
+                                            <th className="left-align contentHeading">Duty</th>   
                                             <th className="left-align contentHeading">Dis.</th>   
-                                            <th className="left-align contentHeading">Other</th>   
+                                            <th className="left-align contentHeading">Transport</th>   
                                             <th className="left-align contentHeading">Net Amount</th>   
-                                            <th className="left-align contentHeading">Total Receive</th>   
-                                            <th className="left-align contentHeading">Cash Receive </th>   
-                                            <th className="left-align contentHeading">Due</th>   
-                                            <th className="left-align contentHeading">Remarks</th>
                                         
                                     </tr>
                                     <tr>
-                                        <td className="left-align contentData">Shop Name</td>  
-                                        <td className="left-align contentData">14/11/2023</td>  
                                         <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Client1</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData"></td>  
+                                        <td className="left-align contentData">Supplier1</td>  
+                                        <td className="left-align contentData">-</td>  
+                                        <td className="left-align contentData">20,000</td>  
+                                        <td className="left-align contentData">30,000</td>  
+                                        <td className="left-align contentData">INR</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">10,000</td>    
                                     </tr>
                                     <tr>
-                                        <td className="left-align contentData">Shop Name</td>  
-                                        <td className="left-align contentData">14/11/2023</td>  
                                         <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Client2</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData"></td>   
+                                        <td className="left-align contentData">Supplier1</td>  
+                                        <td className="left-align contentData">-</td>  
+                                        <td className="left-align contentData">20,000</td>  
+                                        <td className="left-align contentData">30,000</td>  
+                                        <td className="left-align contentData">INR</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">10,000</td>    
                                     </tr>
                                     <tr>
-                                        <td className="left-align contentData">Shop Name</td>  
-                                        <td className="left-align contentData">14/11/2023</td>  
                                         <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Client3</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData"></td>  
+                                        <td className="left-align contentData">Supplier1</td>  
+                                        <td className="left-align contentData">-</td>  
+                                        <td className="left-align contentData">20,000</td>  
+                                        <td className="left-align contentData">30,000</td>  
+                                        <td className="left-align contentData">INR</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">0</td>  
+                                        <td className="left-align contentData">10,000</td>    
                                     </tr>
-                                    <tr>
-                                        <td className="left-align contentData">Shop Name</td>  
-                                        <td className="left-align contentData">14/11/2023</td>  
-                                        <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Client3</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData"></td>  
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align contentData">Shop Name</td>  
-                                        <td className="left-align contentData">14/11/2023</td>  
-                                        <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Client3</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData">10,000</td>  
-                                        <td className="left-align contentData"></td>  
-                                    </tr>
+                                    
                                     
                                     <tr className="bottom-line">
                                         <td style={{visibility:"hidden"}} className="left-align">Shop Name</td>  
                                         <td style={{visibility:"hidden"}} className="left-align">14/11/2023</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">SL.1234</td>  
+                                         
                                         <td className="left-align"><b>Daily Total</b></td>  
                                         <td className="left-align">10,000</td>  
                                         <td className="left-align">10,000</td>  
+                                        <td style={{visibility:"hidden"}} className="left-align">10,000</td>  
+                                        <td className="left-align">0</td>  
+                                        <td className="left-align">0</td>  
+                                        <td className="left-align">0</td>  
                                         <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align"></td>  
+                                         
                                     </tr>
                                     <tr className="bottom-line">
                                         <td style={{visibility:"hidden"}} className="left-align">Shop Name</td>  
                                         <td style={{visibility:"hidden"}} className="left-align">14/11/2023</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">SL.1234</td>  
-                                        <td className="left-align"><b>Branch Total</b></td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align"></td>  
-                                    </tr>
-                                    <tr className="bottom-line">
-                                        <td style={{visibility:"hidden"}} className="left-align">Shop Name</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">14/11/2023</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">SL.1234</td>  
+                                          
                                         <td className="left-align"><b>Grand Total</b></td>  
                                         <td className="left-align">10,000</td>  
                                         <td className="left-align">10,000</td>  
+                                        <td style={{visibility:"hidden"}} className="left-align">10,000</td>  
+                                        <td className="left-align">0</td>  
+                                        <td className="left-align">0</td>  
+                                        <td className="left-align">0</td>  
                                         <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align"></td>  
+                            
                                     </tr>
                                 </tbody>
                             </table>

@@ -160,6 +160,15 @@ const ReportCss = () => {
                 height: 10px;
                 width: 100%;
             }
+            .tableOfContent{
+                border-collapse: collapse;
+            }
+            .tableOfContent .contentData, .contentHeading{
+                border: 1px solid black
+            }
+            ::placeholder{
+                color:Black;
+            }
         `}</style>
     );
 }
