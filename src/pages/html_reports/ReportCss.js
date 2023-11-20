@@ -167,7 +167,7 @@ const ReportCss = () => {
                 border: 1px solid black
             }
             ::placeholder{
-                color:Black;
+                color:black;
             }
         `}</style>
     );

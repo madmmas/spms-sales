@@ -1,5 +1,9 @@
 import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode } from 'primereact/api';
 
 import { getDateWithFormat, getDateFormatted } from '../../utils';
 
@@ -9,9 +13,131 @@ import { ComponentToPrint } from './ComponentToPrint'
 import { TransactionService } from '../../services/TransactionService';
 
 export const PurchaseReport = () => {
+
+    const arrayOfObjects = [
+        {code:1, voucher:"PR.121", supplier:"Sup. 1", cnf:" - ", total_amount:10000, foreign_currency:30000, cur_unit:"INR", duty:0, dis:0, transport:0, net_amount:10000},
+        {code:2, voucher:"PR.122", supplier:"Sup. 2", cnf:" - ", total_amount:30000, foreign_currency:10000, cur_unit:"INR", duty:0, dis:0, transport:0, net_amount:50000},
+        {code:3, voucher:"PR.123", supplier:"Raihan", cnf:" - ", total_amount:10000, foreign_currency:30000, cur_unit:"USD", duty:0, dis:0, transport:0, net_amount:30000},
+        {code:4, voucher:"PR.124", supplier:"Sup. 4", cnf:" - ", total_amount:40000, foreign_currency:50000, cur_unit:"INR", duty:0, dis:0, transport:0, net_amount:10000},
+        {code:5, voucher:"PR.125", supplier:"Sup. 1", cnf:" - ", total_amount:10000, foreign_currency:30000, cur_unit:"INR", duty:0, dis:0, transport:0, net_amount:10000},
+    ]
     
     const [cashFlowData, setCashFlowData] = useState([]);
-    const [trigger, setTrigger] = useState(0)
+    const [trigger, setTrigger] = useState(0);
+    const [purchaseInfo] = useState(arrayOfObjects);
+
+    const [dailyTotalAmount, setDailyTotalAmount] = useState('');
+    const [dailyForeignCurrency, setDailyForeignCurrency] = useState('');
+    const [dailyDuty, setDailyDuty] = useState('');
+    const [dailyDis, setDailyDis] = useState('');
+    const [dailyTransport, setDailyTransport] = useState('');
+    const [dailyNetAmount, setDailyNetAmount] = useState('');
+
+    const [grandTotalAmount, setGrandTotalAmount] = useState('');
+    const [grandForeignCurrency, setGrandForeignCurrency] = useState('');
+    const [grandDuty, setGrandDuty] = useState('');
+    const [grandDis, setGrandDis] = useState('');
+    const [grandTransport, setGrandTransport] = useState('');
+    const [grandNetAmount, setGrandNetAmount] = useState('');
+
+    const [voucherFilterValue, setVoucherFilterValue] = useState('');
+    const [supplierFilterValue, setSupplierFilterValue] = useState('');
+    const [codeFilterValue, setCodeFilterValue] = useState('');
+    const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        voucher: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        supplier: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+
+    const onVoucherChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['voucher'].value = value;
+
+        setFilters(_filters);
+        setVoucherFilterValue(value);
+    };
+
+    const onSupplierChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['supplier'].value = value;
+
+        setFilters(_filters);
+        setSupplierFilterValue(value);
+    };
+
+    const onCodeChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['code'].value = value;
+
+        setFilters(_filters);
+        setCodeFilterValue(value);
+    };
+
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['global'].value = value;
+
+        setFilters(_filters);
+        setGlobalFilterValue(value);
+    };
+
+    const renderHeader = () => {
+        return (
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={voucherFilterValue} onChange={onVoucherChange} placeholder="Voucher" />
+                    </span>
+                </div>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={supplierFilterValue} onChange={onSupplierChange} placeholder="Supplier" />
+                    </span>
+                </div>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={codeFilterValue} onChange={onCodeChange} placeholder="Code" />
+                    </span>
+                </div>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Global" />
+                    </span>
+                </div>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="demo1" />
+                    </span>
+                </div>
+                <div className="">
+                    <span className="">
+                        
+                        <InputText style={{width:"5rem", backgroundColor:"white", color:"black"}} value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="demo2" />
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
+    const header = renderHeader();
+
+    
 
     const transactionService = new TransactionService();
 
@@ -33,6 +159,56 @@ export const PurchaseReport = () => {
             window.print();
         }
     }, [trigger]);
+
+    useEffect(()=>{
+             let dailyTotalAmountLocal = 0;
+             let dailyForeignCurrencyLocal  = 0;
+             let dailyDutyLocal = 0;
+             let dailyDisLocal = 0;
+             let dailyTransportLocal = 0;
+             let dailyNetAmountLocal = 0;
+
+             let grandTotalAmountLocal = 0;
+             let grandForeignCurrencyLocal  = 0;
+             let grandDutyLocal = 0;
+             let grandDisLocal = 0;
+             let grandTransportLocal = 0;
+             let grandNetAmountLocal = 0;
+
+             for(let i = 0; i<purchaseInfo.length; i++){
+                dailyTotalAmountLocal = dailyTotalAmountLocal + purchaseInfo[i].total_amount;
+                dailyForeignCurrencyLocal = dailyForeignCurrencyLocal + purchaseInfo[i].foreign_currency;
+                dailyDutyLocal = dailyDutyLocal + purchaseInfo[i].duty;
+                dailyDisLocal = dailyDisLocal + purchaseInfo[i].dis;
+                dailyTransportLocal = dailyTransportLocal + purchaseInfo[i].transport;
+                dailyNetAmountLocal = dailyNetAmountLocal + purchaseInfo[i].net_amount;
+
+                grandTotalAmountLocal = grandTotalAmountLocal + purchaseInfo[i].total_amount;
+                grandForeignCurrencyLocal = grandForeignCurrencyLocal + purchaseInfo[i].foreign_currency;
+                grandDutyLocal = grandDutyLocal + purchaseInfo[i].duty;
+                grandDisLocal = grandDisLocal + purchaseInfo[i].dis;
+                grandTransportLocal = grandTransportLocal + purchaseInfo[i].transport;
+                grandNetAmountLocal = grandNetAmountLocal + purchaseInfo[i].net_amount;
+
+                
+             }
+
+             setDailyTotalAmount(dailyTotalAmountLocal);
+             setDailyForeignCurrency(dailyForeignCurrencyLocal);
+             setDailyDuty(dailyDutyLocal);
+             setDailyDis(dailyDisLocal);
+             setDailyTransport(dailyTransportLocal);
+             setDailyNetAmount(dailyNetAmountLocal);
+
+             setGrandTotalAmount(grandTotalAmountLocal);
+             setGrandForeignCurrency(grandForeignCurrencyLocal);
+             setGrandDuty(grandDutyLocal);
+             setGrandDis(grandDisLocal);
+             setGrandTransport(grandTransportLocal);
+             setGrandNetAmount(grandNetAmountLocal);
+
+
+    },[])
 
     const PrintElem = (elem) => {
         // window.print();
@@ -76,114 +252,89 @@ export const PurchaseReport = () => {
                     <tr>
                         <th style={{textAlign:"left"}} className="line" colSpan="2"><span className="receipt">Purchase Report</span></th>
                     </tr>
-                    <tr>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Date wise Purchase'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Detail Voucher (Received)'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Item Wise Purchase History'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Supplier wise Purchase'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Vouchers canceled'></input>
-                       <input style={{height:"20px", width:"50px", marginRight:"5px", color:"black"}} placeholder='Vouchers waiting for approval'></input>
-                    
-                    </tr>
-                    <br></br>
+                   
                     {/* <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt"></span></th>
                     </tr> */}
                 </tbody>
             </table>
-            <table className="lineitems">
-               
-                <tbody>
-                    <tr>
-                        <td className="left-align"> 
-                            <table className="lineitems tableOfContent">
-                                <tbody>
-                                    
-                                    <tr>
-                                            <th className="left-align contentHeading">Voucher</th>
-                                            <th className="left-align contentHeading">Supplier</th>
-                                            <th className="left-align contentHeading">CNF</th>
-                                            <th className="left-align contentHeading">Total Amount</th>
-                                            <th className="left-align contentHeading">Foreign Currency</th>   
-                                            <th className="left-align contentHeading">Cur. Unit</th>   
-                                            <th className="left-align contentHeading">Duty</th>   
-                                            <th className="left-align contentHeading">Dis.</th>   
-                                            <th className="left-align contentHeading">Transport</th>   
-                                            <th className="left-align contentHeading">Net Amount</th>   
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Supplier1</td>  
-                                        <td className="left-align contentData">-</td>  
-                                        <td className="left-align contentData">20,000</td>  
-                                        <td className="left-align contentData">30,000</td>  
-                                        <td className="left-align contentData">INR</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">10,000</td>    
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Supplier1</td>  
-                                        <td className="left-align contentData">-</td>  
-                                        <td className="left-align contentData">20,000</td>  
-                                        <td className="left-align contentData">30,000</td>  
-                                        <td className="left-align contentData">INR</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">10,000</td>    
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align contentData">SL.1234</td>  
-                                        <td className="left-align contentData">Supplier1</td>  
-                                        <td className="left-align contentData">-</td>  
-                                        <td className="left-align contentData">20,000</td>  
-                                        <td className="left-align contentData">30,000</td>  
-                                        <td className="left-align contentData">INR</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">0</td>  
-                                        <td className="left-align contentData">10,000</td>    
-                                    </tr>
-                                    
-                                    
-                                    <tr className="bottom-line">
-                                        <td style={{visibility:"hidden"}} className="left-align">Shop Name</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">14/11/2023</td>  
-                                         
-                                        <td className="left-align"><b>Daily Total</b></td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">10,000</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">10,000</td>  
-                                         
-                                    </tr>
-                                    <tr className="bottom-line">
-                                        <td style={{visibility:"hidden"}} className="left-align">Shop Name</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">14/11/2023</td>  
-                                          
-                                        <td className="left-align"><b>Grand Total</b></td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td className="left-align">10,000</td>  
-                                        <td style={{visibility:"hidden"}} className="left-align">10,000</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">0</td>  
-                                        <td className="left-align">10,000</td>  
-                            
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>            
+
+            <DataTable value={purchaseInfo} size="small"  
+                       showGridlines 
+                       dataKey="id"
+                       header={header}
+                       filters={filters}
+                       emptyMessage="Not found"
+                       >
+                <Column field="voucher" header="Voucher" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="supplier" header="Supplier" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="cnf" header="CNF" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="total_amount" header="Total Amount" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="foreign_currency" header="Foreign Currency" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="cur_unit" header="Cur. Unit" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="duty" header="Duty" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="dis" header="Dis." style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="transport" header="Transport" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+                <Column field="net_amount" header="Net Amount" style={{ maxWidth: '5rem', textAlign:"center",backgroundColor:"white",color:"black" }} alignHeader={'center'} />
+            </DataTable>
+            <br></br>
+            <p><b><u>Daily Total</u></b></p>
+            <div style={{display:"flex",justifyContent:"space-between"}}>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Total Amount</label>
+                    <InputText value={dailyTotalAmount} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Foreign Currency</label>
+                    <InputText value={dailyForeignCurrency} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Duty</label>
+                    <InputText value={dailyDuty} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Dis.</label>
+                    <InputText value={dailyDis} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Transport</label>
+                    <InputText value={dailyTransport} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Net Amount</label>
+                    <InputText value={dailyNetAmount} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+            </div>
+            <br></br>
+            <p><b><u>Grand Total</u></b></p>
+            <div style={{display:"flex",justifyContent:"space-between"}}>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Total Amount</label>
+                    <InputText value={dailyTotalAmount} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Foreign Currency</label>
+                    <InputText value={dailyForeignCurrency} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Duty</label>
+                    <InputText value={dailyDuty} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Dis.</label>
+                    <InputText value={dailyDis} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Transport</label>
+                    <InputText value={dailyTransport} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column"}}>
+                    <label>Net Amount</label>
+                    <InputText value={dailyNetAmount} style={{width:"8rem",backgroundColor:"white", color:"black"}}/>
+                </div>
+            </div>
+            
+                       
         </div>
       </div>
     )
