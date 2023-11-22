@@ -408,27 +408,7 @@ const Form = ({ purchase }) => {
                     <div className="field col-12">
                         <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
                         <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
-                    </div>
-                    <div className="field col-12">
-                    <Controller
-                        name="conversion_rate"
-                        control={control}
-                        rules={{ required: 'Conversion Rate is required.' }}
-                        render={({ field, fieldState }) => (
-                            <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Conversion Rate</label>
-                        <InputNumber 
-                            inputId={field.name} value={field.value} inputRef={field.ref} 
-                            className={classNames({ 'p-invalid': fieldState.error })}
-                            onChange={(e) => {
-                                setConversionRate(e.value);
-                                field.onChange(e.value)
-                            }}
-                            min={1} maxFractionDigits={2}
-                            />
-                            </>
-                        )}/>
-                    </div>   
+                    </div>  
                     <div className="field col-12">
                         {!editMode && <>
                             <label>CnF</label>
