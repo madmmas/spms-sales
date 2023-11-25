@@ -184,7 +184,7 @@ export default function SelectMasterDataTable({
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
                     {columns.map((col, index) => {
                         return (
-                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
+                            <Column key={index} field={col.field} header={col.header} body={col.body} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
                         )
                     })}
                 </DataTable>

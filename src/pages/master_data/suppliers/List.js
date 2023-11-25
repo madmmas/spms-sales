@@ -26,7 +26,7 @@ const List = ({ ledger = false }) => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["name", "dtSupplierCategory_id", "status", "contactPersonName", "contactPersonPhone", "contactPersonDesignation", "currency", "address"],
+        fields: ["name", "dtSupplierCategory_id", "status", "contactPersonName", "contactPersonPhone", "contactPersonDesignation", "currency", "address", "phone"],
         first: 0,
         rows: 10,
         page: 1,

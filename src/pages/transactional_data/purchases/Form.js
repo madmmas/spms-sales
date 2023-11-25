@@ -370,6 +370,14 @@ const Form = ({ purchase }) => {
         }
     };
 
+    const categoryNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtSupplierCategory_id+"-dtSupplierCategory")}
+            </>
+        );
+    };
+
     return (
 
 <div className="grid h-screen">    
@@ -400,11 +408,13 @@ const Form = ({ purchase }) => {
                                     className={classNames({ 'p-invalid': fieldState.error })} 
                                     columns={[
                                         {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'},
+                                        {field: 'dtSupplierCategory_id', header: 'Supplier Category', body: categoryNameBodyTemplate, filterPlaceholder: 'Filter by Supplier Category'},
                                         {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'}
+                                        {field: 'contactPersonName', header: 'Contact Person Name', filterPlaceholder: 'Filter by Contact Person Name'},
+                                        {field: 'contactPersonPhone', header: 'Contact Person Phone', filterPlaceholder: 'Filter by Contact Person Phone'},
                                     ]}
                                     defaultFilters= {{
-                                        fields: ["name", "address", "phone"],
+                                        fields: ["name", "dtSupplierCategory_id", "address", "contactPersonName", "contactPersonPhone"],
                                         first: 0,
                                         rows: 10,
                                         page: 1,
@@ -413,6 +423,10 @@ const Form = ({ purchase }) => {
                                         filters: {
                                             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                                             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                            dtSupplierCategory_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                            address: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                            contactPersonName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                            contactPersonPhone: { value: null, matchMode: FilterMatchMode.CONTAINS },
                                         }
                                     }}
                                     />
