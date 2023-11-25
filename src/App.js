@@ -155,15 +155,13 @@ function App() {
           <Route index element={<RouteAuth pageComponent={<SupplierList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<SupplierForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<SupplierDetail />} />} />
-          {/* <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accpayable" header="Supplier Ledger"/>} />} /> */}
-          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="accpayable" header="Supplier Ledger"/>} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="suppliers" header="Supplier Ledger"/>} />} />
         </Route>
         <Route path="/customers">
           <Route index element={<RouteAuth pageComponent={<CustomerList />} />} />
           <Route path="new" element={<RouteAuth pageComponent={<CustomerForm />} />} />
           <Route path=":id" element={<RouteAuth pageComponent={<CustomerDetail />} />} />
-          {/* <Route path="ledger/:id" element={<RouteAuth pageComponent={<Ledger type="accreceivable" header="Customer Ledger"/>} />} /> */}
-          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="accreceivable" header="Customer Ledger"/>} />} />
+          <Route path="ledger/:id" element={<RouteAuth pageComponent={<HtmlLedger type="customers" header="Customer Ledger"/>} />} />
         </Route>
         <Route path="/products">
           <Route index element={<RouteAuth pageComponent={<ProductList />} />} />

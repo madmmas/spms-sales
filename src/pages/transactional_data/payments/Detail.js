@@ -129,8 +129,8 @@ const Detail = () => {
     }
 
     const getPartyBalance = (partyId) => {
-        let _val = partyType==="dtCustomer"?"trxACReceivable":"trxACPayable";
-        orderService.getLedgerBalance(_val, partyId).then(data => {
+        // let _val = partyType==="dtCustomer"?"trxACReceivable":"trxACPayable";
+        orderService.getLedgerBalance(partyType, partyId).then(data => {
             console.log("balance::", data);
             if(data){
                 let dr_amount = Number(data.dr_amount)||0;

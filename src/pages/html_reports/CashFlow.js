@@ -23,7 +23,7 @@ export const CashFlow = () => {
                 // "ondate": getDateWithFormat('2023-11-09', "YYYY-MM-DD"),
             }).then(data => {
                 setCashFlowData(data);
-                console.log(data);
+                console.log("CashFlowData::", data);
             });
         }
     }, [cashFlowData]);
@@ -95,18 +95,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['bank_drawings'] && cashFlowData['bank_drawings'].map((item) =>
                                     <tr>
-                                        <td className="left-align">Bank name 1</td>
-                                        <td className="right-align qty">{Number.parseFloat(3000.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['bank_drawings'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">Bank name 2</td>
-                                        <td className="right-align qty">{Number.parseFloat(989.00).toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align">Bank name 3</td>
-                                        <td className="right-align qty">{Number.parseFloat(2000.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table> 
                             <table className="lineitems">
@@ -116,14 +113,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['mfs_drawings'] && cashFlowData['mfs_drawings'].map((item) =>
                                     <tr>
-                                        <td className="left-align">BKash</td>
-                                        <td className="right-align qty">{Number.parseFloat(3000.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['mfs_drawings'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">Nagad</td>
-                                        <td className="right-align qty">{Number.parseFloat(989.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table> 
                             <table className="lineitems">
@@ -133,14 +131,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['party_collection'] && cashFlowData['party_collection'].map((item) =>
                                     <tr>
-                                        <td className="left-align">1000 Party 1</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['party_collection'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">1002 Party 2</td>
-                                        <td className="right-align qty">{Number.parseFloat(675.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table> 
                             <table className="lineitems">
@@ -152,15 +151,15 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align">New Sales</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["new_sales"]).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["new_sales"] || "0").toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Advance Payment Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["advance_payment_conditional_sales"]).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["advance_payment_conditional_sales"] || "0").toFixed(2)}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Cash Collection Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["cash_collection_conditional_sales"]).toFixed(2)}</td>
+                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["cash_collection_conditional_sales"] || "0").toFixed(2)}</td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -176,11 +175,11 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align"><b>Closing Cash</b></td>
-                                        <td> = Opening Cash + Total Inflow + Total Outflow</td>
+                                        <td> = Opening Cash + Total Inflow - Total Outflow</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
-                                        <td>= {Number.parseFloat(cashFlowData["opening_cash_balance"]).toFixed(2)} + 
+                                        <td>= {Number.parseFloat(cashFlowData["opening_cash_balance"] || "0").toFixed(2)} + 
                                                 49689.00 + 233423.00</td>
                                     </tr>
                                     <tr>
@@ -233,10 +232,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['bank_deposit'] && cashFlowData['bank_deposit'].map((item) =>
                                     <tr>
-                                        <td className="left-align">Bank name</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['bank_deposit'].length === 0 &&
+                                    <tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table>
                             <table className="lineitems">
@@ -246,18 +250,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['party_payment'] && cashFlowData['party_payment'].map((item) =>
                                     <tr>
-                                        <td className="left-align">Suppier's Payment</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['party_payment'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">Sales Return</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td className="left-align">Dispatch Amount</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table>
                             <table className="lineitems">
@@ -267,14 +268,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['mfs_deposit'] && cashFlowData['mfs_deposit'].map((item) =>
                                     <tr>
-                                        <td className="left-align">BKash</td>
-                                        <td className="right-align qty">{Number.parseFloat(3000.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['mfs_deposit'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">Nagad</td>
-                                        <td className="right-align qty">{Number.parseFloat(989.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table>                             
                             <table className="lineitems">
@@ -284,14 +286,15 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {cashFlowData['general_income'] && cashFlowData['general_income'].map((item) =>
                                     <tr>
-                                        <td className="left-align">Petty</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                    </tr>)}
+                                    {cashFlowData['general_income'].length === 0 &&
                                     <tr>
-                                        <td className="left-align">Office Expenses</td>
-                                        <td className="right-align qty">{Number.parseFloat(10.00).toFixed(2)}</td>
-                                    </tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
                                 </tbody>
                             </table>
                             <table className="lineitems box">
