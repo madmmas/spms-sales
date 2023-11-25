@@ -218,6 +218,9 @@ export default function PurchaseProductForm({
         _purchaseProduct['product_id'] = selectedRow.id;
         _purchaseProduct['product_name'] = selectedRow.name;
         _purchaseProduct['code'] = selectedRow.code;
+        _purchaseProduct['brand_name'] = selectedRow.brand_name;
+        _purchaseProduct['model_no'] = selectedRow.model_no;
+        _purchaseProduct['part_number'] = selectedRow.part_number;
         _purchaseProduct['last_purchase_price'] = lastTradePrice;
         setPurchaseProduct(_purchaseProduct);
         console.log("SELECTED __PRODUCT:::=>>", _purchaseProduct)

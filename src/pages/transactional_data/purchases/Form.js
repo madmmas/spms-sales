@@ -11,7 +11,7 @@ import { Dialog } from 'primereact/dialog';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { InputNumber } from 'primereact/inputnumber';
-
+import { FilterMatchMode } from 'primereact/api';
 import SelectMasterData from '../../components/SelectMasterData';
 
 import { PURCHASE_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
@@ -399,8 +399,23 @@ const Form = ({ purchase }) => {
                                     onSelect={onSupplierSelect}
                                     className={classNames({ 'p-invalid': fieldState.error })} 
                                     columns={[
-                                        {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'}
-                                    ]} />
+                                        {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'},
+                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
+                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'}
+                                    ]}
+                                    defaultFilters= {{
+                                        fields: ["name", "address", "phone"],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        }
+                                    }}
+                                    />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>}

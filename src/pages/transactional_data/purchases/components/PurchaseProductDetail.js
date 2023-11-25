@@ -63,10 +63,12 @@ const PurchaseProductDetail = ({
                 allpurchases[i].profit = roundNumber(profit);
             }
         }
+        console.log("ALL-ROWS-PURCHASES::", allpurchases)
         setPurchaseRows(allpurchases);
     };
 
     useEffect(() => {
+        console.log("ALL-ROWS-PURCHASES::", purchases)
         recalculateAllRows(purchases);
         calculateTotals(purchases);
     }, [purchases]);
@@ -95,6 +97,30 @@ const PurchaseProductDetail = ({
         );
     };
 
+    const brandNameBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.brand_name}
+            </>
+        )
+    }
+
+    const partNumberBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.part_number}
+            </>
+        )
+    }
+
+    const modelNumberBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {rowData.model_no}
+            </>
+        )
+    }
+
     return (
         <DataTable value={purchaseRows} 
             stripedRows showGridlines scrollable scrollHeight="25rem" 
@@ -102,7 +128,10 @@ const PurchaseProductDetail = ({
         >
             <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
             <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-            {/* <Column field="product_code" header="Code" headerStyle={{ minWidth: '10rem' }}></Column> */}
+            <Column field="code" header="Code" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
+            <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
 
             <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>
             {returnMode && <Column field="return_qty" header="Return Qty" headerStyle={{ minWidth: '10rem' }}></Column>}
