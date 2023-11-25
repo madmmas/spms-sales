@@ -475,7 +475,7 @@ const Form = React.memo(({ sales }) => {
         if(partyId === null || partyId === undefined || partyId === "") {
             return;
         }
-        orderService.getLedgerBalance("trxACReceivable", partyId).then(data => {
+        orderService.getLedgerBalance("dtCustomer", partyId).then(data => {
             console.log("balance::", data);
             if(data){
                 let dr_amount = Number(data.dr_amount)||0;

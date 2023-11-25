@@ -22,6 +22,9 @@ export default function PurchaseProductForm({
         product_id: "", // select product
         warehouse_id: "", // select warehouse
         code: "", // fetch from selected product
+        brand_name: "", // fetch from selected product
+        model_no: "", // fetch from selected product
+        part_number: "", // fetch from selected product
         last_purchase_price: 0.00, // fetch from selected product
 
         qty: 1,  
@@ -102,6 +105,9 @@ export default function PurchaseProductForm({
             'product_id': '',
             'warehouse_id': defaultWarehouse,
             'code': '',
+            'brand_name': '',
+            'model_no': '',
+            'part_number': '',
             'last_purchase_price': 0.00,
             'qty': 1,
             'unit_cost_f': 0.00,
@@ -228,6 +234,9 @@ export default function PurchaseProductForm({
         console.log("SELECTED PRODUCT ID :::=>>", selectedRow.id)
         setValue('product_id', selectedRow.id);
         setValue('code', selectedRow.code);
+        setValue('brand_name', selectedRow.brand_name);
+        setValue('model_no', selectedRow.model_no);
+        setValue('part_number', selectedRow.part_number);
         setValue('product_name', selectedRow.name);
         setValue('last_purchase_price', lastTradePrice);
         setValue('warehouse_id', defaultWarehouse);
@@ -235,7 +244,7 @@ export default function PurchaseProductForm({
 
     const onAddItem = (dt) => {
         // calculateCost();
-        console.log(dt);
+        console.log("PRODUCT-GOING-TOBE-ADDED",dt);
         // resetForm();
         reset({ ...emptyPurchaseProduct });
         onAdd(dt);
