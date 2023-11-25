@@ -243,12 +243,41 @@ const getProductByIds = async (ids) => {
     return foundProducts;
 }
 
+const getProductMapByIds = async (ids) => {
+    // dispatch product from products
+    let products = window['__all_products'];
+
+    // if products undefined or empty load all from server limit 1000 until no more
+    if (!products || products.length == 0) {
+        await loadAllProducts();
+        products = window['__all_products'];
+    }
+
+    // if products still undefined or empty return empty array
+    if (!products || products.length == 0) {
+        return [];
+    }
+
+    // if products found return products based on limit and offset
+    let foundProducts = {};
+    for (var i = 0; i < products.length; i++) {
+        if (ids.includes(products[i].id)) {
+            // foundProducts.push(products[i]);
+            foundProducts[products[i].id] = products[i];
+        }
+    }
+
+    // if not found send empty product
+    return foundProducts;
+}
+
 export default {
     getProducts,
     getAllProducts,
     getProductById,
     getProductByIds,
     loadAllProducts,
+    getProductMapByIds,
     getProductsByBrandId,
     clearCacheAndLoadAllProducts,
     loadAllProductsFromLocalStorage,

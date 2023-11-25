@@ -4,6 +4,8 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 
+import RProductService from '../../../../services/RProductService';
+
 const PurchaseProductDetail = ({
     purchases, supplierCurrency, conversion_rate,
     onEdit, onDelete, onReturnItem, 
@@ -18,6 +20,8 @@ const PurchaseProductDetail = ({
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
 
     const [purchaseRows, setPurchaseRows] = useState([]);
+
+    const [displayProducts, setDisplayProducts] = useState([]);
 
     const calculateTotals = (allpurchases) => {
         console.log("CALCULATE-PURCHASES::", allpurchases)
@@ -71,6 +75,20 @@ const PurchaseProductDetail = ({
         console.log("ALL-ROWS-PURCHASES::", purchases)
         recalculateAllRows(purchases);
         calculateTotals(purchases);
+        // get all products ids from purchases
+        let productIds = [];
+        if(purchases && purchases.length > 0) {
+            for(let i=0; i<purchases.length; i++) {
+                productIds.push(purchases[i].product_id);
+            }
+        }
+        // get all products from cache
+        RProductService.getProductMapByIds(productIds).then(
+            (data) => {
+                console.log("PRODUCTS-FETCHED-FROM-CACHE::", data);
+                setDisplayProducts(data);
+            }
+        );
     }, [purchases]);
 
     const footer = (
@@ -97,10 +115,18 @@ const PurchaseProductDetail = ({
         );
     };
 
+    const codeNameBodyTemplate = (rowData) =>{
+        return(
+            <>
+               {displayProducts[rowData.product_id].code}
+            </>
+        )
+    }
+
     const brandNameBodyTemplate = (rowData) =>{
         return(
             <>
-               {rowData.brand_name}
+               {displayProducts[rowData.product_id].brand_name}
             </>
         )
     }
@@ -108,7 +134,7 @@ const PurchaseProductDetail = ({
     const partNumberBodyTemplate = (rowData) =>{
         return(
             <>
-               {rowData.part_number}
+               {displayProducts[rowData.product_id].part_number}
             </>
         )
     }
@@ -116,7 +142,7 @@ const PurchaseProductDetail = ({
     const modelNumberBodyTemplate = (rowData) =>{
         return(
             <>
-               {rowData.model_no}
+               {displayProducts[rowData.product_id].model_no}
             </>
         )
     }
@@ -128,7 +154,7 @@ const PurchaseProductDetail = ({
         >
             <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
             <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="code" header="Code" headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="code" header="Code" body={codeNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
             <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
