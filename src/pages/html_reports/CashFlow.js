@@ -1,22 +1,27 @@
 import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
 
-import { getDateWithFormat, getDateFormatted } from '../../utils';
+import { getDateWithFormat, getFormattedNumber } from '../../utils';
 
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
 
 import { TransactionService } from '../../services/TransactionService';
+import { set } from 'react-hook-form';
 
 export const CashFlow = () => {
     
     const [cashFlowData, setCashFlowData] = useState([]);
+    const [cashflowTotal, setCashflowTotal] = useState(0);
+    const [cashInflowTotal, setCashInflowTotal] = useState(0);
+    const [cashOutflowTotal, setCashOutflowTotal] = useState(0);
     const [trigger, setTrigger] = useState(0)
 
     const transactionService = new TransactionService();
 
     useEffect(() => {
-        if(cashFlowData.length === 0){
+        console.log(cashFlowData)
+        if(cashFlowData === undefined){
 
             transactionService.getReport('cashflow', {
                 "ondate": getDateWithFormat(new Date(), "YYYY-MM-DD"),
@@ -26,6 +31,7 @@ export const CashFlow = () => {
                 console.log("CashFlowData::", data);
             });
         }
+        calculateCashflowTotal();
     }, [cashFlowData]);
 
     useEffect(() => {
@@ -33,6 +39,71 @@ export const CashFlow = () => {
             window.print();
         }
     }, [trigger]);
+
+    const calculateCashflowTotal = () => {
+        let total = 0;
+        let inflow = calculateCashInflowTotal();
+        let outflow = calculateCashOutflowTotal();
+        total = inflow - outflow;
+        setCashInflowTotal(inflow);
+        setCashOutflowTotal(outflow);
+        setCashflowTotal(total);
+    }
+
+    const calculateCashInflowTotal = () => {
+        let total = 0;
+        if(cashFlowData['bank_drawings']){
+            cashFlowData['bank_drawings'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['mfs_drawings']){
+            cashFlowData['mfs_drawings'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['party_collection']){
+            cashFlowData['party_collection'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['new_sales']){
+            total += parseFloat(cashFlowData['new_sales']);
+        }
+        if(cashFlowData['advance_payment_conditional_sales']){
+            total += parseFloat(cashFlowData['advance_payment_conditional_sales']);
+        }
+        if(cashFlowData['cash_collection_conditional_sales']){
+            total += parseFloat(cashFlowData['cash_collection_conditional_sales']);
+        }
+        return total;
+    }
+
+    const calculateCashOutflowTotal = () => {
+        let total = 0;
+        if(cashFlowData['bank_deposit']){
+            cashFlowData['bank_deposit'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['party_payment']){
+            cashFlowData['party_payment'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['mfs_deposit']){
+            cashFlowData['mfs_deposit'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['general_income']){
+            cashFlowData['general_income'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+
+        return total;
+    }
 
     const PrintElem = (elem) => {
         // window.print();
@@ -98,9 +169,9 @@ export const CashFlow = () => {
                                     {cashFlowData['bank_drawings'] && cashFlowData['bank_drawings'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['bank_drawings'].length === 0 &&
+                                    {cashFlowData['bank_drawings'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -116,9 +187,9 @@ export const CashFlow = () => {
                                     {cashFlowData['mfs_drawings'] && cashFlowData['mfs_drawings'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['mfs_drawings'].length === 0 &&
+                                    {cashFlowData['mfs_drawings'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -134,9 +205,9 @@ export const CashFlow = () => {
                                     {cashFlowData['party_collection'] && cashFlowData['party_collection'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['party_collection'].length === 0 &&
+                                    {cashFlowData['party_collection'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -151,15 +222,15 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align">New Sales</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["new_sales"] || "0").toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(cashFlowData["new_sales"] || "0")}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Advance Payment Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["advance_payment_conditional_sales"] || "0").toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(cashFlowData["advance_payment_conditional_sales"] || "0")}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align">Cash Collection Sales on Condition</td>
-                                        <td className="right-align qty">{Number.parseFloat(cashFlowData["cash_collection_conditional_sales"] || "0").toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(cashFlowData["cash_collection_conditional_sales"] || "0")}</td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -167,7 +238,7 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align"><b>TOTAL ----</b></td>
-                                        <td className="right-align qty"><b>{Number.parseFloat(40000.00).toFixed(2)}</b></td>
+                                        <td className="right-align qty"><b>{getFormattedNumber(cashInflowTotal)}</b></td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -179,12 +250,11 @@ export const CashFlow = () => {
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
-                                        <td>= {Number.parseFloat(cashFlowData["opening_cash_balance"] || "0").toFixed(2)} + 
-                                                49689.00 + 233423.00</td>
+                                        <td>= {getFormattedNumber(cashFlowData["opening_cash_balance"] || "0")} + {getFormattedNumber(cashInflowTotal)} - {getFormattedNumber(cashOutflowTotal)}</td>
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
-                                        <td>= 9877899.00</td>
+                                        <td>= {getFormattedNumber(cashflowTotal)}</td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -235,9 +305,9 @@ export const CashFlow = () => {
                                     {cashFlowData['bank_deposit'] && cashFlowData['bank_deposit'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['bank_deposit'].length === 0 &&
+                                    {cashFlowData['bank_deposit'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -253,9 +323,9 @@ export const CashFlow = () => {
                                     {cashFlowData['party_payment'] && cashFlowData['party_payment'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['party_payment'].length === 0 &&
+                                    {cashFlowData['party_payment'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -271,9 +341,9 @@ export const CashFlow = () => {
                                     {cashFlowData['mfs_deposit'] && cashFlowData['mfs_deposit'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['mfs_deposit'].length === 0 &&
+                                    {cashFlowData['mfs_deposit'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -289,9 +359,9 @@ export const CashFlow = () => {
                                     {cashFlowData['general_income'] && cashFlowData['general_income'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
-                                        <td className="right-align qty">{Number.parseFloat(item.amount).toFixed(2)}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['general_income'].length === 0 &&
+                                    {cashFlowData['general_income'] === undefined &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -301,7 +371,7 @@ export const CashFlow = () => {
                                 <tbody>
                                     <tr>
                                         <td className="left-align"><b>TOTAL ----</b></td>
-                                        <td className="right-align qty"><b>{Number.parseFloat(40000.00).toFixed(2)}</b></td>
+                                        <td className="right-align qty"><b>{getFormattedNumber(cashOutflowTotal)}</b></td>
                                     </tr>
                                 </tbody>
                             </table>
