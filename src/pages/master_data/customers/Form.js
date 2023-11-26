@@ -90,10 +90,10 @@ const Form = ({customerProfile}) => {
                         <Controller
                             name="name"
                             control={control}
-                            rules={{ required: 'Name is required.' }}
+                            rules={{ required: 'Shop Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer Name*</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Shop Name*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -101,12 +101,12 @@ const Form = ({customerProfile}) => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="shopName"
+                            name="contact_name"
                             control={control}
-                            rules={{ required: 'Shop Name is required.' }}
+                            rules={{ required: 'Contact Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Shop Name*</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Name*</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>

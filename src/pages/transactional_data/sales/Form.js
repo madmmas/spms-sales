@@ -896,14 +896,14 @@ const Form = React.memo(({ sales }) => {
                             onSelect={onCustomerSelect}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
-                                {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
+                                {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
                                 {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
                                 {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
                                 {field: 'phone', header: 'Phone', filterPlaceholder: 'Filter by Phone'},
-                                {field: 'name', header: 'Customer Name', filterPlaceholder: 'Filter by Customer Name'},
+                                {field: 'contact_name', header: 'Contact Name', filterPlaceholder: 'Filter by Contact Name'},
                             ]}
                             defaultFilters= {{
-                                fields: ["name", "shopName", "last_trx_id", "address", "route", "phone"],
+                                fields: ["name", "contact_name", "last_trx_id", "address", "route", "phone"],
                                 first: 0,
                                 rows: 10,
                                 page: 1,
@@ -912,7 +912,7 @@ const Form = React.memo(({ sales }) => {
                                 filters: {
                                     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
                                     name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    shopName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                    contact_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
                                 }
                             }}
                              />

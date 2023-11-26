@@ -19,7 +19,7 @@ export const PrintReport = () => {
         //     if(data && data.customer_category!=="WALKIN"){
         //         masterDataService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
         //             data.party = {
-        //                 "line1": party.shopName,
+        //                 "line1": party.name,
         //                 "line2": party.address,
         //                 "line3": party.phone,
         //             };

@@ -30,7 +30,7 @@ const List = ({ ledger = false }) => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields:['dtCustomerCategory_id','name','address','phone','email','shopName','district','route', 'status'],
+        fields:['dtCustomerCategory_id','name','address','phone','email','contact_name','district','route', 'status'],
         first: 0,
         rows: 10,
         page: 1,
@@ -39,7 +39,7 @@ const List = ({ ledger = false }) => {
         filters: {
             'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'dtCustomerCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'shopName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'contact_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'district': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
@@ -199,10 +199,10 @@ const List = ({ ledger = false }) => {
             </>
         );
     };
-    const shopnameBodyTemplate = (rowData) => {
+    const contactnameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.shopName}
+                {rowData.contact_name}
             </>
         );
     };
@@ -324,10 +324,10 @@ const List = ({ ledger = false }) => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="name" header="Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         
                         {!ledger && <Column field="dtCustomerCategory_id" header="Customer Category" filter filterElement={customerCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by name" sortable body={shopnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        {!ledger && <Column field="contact_name" header="Contact Name" filter filterPlaceholder="Search by contact name" sortable body={contactnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="phone" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" sortable body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}

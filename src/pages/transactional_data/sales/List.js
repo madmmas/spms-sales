@@ -198,19 +198,19 @@ const List = () => {
 
     const nameBodyTemplate = (rowData) => {
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
-            rowData.customer_name = rowData.party_name;
+            rowData.name = rowData.party_name;
         }
         return (
             <>
-                {rowData.customer_name}
+                {rowData.name}
             </>
         );
     };
 
-    const shopNameBodyTemplate = (rowData) =>{
+    const contactNameBodyTemplate = (rowData) =>{
         return (
             <>
-                {rowData.shopName}
+                {rowData.contact_name}
             </>
         );
     }
@@ -396,8 +396,8 @@ const List = () => {
                         <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="shopName" header="Shop Name" filter filterPlaceholder="Search by shop name" sortable body={shopNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="name" header="Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={contactNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by gross" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

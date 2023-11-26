@@ -36,7 +36,7 @@ const ReportLedger = ({ type, header }) => {
                     masterDataService.getById(modelName, id).then(party => {
                         let ledger = {
                             "party": {
-                                "line1": party.shopName||party.name,
+                                "line1": party.name||party.name,
                                 "line2": party.address,
                                 "line3": party.phone,
                             },
@@ -51,7 +51,7 @@ const ReportLedger = ({ type, header }) => {
                     masterDataService.getById(partyType, id).then(party => {
                         let ledger = {
                             "party": {
-                                "line1": party.shopName||party.name,
+                                "line1": party.name||party.name,
                                 "line2": party.address,
                                 "line3": party.phone,
                             },

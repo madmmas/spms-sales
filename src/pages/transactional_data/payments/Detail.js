@@ -1,4 +1,4 @@
-import React, { useState, useRef, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import * as moment from 'moment';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +29,7 @@ const Detail = () => {
     let emptyPayment = {
         payment_date: moment().format('YYYY-MM-DD'),
         payment_no: null,
-        payment_type: '',   // dtCash, dtBank, dtMFS
+        payment_type: 'RECEIVE',   // dtCash, dtBank, dtMFS
         payment_method: 'CASH', // CASH, BANK, MFS
         ref_type: '', // CUSTOMER, SUPPLIER, EMPLOYEE, OTHER
         ref_id: null,
@@ -54,8 +54,8 @@ const Detail = () => {
     };
 
     const tabs = [
-        { component: DispatchPayment },
         { component: ReceivePayment },
+        { component: DispatchPayment },
     ];
 
     const [activeIndex, setActiveIndex] = useState(0);
@@ -69,7 +69,6 @@ const Detail = () => {
     const [paymentType, setPaymentType] = useState("RECEIVE");
     const [initPayment, setInitPayment] = useState(emptyPayment);
     const [dlgTrigger, setDlgTrigger] = useState(0);
-    const [partyBalance, setPartyBalance] = useState(0);
 
     const transactionService = new TransactionService();
     const orderService = new OrderService();
@@ -81,21 +80,21 @@ const Detail = () => {
 
     const onSelectPaymentType = (value) => {
         let _val = value==="RECEIVE"?"trxACReceivable":"trxACPayable";
-        // console.log("SELECT-PAYMENT-TYPE", value, partyType)
-        // setValue("ref_type", partyType);
-        // setPartyType(partyType);
-        // setValue("ref_id", null);
         setPaymentType(_val);
+        setActiveIndex(value==="RECEIVE"?0:1);
+    }
+
+    const onSelectTab = (value) => {
+        setActiveIndex(value);
+        setValue("payment_type", value===0?"RECEIVE":"DISPATCH");
     }
 
     const onSelectPartyType = (value) => {
-        // console.log(value)
         setPartyType(value);
     }
 
     const onPaymnetCallback = (data) => {
         console.log("onPaymnetCallback", data);
-        // call api to save data
         setSubmitted(true);
         transactionService.commitPayment(paymentType, data).then(data => {
             console.log(data);
@@ -162,6 +161,7 @@ const Detail = () => {
                             <>
                                 <div className="flex align-items-center">
                                     <RadioButton inputId="f5" {...field} inputRef={field.ref} value="RECEIVE" 
+                                        // checked={paymentType === 'RECEIVE'}
                                         checked={field.value === 'RECEIVE'}
                                         onChange={(e) => {
                                             field.onChange(e);
@@ -173,6 +173,7 @@ const Detail = () => {
                                     </label>
 
                                     <RadioButton inputId="f6" {...field} value="DISPATCH"
+                                        // checked={paymentType === 'DISPATCH'}
                                         checked={field.value === 'DISPATCH'}
                                         onChange={(e) => {
                                             field.onChange(e);
@@ -229,7 +230,7 @@ const Detail = () => {
                                         getPartyBalance(e._id);
                                     }}
                                     defaultFilters={{
-                                        fields: ["shopName","address","route","phone","name"],
+                                        fields: ["name","address","route","phone","name"],
                                         first: 0,
                                         rows: 10,
                                         page: 1,
@@ -237,7 +238,7 @@ const Detail = () => {
                                         sortOrder: null,
                                         filters: {
                                             global: { value: null, matchMode: 'contains' },
-                                            shopName: { value: null, matchMode: 'contains' },
+                                            name: { value: null, matchMode: 'contains' },
                                             address: { value: null, matchMode: 'contains' },
                                             route: { value: null, matchMode: 'contains' },
                                             phone: { value: null, matchMode: 'contains' },
@@ -246,7 +247,7 @@ const Detail = () => {
                                     }}
                                     className={classNames({ 'p-invalid': fieldState.error })} 
                                     columns={[
-                                        {field: 'shopName', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
+                                        {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
                                         {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
                                         {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
                                         {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
@@ -288,7 +289,7 @@ const Detail = () => {
             <div className="col-12">
                 {renderPaymentForm()}
                 <div className="card">
-                    <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
+                    <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => onSelectTab(e.index)} />
                     <Suspense fallback={<div>Loading...</div>}>
                         {renderTabPanel()}
                     </Suspense>

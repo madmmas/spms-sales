@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useForm, Controller, set } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode } from 'primereact/api';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
@@ -11,6 +11,8 @@ import { Toast } from 'primereact/toast';
 import SelectMasterData from './SelectMasterData';
 
 import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
+
+import CacheMasterDataService from '../../services/CacheMasterDataService';
 
 const PaymentDialog = ( { 
     trigger, initPayment, onPaymnetCallback, 
@@ -137,6 +139,22 @@ const PaymentDialog = ( {
         </>
     );
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
+    const mfsNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+            </>
+        );
+    };
+
     return (
         <Dialog visible={paymentDialog} style={{ width: '450px' }} header={`Payment`} modal className="p-fluid" footer={paymentDialogFooter} onHide={hidePaymentDialog}>                    
             <Toast ref={toast} />
@@ -185,19 +203,28 @@ const PaymentDialog = ( {
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                             <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                displayField="accName" showFields={["_id", "accNumber", "accName"]}
-                                onSelect={(e) => {
-                                    console.log(e);
-                                    // console.log("amountBank:::", amountBank);
-                                    // console.log(field);
-                                    // setValue('bank_account_id', e._id);
-                                }}
+                                displayField="accName"
+                                onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
                                 columns={[
-                                    {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                    {field: 'dtBank_id', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name', body: bankNameBodyTemplate}, 
                                     {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
                                     {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                ]} />
+                                ]} 
+                                defaultFilters={{
+                                    fields: ["dtBank_id", "accNumber", "accName"],
+                                    first: 0,
+                                    rows: 10,
+                                    page: 1,
+                                    sortField: null,
+                                    sortOrder: null,
+                                    filters: {
+                                        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        accName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        accNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        dtBank_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+                                    }
+                                }}/>
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
@@ -231,16 +258,28 @@ const PaymentDialog = ( {
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                             <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                displayField="accName" showFields={["_id", "refNumber", "accName"]}
-                                onSelect={(e) => {
-                                    console.log(e);
-                                }}
+                                displayField="accName"
+                                onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
                                 columns={[
-                                    {field: 'dtMFS_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by MFS Name'}, 
-                                    {field: 'refNumber', header: 'Account Number', filterPlaceholder: 'Filter by Reference Number'},
+                                    {field: 'dtMFS_id', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name', body: mfsNameBodyTemplate}, 
+                                    {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
                                     {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                ]} />
+                                ]} 
+                                defaultFilters={{
+                                    fields: ["dtMFS_id", "refNumber", "accName"],
+                                    first: 0,
+                                    rows: 10,
+                                    page: 1,
+                                    sortField: null,
+                                    sortOrder: null,
+                                    filters: {
+                                        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        accName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        refNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
+                                        dtMFS_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+                                    }
+                                }}/>
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>

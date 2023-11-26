@@ -50,7 +50,7 @@ export const HtmlLedger = ({type, header}) => {
             }                
             masterDataService.getById(partyType, id).then(party => {
                 setPartyData({
-                    "line1": party.shopName||party.name,
+                    "line1": party.name||party.name,
                     "line2": party.address,
                     "line3": party.phone,
                 });

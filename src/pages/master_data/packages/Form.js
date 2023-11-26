@@ -326,7 +326,6 @@ const Form = ({ productData }) => {
                 <Controller
                     name="code"
                     control={control}
-                    rules={{ required: 'Code is required.' }}
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>

@@ -6,6 +6,9 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 
 import { RegisterService } from '../../../services/RegisterService';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
+import { getFormattedNumber } from '../../../utils';
 
 const DispatchPayment = () => {
 
@@ -52,7 +55,7 @@ const DispatchPayment = () => {
     const loadLazyData = async () => {
         setLoading(true);
 
-        registerService.getAll("trxReceivePayment", { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll("trxDispatchPayment", { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setPaymentData(data.rows);
@@ -110,6 +113,36 @@ const DispatchPayment = () => {
         );
     };
 
+    const partyNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.party_id+"-"+rowData.party_type)}
+            </>
+        );
+    };
+
+    const paidAmountBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getFormattedNumber(rowData.amount)}
+            </>
+        );
+    };
+
+    const paymentNameBodyTemplate = (rowData) => {
+        let paymentName = "CASH";
+        if(rowData.payment_method === "BANK") {
+            paymentName = CacheMasterDataService.getShortnameById(rowData.bank_account_id+"-dtBankAccount")
+        } else if(rowData.payment_method === "MFS") {
+            paymentName = CacheMasterDataService.getShortnameById(rowData.mfs_account_id+"-dtMfsAccount")
+        }
+        return (
+            <>
+                {paymentName}
+            </>
+        );
+    };
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -143,16 +176,12 @@ const DispatchPayment = () => {
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
-                    >
+                    >                        
                         <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="shopName" header="Shop Name" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="party_name" header="Party" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="address" header="Address" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="payment_method" header="Payment Method" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="amount" header="Payment Amount" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        
-                        <Column field="bank_name" header="Bank Account" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="party_id" header="Party Name" filter filterElement={expenseTypeFilterTemplate} body={partyNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="payment_method" header="Paid From" filter filterElement={expenseTypeFilterTemplate} body={paymentNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Paid Amount" filter filterElement={expenseTypeFilterTemplate} body={paidAmountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>                        
                     </DataTable>
                 </div>
             </div>
