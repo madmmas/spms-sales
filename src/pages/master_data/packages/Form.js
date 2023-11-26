@@ -24,7 +24,7 @@ import { MasterDataService } from '../../../services/MasterDataService';
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
 
-const Form = ({ productData }) => {
+const Form = ({ packageData }) => {
 
     let navigate = useNavigate();
 
@@ -64,7 +64,7 @@ const Form = ({ productData }) => {
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: productData
+        defaultValues: packageData
     });
 
     const resetForm = () => {
@@ -97,12 +97,12 @@ const Form = ({ productData }) => {
     }, [defaultWarehouse]);
 
     useEffect(() => {
-        if (productData) {
-            reset(productData);
+        if (packageData) {
+            reset(packageData);
         } else {
             resetForm();
         }
-    }, [productData]);
+    }, [packageData]);
 
     const buildFormData = (data) => {
         return {
@@ -121,12 +121,11 @@ const Form = ({ productData }) => {
         }
     }
 
-
     const onSubmit = (formData) => {
         let data = buildFormData({ ...formData, ...{ items: products }});
         try{
             setSubmitted(true);            
-            if(productData==null){
+            if(packageData==null){
                 productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
                     navigate("/packages/" + data.ID);

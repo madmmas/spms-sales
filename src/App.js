@@ -62,7 +62,7 @@ function App() {
   const Accounts = React.lazy(() => import("./pages/transactional_data/accounts/Detail"));
   const Expenses = React.lazy(() => import("./pages/transactional_data/Expenses"));
   const ExtraIncome = React.lazy(() => import("./pages/transactional_data/ExtraIncome"));
-  const CashBank = React.lazy(() => import("./pages/transactional_data/cash_bank/Detail"));
+  const CashBank = React.lazy(() => import("./pages/transactional_data/transfer_money/Detail"));
 
   const CustomerCategory = React.lazy(() => import("./pages/configurations/CustomerCategory"));
   const SupplierCategory = React.lazy(() => import("./pages/configurations/SupplierCategory"));

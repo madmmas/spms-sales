@@ -8,7 +8,7 @@ import { lazyRetry } from '../../components/LazyWithRetry';
 import { ProductService } from '../../../services/ProductService';
 
 const PackageForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfile" */ './Form'), "packageProfile"));
-const PackageView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfileView" */ './View'), "packageProfileView"));
+// const PackageView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfileView" */ './View'), "packageProfileView"));
 const PackageAddStock = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageAddStock" */ './AddStock'), "packageAddStock"));
 
 const Detail = () => {
@@ -21,7 +21,7 @@ const Detail = () => {
     const [packageData, setPackageData] = useState(null);
 
     const tabs = [
-        { component: PackageView },
+        { component: PackageForm },
         { component: PackageAddStock },
     ];
 
