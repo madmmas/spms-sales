@@ -14,6 +14,8 @@ import { Toolbar } from 'primereact/toolbar';
 
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
 import { TransactionService } from '../../../services/TransactionService';
 import { PRODUCT_MODEL, DAMAGED_STOCK_MODEL } from '../../../constants/models';
 import { ON_DAMAGED_STOCK } from '../../../constants/transactions';
@@ -237,6 +239,14 @@ const DamagedStock = () => {
         </>
     );
 
+    const productCategoryBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtProductCategory_id+"-dtProductCategory")}
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -284,7 +294,7 @@ const DamagedStock = () => {
                                                 {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
                                                 {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                                                 {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                                                {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                                                {field: 'dtProductCategory_id', body: productCategoryBodyTemplate, header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
                                             ]} />
                                         {getFormErrorMessage(field.name)}
                                     </>

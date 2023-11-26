@@ -15,10 +15,11 @@ import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
 const MFSRegister = () => {
 
@@ -183,6 +184,14 @@ const MFSRegister = () => {
         )
     }
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -267,10 +276,21 @@ const MFSRegister = () => {
                                         }}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
                                         columns={[
-                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                        ]} />
+                                        ]} 
+                                        defaultFilters={{
+                                            fields: ['dtBank_id', 'accNumber', 'accName'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>

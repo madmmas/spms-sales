@@ -288,6 +288,22 @@ const Income = () => {
         </>
     );
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
+    const mfsNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -311,9 +327,8 @@ const Income = () => {
                         <Column field="dtIncomeType_id" header="Income Type" filter filterElement={incomeTypeFilterTemplate} sortable body={incomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="incomePeriod" header="Income Period" filter filterPlaceholder="Search by Income Period" sortable body={incomePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-
                         <Column field="income_to" header="Income Received In" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
@@ -418,7 +433,7 @@ const Income = () => {
                                             }
                                         }}
                                         columns={[
-                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'}, 
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />
@@ -452,7 +467,7 @@ const Income = () => {
                                             }
                                         }}
                                         columns={[
-                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
                                             {field: 'refNumber', header: 'MFS Number', filterPlaceholder: 'Filter by MFS Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />

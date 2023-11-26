@@ -185,13 +185,6 @@ export const HtmlLedger = ({type, header}) => {
             return "";
         }
         let particular = item.particular;
-        
-        // if(item.reg_type !== null && item.reg_type !== undefined && item.reg_type !== ""){
-        //     particular = particular + " (" + item.reg_type + ")";
-        // }
-        // if(item.shortname !== null && item.shortname !== undefined && item.shortname !== ""){
-        //     particular = particular + " (" + item.shortname + ")";
-        // }
             
         return particular;
     }

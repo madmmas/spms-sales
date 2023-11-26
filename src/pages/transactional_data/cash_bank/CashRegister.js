@@ -15,6 +15,7 @@ import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
@@ -183,6 +184,22 @@ const CashRegister = () => {
         )
     }
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
+    const mfsNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -267,7 +284,7 @@ const CashRegister = () => {
                                         }}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
                                         columns={[
-                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />
@@ -292,7 +309,7 @@ const CashRegister = () => {
                                         }}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
                                         columns={[
-                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
                                             {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />

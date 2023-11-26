@@ -13,7 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { HRService } from '../../../services/HRService';
 import { CITIES } from '../../../constants/lookupData';
 import { DISTRICT } from '../../../constants/districts';
-
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 const List = ({ ledger = false }) => {
@@ -188,7 +188,7 @@ const List = ({ ledger = false }) => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtCustomerCategory_id_shortname}
+                {CacheMasterDataService.getShortnameById(rowData.dtCustomerCategory_id+"-dtCustomerCategory")}
             </>
         );
     };

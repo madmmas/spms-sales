@@ -106,14 +106,6 @@ const ReceivePayment = () => {
         // return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
-    const expenseBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtExpenseType_id_shortname}
-            </>
-        );
-    };
-
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">

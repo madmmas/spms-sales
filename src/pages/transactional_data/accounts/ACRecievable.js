@@ -92,14 +92,6 @@ const ACRecievable = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtCustomer_id_shortname}
-            </>
-        );
-    };
-
     const dtCustomer_idBodyTemplate = (rowData) => {
         return (
             <>

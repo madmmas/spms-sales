@@ -11,6 +11,7 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import SelectMasterData from '../../components/SelectMasterData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectLookupData from '../../components/SelectLookupData';
@@ -285,7 +286,6 @@ const Form = ({ productData }) => {
                     {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
                     {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
                     {field: 'price', header: 'Trade Price', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
-                    // {field: 'dtProductCategory_id_shortname', header: 'Product Category', filterPlaceholder: 'Filter by Product Category', minWidth: '10rem'}
                 ]} 
                 />
         </div>

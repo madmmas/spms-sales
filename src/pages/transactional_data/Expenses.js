@@ -290,6 +290,22 @@ const Expenses = () => {
         </>
     );
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
+    const mfsNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -418,7 +434,7 @@ const Expenses = () => {
                                             }
                                         }}
                                         columns={[
-                                            {field: 'dtBank_id_shortname', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name'}, 
+                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'}, 
                                             {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />
@@ -452,7 +468,7 @@ const Expenses = () => {
                                             }
                                         }}
                                         columns={[
-                                            {field: 'dtMFS_id_shortname', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
                                             {field: 'refNumber', header: 'MFS Number', filterPlaceholder: 'Filter by MFS Number'},
                                             {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
                                         ]} />

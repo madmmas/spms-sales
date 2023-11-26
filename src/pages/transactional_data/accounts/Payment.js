@@ -92,14 +92,6 @@ const Payment = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtProduct_id_shortname}
-            </>
-        );
-    };
-
     const trxSales_idBodyTemplate = (rowData) => {
         return (
             <>

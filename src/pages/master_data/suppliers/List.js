@@ -11,6 +11,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { HRService } from '../../../services/HRService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
@@ -179,7 +180,7 @@ const List = ({ ledger = false }) => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtSupplierCategory_id_shortname}
+                {CacheMasterDataService.getShortnameById(rowData.dtSupplierCategory_id+"-dtSupplierCategory")}
             </>
         );
     };

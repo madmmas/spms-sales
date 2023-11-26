@@ -1,33 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { MasterDataService } from '../../services/MasterDataService';
-import { set } from 'react-hook-form';
 
 export default function SelectMasterDataTable({ 
     trigger, fieldValue, onSelect, modelName, 
     columns, defaultFilters,
-    showFields=[], caption="Select", 
     dialogHeight='70vh', dialogWidth='80vw'
 }) {
 
     const dt = useRef(null);
-
-    // let defaultFilters = {
-    //     fields: showFields,
-    //     first: 0,
-    //     rows: 10,
-    //     page: 1,
-    //     sortField: null,
-    //     sortOrder: null,
-    //     filters: {
-    //         global: { value: null, matchMode: FilterMatchMode.CONTAINS }            
-    //     }
-    // };
 
     const [loading, setLoading] = useState(false);
     const [globalFilterValue, setGlobalFilterValue] = useState('');
