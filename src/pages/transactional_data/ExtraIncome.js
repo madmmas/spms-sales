@@ -18,11 +18,14 @@ import SelectLookupData from '../components/SelectLookupData';
 import SelectMasterData from '../components/SelectMasterData';
 import React, { useEffect, useRef, useState } from 'react';
 
+import CacheMasterDataService from '../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
 import { INCOME_MODEL, INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
+
+import { getFormattedNumber } from '../../utils';
 
 const Income = () => {
 
@@ -116,7 +119,6 @@ const Income = () => {
         setLoading(true);
 
         registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
             setTotalRecords(data.total);
             setIncomeData(data.rows);
             setLoading(false);
@@ -140,13 +142,11 @@ const Income = () => {
         setSubmitted(true);
         console.debug(formData);
         transactionService.generaleIncome(formData).then(data => {
-            console.log(data);
             setIncomeDialog(false);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Income Created', life: 3000 });
         });
 
-        // setIncomeDialog(false);
         reset(emptyIncome)
     };
 
@@ -211,22 +211,10 @@ const Income = () => {
         return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={incomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
-    const bankAccountFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={incomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-
     const incomeBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtIncomeType_id_shortname}
-            </>
-        );
-    };
-
-    const bankAccountBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtBankAccount_id_shortname}
+                {CacheMasterDataService.getShortnameById(rowData.dtIncomeType_id+"-dtIncomeType")}
             </>
         );
     };
@@ -250,7 +238,7 @@ const Income = () => {
     const amountBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.amount}
+                {getFormattedNumber(rowData.amount)}
             </>
         );
     };
@@ -260,9 +248,15 @@ const Income = () => {
     };
 
     const bankorcashBodyTemplate = (rowData) => {
+        let incomeTo = "CASH";
+        if(rowData.income_to === "BANK") {
+            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
+        } else if(rowData.income_to === "MFS") {
+            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMfsAccount")
+        }
         return (
             <>
-                {rowData.income_to}
+                {incomeTo}
             </>
         );
     };
@@ -274,15 +268,6 @@ const Income = () => {
             </>
         );
     };
-
-    // const renderHeader = () => {
-    //     return (
-    //         <div className="flex justify-content-between">
-    //             <h5 className="m-0">Manage Income</h5>
-    //             <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
-    //         </div>
-    //     )
-    // }
 
     const renderHeader = () => {
         return (
@@ -326,9 +311,9 @@ const Income = () => {
                         <Column field="dtIncomeType_id" header="Income Type" filter filterElement={incomeTypeFilterTemplate} sortable body={incomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="incomePeriod" header="Income Period" filter filterPlaceholder="Search by Income Period" sortable body={incomePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="income_to" header="Bank or Cash or MFS" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+
+                        <Column field="income_to" header="Income Received In" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 

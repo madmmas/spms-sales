@@ -25,6 +25,8 @@ import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
 import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL, BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
 
+import { getFormattedNumber } from '../../utils';
+
 const Expenses = () => {
 
     const modelName = EXPENSE_MODEL;
@@ -141,15 +143,12 @@ const Expenses = () => {
 
     const saveExpenses = (formData) => {
         setSubmitted(true);
-        console.debug(formData);
         transactionService.generaleExpenses(formData).then(data => {
-            console.log(data);
             setExpensesDialog(false);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expenses Created', life: 3000 });
         });
 
-        // setExpensesDialog(false);
         reset(emptyExpenses)
     };
 
@@ -214,22 +213,10 @@ const Expenses = () => {
         return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
-    const bankAccountFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
-    };
-
     const expenseBodyTemplate = (rowData) => {
         return (
             <>
                 {CacheMasterDataService.getShortnameById(rowData.dtExpenseType_id+"-dtExpenseType")}
-            </>
-        );
-    };
-
-    const bankAccountBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtBankAccount_id_shortname}
             </>
         );
     };
@@ -253,7 +240,7 @@ const Expenses = () => {
     const amountBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.amount}
+                {getFormattedNumber(rowData.amount)}
             </>
         );
     };
@@ -263,9 +250,15 @@ const Expenses = () => {
     };
 
     const bankorcashBodyTemplate = (rowData) => {
+        let expenseFrom = "CASH";
+        if(rowData.expense_from === "BANK") {
+            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
+        } else if(rowData.expense_from === "MFS") {
+            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMfsAccount")
+        }
         return (
             <>
-                {rowData.expense_from}
+                {expenseFrom}
             </>
         );
     };
@@ -277,17 +270,6 @@ const Expenses = () => {
             </>
         );
     };
-
-    
-
-    // const renderHeader = () => {
-    //     return (
-    //         <div className="flex justify-content-between">
-    //             <h5 className="m-0">Manage Expenses</h5>
-    //             <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
-    //         </div>
-    //     )
-    // }
 
     const renderHeader = () => {
         return (
@@ -331,9 +313,8 @@ const Expenses = () => {
                         <Column field="dtExpenseType_id" header="Expense Type" filter filterElement={expenseTypeFilterTemplate} sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="amount" header="Amount" filter filterPlaceholder="Search by Amount" sortable body={amountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="expense_from" header="Bank or Cash or MFS" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtBankAccount_id" header="Bank Account" filter filterElement={bankAccountFilterTemplate} sortable body={bankAccountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="expense_from" header="Expense Paid From" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter filterElement={expenseTypeFilterTemplate} body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
