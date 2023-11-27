@@ -139,7 +139,7 @@ export class TransactionService {
         const resp = await axiosInstance.post(`/payment/${paymentType}`, payment);
         console.log(resp.data);
         // delayed response
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        // await new Promise(resolve => setTimeout(resolve, 1000));
         return resp.data;
     }
 

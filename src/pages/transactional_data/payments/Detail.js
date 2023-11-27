@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, Suspense } from 'react';
 import * as moment from 'moment';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
@@ -91,6 +91,8 @@ const Detail = () => {
 
     const onSelectPartyType = (value) => {
         setPartyType(value);
+        setValue("ref_id", null);
+        setValue("current_balance", 0);
     }
 
     const onPaymnetCallback = (data) => {
@@ -152,6 +154,129 @@ const Detail = () => {
                 <h5>Payment Information:</h5>
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12 md:col-3">
+                        <Controller
+                            name="ref_type"
+                            control={control}
+                            rules={{ required: 'Party Type is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Party Type*</label>
+                                <Dropdown
+                                    value={field.value}
+                                    optionValue="code" 
+                                    optionLabel="name"
+                                    placeholder="Select a Party Type"
+                                    options={partyTypes}
+                                    onChange={(e) => {
+                                        field.onChange(e.value)
+                                        onSelectPartyType(e.value)
+                                    }}
+                                    className={classNames({ 'p-invalid': fieldState.error })}
+                                />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    {partyType == "dtCustomer" && <div className="field col-12 md:col-3">
+                        <Controller
+                            name="ref_id"
+                            control={control}
+                            rules={{ required: 'Party is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
+                                <SelectMasterData field={field} modelName="dtCustomer"
+                                    displayField="name" showFields={["name"]}
+                                    onSelect={(e) => {
+                                        console.log("selected Party:::", e);
+                                        getPartyBalance(e._id);
+                                    }}
+                                    defaultFilters={{
+                                        fields: ["name","address","route","phone","contact_name"],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: 'contains' },
+                                            name: { value: null, matchMode: 'contains' },
+                                            address: { value: null, matchMode: 'contains' },
+                                            route: { value: null, matchMode: 'contains' },
+                                            phone: { value: null, matchMode: 'contains' },
+                                            contact_name: { value: null, matchMode: 'contains' },
+                                        }
+                                    }}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
+                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
+                                        {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
+                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
+                                        {field: 'contact_name', header: 'Contact Person', filterPlaceholder: 'Filter by Contact Person'},
+                                    ]} />
+                                    {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>}
+                    {partyType == "dtSupplier" && <div className="field col-12 md:col-3">
+                        <Controller
+                            name="ref_id"
+                            control={control}
+                            rules={{ required: 'Party is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
+                                <SelectMasterData field={field} modelName="dtSupplier"
+                                    displayField="name" showFields={["name"]}
+                                    onSelect={(e) => {
+                                        console.log("selected Party:::", e);
+                                        getPartyBalance(e._id);
+                                    }}
+                                    defaultFilters={{
+                                        fields: ["name","address","phone"],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: 'contains' },
+                                            name: { value: null, matchMode: 'contains' },
+                                            address: { value: null, matchMode: 'contains' },
+                                            phone: { value: null, matchMode: 'contains' },
+                                        }
+                                    }}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'name', header: 'Name', filterPlaceholder: 'Filter by Shop Name'},
+                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
+                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
+                                    ]} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>}
+
+                    <div className="field col-12 md:col-3">
+                        <Controller
+                            name="current_balance"
+                            control={control}
+                            // rules={{ required: 'Current Balance is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Current Balance*</label>
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    className={classNames({ 'p-invalid': fieldState.error })}
+                                    onValueChange={(e) => field.onChange(e)}
+                                    readOnly={true}
+                                    />                                
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-3">
                     <div>Payment type:</div>
                     <Controller
                         name="payment_type"
@@ -188,92 +313,6 @@ const Detail = () => {
                             </>
                         )}
                     />
-                    </div>
-
-                    <div className="field col-12 md:col-3">
-                        <Controller
-                            name="ref_type"
-                            control={control}
-                            rules={{ required: 'Party Type is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Party Type*</label>
-                                <Dropdown
-                                    value={field.value}
-                                    optionValue="code" 
-                                    optionLabel="name"
-                                    placeholder="Select a Party Type"
-                                    options={partyTypes}
-                                    onChange={(e) => {
-                                        field.onChange(e.value)
-                                        onSelectPartyType(e.value)
-                                    }}
-                                    className={classNames({ 'p-invalid': fieldState.error })}
-                                />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-3">
-                        <Controller
-                            name="ref_id"
-                            control={control}
-                            rules={{ required: 'Party is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
-                                <SelectMasterData field={field} modelName={partyType}
-                                    displayField="name" showFields={["name"]}
-                                    onSelect={(e) => {
-                                        console.log("selected Party:::", e);
-                                        getPartyBalance(e._id);
-                                    }}
-                                    defaultFilters={{
-                                        fields: ["name","address","route","phone","name"],
-                                        first: 0,
-                                        rows: 10,
-                                        page: 1,
-                                        sortField: null,
-                                        sortOrder: null,
-                                        filters: {
-                                            global: { value: null, matchMode: 'contains' },
-                                            name: { value: null, matchMode: 'contains' },
-                                            address: { value: null, matchMode: 'contains' },
-                                            route: { value: null, matchMode: 'contains' },
-                                            phone: { value: null, matchMode: 'contains' },
-                                            name: { value: null, matchMode: 'contains' },
-                                        }
-                                    }}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
-                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                        {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
-                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
-                                        {field: 'name', header: 'Party Name', filterPlaceholder: 'Filter by Party Name'},
-                                    ]} />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-
-                    <div className="field col-12 md:col-3">
-                        <Controller
-                            name="current_balance"
-                            control={control}
-                            // rules={{ required: 'Current Balance is required.' }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Current Balance*</label>
-                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                                    className={classNames({ 'p-invalid': fieldState.error })}
-                                    onValueChange={(e) => field.onChange(e)}
-                                    readOnly={true}
-                                    />                                
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
                     </div>
                     <div className="field col-12 md:col-2">
                         <Button label="New Payment" icon="pi pi-plus" className="p-button-success mr-2" onClick={handleSubmit((d) => onPaymnetSubmit(d))} />

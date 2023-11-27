@@ -6,7 +6,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
-
+import { Calendar } from 'primereact/calendar';
 import SelectConstData from './SelectConstData';
 import SelectMasterData from './SelectMasterData';
 
@@ -19,7 +19,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
 
     const [submitted, setSubmitted] = useState(false);
     const [paymentDialog, setPaymentDialog] = useState(false);
-    const [paymentType, setBankCash] = useState("CASH");
+    const [paymentType, setPaymentType] = useState("CASH");
 
     const {
         control,
@@ -36,15 +36,19 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
             reset({
                 ...initPayment
             })
-            // setValue('payment_method', initPayment.payment_method);
-            // setValue('current_balance', initPayment.current_balance);
-            // setValue('amount', initPayment.amount);
-            // setValue('payment_date', initPayment.payment_date);
         }
     }, [initPayment]);
 
     useEffect(() => {
         if (trigger) {
+            setValue('payment_method', 'CASH');
+            setValue('current_balance', 0);
+            setValue('amount', 0);
+            setValue('payment_date', new Date());
+            setValue('remarks', '');
+            setValue('bank_account_id', null);
+            setValue('mfs_account_id', null);
+            setPaymentType('CASH');
             setPaymentDialog(true);
         }
     }, [trigger]);
@@ -121,6 +125,20 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
     return (
         <Dialog visible={paymentDialog} style={{ width: '450px' }} header={`Payment`} modal className="p-fluid" footer={paymentDialogFooter} onHide={hidePaymentDialog}>                    
             <div className="p-fluid formgrid grid">
+                <div className="field col-12 md:col-6">
+                    <Controller
+                        name="payment_date"
+                        control={control}
+                        rules={{ required: 'Date is required.' }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name}>Date*</label>
+                            <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
+                                dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
+                            {getFormErrorMessage(field.name)}
+                        </>                                
+                    )}/>
+                    </div>
                 <div className="field col-12 md:col-12">
                     <Controller
                         name="payment_method"
@@ -130,13 +148,13 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Payment Method</label>
                             <SelectConstData field={field} data={PAYMENT_TYPES}
-                                onSelectChange={(value) => {console.log(value); setBankCash(value)}}
+                                onSelectChange={(value) => {console.log(value); setPaymentType(value)}}
                                 className={classNames({ 'p-invalid': fieldState.error })} /> 
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
                 </div>
-                <div hidden={paymentType !== "BANK"} className="field col-12 md:col-12">
+                {paymentType === "BANK" && <div className="field col-12 md:col-12">
                 <Controller
                     name="bank_account_id"
                     control={control}
@@ -172,8 +190,8 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
-                </div>
-                <div hidden={paymentType !== "MFS"} className="field col-12 md:col-12">
+                </div>}
+                {paymentType === "MFS" && <div className="field col-12 md:col-12">
                 <Controller
                     name="mfs_account_id"
                     control={control}
@@ -209,7 +227,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
-                </div>
+                </div>}
                 <div className="field col-12 md:col-12">
                 <Controller
                     name="current_balance"
@@ -244,19 +262,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
-                </div>                            
-                {/* <div className="field col-12 md:col-12">
-                <Controller
-                    name="reference"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                    <>
-                        <label htmlFor="reference">Reference</label>
-                        <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
-                        {getFormErrorMessage(field.name)}
-                    </>
-                )}/>
-                </div> */}
+                </div>
                 <div className="field col-12 md:col-12">
                 <Controller
                     name="remarks"
