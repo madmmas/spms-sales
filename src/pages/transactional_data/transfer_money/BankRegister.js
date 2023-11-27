@@ -19,15 +19,15 @@ import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import {  MFS_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
 import { getFormattedNumber } from '../../../utils';
 
 const BankRegister = () => {
 
     let emptyBankRegister = {
         transfer_to: 'CASH',
-        ref_id: null,
-        trx_date: null,
+        to_ref_id: null,
+        trx_date: new Date(),
         amount: 0,
         remarks: '',
     };
@@ -38,6 +38,7 @@ const BankRegister = () => {
         formState: { errors },
         reset,
         setValue,
+        getValues,
         handleSubmit
     } = useForm({
         defaultValues: emptyBankRegister
@@ -127,6 +128,8 @@ const BankRegister = () => {
     };
 
     const transferBank = () => {
+        setValue("transfer_to", "CASH");
+        setTransferTo("CASH");
         reset({ ...emptyBankRegister });        
         setSubmitted(false);
         setBankRegisterDialog(true);
@@ -185,6 +188,14 @@ const BankRegister = () => {
         )
     }
 
+    const bankNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+            </>
+        );
+    };
+
     const mfsNameBodyTemplate = (rowData) => {
         return (
             <>
@@ -202,9 +213,23 @@ const BankRegister = () => {
     };
 
     const refBodyTemplate = (rowData) => {
+        let ref = "CASH";
+        if(rowData.trx_type === "BANK_TO_MFS") {
+            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtMFSAccount");
+        } else if(rowData.trx_type === "BANK_TO_BANK") {
+            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtBankAccount");
+        }
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.ref_id+"-dtMFSAccount")}
+                {ref}
+            </>
+        );
+    };
+
+    const fromBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.from_ref_id+"-dtBankAccount")}
             </>
         );
     };
@@ -231,12 +256,47 @@ const BankRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="from_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={"Bank Transfer"} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         <div className="p-fluid formgrid grid">
+                        <div className="field col-12 md:col-12">
+                        <Controller
+                            name="from_ref_id"
+                            control={control}
+                            rules={{ required: 'Bank Account is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Transfer From Bank Account*</label>
+                                <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                    displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                    onSelect={(e) => {
+                                        console.log(e);
+                                    }}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
+                                        {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                        {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                    ]} 
+                                    defaultFilters={{
+                                        fields: ['dtBank_id', 'accNumber', 'accName'],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: 'contains' }
+                                        }
+                                    }}/>
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                        </div>
                         <div className="field col-12 md:col-12">
                             <div>Transfer to:</div>
                             <Controller
@@ -257,6 +317,17 @@ const BankRegister = () => {
                                                 Cash
                                             </label>
 
+                                            <RadioButton inputId="f6" {...field} value="BANK"
+                                                checked={transferTo === 'BANK'}
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    onSelectTransferTo(e.value);
+                                                }}
+                                            />
+                                            <label htmlFor="f6" className="ml-1 mr-3">
+                                                BANK
+                                            </label>
+
                                             <RadioButton inputId="f6" {...field} value="MFS"
                                                 checked={transferTo === 'MFS'}
                                                 onChange={(e) => {
@@ -273,13 +344,51 @@ const BankRegister = () => {
                                 )}
                             />
                             </div>
-
-                            <div hidden={transferTo !== "MFS"} className="field col-12 md:col-12">
+                            {transferTo === "BANK" &&
+                            <div className="field col-12 md:col-12">
                             <Controller
-                                name="ref_id"
+                                name="to_ref_id"
+                                control={control}
+                                rules={{
+                                    required: 'Bank Account is required.', 
+                                    validate: (value) => (value !== getValues("from_ref_id")) || 'Bank Account is same as Transfer From Bank Account.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                                    <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        onSelect={(e) => {
+                                            console.log(e);
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
+                                            {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} 
+                                        defaultFilters={{
+                                            fields: ['dtBank_id', 'accNumber', 'accName'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}/>
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>}
+                            {transferTo === "MFS" &&
+                            <div className="field col-12 md:col-12">
+                            <Controller
+                                name="to_ref_id"
                                 control={control}
                                 rules={{ 
-                                    validate: (value) => ((transferTo === "CASH" ) || (transferTo === "MFS" && value !== null) ) || 'Bank Account is required.'
+                                        validate: (value) => (transferTo === "MFS" && value !== null) || 'MFS Account is required.'
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
@@ -309,7 +418,7 @@ const BankRegister = () => {
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
-                            </div>
+                            </div>}
                             <div className="field col-12 md:col-6">
                             <Controller
                                 name="trx_date"

@@ -19,15 +19,15 @@ import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import SelectMasterData from '../../components/SelectMasterData';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import { BANK_ACCOUNT_MODEL } from '../../../constants/models';
+import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
 import { getFormattedNumber } from '../../../utils';
 
 const MFSRegister = () => {
 
     let emptyMFSRegister = {
         transfer_to: 'CASH',
-        ref_id: null,
-        trx_date: null,
+        to_ref_id: null,
+        trx_date: new Date(),
         amount: 0,
         remarks: '',
     };
@@ -38,6 +38,7 @@ const MFSRegister = () => {
         formState: { errors },
         reset,
         setValue,
+        getValues,
         handleSubmit
     } = useForm({
         defaultValues: emptyMFSRegister
@@ -127,6 +128,8 @@ const MFSRegister = () => {
     };
 
     const transferMFS = () => {
+        setValue("transfer_to", "CASH");
+        setTransferTo("CASH");
         reset({ ...emptyMFSRegister });        
         setSubmitted(false);
         setMFSRegisterDialog(true);
@@ -193,6 +196,14 @@ const MFSRegister = () => {
         );
     };
 
+    const mfsNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+            </>
+        );
+    };
+
     const amountBodyTemplate = (rowData) => {
         return (
             <>
@@ -202,9 +213,23 @@ const MFSRegister = () => {
     };
 
     const refBodyTemplate = (rowData) => {
+        let ref = "CASH";
+        if(rowData.trx_type === "MFS_TO_MFS") {
+            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtMFSAccount");
+        } else if(rowData.trx_type === "MFS_TO_BANK") {
+            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtBankAccount");
+        }
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.ref_id+"-dtMFSAccount")}
+                {ref}
+            </>
+        );
+    };
+
+    const fromBodyTemplate = (rowData) => {
+        return (
+            <>
+                {CacheMasterDataService.getShortnameById(rowData.from_ref_id+"-dtMFSAccount")}
             </>
         );
     };
@@ -231,12 +256,47 @@ const MFSRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="from_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={"MFS Transfer"} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         <div className="p-fluid formgrid grid">
+                        <div className="field col-12 md:col-12">
+                        <Controller
+                            name="from_ref_id"
+                            control={control}
+                            rules={{ required: 'MFS Account is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Transfer From MFS Account*</label>
+                                <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                    displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                    onSelect={(e) => {
+                                        console.log(e);
+                                    }}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    columns={[
+                                        {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
+                                        {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
+                                        {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                    ]} 
+                                    defaultFilters={{
+                                        fields: ['dtMFS_id', 'refNumber', 'accName'],
+                                        first: 0,
+                                        rows: 10,
+                                        page: 1,
+                                        sortField: null,
+                                        sortOrder: null,
+                                        filters: {
+                                            global: { value: null, matchMode: 'contains' }
+                                        }
+                                    }}/>
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                        </div>
                         <div className="field col-12 md:col-12">
                             <div>Transfer to:</div>
                             <Controller
@@ -267,6 +327,17 @@ const MFSRegister = () => {
                                             <label htmlFor="f6" className="ml-1 mr-3">
                                                 BANK
                                             </label>
+
+                                            <RadioButton inputId="f6" {...field} value="MFS"
+                                                checked={transferTo === 'MFS'}
+                                                onChange={(e) => {
+                                                    field.onChange(e);
+                                                    onSelectTransferTo(e.value);
+                                                }}
+                                            />
+                                            <label htmlFor="f6" className="ml-1 mr-3">
+                                                MFS
+                                            </label>
                                         </div>
                                         {getFormErrorMessage(field.name)}
                                     </>
@@ -274,16 +345,17 @@ const MFSRegister = () => {
                             />
                             </div>
 
-                            <div hidden={transferTo !== "BANK"} className="field col-12 md:col-12">
+                            {transferTo === "BANK" &&
+                            <div className="field col-12 md:col-12">
                             <Controller
-                                name="ref_id"
+                                name="to_ref_id"
                                 control={control}
-                                rules={{ 
-                                    validate: (value) => ((transferTo === "CASH" ) || (transferTo === "BANK" && value !== null) ) || 'Bank Account is required.'
+                                rules={{
+                                    required: 'Bank Account is required.',
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>BANK Name*</label>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                                     <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
                                         displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {
@@ -309,7 +381,45 @@ const MFSRegister = () => {
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
-                            </div>
+                            </div>}
+                            {transferTo === "MFS" &&
+                            <div className="field col-12 md:col-12">
+                            <Controller
+                                name="to_ref_id"
+                                control={control}
+                                rules={{ 
+                                    required: 'MFS Account is required.',
+                                    validate: (value) => (value !== getValues("from_ref_id")) || 'MFS Account is same as Transfer From MFS Account.'
+                                }}
+                                render={({ field, fieldState }) => (
+                                <>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                                    <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
+                                        displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        onSelect={(e) => {
+                                            console.log(e);
+                                        }}
+                                        className={classNames({ 'p-invalid': fieldState.error })} 
+                                        columns={[
+                                            {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
+                                            {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
+                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
+                                        ]} 
+                                        defaultFilters={{
+                                            fields: ['dtMFS_id', 'refNumber', 'accName'],
+                                            first: 0,
+                                            rows: 10,
+                                            page: 1,
+                                            sortField: null,
+                                            sortOrder: null,
+                                            filters: {
+                                                global: { value: null, matchMode: 'contains' }
+                                            }
+                                        }}/>
+                                    {getFormErrorMessage(field.name)}
+                                </>
+                            )}/>
+                            </div>}
                             <div className="field col-12 md:col-6">
                             <Controller
                                 name="trx_date"

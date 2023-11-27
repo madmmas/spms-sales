@@ -10,8 +10,8 @@ import { MasterDataService } from '../../services/MasterDataService';
 import { TransactionService } from '../../services/TransactionService';
 
 import { 
-    BANK_MODEL,
-    MFS_MODEL,
+    BANK_ACCOUNT_MODEL,
+    MFS_ACCOUNT_MODEL,
     SUPPLIER_MODEL,
     CUSTOMER_MODEL
 } from '../../constants/models';
@@ -142,9 +142,9 @@ export const HtmlLedger = ({type, header}) => {
     const getPartyModel = (type) => {
         switch (type) {
             case 'bank':
-                return BANK_MODEL;
+                return BANK_ACCOUNT_MODEL;
             case 'mfs':
-                return MFS_MODEL;
+                return MFS_ACCOUNT_MODEL;
             case 'accreceivable':
             case 'customers':
                 return CUSTOMER_MODEL;

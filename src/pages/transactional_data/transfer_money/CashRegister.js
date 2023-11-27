@@ -26,8 +26,8 @@ const CashRegister = () => {
 
     let emptyCashRegister = {
         transfer_to: 'BANK',
-        ref_id: null,
-        trx_date: null,
+        to_ref_id: null,
+        trx_date: new Date(),
         amount: 0,
         remarks: '',
     };
@@ -127,6 +127,8 @@ const CashRegister = () => {
     };
 
     const transferCash = () => {
+        setValue("transfer_to", "BANK");
+        setTransferTo("BANK");
         reset({ ...emptyCashRegister });        
         setSubmitted(false);
         setCashRegisterDialog(true);
@@ -216,7 +218,7 @@ const CashRegister = () => {
         }
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.ref_id+"-"+refName)}
+                {CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-"+refName)}
             </>
         );
     };
@@ -243,7 +245,7 @@ const CashRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
@@ -289,7 +291,7 @@ const CashRegister = () => {
 
                             <div hidden={transferTo !== "BANK"} className="field col-12 md:col-12">
                             <Controller
-                                name="ref_id"
+                                name="to_ref_id"
                                 control={control}
                                 rules={{ 
                                     validate: (value) => ((transferTo === "MFS" ) || (transferTo === "BANK" && value !== null) ) || 'Bank Account is required.'
@@ -325,7 +327,7 @@ const CashRegister = () => {
                             </div>
                             <div hidden={transferTo !== "MFS"} className="field col-12 md:col-12">
                             <Controller
-                                name="ref_id"
+                                name="to_ref_id"
                                 control={control}
                                 rules={{ 
                                     validate: (value) => ((transferTo === "BANK" ) || (transferTo === "MFS" && value !== null) ) || 'Bank Account is required.'

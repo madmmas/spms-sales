@@ -112,18 +112,24 @@ export class TransactionService {
     }
 
     async transferCash(to, data) {
+        data.from_ref_type = 'CASH';
+        data.to_ref_type = to;
         const resp = await axiosInstance.post(`/transfer/CASH/`+to, data);
         console.log(resp.data);
         return resp.data;
     }
 
     async transferBank(to, data) {
+        data.from_ref_type = 'BANK';
+        data.to_ref_type = to;
         const resp = await axiosInstance.post(`/transfer/BANK/`+to, data);
         console.log(resp.data);
         return resp.data;
     }
 
     async transferMFS(to, data) {
+        data.from_ref_type = 'MFS';
+        data.to_ref_type = to;
         const resp = await axiosInstance.post(`/transfer/MFS/`+to, data);
         console.log(resp.data);
         return resp.data;
