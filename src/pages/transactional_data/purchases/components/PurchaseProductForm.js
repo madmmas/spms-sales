@@ -210,7 +210,9 @@ export default function PurchaseProductForm({
 
         if(selSupplierId!==null){
             // crash here
-            lastTradePrice = await orderService.getOrderProductLastPrice("trxPurchase", selectedRow.id, selSupplierId);
+            let resp = await orderService.getOrderProductLastPriceByParty("trxPurchase", selectedRow.id, selSupplierId);
+            lastTradePrice = resp.prev_price;
+            // lastOrderId = resp.order_id;
         }
         console.log("LAST TRADE PRICE::", lastTradePrice);
 
