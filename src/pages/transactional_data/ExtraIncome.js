@@ -37,7 +37,7 @@ const Income = () => {
         dtMFSAccount_id : null,
         dtIncomeType_id: null,
         incomePeriod: null,
-        date: null,
+        date: new Date(),
         amount: 0,
         remarks: '',
         income_to: 'CASH',
@@ -252,7 +252,7 @@ const Income = () => {
         if(rowData.income_to === "BANK") {
             incomeTo = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
         } else if(rowData.income_to === "MFS") {
-            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMfsAccount")
+            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMFSAccount")
         }
         return (
             <>

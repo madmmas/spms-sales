@@ -61,16 +61,22 @@ export const getConstantNameById = (id, data) => {
     return item ? item.name : '';
 }
 
+export const getLedgerFormattedNumber = (num, options = {
+    style: 'decimal',  // Other options: 'currency', 'percent', etc.
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+}) => {
+    if (num < 0) {
+        return '(' + parseFloat(-num).toLocaleString('en-IN', options) + ')';
+    }
+    return parseFloat(num).toLocaleString('en-IN', options);
+}
+
 export const getFormattedNumber = (num, options = {
     style: 'decimal',  // Other options: 'currency', 'percent', etc.
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
 }) => {
-    // const options = {
-    //     style: 'decimal',  // Other options: 'currency', 'percent', etc.
-    //     minimumFractionDigits: 2,
-    //     maximumFractionDigits: 2,
-    // };
     return parseFloat(num).toLocaleString('en-IN', options);
 }
 

@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
 import { useParams } from 'react-router-dom';
-import { getDateFormatted, getFormattedNumber } from '../../utils';
+import { getDateFormatted, getFormattedNumber, getLedgerFormattedNumber } from '../../utils';
 
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
@@ -237,7 +237,7 @@ export const HtmlLedger = ({type, header}) => {
                         <td className="left-align">{getParticular(item)}</td>
                         <td className="right-align"><b>{getFormattedNumber(item.dr_amount)}</b></td>
                         <td className="right-align"><b>{getFormattedNumber(item.cr_amount)}</b></td>
-                        <td className="right-align"><b>{getFormattedNumber(item.balance)}</b></td>
+                        <td className="right-align"><b>{getLedgerFormattedNumber(item.balance)}</b></td>
                     </tr>)}
                 {ledgerData.length === 0 && <tr>
                         <td className="left-align" colSpan="7">No Data Found</td>
@@ -247,7 +247,7 @@ export const HtmlLedger = ({type, header}) => {
                         <th colSpan="4" className="text right-align line">Closing Balance:</th>
                         <th className="total price right-align line">{ getFormattedNumber(drTotal)}</th>
                         <th className="total price right-align line">{ getFormattedNumber(crTotal)}</th>
-                        <th className="total price right-align line">{ getFormattedNumber(closingBalance)}</th>
+                        <th className="total price right-align line">{ getLedgerFormattedNumber(closingBalance)}</th>
                     </tr>
                 </tbody>
             </table>

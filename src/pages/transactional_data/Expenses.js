@@ -37,7 +37,7 @@ const Expenses = () => {
         dtMFSAccount_id: null,
         dtExpenseType_id: null,
         expensePeriod: null,
-        date: null,
+        date: new Date(),
         amount: 0,
         remarks: '',
         expense_from: 'CASH',
@@ -254,7 +254,7 @@ const Expenses = () => {
         if(rowData.expense_from === "BANK") {
             expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
         } else if(rowData.expense_from === "MFS") {
-            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMfsAccount")
+            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMFSAccount")
         }
         return (
             <>
