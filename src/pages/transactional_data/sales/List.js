@@ -25,7 +25,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["created_at", "party_id", "customer_category", "customer_name", "customer_phone",  "gross", "transport", "duty_vat", "net"],
+        fields: [],
         first: 0,
         rows: 10,
         page: 1,
@@ -197,12 +197,15 @@ const List = () => {
     };
 
     const nameBodyTemplate = (rowData) => {
+        let name = "";
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
-            rowData.name = rowData.party_name;
+            name = rowData.party_name;
+        } else {
+            name = rowData.customer_name;
         }
         return (
             <>
-                {rowData.name}
+                {name}
             </>
         );
     };
@@ -232,62 +235,49 @@ const List = () => {
     };
 
     const  cashBodyTemplate = (rowData) => {
+        let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
-            if(rowData.trx_status === "pending"){
-                let obj = JSON.parse(rowData.advance_payment);
-                return (
-                    <>
-                        {obj.cash_amount}
-                    </>
-                );
-            }
-            if(rowData.trx_status === "completed"){
-                let obj = JSON.parse(rowData.advance_payment);
-                return (
-                    <>
-                        {obj.cash_amount + obj.current_balance}
-                    </>
-                );
+            if(rowData.advance_payment !== null && rowData.advance_payment !== undefined && rowData.advance_payment !== ""){
+                if(rowData.trx_status === "pending"){
+                    let obj = JSON.parse(rowData.advance_payment);
+                    amount = obj ? obj.cash_amount: 0; 
+                } else if(rowData.trx_status === "completed"){
+                    let obj = JSON.parse(rowData.advance_payment);
+                    amount = obj ? obj.cash_amount + obj.current_balance: 0; 
+                }
             }
         }else{
-            if(rowData.payment === null){
-                rowData.payment = '{}';
+            amount = 0;
+            if(rowData.payment !== null && rowData.payment !== undefined && rowData.payment !== ""){
+                let obj = JSON.parse(rowData.payment)
+                amount = obj.cash_amount;
             }
-            let obj = JSON.parse(rowData.payment)
-            if(JSON.stringify(obj) === '{}'){
-                obj.cash_amount = 0;
-            }
-            return (
-                <>
-                    {obj.cash_amount}
-                </>
-            );
         }
+        return (
+            <>
+                {amount}
+            </>
+        );
     };
 
     const  othersBodyTemplate = (rowData) => {
+        let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
-            let obj = JSON.parse(rowData.advance_payment);
-            return (
-                <>
-                    {obj.bank_amount + obj.mfs_amount}
-                </>
-            );
+            if(rowData.advance_payment !== null && rowData.advance_payment !== undefined && rowData.advance_payment !== ""){
+                let advance_payment = JSON.parse(rowData.advance_payment);
+                amount = advance_payment ? advance_payment.bank_amount + advance_payment.mfs_amount: 0;
+            }
         }else{
-            if(rowData.payment === null){
-                rowData.payment = '{}';
+            if(rowData.payment !== null && rowData.payment !== undefined && rowData.payment !== ""){
+                let payment = JSON.parse(rowData.payment)
+                amount = payment.bank_amount + payment.mfs_amount;
             }
-            let obj = JSON.parse(rowData.payment)
-            if(JSON.stringify(obj) === '{}'){
-                obj.bank_amount = 0;
-                obj.mfs_amount = 0;
-            }
-            return (
-                <>
-                    {obj.bank_amount + obj.mfs_amount}
-                </>
-            );
         }
+        return (
+            <>
+                {amount}
+            </>
+        );
     };
 
     const totalDiscountBodyTemplate = (rowData) => {
@@ -321,15 +311,15 @@ const List = () => {
             </>
         );
     };
+
     const dueAmountBodyTemplate = (rowData) => {
-        if(rowData.payment === null){
-            rowData.payment = '{}';
+        let obj = {
+            cash_amount: 0,
+            bank_amount: 0,
+            mfs_amount: 0
         }
-        let obj = JSON.parse(rowData.payment)
-        if(JSON.stringify(obj) === '{}'){
-            obj.cash_amount = 0;
-            obj.bank_amount = 0;
-            obj.mfs_amount = 0;
+        if(rowData.payment !== null){
+            obj = JSON.parse(rowData.payment)
         }
         return (
             <>
@@ -396,16 +386,12 @@ const List = () => {
                         <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="name" header="Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={contactNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="name" header="Customer/Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by gross" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="due" header="Due Balance" filter filterPlaceholder="Search by Net Amount" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_name" header="Customer Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        {/* <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by name" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
-                        
+                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="duty_vat" header="VAT" filter filterPlaceholder="Search by Vat Amount" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
