@@ -22,7 +22,6 @@ export const CashFlow = () => {
 
     useEffect(() => {
         loadCashFlowData();
-        calculateCashflowTotal();
     }, [reportDate]);
 
     useEffect(() => {
@@ -36,73 +35,74 @@ export const CashFlow = () => {
             "ondate": getDateWithFormat(reportDate, "YYYY-MM-DD"),
         }).then(data => {
             setCashFlowData(data);
+            calculateCashflowTotal(data);
             console.log("CashFlowData::", data);
         });
     }
 
-    const calculateCashflowTotal = () => {
+    const calculateCashflowTotal = (data) => {
         let total = 0;
-        let inflow = calculateCashInflowTotal();
-        let outflow = calculateCashOutflowTotal();
+        let inflow = calculateCashInflowTotal(data);
+        let outflow = calculateCashOutflowTotal(data);
         total = inflow - outflow;
         setCashInflowTotal(inflow);
         setCashOutflowTotal(outflow);
         setCashflowTotal(total);
     }
 
-    const calculateCashInflowTotal = () => {
+    const calculateCashInflowTotal = (data) => {
         let total = 0;
-        if(cashFlowData['bank_drawings']){
-            cashFlowData['bank_drawings'].forEach(item => {
+        if(data['bank_drawings']){
+            data['bank_drawings'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['mfs_drawings']){
-            cashFlowData['mfs_drawings'].forEach(item => {
+        if(data['mfs_drawings']){
+            data['mfs_drawings'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['general_income']){
-            cashFlowData['general_income'].forEach(item => {
+        if(data['general_income']){
+            data['general_income'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['party_collection']){
-            cashFlowData['party_collection'].forEach(item => {
+        if(data['party_collection']){
+            data['party_collection'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['new_sales']){
-            total += parseFloat(cashFlowData['new_sales']);
+        if(data['new_sales']){
+            total += parseFloat(data['new_sales']);
         }
-        if(cashFlowData['advance_payment_conditional_sales']){
-            total += parseFloat(cashFlowData['advance_payment_conditional_sales']);
+        if(data['advance_payment_conditional_sales']){
+            total += parseFloat(data['advance_payment_conditional_sales']);
         }
-        if(cashFlowData['cash_collection_conditional_sales']){
-            total += parseFloat(cashFlowData['cash_collection_conditional_sales']);
+        if(data['cash_collection_conditional_sales']){
+            total += parseFloat(data['cash_collection_conditional_sales']);
         }
         return total;
     }
 
-    const calculateCashOutflowTotal = () => {
+    const calculateCashOutflowTotal = (data) => {
         let total = 0;
-        if(cashFlowData['bank_deposit']){
-            cashFlowData['bank_deposit'].forEach(item => {
+        if(data['bank_deposit']){
+            data['bank_deposit'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['party_payment']){
-            cashFlowData['party_payment'].forEach(item => {
+        if(data['party_payment']){
+            data['party_payment'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['mfs_deposit']){
-            cashFlowData['mfs_deposit'].forEach(item => {
+        if(data['mfs_deposit']){
+            data['mfs_deposit'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
-        if(cashFlowData['general_income']){
-            cashFlowData['general_income'].forEach(item => {
+        if(data['general_income']){
+            data['general_income'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
@@ -151,7 +151,7 @@ export const CashFlow = () => {
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
-            <p class="line">Daily Statement of Showroom: SPARE PARTS Dated at {getDateWithFormat(new Date(), "DD-MMM-YYYY")}</p>
+            <p class="line">Daily Statement of Showroom: SPARE PARTS Dated at <b>{getDateWithFormat(reportDate, "DD-MMM-YYYY")}</b></p>
             <table className="bill-details">
                 <tbody>
                     <tr>
