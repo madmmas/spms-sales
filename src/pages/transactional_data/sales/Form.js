@@ -313,8 +313,8 @@ const Form = React.memo(({ sales }) => {
             "gross": salesGross,
             "discount": salesDiscount,
             "net": salesNet,
-            "due": salesDue,
-            "paid": salesPaid,
+            "due": formData.customer_category === "REGISTERED"?0.00:salesDue,
+            "paid": formData.customer_category === "REGISTERED"?0.00:salesPaid,
             "balance_forward": -99999999,
         };
         

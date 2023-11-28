@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
-
-import { getDateWithFormat, getFormattedNumber } from '../../utils';
+import { Calendar } from 'primereact/calendar';
+import { getDateWithFormat, getFormattedNumber, getLedgerFormattedNumber } from '../../utils';
 
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
@@ -16,29 +16,29 @@ export const CashFlow = () => {
     const [cashInflowTotal, setCashInflowTotal] = useState(0);
     const [cashOutflowTotal, setCashOutflowTotal] = useState(0);
     const [trigger, setTrigger] = useState(0)
+    const [reportDate, setReportDate] = useState(new Date())
 
     const transactionService = new TransactionService();
 
     useEffect(() => {
-        console.log(cashFlowData)
-        if(cashFlowData === undefined){
-
-            transactionService.getReport('cashflow', {
-                "ondate": getDateWithFormat(new Date(), "YYYY-MM-DD"),
-                // "ondate": getDateWithFormat('2023-11-09', "YYYY-MM-DD"),
-            }).then(data => {
-                setCashFlowData(data);
-                console.log("CashFlowData::", data);
-            });
-        }
+        loadCashFlowData();
         calculateCashflowTotal();
-    }, [cashFlowData]);
+    }, [reportDate]);
 
     useEffect(() => {
         if(trigger>0){
             window.print();
         }
     }, [trigger]);
+
+    const loadCashFlowData = () => {
+        transactionService.getReport('cashflow', {
+            "ondate": getDateWithFormat(reportDate, "YYYY-MM-DD"),
+        }).then(data => {
+            setCashFlowData(data);
+            console.log("CashFlowData::", data);
+        });
+    }
 
     const calculateCashflowTotal = () => {
         let total = 0;
@@ -59,6 +59,11 @@ export const CashFlow = () => {
         }
         if(cashFlowData['mfs_drawings']){
             cashFlowData['mfs_drawings'].forEach(item => {
+                total += parseFloat(item.amount);
+            });
+        }
+        if(cashFlowData['general_income']){
+            cashFlowData['general_income'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
@@ -131,6 +136,11 @@ export const CashFlow = () => {
     return (
       <div>
         <ReportCss />
+        <Calendar value={reportDate} 
+            onChange={(e) => setReportDate(e.value)} 
+            dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" 
+            />
+        <button className = "no-printme" onClick={() =>loadCashFlowData()}>Refresh</button>
         <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>
 
         <ComponentToPrint />
@@ -171,7 +181,8 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['bank_drawings'] === undefined &&
+                                    {(cashFlowData['bank_drawings'] === undefined || 
+                                        cashFlowData['bank_drawings'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -189,7 +200,8 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['mfs_drawings'] === undefined &&
+                                    {(cashFlowData['mfs_drawings'] === undefined || 
+                                        cashFlowData['mfs_drawings'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -207,12 +219,32 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['party_collection'] === undefined &&
+                                    {(cashFlowData['party_collection'] === undefined || 
+                                        cashFlowData['party_collection'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
                                 </tbody>
-                            </table> 
+                            </table>
+                            <table className="lineitems">
+                                <thead>
+                                    <tr>
+                                        <th colSpan="2" className="bottom-line left-align">General Income</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {cashFlowData['general_income'] && cashFlowData['general_income'].map((item) =>
+                                    <tr>
+                                        <td className="left-align">{item.particular}</td>
+                                        <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
+                                    </tr>)}
+                                    {(cashFlowData['general_income'] === undefined || 
+                                        cashFlowData['general_income'].length==0) &&
+                                    <tr>
+                                        <td className="left-align" colSpan="2">No Record ...</td>
+                                    </tr>}
+                                </tbody>
+                            </table>
                             <table className="lineitems">
                                 <thead>
                                     <tr>
@@ -254,7 +286,7 @@ export const CashFlow = () => {
                                     </tr>
                                     <tr>
                                         <td className="left-align"></td>
-                                        <td>= {getFormattedNumber(cashflowTotal)}</td>
+                                        <td>= {getLedgerFormattedNumber(cashflowTotal)}</td>
                                     </tr>
                                 </tbody>
                             </table> 
@@ -307,7 +339,8 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['bank_deposit'] === undefined &&
+                                    {(cashFlowData['bank_deposit'] === undefined || 
+                                        cashFlowData['bank_deposit'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -325,7 +358,8 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['party_payment'] === undefined &&
+                                    {(cashFlowData['party_payment'] === undefined || 
+                                        cashFlowData['party_payment'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -343,7 +377,8 @@ export const CashFlow = () => {
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['mfs_deposit'] === undefined &&
+                                    {(cashFlowData['mfs_deposit'] === undefined || 
+                                        cashFlowData['mfs_deposit'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}
@@ -356,12 +391,13 @@ export const CashFlow = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {cashFlowData['general_income'] && cashFlowData['general_income'].map((item) =>
+                                    {cashFlowData['general_expenses'] && cashFlowData['general_expenses'].map((item) =>
                                     <tr>
                                         <td className="left-align">{item.particular}</td>
                                         <td className="right-align qty">{getFormattedNumber(item.amount)}</td>
                                     </tr>)}
-                                    {cashFlowData['general_income'] === undefined &&
+                                    {(cashFlowData['general_expenses'] === undefined || 
+                                        cashFlowData['general_expenses'].length==0) &&
                                     <tr>
                                         <td className="left-align" colSpan="2">No Record ...</td>
                                     </tr>}

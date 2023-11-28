@@ -79,8 +79,8 @@ const Detail = () => {
     ];
 
     const onSelectPaymentType = (value) => {
-        let _val = value==="RECEIVE"?"trxACReceivable":"trxACPayable";
-        setPaymentType(_val);
+        // let _val = value==="RECEIVE"?"trxACReceivable":"trxACPayable";
+        setPaymentType(value);
         setActiveIndex(value==="RECEIVE"?0:1);
     }
 
@@ -98,7 +98,9 @@ const Detail = () => {
     const onPaymnetCallback = (data) => {
         console.log("onPaymnetCallback", data);
         setSubmitted(true);
-        transactionService.commitPayment(paymentType, data).then(data => {
+        console.log("paymentType::", paymentType)
+        let _paymentType = paymentType==="RECEIVE"?"trxACReceivable":"trxACPayable";
+        transactionService.commitPayment(_paymentType, data).then(data => {
             console.log(data);
             setSubmitted(false);
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Created', life: 3000 });
@@ -286,7 +288,6 @@ const Detail = () => {
                             <>
                                 <div className="flex align-items-center">
                                     <RadioButton inputId="f5" {...field} inputRef={field.ref} value="RECEIVE" 
-                                        // checked={paymentType === 'RECEIVE'}
                                         checked={field.value === 'RECEIVE'}
                                         onChange={(e) => {
                                             field.onChange(e);
@@ -298,7 +299,6 @@ const Detail = () => {
                                     </label>
 
                                     <RadioButton inputId="f6" {...field} value="DISPATCH"
-                                        // checked={paymentType === 'DISPATCH'}
                                         checked={field.value === 'DISPATCH'}
                                         onChange={(e) => {
                                             field.onChange(e);

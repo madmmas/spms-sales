@@ -43,7 +43,14 @@ const Form = ({mfsAccountProfile}) => {
 
     const onSubmit = (formData) => {
         try{
-
+        // initialize balance
+        if(formData.initBalance===undefined && formData.initBalance===null){
+            formData.initBalance = 0;
+        }
+        // current balance
+        if(formData.balance===undefined && formData.balance===null){
+            formData.balance = formData.initBalance;
+        }
         setSubmitted(true);
         if(!isEdit){
             formData.balance = formData.initBalance;
@@ -136,13 +143,16 @@ const Form = ({mfsAccountProfile}) => {
                         <Controller
                             name="initBalance"
                             control={control}
-                            rules={{
-                                validate: (value) => (value!==null) || 'Initial Balance is required.'
-                            }}
+                            // rules={{
+                            //     validate: (value) => (value!==null) || 'Initial Balance is required.'
+                            // }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>
-                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} minFractionDigits={2} mode="currency" currency="BDT" currencyDisplay="code" locale="en-IN" />                                
+                                <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} 
+                                    />                                
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
