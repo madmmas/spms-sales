@@ -30,15 +30,15 @@ const Form = ({ packageData }) => {
 
     let defaultPackageProduct = {
         id: null,
-        dtProduct_id: "",
+        dtProduct_id: null,
+        product_name: "",
         code: "",
-
-        unitTradePrice: 0.00,
-        quantity: 1,  
-        totalPrice: 0.00,
-        netPrice: 0.00,
-
-        remarks: "",
+        brand_name: "",
+        model_no: "",
+        part_number: "",
+        quantity: 0,
+        price: 0.00,
+        min_trade_price: 0.00,
     };
 
     const toast = useRef(null);
@@ -62,9 +62,11 @@ const Form = ({ packageData }) => {
         formState: { errors },
         reset,
         setValue,
+        getValues,
         handleSubmit
     } = useForm({
-        defaultValues: packageData
+        defaultValues: defaultPackageProduct,
+        // packageData,
     });
 
     const resetForm = () => {
@@ -99,21 +101,27 @@ const Form = ({ packageData }) => {
     useEffect(() => {
         if (packageData) {
             reset(packageData);
+            setProducts(packageData.items);
         } else {
             resetForm();
         }
     }, [packageData]);
 
+    useEffect(() => {
+        calculateTotals(products);
+    }, [products]);
+
     const buildFormData = (data) => {
         return {
             id: data.id,
-            // code: data.code,
             name: data.name,
             price: Number(data.price),
+            // min_trade_price: Number(data.min_trade_price),
             type: 'PACKAGE',
             warehouse_id: data.warehouse_id,
-            brand_id: data.brand_id,
-            model_id: data.model_id,
+            brand_id: Number(data.brand_id),
+            model_id: Number(data.model_id),
+            part_number: data.part_number,
             low_stock_qty: Number(data.low_stock_qty),
             remarks: data.remarks,
             items: data.items,
@@ -128,12 +136,12 @@ const Form = ({ packageData }) => {
             if(packageData==null){
                 productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    navigate("/packages/" + data.ID);
+                    navigate("/packages");
                 });
             } else {
                 productService.update(data.id, data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    navigate("/packages/" + data.ID);
+                    navigate("/packages");
                 });
             }
         }
@@ -157,7 +165,6 @@ const Form = ({ packageData }) => {
         addedItem['index'] = products.length;
         newProducts.push(addedItem);
         setProducts(newProducts);
-        calculateTotals(newProducts);
         clearProductSelection();
     };
 
@@ -165,7 +172,6 @@ const Form = ({ packageData }) => {
         let newProducts = [...products];
         newProducts[selectedProduct.index] = dtPackageProduct;
         setProducts(newProducts);
-        calculateTotals(newProducts);
         clearProductSelection();
     };
 
@@ -195,6 +201,10 @@ const Form = ({ packageData }) => {
             total += sale.totalPrice;
         });
         setTotalPrice(total);
+        setValue('price', total);
+        // if(getValues('min_trade_price')===0) {
+        //     setValue('min_trade_price', total);
+        // }
     };
 
     const editPackageProduct = (dtPackageProduct) => {
@@ -379,12 +389,35 @@ const Form = ({ packageData }) => {
                         render={({ field, fieldState }) => (
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Price</label>
-                            <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} minFractionDigits={2} />
-                            {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
+                            <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                onValueChange={(e) => field.onChange(e.target.value)} 
+                                />
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
                     </div>
+                    {/* <div className="field col-12 md:col-4">
+                    <Controller
+                        name="min_trade_price"
+                        control={control}
+                        rules={{ 
+                            required: 'Minimum Package Price is required.',
+                            validate: (value) => {
+                                return value >= Number(getValues('price')) || 'Must be less than Package Price.';
+                            }
+                        }}
+                        render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Minimum Package Price</label>
+                            <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                className={classNames({ 'p-invalid': fieldState.error })} 
+                                onValueChange={(e) => field.onChange(e.target.value)} 
+                                />
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                    </div> */}
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="low_stock_qty"
@@ -392,7 +425,7 @@ const Form = ({ packageData }) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
-                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} minFractionDigits={2} />
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} />
                                 {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
                                 {getFormErrorMessage(field.name)}
                             </>
