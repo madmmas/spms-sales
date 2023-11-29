@@ -87,6 +87,7 @@ const Detail = () => {
     const onSelectTab = (value) => {
         setActiveIndex(value);
         setValue("payment_type", value===0?"RECEIVE":"DISPATCH");
+        setPaymentType(value===0?"RECEIVE":"DISPATCH");
     }
 
     const onSelectPartyType = (value) => {
@@ -108,6 +109,7 @@ const Detail = () => {
                 "ref_type": partyType,
                 "ref_id": null,
                 "current_balance": 0,
+                "payment_type": paymentType,
             })
         }).catch(error => {
             console.log(error);
@@ -189,6 +191,7 @@ const Detail = () => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
                                 <SelectMasterData field={field} modelName="dtCustomer"
+                                    caption='Select Customer'
                                     displayField="name" showFields={["name"]}
                                     onSelect={(e) => {
                                         console.log("selected Party:::", e);

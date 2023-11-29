@@ -8,7 +8,7 @@ import { InputText } from 'primereact/inputtext';
 import { RegisterService } from '../../../services/RegisterService';
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
-import { getFormattedNumber } from '../../../utils';
+import { getFormattedNumber, getDateTimeFormatted } from '../../../utils';
 
 const DispatchPayment = () => {
 
@@ -113,6 +113,14 @@ const DispatchPayment = () => {
         );
     };
 
+    const paymentDateBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getDateTimeFormatted(rowData.payment_date)}
+            </>
+        );
+    };
+
     const paidAmountBodyTemplate = (rowData) => {
         return (
             <>
@@ -126,7 +134,7 @@ const DispatchPayment = () => {
         if(rowData.payment_method === "BANK") {
             paymentName = CacheMasterDataService.getShortnameById(rowData.bank_account_id+"-dtBankAccount")
         } else if(rowData.payment_method === "MFS") {
-            paymentName = CacheMasterDataService.getShortnameById(rowData.mfs_account_id+"-dtMfsAccount")
+            paymentName = CacheMasterDataService.getShortnameById(rowData.mfs_account_id+"-dtMFSAccount")
         }
         return (
             <>
@@ -170,7 +178,7 @@ const DispatchPayment = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >                        
                         <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} body={paymentDateBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="party_id" header="Party Name" filter filterElement={expenseTypeFilterTemplate} body={partyNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_method" header="Paid From" filter filterElement={expenseTypeFilterTemplate} body={paymentNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Paid Amount" filter filterElement={expenseTypeFilterTemplate} body={paidAmountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>                        

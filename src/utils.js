@@ -48,6 +48,10 @@ export const getTimeFormatted = (date) => {
     return moment(date).format('hh:mm:ss');
 }
 
+export const getDateTimeFormatted = (date) => {
+    return moment(date).format('DD/MM/YYYY hh:mm:ss');
+}
+
 export const getDate = (date) => {
     return moment(parseInt(date)).format('DD/MM/YYYY');
 }
