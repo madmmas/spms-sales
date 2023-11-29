@@ -244,27 +244,6 @@ export default function SalesProductForm({
                     </>
                 )}/>
             </div>
-
-            {/* <div className="field col-12 md:col-2">
-            <Controller
-                name="trade_price"
-                control={control}
-                rules={{ 
-                    required: 'Trade Price is required.', 
-                    min: { value: min_trade_price, message: 'Must be greater than or equal to min price.' } 
-                }}
-
-                render={({ field, fieldState }) => (
-                    <>
-                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
-                <InputNumber
-                    inputId={field.name} value={field.value} inputRef={field.ref} 
-                    className={classNames({ 'p-invalid': fieldState.error })}
-                    disabled={false} />
-                    </>
-                )}/>
-            </div> */}
-            
             <div className="field col-12 md:col-2">
                 <label>Current Stock</label>
                 <InputText readonly="true" value={current_stock} placeholder="Current Stock" />
@@ -298,7 +277,7 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
-                <InputNumber ref={quantityRef}
+                <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_trade_price} max={10000000} />
