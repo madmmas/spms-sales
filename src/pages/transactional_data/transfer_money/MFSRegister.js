@@ -93,7 +93,7 @@ const MFSRegister = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        registerService.getAll("trxMFSRegister", { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll("trxMFSTransfer", { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setMFSRegister(data.rows);

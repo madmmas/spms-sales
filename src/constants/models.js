@@ -25,8 +25,8 @@ export const STOCK_OUT_MODEL = 'trxStockOut';
 
 export const ACC_RECEIVABLE = 'trxACReceivable';
 export const ACC_PAYABLE = 'trxACPayable';
-export const BANK_REGISTER = 'trxBankRegister';
-export const CASH_REGISTER = 'trxCashRegister';
+export const BANK_REGISTER = 'trxBankTransfer';
+export const CASH_REGISTER = 'trxCashTransfer';
 export const EXTRA_INCOME_REGISTER = 'trxIncomeRegister';
 export const EXPENSE_REGISTER = 'trxExpenseRegister';
 export const PYAMENT_REGISTER = 'trxPayment';

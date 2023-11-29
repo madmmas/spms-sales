@@ -93,7 +93,7 @@ const BankRegister = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        registerService.getAll("trxBankRegister", { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll("trxBankTransfer", { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setBankRegister(data.rows);
