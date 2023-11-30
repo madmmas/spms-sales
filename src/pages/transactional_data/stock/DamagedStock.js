@@ -37,14 +37,19 @@ const DamagedStock = () => {
     const detailsRef = useRef(null);
 
     let defaultFilters = {
-        fields: [],
+        fields: ['code', 'name', 'brand_name', 'model_no', 'part_number'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },            
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },   
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
     };
 
@@ -291,10 +296,10 @@ const DamagedStock = () => {
                                             defaultFilters={defaultFilters}
                                             columns={[
                                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
-                                                {field: 'brandName', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                                {field: 'modelNo', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
-                                                {field: 'partNumber', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                                                {field: 'dtProductCategory_id', body: productCategoryBodyTemplate, header: 'Product Category', filterPlaceholder: 'Filter by Product Category', width: '15rem'}
+                                                {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                                {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                                {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                                                {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'}
                                             ]} />
                                         {getFormErrorMessage(field.name)}
                                     </>
@@ -327,7 +332,7 @@ const DamagedStock = () => {
                                 <>
                                     <label htmlFor="details">Details*</label>
                                     <InputTextarea ref={detailsRef}
-                                        inputId={field.name} value={field.value} inputRef={field.ref} keyfilter="text" 
+                                        inputId={field.name} value={field.value} inputRef={field.ref}
                                         className={classNames({ 'p-invalid': fieldState.error })} 
                                         onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
                                     {getFormErrorMessage(field.name)}

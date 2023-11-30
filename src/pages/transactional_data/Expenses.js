@@ -483,7 +483,9 @@ const Expenses = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks*</label>
-                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                                    <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  
+                                        onChange={(e) => field.onChange(e.target.value)} 
+                                        className={classNames({ 'p-invalid': fieldState.error })}/>
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>

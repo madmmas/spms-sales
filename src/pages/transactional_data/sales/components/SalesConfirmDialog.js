@@ -59,7 +59,7 @@ const SalesConfirmDialog = ( { trigger, confirmOrder }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="notes">Note*</label>
-                        <InputTextarea inputId={field.name} value={field.value} inputRef={field.payRef} keyfilter="text" 
+                        <InputTextarea inputId={field.name} value={field.value} inputRef={field.payRef}  
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             onChange={(e) => field.onChange(e.target.value)} rows={3} cols={20} />
                         {getFormErrorMessage(field.name)}
