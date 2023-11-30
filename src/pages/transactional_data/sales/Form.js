@@ -677,6 +677,7 @@ const Form = React.memo(({ sales }) => {
         orderService.return(SALES_MODEL, sales.id, selectedReturnItems).then(data => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Record Created', life: 3000 });
             navigate("/sales");
+            window.open("#/invoice/" + sales.id + "/R", "_blank");
         });
     };
 

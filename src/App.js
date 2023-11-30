@@ -16,6 +16,7 @@ import RouteAuth from "./auth/RouteAuth";
 import POS from "./pages/POS";
 
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
+import { PrintInvoiceSalesReturn } from "./pages/transactional_data/sales/components/PrintInvoiceSalesReturn";
 import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
 import { CashFlow } from "./pages/html_reports/CashFlow";
@@ -93,6 +94,9 @@ function App() {
       <Route path="/pos" element={<POS />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
+      <Route path="/invoice/">
+        <Route path=":id/R" element={<PrintInvoiceSalesReturn />} />
+      </Route>
 
       <Route path="/sales">
         <Route path="new" element={<RouteAuth pageComponent={<SaleForm />} />} />
