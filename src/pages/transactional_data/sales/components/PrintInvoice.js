@@ -208,7 +208,8 @@ export const PrintInvoice = () => {
                                     <>MFS : <span className="price">{invoice.advance_payment.mfs_amount} </span></>
                                 ]
                               </span>}
-                            (-) Payment
+                        {invoice.customer_category === "REGISTERED" && "(-) Payment Collection"}
+                        {invoice.customer_category !== "REGISTERED" && "(-) Payment"}
 
                         </td>
                         {invoice.customer_category !== "REGISTERED" && <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>}
@@ -277,12 +278,12 @@ export const PrintInvoice = () => {
             <section>
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
+                      <b>In Words (Invoice Amount) : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
+                      <b>In Words (Invoice Amount) : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "WALKIN" &&
