@@ -2,7 +2,7 @@ import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
 import { useParams } from 'react-router-dom';
 import { getDateFormatted, getFormattedNumber, getLedgerFormattedNumber } from '../../utils';
-
+import { Calendar } from 'primereact/calendar';
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
 
@@ -15,7 +15,6 @@ import {
     SUPPLIER_MODEL,
     CUSTOMER_MODEL
 } from '../../constants/models';
-import { set } from 'react-hook-form';
 
 export const HtmlLedger = ({type, header}) => {
     
@@ -29,18 +28,15 @@ export const HtmlLedger = ({type, header}) => {
     const [drTotal, setDrTotal] = useState(0);
     const [crTotal, setCrTotal] = useState(0);
 
+    // local date state mm/dd/yyyy
+    const [fromDate, setFromDate] = useState(getDateFormatted(new Date()))
+    const [toDate, setToDate] = useState()
+
     const transactionService = new TransactionService();
     const masterDataService = new MasterDataService();
 
     useEffect(() => {
-        let cacode = getCACode(type);
-        if(cacode === null || cacode === ""){
-            return;
-        }
         console.log("TYPE CHANGED::", type)
-        let params = {
-            code: cacode,
-        }
         if(id != null){
             console.log("ID CHANGED::", id)
             let partyType = getPartyModel(type);
@@ -50,11 +46,48 @@ export const HtmlLedger = ({type, header}) => {
             }                
             masterDataService.getById(partyType, id).then(party => {
                 setPartyData({
-                    "line1": party.name||party.name,
-                    "line2": party.address,
-                    "line3": party.phone,
+                    "line1": party.name||party.contact_name||party.accName,
+                    "line2": party.address||party.branch,
+                    "line3": party.accNumber||party.refNumber||party.phone,
                 });
             });
+        }
+        refreshLedger();
+    }, [type, id]);
+
+    useEffect(() => {
+        refreshLedger();
+    }, [fromDate, toDate]);
+
+    useEffect(() => {
+        if(trigger>0){
+            window.print();
+        }
+    }, [trigger]);
+
+    const refreshLedger = () => {
+        let cacode = getCACode(type);
+        if(cacode === null || cacode === ""){
+            return;
+        }
+        let params = {
+            code: cacode,
+        }
+        console.log("FROM DATE::=>>>", fromDate)
+        if(fromDate != null){
+            params["fromdate"] = moment(fromDate).format('YYYY-MM-DD');
+        }
+        console.log("TO DATE::=>>>", toDate)
+        if(fromDate != null && toDate != null){
+            params["todate"] = moment(toDate).format('YYYY-MM-DD');
+        }
+        if(id != null){
+            console.log("ID CHANGED::", id)
+            let partyType = getPartyModel(type);
+            console.log("PARTY TYPE::", type, partyType)
+            if(partyType === null || partyType === ""){
+                return;
+            }                
             params["partyid"] = id;
             params["partytype"] = partyType;
             transactionService.getReportBy('ledger', params).then(data => {
@@ -69,13 +102,7 @@ export const HtmlLedger = ({type, header}) => {
                 console.log("LEDGER DATA::=>>>", dataWithBalance);
             });
         }
-    }, [type, id]);
-
-    useEffect(() => {
-        if(trigger>0){
-            window.print();
-        }
-    }, [trigger]);
+    }
 
     const calculateBalance = (data) => {
         let dataMap = new Map();
@@ -192,6 +219,15 @@ export const HtmlLedger = ({type, header}) => {
     return (
       <div>
         <ReportCss />
+        <Calendar value={fromDate} 
+            onChange={(e) => setFromDate(e.value)} 
+            dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy" mask="99/99/9999" 
+            />
+        <Calendar value={toDate} 
+            onChange={(e) => setToDate(e.value)} 
+            dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy" mask="99/99/9999" 
+            />
+        <button className = "no-printme" onClick={() =>refreshLedger()}>Refresh</button>
         <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>
 
         <ComponentToPrint />
@@ -207,7 +243,7 @@ export const HtmlLedger = ({type, header}) => {
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
             </header>}
-            <p class="line">Date : {getDateFormatted(moment().format('YYYY-MM-DD'))}</p>
+            <p class="line">Date : {getDateFormatted(fromDate)}</p>
             <table className="bill-details">
                 <tbody>
                     <tr>

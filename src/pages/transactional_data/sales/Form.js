@@ -98,6 +98,7 @@ const Form = React.memo(({ sales }) => {
     const [selectedReturnItem, setSelectedReturnItem] = useState({});
     const [selectedReturnItems, setSelectedReturnItems] = useState([]);
     const [returnItems, setReturnItems] = useState([]);
+    const [returnedAmount, setReturnedAmount] = useState(0.00);
     const [returnDlgTrigger, setReturnDlgTrigger] = useState(0);
     const [returnDialog, setReturnDialog] = useState(false);
 
@@ -199,6 +200,9 @@ const Form = React.memo(({ sales }) => {
             console.log("FETCHED-SALES::", sales);
             setStatus(sales.status);
             setTrxNo(sales.voucher_no);
+            sales.items.forEach((item, index) => {
+                item['index'] = index;
+            });
             setSalesItems(sales.items);
             let totalReturnedPrice = 0;
             let arrayOfSalesReturnItems = sales?.return_items?.map((item)=>{
@@ -654,6 +658,16 @@ const Form = React.memo(({ sales }) => {
     }
 
     ///// Events -- RETURN /////
+    useEffect(() => {
+        // calculate returned amount
+        let _returnedAmount = 0.00;
+        console.log("selectedReturnItems::", selectedReturnItems);
+        selectedReturnItems.forEach(item => {
+            _returnedAmount += item.return_qty * item.trade_price;
+        });
+        setReturnedAmount(_returnedAmount);
+    }, [selectedReturnItems]);
+
     const hideReturnDialog = () => {
         setReturnDialog(false);
     };
@@ -701,7 +715,10 @@ const Form = React.memo(({ sales }) => {
                 return;
             }
         }
-
+        // calculate return amount
+        returnItem['return_amount'] = returnItem.return_qty * returnItem.trade_price;
+        setReturnedAmount(returnedAmount + returnItem.return_amount);
+        // add to return items
         setSelectedReturnItems([...selectedReturnItems, returnItem]);
     };
 
@@ -957,23 +974,42 @@ const Form = React.memo(({ sales }) => {
         );
     };
 
+    const returnQtyBodyTemplate = (rowData) => {
+        return (
+            <>
+                {parseInt(rowData.return_qty)}
+            </>
+        );
+    };
+
     const renderReturnUI = () => {
         return (
             <>
             {selectedReturnItems && selectedReturnItems.length>0 && <div className="col-12">
             <h5>New Returns:</h5>
+            <label><b>Returning Amount : </b></label>
+            <InputText readOnly="true" value={returnedAmount}/>
+            <br></br>
             <DataTable value={selectedReturnItems} stripedRows showGridlines scrollable scrollHeight="25rem" >
                 <Column body={renderActionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
                 <Column field="product_name" header="Product Name" sortable></Column>
-                <Column field="return_qty" header="Returned Qty" sortable></Column>
+                <Column field="return_qty" header="Returned Qty" body={returnQtyBodyTemplate} sortable></Column>
+                <Column field="trade_price" header="Trade Price" sortable></Column>
+                <Column field="return_amount" header="Total Amount" sortable></Column>
                 <Column field="reason" header="Reason" sortable></Column>
+                {/* <Column field="code" header="Code" sortable></Column>
+                <Column field="brand_name" header="Brand Name" sortable></Column>
+                <Column field="model_no" header="Model No." sortable></Column>
+                <Column field="part_number" header="Part Number" sortable></Column> */}
             </DataTable>
+            
         </div>}
 
         {returnItems && returnItems.length>0 && <div className="col-12">
             <h5>Returned Items:</h5>
             <DataTable value={returnItems} stripedRows showGridlines scrollable scrollHeight="25rem" >
                 <Column field="product_name" header="Product Name" sortable></Column>
+                <Column field="code" header="Code" sortable></Column>
                 <Column field="brand_name" header="Brand Name" sortable></Column>
                 <Column field="model_no" header="Model No." sortable></Column>
                 <Column field="part_number" header="Part Number" sortable></Column>

@@ -337,7 +337,7 @@ const Form = ({ packageData }) => {
                     control={control}
                     render={({ field, fieldState }) => (
                         <>
-                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code*</label>
+                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Code</label>
                     <InputText readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
                     {getFormErrorMessage(field.name)}
                         </>
@@ -376,7 +376,7 @@ const Form = ({ packageData }) => {
                         // rules={{ required: 'Part_number is required.' }}
                         render={({ field, fieldState }) => (
                             <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number*</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Part Number</label>
                         <InputText inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} />
                         {getFormErrorMessage(field.name)}
                             </>
@@ -426,7 +426,6 @@ const Form = ({ packageData }) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
                                 <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} />
-                                {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

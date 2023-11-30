@@ -256,10 +256,9 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
-                        <Column field="price" header="Last Trade Price" filter filterPlaceholder="Search by Last Purchase Price" sortable body={lastTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="active" header="Status" filter filterPlaceholder="Search by Status" sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
+                        <Column field="brand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="model_id" header="Model No" filter filterPlaceholder="Search by Model No" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

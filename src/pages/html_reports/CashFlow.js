@@ -15,7 +15,7 @@ export const CashFlow = () => {
     const [cashInflowTotal, setCashInflowTotal] = useState(0);
     const [cashOutflowTotal, setCashOutflowTotal] = useState(0);
     const [trigger, setTrigger] = useState(0)
-    const [reportDate, setReportDate] = useState(moment().format('YYYY-MM-DD'))
+    const [reportDate, setReportDate] = useState(new Date())
 
     const transactionService = new TransactionService();
 
@@ -137,7 +137,7 @@ export const CashFlow = () => {
         <ReportCss />
         <Calendar value={reportDate} 
             onChange={(e) => setReportDate(e.value)} 
-            dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" 
+            dateFormat="mm/dd/yy" placeholder="mm/dd/yy" mask="99/99/9999" 
             />
         <button className = "no-printme" onClick={() =>loadCashFlowData()}>Refresh</button>
         <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>

@@ -59,7 +59,9 @@ const ReturnItemDialog = ({ selectedReturnItem, trigger, onAddReturnItem }) => {
         onAddReturnItem({
             'product_id': selectedReturnItem.product_id,
             'product_name': selectedReturnItem.product_name,
+            'trade_price': selectedReturnItem.trade_price,
             'return_qty': data.return_qty,
+            'return_amount': data.return_qty * selectedReturnItem.trade_price,
             'reason': data.reason,
         });
         setReturnItemDialog(false);

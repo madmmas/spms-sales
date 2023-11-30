@@ -43,9 +43,9 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
     useEffect(() => {
         if (trigger) {
             setValue('payment_method', 'CASH');
-            setValue('current_balance', 0);
+            setValue('current_balance', initPayment.current_balance);
             setValue('amount', 0);
-            setValue('payment_date', moment().format('YYYY-MM-DD'));
+            setValue('payment_date', new Date());
             setValue('remarks', '');
             setValue('bank_account_id', null);
             setValue('mfs_account_id', null);
