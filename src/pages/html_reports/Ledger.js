@@ -207,7 +207,7 @@ export const HtmlLedger = ({type, header}) => {
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
             </header>}
-            <p class="line">Date : {getDateFormatted(new Date())}</p>
+            <p class="line">Date : {getDateFormatted(moment().format('YYYY-MM-DD'))}</p>
             <table className="bill-details">
                 <tbody>
                     <tr>

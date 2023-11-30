@@ -693,7 +693,6 @@ const Form = React.memo(({ sales }) => {
         // add index to return item
         returnItem['index'] = selectedReturnItems.length;
         // add timestamp
-        // returnItem['created_at'] = new Date();
         returnItem['created_at'] = moment();
         // check if already added
         for(let i=0; i<selectedReturnItems.length; i++) {

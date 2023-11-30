@@ -32,6 +32,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-list',
                     items: [
                         { label: 'Accounts', icon: 'pi pi-fw pi-list', to: '/accounts' },
+                        { label: 'Adjustments', icon: 'pi pi-fw pi-list', to: '/adjustments' },
                         { label: 'Attendance', icon: 'pi pi-fw pi-list', to: '/attendance' },
                         { label: 'Expenses', icon: 'pi pi-fw pi-list', to: '/expenses' },
                         { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },

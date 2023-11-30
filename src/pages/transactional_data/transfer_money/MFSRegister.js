@@ -5,7 +5,6 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { RadioButton } from "primereact/radiobutton";
 import { Column } from 'primereact/column';
-import { Dropdown } from 'primereact/dropdown';
 import { useForm, Controller } from 'react-hook-form';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -27,7 +26,7 @@ const MFSRegister = () => {
     let emptyMFSRegister = {
         transfer_to: 'CASH',
         to_ref_id: null,
-        trx_date: new Date(),
+        trx_date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
     };

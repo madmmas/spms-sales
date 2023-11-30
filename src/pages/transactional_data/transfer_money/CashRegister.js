@@ -27,7 +27,7 @@ const CashRegister = () => {
     let emptyCashRegister = {
         transfer_to: 'BANK',
         to_ref_id: null,
-        trx_date: new Date(),
+        trx_date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
     };

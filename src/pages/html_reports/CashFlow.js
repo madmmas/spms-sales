@@ -7,7 +7,6 @@ import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
 
 import { TransactionService } from '../../services/TransactionService';
-import { set } from 'react-hook-form';
 
 export const CashFlow = () => {
     
@@ -16,7 +15,7 @@ export const CashFlow = () => {
     const [cashInflowTotal, setCashInflowTotal] = useState(0);
     const [cashOutflowTotal, setCashOutflowTotal] = useState(0);
     const [trigger, setTrigger] = useState(0)
-    const [reportDate, setReportDate] = useState(new Date())
+    const [reportDate, setReportDate] = useState(moment().format('YYYY-MM-DD'))
 
     const transactionService = new TransactionService();
 

@@ -60,6 +60,7 @@ function App() {
   const PurchaseForm = React.lazy(() => import("./pages/transactional_data/purchases/Form"));
   const StockStatus = React.lazy(() => import("./pages/transactional_data/stock/Detail"));
   const Accounts = React.lazy(() => import("./pages/transactional_data/accounts/Detail"));
+  const Adjustments = React.lazy(() => import("./pages/transactional_data/Adjustments"));
   const Expenses = React.lazy(() => import("./pages/transactional_data/Expenses"));
   const ExtraIncome = React.lazy(() => import("./pages/transactional_data/ExtraIncome"));
   const CashBank = React.lazy(() => import("./pages/transactional_data/transfer_money/Detail"));
@@ -188,6 +189,7 @@ function App() {
         <Route path="/accounts" element={<RouteAuth pageComponent={<Accounts />} />} />
         <Route path="/stocks" element={<RouteAuth pageComponent={<StockStatus />} />} />
         <Route path="/payments" element={<RouteAuth pageComponent={<PaymentDetail />} />} />
+        <Route path="/adjustments" element={<RouteAuth pageComponent={<Adjustments />} />} />
         <Route path="/expenses" element={<RouteAuth pageComponent={<Expenses />} />} />
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
         <Route path="/transfer" element={<RouteAuth pageComponent={<CashBank />} />} />

@@ -111,6 +111,12 @@ export class TransactionService {
         return resp.data;
     }
 
+    async ledgerAdjustment(data) {
+        const resp = await axiosInstance.post(`/adjustments`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async transferCash(to, data) {
         data.from_ref_type = 'CASH';
         data.to_ref_type = to;

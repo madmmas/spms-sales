@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef, Suspense } from 'react';
 import * as moment from 'moment';
+import React, { useState, useRef, Suspense } from 'react';
 import { useForm, Controller, set } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { RadioButton } from "primereact/radiobutton";
@@ -79,7 +78,6 @@ const Detail = () => {
     ];
 
     const onSelectPaymentType = (value) => {
-        // let _val = value==="RECEIVE"?"trxACReceivable":"trxACPayable";
         setPaymentType(value);
         setActiveIndex(value==="RECEIVE"?0:1);
     }
@@ -97,12 +95,9 @@ const Detail = () => {
     }
 
     const onPaymnetCallback = (data) => {
-        console.log("onPaymnetCallback", data);
         setSubmitted(true);
-        console.log("paymentType::", paymentType)
         let _paymentType = paymentType==="RECEIVE"?"trxACReceivable":"trxACPayable";
         transactionService.commitPayment(_paymentType, data).then(data => {
-            console.log(data);
             setSubmitted(false);
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Created', life: 3000 });
             reset({
@@ -112,31 +107,21 @@ const Detail = () => {
                 "payment_type": paymentType,
             })
         }).catch(error => {
-            console.log(error);
             setSubmitted(false);
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Payment Creation Failed', life: 3000 });
         });
     }
 
     const onPaymnetSubmit = (formData) => {
-        console.log("selected Payment--1:::", emptyPayment);
-        console.log("selected Payment--2:::", formData);
-        console.log("selected Payment--3:::", {
-            ...emptyPayment,
-            ...formData,
-        });
         setInitPayment({
             ...emptyPayment,
             ...formData,
         });
-        console.log("InitPayment::", initPayment);
         setDlgTrigger(dlgTrigger + 1);
     }
 
     const getPartyBalance = (partyId) => {
-        // let _val = partyType==="dtCustomer"?"trxACReceivable":"trxACPayable";
         orderService.getLedgerBalance(partyType, partyId).then(data => {
-            console.log("balance::", data);
             if(data){
                 let dr_amount = Number(data.dr_amount)||0;
                 let cr_amount = Number(data.cr_amount)||0;
@@ -194,7 +179,6 @@ const Detail = () => {
                                     caption='Select Customer'
                                     displayField="name" showFields={["name"]}
                                     onSelect={(e) => {
-                                        console.log("selected Party:::", e);
                                         getPartyBalance(e._id);
                                     }}
                                     defaultFilters={{
@@ -234,9 +218,9 @@ const Detail = () => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
                                 <SelectMasterData field={field} modelName="dtSupplier"
+                                    caption='Select Supplier'
                                     displayField="name" showFields={["name"]}
                                     onSelect={(e) => {
-                                        console.log("selected Party:::", e);
                                         getPartyBalance(e._id);
                                     }}
                                     defaultFilters={{

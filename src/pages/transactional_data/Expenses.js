@@ -37,7 +37,7 @@ const Expenses = () => {
         dtMFSAccount_id: null,
         dtExpenseType_id: null,
         expensePeriod: null,
-        date: new Date(),
+        date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
         expense_from: 'CASH',
@@ -131,7 +131,7 @@ const Expenses = () => {
         setCreateEdit(true);
         reset({ ...emptyExpenses });
         setBankCash("CASH");
-        setValue('date', new Date());
+        setValue('date', moment().format('YYYY-MM-DD'));
         setSubmitted(false);
         setExpensesDialog(true);
     };

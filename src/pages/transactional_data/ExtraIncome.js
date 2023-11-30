@@ -37,7 +37,7 @@ const Income = () => {
         dtMFSAccount_id : null,
         dtIncomeType_id: null,
         incomePeriod: null,
-        date: new Date(),
+        date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
         income_to: 'CASH',

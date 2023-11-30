@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { FilterMatchMode } from 'primereact/api';
@@ -44,7 +45,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
             setValue('payment_method', 'CASH');
             setValue('current_balance', 0);
             setValue('amount', 0);
-            setValue('payment_date', new Date());
+            setValue('payment_date', moment().format('YYYY-MM-DD'));
             setValue('remarks', '');
             setValue('bank_account_id', null);
             setValue('mfs_account_id', null);
