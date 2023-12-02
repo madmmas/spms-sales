@@ -4,6 +4,7 @@ import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../u
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataService } from '../../../../services/MasterDataService'
+import cacheMasterDataService from '../../../../services/CacheMasterDataService'
 
 import InvoiceCss from './InvoiceCss'
 
@@ -21,6 +22,8 @@ export const PrintInvoiceSalesReturn = () => {
     const [printme, setPrintme] = useState(true)
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
+    const [render, setRender] = useState(false)
+    const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
     useEffect(() => {
@@ -53,6 +56,27 @@ export const PrintInvoiceSalesReturn = () => {
 
     useEffect(() => {
         console.log("invoice::", invoice);
+        for(let i = 0; i<invoice?.items.length; i++){
+            for(let j = 0; j<invoice.return_items.length; j++){
+                if(invoice.items[i].product_id === invoice.return_items[j].product_id){
+                       invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
+                       invoice.return_items[j].trade_price = invoice.items[i].trade_price;
+                       invoice.return_items[j].product_model_no = cacheMasterDataService.getShortnameById(invoice.items[i].product_model_id + '-dtProductModel');
+                       invoice.return_items[j].product_brand_name = cacheMasterDataService.getShortnameById(invoice.items[i].product_brand_id + '-dtProductBrand');
+               }
+            }
+        }
+
+        let totalReturningAmountLocal = 0;
+        for(let i = 0; i<invoice?.return_items.length; i++){
+            totalReturningAmountLocal = totalReturningAmountLocal + invoice.return_items[i].return_qty * Number.parseFloat(invoice.return_items[i].trade_price)
+        }
+
+        setTotalReturningAmount(totalReturningAmountLocal)
+        setRender((prevState)=>!prevState)
+
+        console.log(invoice)
+        
     }, [invoice]);
 
     useEffect(() => {
@@ -120,8 +144,8 @@ export const PrintInvoiceSalesReturn = () => {
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
-            <p  class="line">Invoice Number : {invoice.voucher_no+".R"}</p>
-            <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
+            <p  class="line">Sales Invoice Number : {invoice.voucher_no} [Previous Total Amount : <span className="price">{invoice.gross}</span>]</p>
+            <p>Sales Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
             <table className="bill-details">
                 <tbody>
                     <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>
@@ -135,7 +159,7 @@ export const PrintInvoiceSalesReturn = () => {
                             <span>{invoice.customer_phone}</span></td>
                     </tr>}
                     <tr>
-                        <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INVOICE</span></th>
+                        <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INVOICE ({invoice.voucher_no + ".R"})</span></th>
                     </tr>
                 </tbody>
             </table>
@@ -143,103 +167,34 @@ export const PrintInvoiceSalesReturn = () => {
                 <thead>
                     <tr>
                         {/* <th className="heading name">Sl</th> */}
+                        <th className="heading qty left-align">Date</th>
                         <th className="heading qty left-align">Qty</th>
                         <th className="heading name left-align">Product Name</th>
                         <th className="heading brand left-align">Brand</th>
                         <th className="heading brand left-align">Part No</th>
                         <th className="heading brand left-align">Model</th>
-                        <th className="heading brand right-align">Unit Price</th>
-                        <th className="heading qty center-align">D %</th>
+                        <th className="heading unit right-align">Unit Price</th>
                         <th className="heading amount right-align">Amount</th>
                     </tr>
                 </thead>
             
                 <tbody>
-                {invoice.return_items.map( item => 
+                {invoice?.return_items.map( item => 
                     <tr>
+                        <td className="left-align">{getDateFormatted(item.created_at)}</td>
                         <td className="left-align">{Number.parseFloat(item.return_qty).toFixed(0)}</td>
                         <td className="left-align">{item.product_name}</td>
                         <td className="left-align">{item.product_brand_name}</td>
                         <td className="left-align">{item.product_part_number}</td>
                         <td className="left-align">{item.product_model_no}</td>
                         <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
-                        <td className="center-align">{item.discount_profit}</td>
-                        <td className="right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                        <td className="right-align">{Number.parseFloat(item.return_qty*item.trade_price).toFixed(2) }</td>
                     </tr>)}
-
                     <tr>
-                        <td colSpan="7" className="sum-up line">Total Returning Amount</td>
-                        <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
+                        <th colSpan="7" className="total text line">Total Returning Amount</th>
+                        <th className="total price right-align line">{Number.parseFloat(totalReturningAmount).toFixed(2)}</th>
                     </tr>
-                    <tr>
-                        <td colSpan="7" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                        <th colSpan="7" className="total text line">Net Returning Amount</th>
-                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
-                    </tr>
-                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) B/F Balance</th>
-                        <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
-                    </tr>}
-                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Returning Amount</th>
-                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2))}</th>
-                    </tr>}
-                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Returning Amount</th>
-                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2) }</th>
-                    </tr>}
-                    {invoice.payment && <tr>
-                        <td colSpan="7" className="sum-up">
-                              {invoice.customer_category !== "CONDITIONAL" && <span>
-                                [
-                                    Bank : <span className="price">{invoice.payment.bank_amount} </span>
-                                    Cash : <span className="price">{invoice.payment.cash_amount} </span>
-                                    MFS : <span className="price">{invoice.payment.mfs_amount} </span>
-                                ]
-                              </span>}
-                              {invoice.customer_category === "CONDITIONAL" && <span>
-                                [
-                                    <>Bank : <span className="price">{invoice.advance_payment.bank_amount} </span></>
-                                    {invoice.trx_status === "pending" && <>Cash : <span className="price">{invoice.advance_payment.cash_amount} </span></>}
-                                    {invoice.trx_status === "completed" && <>Cash : <span className="price">{invoice.advance_payment.cash_amount} </span> + <span className="price">{invoice.advance_payment.current_balance} </span></>}
-                                    <>MFS : <span className="price">{invoice.advance_payment.mfs_amount} </span></>
-                                ]
-                              </span>}
-                            (-) Payment
-
-                        </td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.paid).toFixed(2)}</td>
-                    </tr>}
                     
-                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
-                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
-                    </tr>}
-                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward === -99999999 && <tr>
-                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
-                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
-                    </tr>}
-                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">B/F Balance</th>
-                        <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2) }</th>
-                    </tr>}
-                    {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Receivable (Ledger)</th>
-                        <th className="total price right-align line">{ Number.parseFloat((Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) }</th>
-                    </tr>}
-
-                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) Balance</th>
-                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2)) }</th>
-                    </tr>}
-                    {invoice.customer_category === "REGISTERED" && invoice.balance_forward !==-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) Balance</th>
-                        <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) -  Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
-                    </tr>}
-                   
                 </tbody>
             </table>}
             {printmePos && <table className="lineitems">            
@@ -252,7 +207,7 @@ export const PrintInvoiceSalesReturn = () => {
                     </tr>)}
 
                     <tr>
-                        <td className="sum-up line">Total Returning Amount</td>
+                        <td className="sum-up line">Total Amount</td>
                         <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
@@ -260,11 +215,11 @@ export const PrintInvoiceSalesReturn = () => {
                         <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <th className="sum-up">Net Returning Amount</th>
+                        <th className="sum-up">Net Amount</th>
                         <th className="total price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
                     <tr>
-                        <th className="sum-up">Total Returning Amount</th>
+                        <th className="sum-up">Total Amount</th>
                         <th className="total price right-align">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
                     {invoice.balance_forward!==-99999999 && <tr>
@@ -276,31 +231,28 @@ export const PrintInvoiceSalesReturn = () => {
             <section>
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
                     <p>
-                      <b>In Words : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "WALKIN" &&
                     <p>
-                      <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 &&
                     <p>
-                      <b>In Words : <br></br>
-                      Conditional Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> <br></br>
-                      Ledger Balance : <i>{getNumToWords(((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
                    </p>
                 }
                 { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward===-99999999 &&
                     <p>
-                      <b>In Words : <br></br>
-                      Total Recievable : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> </b>
-                   </p>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
+                    </p>
                 }
                 {/* <p>
                     Paid by : <span>CASH</span>

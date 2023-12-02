@@ -4,6 +4,7 @@ import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../u
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataService } from '../../../../services/MasterDataService'
+import cacheMasterDataService from '../../../../services/CacheMasterDataService'
 
 import InvoiceCss from './InvoiceCss'
 
@@ -159,9 +160,9 @@ export const PrintInvoice = () => {
                     <tr>
                         <td className="left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
                         <td className="left-align">{item.product_name}</td>
-                        <td className="left-align">{item.product_brand_name}</td>
+                        <td className="left-align">{cacheMasterDataService.getShortnameById(item.product_brand_id + '-dtProductBrand')}</td>
                         <td className="left-align">{item.product_part_number}</td>
-                        <td className="left-align">{item.product_model_no}</td>
+                        <td className="left-align">{cacheMasterDataService.getShortnameById(item.product_model_id + '-dtProductModel')}</td>
                         <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
                         <td className="center-align">{item.discount_profit}</td>
                         <td className="right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>

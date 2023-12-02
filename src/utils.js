@@ -29,7 +29,7 @@ export const getNumToWords = (num) => {
     // get the number after dicimal
     let num2 = num.split(".")[1];
     
-    if(Number(num2)===0){
+    if((Number(num2) === 0) || (num2 === undefined)){
       return numWords(num1);
     }
 
