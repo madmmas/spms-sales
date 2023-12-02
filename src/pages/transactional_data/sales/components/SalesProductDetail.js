@@ -131,7 +131,7 @@ const SalesProductDetail = ({
     };
 
     const actionBodyTemplate = (rowData) => {
-        let returnFlg = returnMode? rowData.qty - rowData.return_qty > 0 : false;
+        let returnFlg = returnMode? (Number(rowData.qty) - Number(rowData.return_qty)) > 0 : false;
         return (
             <>
                 {editMode && <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => onEdit(rowData)} />}
@@ -140,8 +140,6 @@ const SalesProductDetail = ({
             </>
         );
     };
-    
-    
     
     const serialBodyTemplate = (rowData) =>{
         return(

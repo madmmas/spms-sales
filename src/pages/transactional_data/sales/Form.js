@@ -823,9 +823,7 @@ const Form = React.memo(({ sales }) => {
     
     const [withPayment, setWithPayment] = useState(false);
 
-
     const [includeDueAmount, setIncludeDueAmount] = useState(false);
-
 
     const renderForm = () => {
         let readOnly = false;
