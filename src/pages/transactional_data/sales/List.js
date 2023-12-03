@@ -332,19 +332,23 @@ const List = () => {
     };
 
     const dueAmountBodyTemplate = (rowData) => {
-        let obj = {
-            cash_amount: 0,
-            bank_amount: 0,
-            mfs_amount: 0
+        if(rowData.customer_category === "CONDITIONAL" || rowData.customer_category === "WALKIN"){
+            return (
+                <>
+                    {rowData.due}
+                </>
+            )
+        }else{
+            let obj;
+            if(rowData.payment){
+                obj = JSON.parse(rowData.payment);
+            }
+            return (
+                <>
+                    {obj.invoice_amount - obj.cash_amount - obj.bank_amount - obj.mfs_amount}
+                </>
+            )
         }
-        if(rowData.payment !== null){
-            obj = JSON.parse(rowData.payment)
-        }
-        return (
-            <>
-                {rowData.net - obj.cash_amount - obj.bank_amount - obj.mfs_amount}
-            </>
-        );
     };
 
     const renderHeader = () => {
@@ -415,7 +419,7 @@ const List = () => {
                         <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by gross" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="due" header="Due Balance" filter filterPlaceholder="Search by Net Amount" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="" header="Due Balance" body={dueAmountBodyTemplate} filter filterPlaceholder="Search by Net Amount" sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
