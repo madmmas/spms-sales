@@ -2,6 +2,7 @@ import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { getDateFormatted } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
+
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -11,9 +12,11 @@ import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
+import OrderFilter from '../../components/OrderFilter';
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
 import { SALES_MODEL } from '../../../constants/models';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
 const List = () => {
 
@@ -36,6 +39,8 @@ const List = () => {
         }
     };
 
+    
+    
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
     const [dtProfiles, setProfiles] = useState(null);
@@ -69,6 +74,20 @@ const List = () => {
         setLoading(true);
 
         await orderService.getAll(SALES_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
+            if(data){
+                console.log(data)
+                setTotalRecords(data.total);
+                setProfiles(data.rows);
+                setLoading(false);
+            }
+        });
+    }
+
+    const reloadLazyData = async (filters) => {
+        setLoading(true);
+        let _lazyParams = { ...lazyParams };
+        _lazyParams['filters'] = filters;
+        await orderService.getAll(SALES_MODEL, { params: JSON.stringify(_lazyParams) }).then(data => {
             if(data){
                 console.log(data)
                 setTotalRecords(data.total);
@@ -199,7 +218,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         let name = "";
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
-            name = rowData.party_name;
+            name = CacheMasterDataService.getShortnameById(rowData.party_id+"-dtCustomer");
         } else {
             name = rowData.customer_name;
         }
@@ -364,10 +383,16 @@ const List = () => {
         </>
     );
 
+
+
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
+
+                    <OrderFilter reloadData={reloadLazyData} isSales={true} />
+
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
                     <DataTable
@@ -386,7 +411,7 @@ const List = () => {
                         <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="name" header="Customer/Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="" header="Customer/Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by gross" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

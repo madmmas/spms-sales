@@ -14,6 +14,9 @@ import { OrderService } from '../../../services/OrderService';
 
 import { PURCHASE_MODEL } from '../../../constants/models';
 
+import OrderFilter from '../../components/OrderFilter';
+import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
 const List = () => {
 
     const modelName = PURCHASE_MODEL;
@@ -24,7 +27,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["date", "party_id", "cnf", "be_no", "lc_no",  "gross", "transport", "duty_vat", "net"],
+        fields: [],
         first: 0,
         rows: 10,
         page: 1,
@@ -74,6 +77,20 @@ const List = () => {
         setLoading(true);
 
         await orderService.getAll(PURCHASE_MODEL, { params: JSON.stringify(lazyParams) }).then(data => {
+            if(data) {
+                console.log(data)
+                setTotalRecords(data.total);
+                setProfiles(data.rows);
+                setLoading(false);    
+            }
+        });
+    }
+
+    const reloadLazyData = async (filters) => {
+        setLoading(true);
+        let _lazyParams = { ...lazyParams };
+        _lazyParams['filters'] = filters;
+        await orderService.getAll(PURCHASE_MODEL, { params: JSON.stringify(_lazyParams) }).then(data => {
             if(data) {
                 console.log(data)
                 setTotalRecords(data.total);
@@ -193,7 +210,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.party_name}
+                {CacheMasterDataService.getShortnameById(rowData.party_id+"-dtSupplier")}
             </>
         );
     };
@@ -308,6 +325,9 @@ const List = () => {
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
+
+                    <OrderFilter reloadData={reloadLazyData} isSales={false} />
+
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
