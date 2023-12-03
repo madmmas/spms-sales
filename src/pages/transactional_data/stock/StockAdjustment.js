@@ -25,13 +25,13 @@ const StockAdjustment = () => {
 
     const modelName = STOCK_ADJUSTMENT_MODEL;
 
-    // date, adjustmentType, dtProduct_id, quantity, transferBy, reason
+    // date, adjustment_type, dtProduct_id, quantity, transferBy, remarks
     let defaultValue = {
         date: Date.now(),
-        adjustmentType: "", // ADD, REDUCE
+        adjustment_type: "", // ADD, REDUCE
         dtProduct_id: null,
         quantity: 0,
-        reason: '',
+        remarks: '',
     };
 
     const toast = useRef(null);
@@ -138,7 +138,7 @@ const StockAdjustment = () => {
     const resetForm = () => {
         resetField('dtProduct_id');
         resetField('quantity');
-        resetField('reason');
+        resetField('remarks');
         setSubmitted(false);
     };
 
@@ -154,13 +154,14 @@ const StockAdjustment = () => {
             return;
         }
         let _data = {
-            adjustmentType: formData.adjustmentType,
+            adjustment_type: formData.adjustment_type,
             dtProduct_id: formData.dtProduct_id,
             quantity: formData.quantity,
-            reason: formData.reason,
+            remarks: formData.remarks,
+            registered_date: Date.now(),
         };
         console.log(_data);
-        transactionService.processTransaction(ON_STOCK_ADJUSTMENT, _data).then(response => {
+        transactionService.stockAdjustment(_data).then(response => {
             console.log(response);
             if (response.success) {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
@@ -213,7 +214,7 @@ const StockAdjustment = () => {
     const adjustmentTypeBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.adjustmentType}
+                {rowData.adjustment_type}
             </>
         );
     };
@@ -229,7 +230,7 @@ const StockAdjustment = () => {
     const reasonBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.reason}
+                {rowData.remarks}
             </>
         );
     };
@@ -285,10 +286,10 @@ const StockAdjustment = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column field="date" header="Transaction Datetime" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="adjustmentType" header="Adjustment Type" filter filterPlaceholder="Search by name" sortable body={adjustmentTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="adjustment_type" header="Adjustment Type" filter filterPlaceholder="Search by name" sortable body={adjustmentTypeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="reason" header="Reason" filter filterPlaceholder="Search by name" sortable body={reasonBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="remarks" header="Reason" filter filterPlaceholder="Search by name" sortable body={reasonBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
@@ -296,7 +297,7 @@ const StockAdjustment = () => {
                         <div className="p-fluid formgrid grid">
                             <div className="field col-12 md:col-6">
                             <Controller
-                                name="adjustmentType"
+                                name="adjustment_type"
                                 control={control}
                                 rules={{ required: 'Adjustment Type is required.' }}
                                 render={({ field, fieldState }) => (
@@ -352,12 +353,12 @@ const StockAdjustment = () => {
                             </div>                            
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="reason"
+                                name="remarks"
                                 control={control}
                                 rules={{ required: 'Reason is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor="reason">Reason*</label>
+                                    <label htmlFor="remarks">Reason*</label>
                                     <InputTextarea ref={reasonRef}
                                         inputId={field.name} value={field.value} inputRef={field.ref}  
                                         className={classNames({ 'p-invalid': fieldState.error })} 

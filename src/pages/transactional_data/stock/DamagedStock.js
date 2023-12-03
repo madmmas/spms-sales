@@ -28,7 +28,7 @@ const DamagedStock = () => {
         date: Date.now(),
         dtProduct_id: null,
         quantity: 0,
-        details: '',
+        remarks: '',
     };
 
     const toast = useRef(null);
@@ -135,7 +135,7 @@ const DamagedStock = () => {
     const resetForm = () => {
         resetField('dtProduct_id');
         resetField('quantity');
-        resetField('details');
+        resetField('remarks');
         setSubmitted(false);
     };
 
@@ -153,10 +153,11 @@ const DamagedStock = () => {
         let _data = {
             dtProduct_id: formData.dtProduct_id,
             quantity: formData.quantity,
-            details: formData.details,
+            remarks: formData.remarks,
+            register_date: Date.now(),
         };
         console.log(_data);
-        transactionService.processTransaction(ON_DAMAGED_STOCK, _data).then(response => {
+        transactionService.damageStock(_data).then(response => {
             console.log(response);
             if (response.success) {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
@@ -217,7 +218,7 @@ const DamagedStock = () => {
     const detailsBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.details}
+                {rowData.remarks}
             </>
         );
     };
@@ -275,7 +276,7 @@ const DamagedStock = () => {
                         <Column field="date" header="Transaction Datetime" filter filterPlaceholder="Search by name" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="details" header="Details" filter filterPlaceholder="Search by name" sortable body={detailsBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="remarks" header="Details" filter filterPlaceholder="Search by name" sortable body={detailsBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
@@ -325,12 +326,12 @@ const DamagedStock = () => {
                             </div>                            
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="details"
+                                name="remarks"
                                 control={control}
                                 rules={{ required: 'Details is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor="details">Details*</label>
+                                    <label htmlFor="remarks">Details*</label>
                                     <InputTextarea ref={detailsRef}
                                         inputId={field.name} value={field.value} inputRef={field.ref}
                                         className={classNames({ 'p-invalid': fieldState.error })} 

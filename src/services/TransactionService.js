@@ -114,6 +114,18 @@ export class TransactionService {
         return resp.data;
     }
 
+    async stockAdjustment(data) {
+        const resp = await axiosInstance.post(`/stock_adjustment`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async damageStock(data) {
+        const resp = await axiosInstance.post(`/damage_stock`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async generaleExpenses(data) {
         const resp = await axiosInstance.post(`/expenses`, data);
         console.log(resp.data);
