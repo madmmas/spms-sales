@@ -135,13 +135,14 @@ export const CashFlow = () => {
     return (
       <div>
         <ReportCss />
+        <div className="no-printme">
         <Calendar value={reportDate} 
             onChange={(e) => setReportDate(e.value)} 
             dateFormat="mm/dd/yy" placeholder="mm/dd/yy" mask="99/99/9999" 
             />
         <button className = "no-printme" onClick={() =>loadCashFlowData()}>Refresh</button>
         <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>
-
+        </div>
         <ComponentToPrint />
         
         <div className='printme' id='printme'>

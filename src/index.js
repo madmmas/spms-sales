@@ -11,7 +11,7 @@ import db from "./db";
 import RProductService from "./services/RProductService";
 import CacheMasterDataService from "./services/CacheMasterDataService";
 
-moment.tz.setDefault("Asia/Dhaka");
+// moment.tz.setDefault("Asia/Dhaka");
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 const loadAllData = async () => {

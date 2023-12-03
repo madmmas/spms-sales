@@ -1,11 +1,14 @@
 import * as moment from 'moment';
 import React, {useEffect, useRef, useState} from 'react'
+import { useForm, Controller, set } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { getDateFormatted, getFormattedNumber, getLedgerFormattedNumber } from '../../utils';
+import { Button } from 'primereact/button';
 import { Calendar } from 'primereact/calendar';
+import { classNames } from 'primereact/utils';
+
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
-
 import { MasterDataService } from '../../services/MasterDataService';
 import { TransactionService } from '../../services/TransactionService';
 
@@ -20,6 +23,27 @@ export const HtmlLedger = ({type, header}) => {
     
     let { id } = useParams();
 
+    const {
+        register,
+        control,
+        formState: { errors },
+        reset,
+        setValue,
+        handleSubmit
+    } = useForm({
+        defaultValues: {}
+    });
+
+    const resetForm = () => {
+        reset({ 
+            "netPrice": 0.00,
+            "lastTradePrice": 0.00,
+         });
+        // setSalesProduct(null);
+    };
+
+    const [openingData, setOpeningData] = useState({});
+    const [datesData, setDatesData] = useState({});
     const [ledgerData, setLedgerData] = useState([]);
     const [partyData, setPartyData] = useState(null);
     const [trigger, setTrigger] = useState(0);
@@ -29,18 +53,18 @@ export const HtmlLedger = ({type, header}) => {
     const [crTotal, setCrTotal] = useState(0);
 
     // local date state mm/dd/yyyy
-    const [fromDate, setFromDate] = useState(getDateFormatted(new Date()))
-    const [toDate, setToDate] = useState()
+    const [fromDate, setFromDate] = useState()
+    const [toDate, setToDate] = useState(new Date())
 
     const transactionService = new TransactionService();
     const masterDataService = new MasterDataService();
 
     useEffect(() => {
-        console.log("TYPE CHANGED::", type)
+        // console.log("TYPE CHANGED::", type)
         if(id != null){
-            console.log("ID CHANGED::", id)
+            // console.log("ID CHANGED::", id)
             let partyType = getPartyModel(type);
-            console.log("PARTY TYPE::", type, partyType)
+            // console.log("PARTY TYPE::", type, partyType)
             if(partyType === null || partyType === ""){
                 return;
             }                
@@ -52,12 +76,12 @@ export const HtmlLedger = ({type, header}) => {
                 });
             });
         }
-        refreshLedger();
+        refreshLedger(fromDate, toDate);
     }, [type, id]);
 
-    useEffect(() => {
-        refreshLedger();
-    }, [fromDate, toDate]);
+    // useEffect(() => {
+    //     refreshLedger();
+    // }, [fromDate, toDate]);
 
     useEffect(() => {
         if(trigger>0){
@@ -65,63 +89,75 @@ export const HtmlLedger = ({type, header}) => {
         }
     }, [trigger]);
 
-    const refreshLedger = () => {
+    const refreshLedger = (from_date, to_date) => {
         let cacode = getCACode(type);
         if(cacode === null || cacode === ""){
             return;
         }
-        let params = {
-            code: cacode,
+        let params = {}
+
+        console.log("FROM DATE::=>>>", from_date)
+        if(from_date != null){
+            params["from_date"] = moment(from_date).format('YYYY-MM-DD');
         }
-        console.log("FROM DATE::=>>>", fromDate)
-        if(fromDate != null){
-            params["fromdate"] = moment(fromDate).format('YYYY-MM-DD');
+        console.log("TO DATE::=>>>", to_date)
+        if(to_date != null){
+            params["to_date"] = moment(to_date).format('YYYY-MM-DD');
+        } else {
+            params["to_date"] = moment().format('YYYY-MM-DD');
+            // setToDate(new Date());
         }
-        console.log("TO DATE::=>>>", toDate)
-        if(fromDate != null && toDate != null){
-            params["todate"] = moment(toDate).format('YYYY-MM-DD');
-        }
+
+        console.log("PARAMS::=>>>", params)
         if(id != null){
-            console.log("ID CHANGED::", id)
+            // console.log("ID CHANGED::", id)
             let partyType = getPartyModel(type);
-            console.log("PARTY TYPE::", type, partyType)
+            // console.log("PARTY TYPE::", type, partyType)
             if(partyType === null || partyType === ""){
                 return;
             }                
-            params["partyid"] = id;
-            params["partytype"] = partyType;
-            transactionService.getReportBy('ledger', params).then(data => {
-                let dataWithBalance = calculateBalance(data);
-                setLedgerData(dataWithBalance);
-                console.log("LEDGER DATA::=>>>", dataWithBalance);
-            });
-        } else {
-            transactionService.getReportBy('ledger', params).then(data => {
-                let dataWithBalance = calculateBalance(data);
-                setLedgerData(dataWithBalance);
-                console.log("LEDGER DATA::=>>>", dataWithBalance);
-            });
+            params["party_id"] = id;
+            params["party_type"] = partyType;
         }
+        console.log("PARAMS::=>>>", params)
+        transactionService.getLedgerReport(cacode, params).then(data => {
+            let ledgerData = data.ledger
+            let openingDr = Number.parseFloat(data.opening.dr_amount?data.opening.dr_amount:0);
+            let openingCr = Number.parseFloat(data.opening.cr_amount?data.opening.cr_amount:0);
+            setOpeningData({
+                "dr_amount": openingDr,
+                "cr_amount": openingCr,
+                "balance": openingDr-openingCr,
+            });
+            setDatesData({
+                "from_date": data.dates.from_date,
+                "to_date": data.dates.to_date,
+            });
+            let dataWithBalance = calculateBalance(openingData, ledgerData);
+            setLedgerData(dataWithBalance);
+            // console.log("LEDGER DATA::=>>>", openingData, dataWithBalance);
+        });
     }
 
-    const calculateBalance = (data) => {
+    const calculateBalance = (opening, data) => {
         let dataMap = new Map();
         let drTotal = 0;
         let crTotal = 0;
         data.forEach(item => {
+            // console.log("ITEM::=>>>", item);
             drTotal = drTotal + Number.parseFloat(item.dr_amount);
             crTotal = crTotal + Number.parseFloat(item.cr_amount);
             let balance = Number.parseFloat(item.dr_amount) - Number.parseFloat(item.cr_amount);
             item.balance = balance;
             dataMap.set(item.sl, {balance: balance});
         });
-        console.log("DR TOTAL::=>>>", drTotal);
-        console.log("CR TOTAL::=>>>", crTotal);
+        // console.log("DR TOTAL::=>>>", drTotal);
+        // console.log("CR TOTAL::=>>>", crTotal);
         // console.log("DATA MAP - 1::=>>>", dataMap);
         let balance = 0;
         for(let i=1; i<=data.length; i++){
             let dataItem = dataMap.get(i);
-            // console.log("DATA ITEM::=>>>", i, dataItem);
+            console.log("DATA ITEM::=>>>", i, dataItem);
             balance = Number.parseFloat(balance) + Number.parseFloat(dataItem.balance);
             dataMap.set(i, {balance: balance});
         }
@@ -135,7 +171,7 @@ export const HtmlLedger = ({type, header}) => {
                 }
             }
         }
-        console.log("DATA MAP - 3 ::=>>>", data);
+        // console.log("DATA MAP - 3 ::=>>>", data);
         setDrTotal(drTotal);
         setCrTotal(crTotal);
         setClosingBalance(balance);
@@ -183,27 +219,8 @@ export const HtmlLedger = ({type, header}) => {
         }
     }
 
-    const PrintElem = (elem) => {
-        // window.print();
-        var mywindow = window.open('', 'PRINT', 'height=400,width=600');
-
-        mywindow.document.write('<html><head><title>' + document.title  + '</title>');
-        mywindow.document.write('</head><body >');
-        mywindow.document.write('<h1>' + document.title  + '</h1>');
-        mywindow.document.write(document.getElementById(elem).innerHTML);
-        mywindow.document.write('</body></html>');
-
-        mywindow.document.close(); // necessary for IE >= 10
-        mywindow.focus(); // necessary for IE >= 10*/
-
-        mywindow.print();
-        mywindow.close();
-
-        return true;
-    }
     const handlePrint = () => {
         setTrigger(trigger+1);
-        // PrintElem("printme");
     }
 
     const getParticular = (item) => {
@@ -216,23 +233,60 @@ export const HtmlLedger = ({type, header}) => {
         return particular;
     }
 
+    const getFormErrorMessage = (name) => {
+        return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+    const onSubmit = (data) => {
+        console.log("FORM-DATA::=>>>", data);
+        setFromDate(data.from_date);
+        setToDate(data.to_date);
+        refreshLedger(data.from_date, data.to_date);
+    }
+    
     return (
-      <div>
+        <div className="grid">     
         <ReportCss />
-        <Calendar value={fromDate} 
-            onChange={(e) => setFromDate(e.value)} 
-            dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy" mask="99/99/9999" 
-            />
-        <Calendar value={toDate} 
-            onChange={(e) => setToDate(e.value)} 
-            dateFormat="dd/mm/yy" placeholder="dd/mm/yyyy" mask="99/99/9999" 
-            />
-        <button className = "no-printme" onClick={() =>refreshLedger()}>Refresh</button>
-        <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>
-
+        <div className="card col-12 md:col-12 no-printme">
+        <div className="p-fluid formgrid grid">
+            <div className="field col-12 md:col-2">
+            <Controller
+                name="from_date"
+                control={control}
+                render={({ field, fieldState }) => (
+                <>
+                    <label htmlFor={field.name}>From Date</label>
+                    <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
+                        dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
+                    {getFormErrorMessage(field.name)}
+                </>                                
+            )}/>
+            </div>
+            <div className="field col-12 md:col-2">
+            <Controller
+                name="to_date"
+                control={control}
+                render={({ field, fieldState }) => (
+                <>
+                    <label htmlFor={field.name}>To Date</label>
+                    <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
+                        dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
+                    {getFormErrorMessage(field.name)}
+                </>                                
+            )}/>
+            </div>
+            <div className="field col-12 md:col-2">
+                <Button type="submit" label="Submit" className="mt-2"
+                    onClick={handleSubmit((d) => onSubmit(d))}
+                    />    
+                <Button label="Print" className="p-button-outlined p-button-warning mt-2" 
+                    onClick={() => handlePrint()} />
+            </div>
+        </div>
+        </div>
+    
         <ComponentToPrint />
         
-        <div className='printme' id='printme'>
+        <div className='card p-fluid grid printme' id='printme'>
             <header>
                 <p>M/S JONONI MOTORS</p>
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
@@ -243,7 +297,10 @@ export const HtmlLedger = ({type, header}) => {
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
             </header>}
-            <p class="line">Date : {getDateFormatted(fromDate)}</p>
+            <p class="line">
+                <b>From Date :</b> {datesData['from_date']}
+                , <b>To Date :</b> {datesData['to_date']}
+            </p>
             <table className="bill-details">
                 <tbody>
                     <tr>
@@ -265,6 +322,15 @@ export const HtmlLedger = ({type, header}) => {
                 </thead>
             
                 <tbody>
+                    <tr>
+                        <td className="left-align">0</td>
+                        <td className="left-align">{getDateFormatted(datesData['from_date'])}</td>
+                        <td className="left-align"></td>
+                        <td className="left-align">Opening Balance</td>
+                        <td className="right-align"><b>{getFormattedNumber(openingData.dr_amount)}</b></td>
+                        <td className="right-align"><b>{getFormattedNumber(openingData.cr_amount)}</b></td>
+                        <td className="right-align"><b>{getLedgerFormattedNumber(openingData.balance)}</b></td>
+                    </tr>
                 {ledgerData.map( item => 
                     <tr>
                         <td className="left-align">{Number.parseFloat(item.sl).toFixed(0)}</td>
