@@ -10,7 +10,7 @@ import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
 import { getFormattedNumber, getDateTimeFormatted } from '../../../utils';
 
-const DispatchPayment = () => {
+const DispatchPayment = ({trigger}) => {
 
     const dt = useRef(null);
 
@@ -50,7 +50,7 @@ const DispatchPayment = () => {
 
     useEffect(() => {
         loadLazyData();
-    }, [lazyParams]);
+    }, [lazyParams, trigger]);
 
     const loadLazyData = async () => {
         setLoading(true);

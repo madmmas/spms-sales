@@ -139,6 +139,8 @@ const Adjustments = () => {
                 "current_balance": 0,
                 "adjustment_type": adjustmentType,
             })
+            // reload data
+            setLazyParams({ ...lazyParams });
         }).catch(error => {
             console.log(error);
             setSubmitted(false);

@@ -68,6 +68,8 @@ const Detail = () => {
     const [paymentType, setPaymentType] = useState("RECEIVE");
     const [initPayment, setInitPayment] = useState(emptyPayment);
     const [dlgTrigger, setDlgTrigger] = useState(0);
+    const [receiveTrigger, setReceiveTrigger] = useState(0);
+    const [dispatchTrigger, setDispatchTrigger] = useState(0);
 
     const transactionService = new TransactionService();
     const orderService = new OrderService();
@@ -106,6 +108,11 @@ const Detail = () => {
                 "current_balance": 0,
                 "payment_type": paymentType,
             })
+            if(paymentType==="RECEIVE"){
+                setReceiveTrigger(receiveTrigger+1);
+            }else{
+                setDispatchTrigger(dispatchTrigger+1);
+            }
         }).catch(error => {
             setSubmitted(false);
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Payment Creation Failed', life: 3000 });
@@ -133,7 +140,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel />;
+        return <TabPanel trigger={activeIndex==0?receiveTrigger:dispatchTrigger} />;
     };
 
     const renderPaymentForm = () => {

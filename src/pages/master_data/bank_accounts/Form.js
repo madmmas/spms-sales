@@ -157,9 +157,9 @@ const Form = ({bankAccountProfile}) => {
                         <Controller
                             name="initBalance"
                             control={control}
-                            // rules={{
-                            //     validate: (value) => (value!==null) || 'Initial Balance is required.'
-                            // }}
+                            rules={{
+                                validate: (value) => (value!==null) || 'Initial Balance is required.'
+                            }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>

@@ -233,9 +233,6 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                 <Controller
                     name="current_balance"
                     control={control}
-                    // rules={{
-                    //     validate: (value) => (value > 0) || 'Enter a valid amount.'
-                    // }}
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="current_balance">Current Balance</label>
@@ -270,7 +267,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     control={control}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor="remarks">Remarks*</label>
+                        <label htmlFor="remarks">Remarks</label>
                         <InputTextarea inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
                         {getFormErrorMessage(field.name)}
                     </>

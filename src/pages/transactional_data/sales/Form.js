@@ -92,6 +92,7 @@ const Form = React.memo(({ sales }) => {
     // STATES FOR FORM SUBMIT
     const [selAction, setSelAction] = useState(null);
     const [selFormData, setSelFormData] = useState(null);
+    const [showOptions, setShowOptions] = useState(false);
 
     // STATES FOR FORM RETURN
     const [returnMode, setReturnMode] = useState(false);
@@ -472,6 +473,12 @@ const Form = React.memo(({ sales }) => {
 
         // need to reload lastTradePrice
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
+
+        if(value === "WALKIN") {
+            setShowOptions(false);
+        } else {
+            setShowOptions(true);
+        }
     };
 
     const getPartyBalance = (partyId) => {
@@ -576,7 +583,7 @@ const Form = React.memo(({ sales }) => {
             setTrxStatus("cancelled");
             setConfirmDialogMessage("Are you sure you want to cancel this order?");
             if(customerCategory === "CONDITIONAL") {
-            setCancellationFeeDlgTrigger(cancellationFeeDlgTrigger+1);
+                setCancellationFeeDlgTrigger(cancellationFeeDlgTrigger+1);
             }else{
                 setTriggerConfirmDialog(triggerConfirmDialog+1);
             }
@@ -943,11 +950,11 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                {(status==="draft") && <div className="field col-12 md:col-6">
+                {showOptions && <div className="field col-12 md:col-6">
                     <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
                 </div>}
-                {(customerCategory === "REGISTERED" && status==="draft") && 
+                {(customerCategory === "REGISTERED" && showOptions) && 
                 <div className="field col-12 md:col-6">
                     <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
