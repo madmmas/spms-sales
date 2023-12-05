@@ -15,10 +15,12 @@ import { Toolbar } from 'primereact/toolbar';
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
+import RProductService from '../../../services/RProductService';
 
 import { TransactionService } from '../../../services/TransactionService';
+import { RegisterService } from '../../../services/RegisterService';
 import { PRODUCT_MODEL, DAMAGED_STOCK_MODEL } from '../../../constants/models';
-import { ON_DAMAGED_STOCK } from '../../../constants/transactions';
+import { getDateFormatted } from '../../../utils';
 
 const DamagedStock = () => {
 
@@ -61,6 +63,7 @@ const DamagedStock = () => {
     const [submitted, setSubmitted] = useState(false);
 
     const transactionService = new TransactionService();
+    const registerService = new RegisterService();
 
     const {
         register,
@@ -91,9 +94,13 @@ const DamagedStock = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then( async data => {
             console.log(data)
             setTotalRecords(data.total);
+            for(let i=0; i<data.rows.length; i++) {
+                let product = await RProductService.getProductById(data.rows[i].dtProduct_id);
+                data.rows[i]['product_name'] = product.name;
+            }
             setDamagedStock(data.rows);
             setLoading(false);
         });
@@ -126,7 +133,7 @@ const DamagedStock = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.name}
+                {rowData.product_name}
             </>
         );
     };
@@ -159,7 +166,7 @@ const DamagedStock = () => {
         console.log(_data);
         transactionService.damageStock(_data).then(response => {
             console.log(response);
-            if (response.success) {
+            if (response.status) {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
                 resetForm();
                 setShowForm(false);
@@ -202,7 +209,7 @@ const DamagedStock = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDateFormatted(rowData.date)}
             </>
         );
     };

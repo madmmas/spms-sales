@@ -17,9 +17,12 @@ import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { TransactionService } from '../../../services/TransactionService';
+import { RegisterService } from '../../../services/RegisterService';
 import { PRODUCT_MODEL, STOCK_ADJUSTMENT_MODEL } from '../../../constants/models';
-import { ON_STOCK_ADJUSTMENT } from '../../../constants/transactions';
+
 import { ADJUSTMENT_TYPE } from '../../../constants/lookupData';
+import RProductService from '../../../services/RProductService';
+import { getDateFormatted } from '../../../utils';
 
 const StockAdjustment = () => {
 
@@ -64,6 +67,7 @@ const StockAdjustment = () => {
     const [submitted, setSubmitted] = useState(false);
 
     const transactionService = new TransactionService();
+    const registerService = new RegisterService();
 
     const {
         register,
@@ -94,9 +98,13 @@ const StockAdjustment = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        transactionService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        registerService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then( async data => {
             console.log(data)
             setTotalRecords(data.total);
+            for(let i=0; i<data.rows.length; i++) {
+                let product = await RProductService.getProductById(data.rows[i].dtProduct_id);
+                data.rows[i]['product_name'] = product.name;
+            }
             setStockAdjustment(data.rows);
             setLoading(false);
         });
@@ -129,7 +137,7 @@ const StockAdjustment = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.name}
+                {rowData.product_name}
             </>
         );
     };
@@ -162,8 +170,8 @@ const StockAdjustment = () => {
         };
         console.log(_data);
         transactionService.stockAdjustment(_data).then(response => {
-            console.log(response);
-            if (response.success) {
+            // console.log(response);
+            if (response.status) {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
                 resetForm();
                 setShowForm(false);
@@ -206,7 +214,7 @@ const StockAdjustment = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDate(rowData.date)}
+                {getDateFormatted(rowData.date)}
             </>
         );
     };
@@ -290,7 +298,7 @@ const StockAdjustment = () => {
                         <Column field="dtProduct_id" header="Product Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="quantity" header="Quantity" filter filterPlaceholder="Search by name" sortable body={quantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="remarks" header="Reason" filter filterPlaceholder="Search by name" sortable body={reasonBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        {/* <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
                     </DataTable>
 
                     <Dialog visible={showForm} style={{ width: '450px' }} header={`Add Damaged Stock`} modal className="p-fluid" footer={footerDialog} onHide={hideForm}>                    
