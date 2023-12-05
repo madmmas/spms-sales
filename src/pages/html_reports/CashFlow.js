@@ -297,7 +297,7 @@ export const CashFlow = () => {
                                     </tr>
                                 </tbody>
                             </table> 
-                            <table className="lineitems">
+                            {/* <table className="lineitems">
                                 <tbody>
                                     <tr>
                                         <th colSpan="5" className="bottom-line left-align">Customer's Payment Through Bank</th>
@@ -331,7 +331,7 @@ export const CashFlow = () => {
                                         <td className="left-align">30,000</td>  
                                     </tr>
                                 </tbody>
-                            </table> 
+                            </table>  */}
                         </td>
                         <td className="left-align">
                             <table className="lineitems">

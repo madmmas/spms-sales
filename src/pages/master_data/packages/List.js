@@ -38,7 +38,7 @@ const List = () => {
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [dtProfiles, setProfiles] = useState(null);
+    const [dtProfiles, setProducts] = useState(null);
     const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [dtProfile, setProfile] = useState({});
@@ -67,10 +67,10 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        productService.getAll(lazyParams).then(data => {
+        productService.getAll(lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
-            setProfiles(data.rows);
+            setProducts(data.rows);
             setLoading(false);
         });
     }
@@ -118,7 +118,7 @@ const List = () => {
 
     const deleteSelectedProfiles = () => {
         let _dtProfiles = dtProfiles.filter((val) => !selectedProfiles.includes(val));
-        setProfiles(_dtProfiles);
+        setProducts(_dtProfiles);
         setDeleteProfilesDialog(false);
         setSelectedProfiles(null);
         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Deleted', life: 3000 });
@@ -256,8 +256,8 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="brand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="model_id" header="Model No" filter filterPlaceholder="Search by Model No" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="brand_name" header="Brand Name" filter filterPlaceholder="Search by Brand Name" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="model_no" header="Model No" filter filterPlaceholder="Search by Model No" sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                     </DataTable>
 
