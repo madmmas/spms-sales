@@ -60,6 +60,19 @@ export class TransactionService {
         return resp.data;
     }
 
+    async getLedgerBalanceUpto(cacode, upto) {
+        let uri = `/ledger/balance/${cacode}/${upto}`;
+        const resp = await axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 1 // 20 seconds.
+            }
+        });
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async getReportByQueryName(report_name, query_name, params) {
         // conver json into query string
         const queryParams = params ? Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&') : '';

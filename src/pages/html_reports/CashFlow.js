@@ -30,12 +30,19 @@ export const CashFlow = () => {
     }, [trigger]);
 
     const loadCashFlowData = () => {
+        let ondate = moment(reportDate).format("YYYY-MM-DD");
         transactionService.getReport('cashflow', {
-            "ondate": getDateWithFormat(reportDate, "YYYY-MM-DD"),
+            "ondate": ondate,
         }).then(data => {
             setCashFlowData(data);
             calculateCashflowTotal(data);
             console.log("CashFlowData::", data);
+        });
+        transactionService.getLedgerBalanceUpto('dtCash', ondate).then(data => {
+            console.log("dtCash::", data);
+            setCashFlowData(prevState => {
+                return {...prevState, opening_cash_balance: data.balance}
+            });
         });
     }
 
@@ -100,8 +107,8 @@ export const CashFlow = () => {
                 total += parseFloat(item.amount);
             });
         }
-        if(data['general_income']){
-            data['general_income'].forEach(item => {
+        if(data['general_expenses']){
+            data['general_expenses'].forEach(item => {
                 total += parseFloat(item.amount);
             });
         }
