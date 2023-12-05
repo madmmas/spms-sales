@@ -149,7 +149,6 @@ const InvoiceCss = () => {
                 font-size: 12px;
             }
             footer {
-                position: absolute;
                 bottom: 40px;
                 height: 10px;
                 width: 100%;

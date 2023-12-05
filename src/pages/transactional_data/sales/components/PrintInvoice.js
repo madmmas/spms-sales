@@ -20,8 +20,12 @@ export const PrintInvoice = () => {
 
     const [invoice, setInvoice] = useState(null);
     const [printme, setPrintme] = useState(true)
+    const [printOnlySales, setPrintOnlySales] = useState(true)
+    const [printOnlySalesReturn, setPrintOnlySalesReturn] = useState(true)
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
+    const [render, setRender] = useState(false)
+    const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
     useEffect(() => {
@@ -54,6 +58,26 @@ export const PrintInvoice = () => {
 
     useEffect(() => {
         console.log("invoice::", invoice);
+        for(let i = 0; i<invoice?.items?.length; i++){
+            for(let j = 0; j<invoice?.return_items?.length; j++){
+                if(invoice.items[i].product_id === invoice.return_items[j].product_id){
+                       invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
+                       invoice.return_items[j].trade_price = invoice.items[i].trade_price;
+                       invoice.return_items[j].product_model_no = cacheMasterDataService.getShortnameById(invoice.items[i].product_model_id + '-dtProductModel');
+                       invoice.return_items[j].product_brand_name = cacheMasterDataService.getShortnameById(invoice.items[i].product_brand_id + '-dtProductBrand');
+               }
+            }
+        }
+
+        let totalReturningAmountLocal = 0;
+        for(let i = 0; i<invoice?.return_items?.length; i++){
+            totalReturningAmountLocal = totalReturningAmountLocal + invoice.return_items[i].return_qty * Number.parseFloat(invoice.return_items[i].trade_price)
+        }
+
+        setTotalReturningAmount(totalReturningAmountLocal)
+        setRender((prevState)=>!prevState)
+
+        console.log(invoice)
     }, [invoice]);
 
     useEffect(() => {
@@ -82,6 +106,24 @@ export const PrintInvoice = () => {
     }
     const handlePrint = () => {
         setPrintme(true);
+        setPrintOnlySales(true);
+        setPrintOnlySalesReturn(true);
+        setPrintmePos(false);
+        setTrigger(trigger+1);
+        // PrintElem("printme");
+    }
+
+    const handlePrintOnlySales = () => {
+        setPrintOnlySales(true);
+        setPrintOnlySalesReturn(false);
+        setPrintmePos(false);
+        setTrigger(trigger+1);
+        // PrintElem("printme");
+    }
+
+    const handlePrintOnlySalesReturn = () => {
+        setPrintOnlySales(false);
+        setPrintOnlySalesReturn(true);
         setPrintmePos(false);
         setTrigger(trigger+1);
         // PrintElem("printme");
@@ -110,7 +152,9 @@ export const PrintInvoice = () => {
     return (
       <div>
         <InvoiceCss />
-        <button className = "no-printme" onClick={() =>handlePrint()}>PRINT</button>
+        <button className = "no-printme mr-2" onClick={() =>handlePrint()}>PRINT</button>
+        <button className = "no-printme mr-2" onClick={() =>handlePrintOnlySales()}>PRINT ONLY SALES</button>
+        <button className = "no-printme mr-2" onClick={() =>handlePrintOnlySalesReturn()}>PRINT ONLY SALES RETURN</button>
         <button className = "no-printme" onClick={() =>handlePrintPOS()}>PRINT-POS</button>
         {printmePos && <PrintPOS />}
         {printme && <ComponentToPrint />}
@@ -135,12 +179,12 @@ export const PrintInvoice = () => {
                         <td><span>{invoice.customer_name}</span><br/>
                             <span>{invoice.customer_phone}</span></td>
                     </tr>}
-                    <tr>
+                    {printOnlySales && <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE</span></th>
-                    </tr>
+                    </tr>}
                 </tbody>
             </table>
-            {printme && <table className="lineitems">
+            {printme && printOnlySales && <table className="lineitems">
                 <thead>
                     <tr>
                         {/* <th className="heading name">Sl</th> */}
@@ -277,29 +321,29 @@ export const PrintInvoice = () => {
                 </tbody>
             </table>}
             <section>
-                { invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
+                { printOnlySales && invoice.customer_category === "REGISTERED" && invoice.balance_forward===-99999999 &&
                     <p>
                       <b>In Words (Invoice Amount) : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
-                { invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
+                { printOnlySales && invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
                     <p>
                       <b>In Words (Invoice Amount) : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
-                { invoice.customer_category === "WALKIN" &&
+                { printOnlySales && invoice.customer_category === "WALKIN" &&
                     <p>
                       <b>In Words : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
-                { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 &&
+                { printOnlySales && invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 &&
                     <p>
                       <b>In Words : <br></br>
                       Conditional Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> <br></br>
                       Ledger Balance : <i>{getNumToWords(((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
-                { invoice.customer_category === "CONDITIONAL" && invoice.balance_forward===-99999999 &&
+                { printOnlySales && invoice.customer_category === "CONDITIONAL" && invoice.balance_forward===-99999999 &&
                     <p>
                       <b>In Words : <br></br>
                       Total Recievable : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> </b>
@@ -308,11 +352,60 @@ export const PrintInvoice = () => {
                 {/* <p>
                     Paid by : <span>CASH</span>
                 </p> */}
+                {printOnlySales && <p> 
+                    <b>Remarks :</b> <span>{invoice.notes}</span>
+                </p>}
+            </section>
+            {(invoice?.return_items?.length > 0 && printOnlySalesReturn) && <section>
+                <table className="bill-details">
+                    <tbody>
+                        <tr>
+                            <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INFORMATION</span></th>
+                        </tr>
+                    </tbody>
+                </table>
+                {printme && <table className="lineitems">
+                    <thead>
+                        <tr>
+                            {/* <th className="heading name">Sl</th> */}
+                            <th className="heading qty left-align">Date</th>
+                            <th className="heading qty left-align">Qty</th>
+                            <th className="heading name left-align">Product Name</th>
+                            <th className="heading brand left-align">Brand</th>
+                            <th className="heading brand left-align">Part No</th>
+                            <th className="heading brand left-align">Model</th>
+                            <th className="heading unit right-align">Unit Price</th>
+                            <th className="heading amount right-align">Amount</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody>
+                    {invoice?.return_items.map( item => 
+                        <tr>
+                            <td className="left-align">{getDateFormatted(item.created_at)}</td>
+                            <td className="left-align">{Number.parseFloat(item.return_qty).toFixed(0)}</td>
+                            <td className="left-align">{item.product_name}</td>
+                            <td className="left-align">{item.product_brand_name}</td>
+                            <td className="left-align">{item.product_part_number}</td>
+                            <td className="left-align">{item.product_model_no}</td>
+                            <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
+                            <td className="right-align">{Number.parseFloat(item.return_qty*item.trade_price).toFixed(2) }</td>
+                        </tr>)}
+                        <tr>
+                            <th colSpan="7" className="total text line">Total Returned Amount</th>
+                            <th className="total price right-align line">{Number.parseFloat(totalReturningAmount).toFixed(2)}</th>
+                        </tr>
+                        
+                    </tbody>
+                </table>}
+                <p>
+                      <b>In Words : <i>{getNumToWords(totalReturningAmount)} Taka only</i> </b>
+                   </p>
                 <p> 
                     <b>Remarks :</b> <span>{invoice.notes}</span>
                 </p>
-            </section>
-            <footer>
+            </section>}
+            <footer style={{marginTop:"5rem"}}>
                 <table style={{"textAlign": "center"}}>
                     <tbody>
                         <tr>
