@@ -326,9 +326,14 @@ export const PrintInvoice = () => {
                       <b>In Words (Invoice Amount) : <i>{getNumToWords(Number.parseFloat(invoice.net).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
-                { printOnlySales && invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 &&
+                { printOnlySales && invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && (invoice.balance_forward + invoice.net) > 0 &&
                     <p>
                       <b>In Words (Invoice Amount) : <i>{getNumToWords((Number.parseFloat(invoice.net) + Number.parseFloat(invoice.balance_forward)).toFixed(2))} Taka only</i> </b>
+                   </p>
+                }
+                { printOnlySales && invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && (invoice.balance_forward + invoice.net) < 0 &&
+                    <p>
+                      <b>In Words (Invoice Amount) : <i>{getNumToWords(Number.parseFloat((-1) * (invoice.balance_forward + invoice.net)).toFixed(2))} Taka only [Advance]</i> </b>
                    </p>
                 }
                 { printOnlySales && invoice.customer_category === "WALKIN" &&
