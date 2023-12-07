@@ -51,6 +51,7 @@ export const HtmlLedger = ({type, header}) => {
     const [closingBalance, setClosingBalance] = useState(0);
     const [drTotal, setDrTotal] = useState(0);
     const [crTotal, setCrTotal] = useState(0);
+    const [render, setRender] = useState(false);
 
     // local date state mm/dd/yyyy
     const [fromDate, setFromDate] = useState()
@@ -134,10 +135,46 @@ export const HtmlLedger = ({type, header}) => {
                 "to_date": data.dates.to_date,
             });
             let dataWithBalance = calculateBalance(openingData, ledgerData);
-            setLedgerData(dataWithBalance);
+
+            let newLedgerData=dataWithBalance;
+            console.log(dataWithBalance)
+            for(let i = 0; i < dataWithBalance.length; i++){
+                let selectedString = '';
+                if(dataWithBalance[i]?.particular?.includes(partyData?.line1) === true){
+                    console.log("hi")
+                    for(let j=dataWithBalance[i]?.particular?.indexOf(partyData?.line1) - 1; j < dataWithBalance[i]?.particular?.length; j++){
+                        selectedString = selectedString + dataWithBalance[i]?.particular[j];
+                    };
+                    console.log(selectedString)
+                    newLedgerData[i].particular = dataWithBalance[i]?.particular.replace(selectedString,'')
+                }
+            }
+            console.log(newLedgerData);
+            setLedgerData(newLedgerData);
+            setRender((prevState)=>!prevState)
+            //setLedgerData(dataWithBalance);
             // console.log("LEDGER DATA::=>>>", openingData, dataWithBalance);
         });
     }
+
+    /* useEffect(()=>{
+        let newLedgerData=ledgerData;
+        console.log(ledgerData)
+        for(let i = 0; i < ledgerData.length; i++){
+            let selectedString = '';
+            if(ledgerData[i]?.particular?.includes(partyData?.line1) === true){
+                console.log("hi")
+                for(let j=ledgerData[i]?.particular?.indexOf(partyData?.line1) - 1; j < ledgerData[i]?.particular?.length; j++){
+                    selectedString = selectedString + ledgerData[i]?.particular[j];
+                };
+                console.log(selectedString)
+                newLedgerData[i].particular = ledgerData[i]?.particular.replace(selectedString,'')
+            }
+        }
+        setRender((prevState)=>!prevState)
+        console.log(newLedgerData);
+        setLedgerData(newLedgerData);
+    },[]) */
 
     const calculateBalance = (opening, data) => {
         let dataMap = new Map();
