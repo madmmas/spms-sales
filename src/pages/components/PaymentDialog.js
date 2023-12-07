@@ -203,7 +203,10 @@ const PaymentDialog = ( {
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                             <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                displayField="accName"
+                                // displayField="dtBank_id_shortname"
+                                displayFunc={(data) => {
+                                    return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
+                                }}
                                 onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
                                 columns={[
@@ -258,7 +261,10 @@ const PaymentDialog = ( {
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                             <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                displayField="accName"
+                                // displayField="dtMFS_id_shortname"
+                                displayFunc={(data) => {
+                                    return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
+                                }}
                                 onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
                                 columns={[

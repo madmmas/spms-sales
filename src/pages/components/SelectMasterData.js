@@ -5,7 +5,8 @@ import SelectMasterDataTable from './SelectMasterDataTable';
 import { MasterDataService } from '../../services/MasterDataService';
 
 export default function SelectMasterData({ 
-    field, displayField, showFields=[], modelName, className, 
+    field, displayField,
+    showFields=[], modelName, className, 
     columns, caption="Select", onSelect, 
     defaultFilters={
         fields: [],
@@ -17,6 +18,9 @@ export default function SelectMasterData({
         filters: {
             global: { value: null, matchMode: 'contains' },
         }
+    },
+    displayFunc = (data) => {
+        return data[displayField];
     }
 }) {
 
@@ -37,12 +41,12 @@ export default function SelectMasterData({
                 setSelectedRow("");
                 return;
             }
-            setSelectedRow(data[displayField]);
+            setSelectedRow(displayFunc(data));
         });
     }, [field.value]);
 
     const onSelection = (e) => {
-        setSelectedRow(e.value[displayField]);
+        setSelectedRow(displayFunc(e.value));
         field.onChange(e.value._id);
         onSelect(e.value)
     }
