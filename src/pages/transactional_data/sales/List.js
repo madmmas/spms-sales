@@ -8,6 +8,8 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
+import { InputText } from 'primereact/inputtext';
+import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
@@ -48,6 +50,11 @@ const List = () => {
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
+    const [isCourierVisible, setIsCourierVisible] = useState(false);
+    const [isParamMissing, setIsParamMissing] = useState(false);
+    const [courierName, setCourierName] = useState('');
+    const [courierMemoNumber, setCourierMemoNumber] = useState('');
+    const [courierDate, setCourierDate] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -120,6 +127,55 @@ const List = () => {
     const openNew = () => {
         navigate("/sales/new");
     };
+
+    const openCourier = () => {
+        setIsCourierVisible(true);
+    }
+
+    const onInputChange = (e, param) => {
+           if(param === "name"){
+            setCourierName(e.target.value)
+           }
+           if(param === "number"){
+            setCourierMemoNumber(e.target.value)
+           }
+           if(param === "date"){
+            setCourierDate(e.target.value)
+           }
+           if(e.target.value === "" && param === "name"){
+            setCourierName("")
+           }
+           if(e.target.value === "" && param === "number"){
+            setCourierMemoNumber("")
+           }
+           if(e.target.value === "" && param === "date"){
+            setCourierDate("")
+           }
+    }
+
+    const hideDialog = () => {
+        setIsCourierVisible(false);
+        setCourierName('')
+        setCourierMemoNumber("")
+        setCourierDate("")
+        setIsParamMissing(false)
+    }
+
+    const saveCourier = () => {
+        if(courierName === "" || courierMemoNumber === "" || courierDate === ""){
+            setIsParamMissing(true)
+        }else{
+            setIsParamMissing(false)
+        }
+    }
+
+    const courierDialogFooter = (
+        <>
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
+            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveCourier} />
+        </>
+    );
+
 
     const editProfile = (dtProfile) => {
         navigate("/sales/" + dtProfile.id);
@@ -365,6 +421,7 @@ const List = () => {
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
                 <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} />
+                {rowData.trx_status==="pending" && <Button icon="pi pi-pencil" className="p-button-rounded p-button-secondary mr-2" onClick={openCourier} />}
             </>
         );
     };
@@ -439,6 +496,25 @@ const List = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
+                    </Dialog>
+
+                    <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>                    
+                            <div className="field">
+                                    <label htmlFor="name">Courier Name*</label>
+                                    <InputText id="name" value={courierName} onChange={(e) => onInputChange(e, 'name')} required autoFocus />
+                                    {isParamMissing && !courierName && <small>Name is required.</small>}
+                                    <br></br>
+                                    <br></br>
+                                    <label htmlFor="number">Courier Memo Number*</label>
+                                    <InputText id="number" value={courierMemoNumber} onChange={(e) => onInputChange(e, 'number')} required />
+                                    {isParamMissing && !courierMemoNumber && <small>Number is required.</small>}
+                                    <br></br>
+                                    <br></br>
+                                    <label htmlFor="name">Date*</label>
+                                    <Calendar dateFormat="dd/mm/yy" value={courierDate} onChange={(e) => onInputChange(e, 'date')}/>
+                                    {isParamMissing && !courierDate && <small>Date is required.</small>}
+                                    
+                            </div>       
                     </Dialog>
                 </div>
             </div>
