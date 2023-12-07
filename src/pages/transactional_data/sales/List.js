@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { useForm, Controller, set } from 'react-hook-form';
 import { getDateFormatted } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +14,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import OrderFilter from '../../components/OrderFilter';
+import CourierDialog from '../../components/CourierDialog';
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
 import { SALES_MODEL } from '../../../constants/models';
@@ -26,6 +28,14 @@ const List = () => {
 
     const toast = useRef(null);
     const dt = useRef(null);
+
+    const {
+        control,
+        formState: { errors },
+        setValue,
+        reset,
+        handleSubmit
+    } = useForm({});
 
     let defaultFilters = {
         fields: [],
@@ -48,6 +58,8 @@ const List = () => {
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
+    const [isCourierVisible, setIsCourierVisible] = useState(false);
+    const [id, setID] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -121,6 +133,58 @@ const List = () => {
         navigate("/sales/new");
     };
 
+    const openCourier = (dtProfile1) => {
+        setIsCourierVisible(true);
+        setID(dtProfile1.id)
+    }
+
+   
+        const onInputChange = (e, name) => {
+            const val = e.target.value;
+            setValue(`${name}`, val);
+        };
+    
+
+    const hideDialog = () => {
+        setIsCourierVisible(false);
+        setValue('courier_name', '');
+        setValue('courier_memo_number', '');
+        setValue('date', '');
+    }
+
+    const saveCourier = async (data) => {
+        console.log(data)
+        let valid = true;
+        if(!data.courier_name){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Name is required.', life: 3000 });
+            valid = false;
+        }else if(!data.courier_memo_number){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Memo Number is required.', life: 3000 });
+            valid = false;
+        }else if(!data.date){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Date is required.', life: 3000 });
+            valid = false;
+        }
+        if(!valid){
+            return
+        }
+        await orderService.updateCourier(SALES_MODEL, id , data).then(result => {
+            if(result){
+                console.log(result)
+            }
+        });
+        hideDialog();
+        
+    }
+
+    const courierDialogFooter = (
+        <>
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
+            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => saveCourier(d))} />
+        </>
+    );
+
+
     const editProfile = (dtProfile) => {
         navigate("/sales/" + dtProfile.id);
     };
@@ -148,7 +212,7 @@ const List = () => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
         });
         setDeleteProfileDialog(false);
-        setProfile(null);
+        setProfile(null)
     };
 
     
@@ -365,8 +429,13 @@ const List = () => {
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
                 <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} />
+                {rowData.trx_status==="pending" && <Button icon="pi pi-pencil" className="p-button-rounded p-button-secondary mr-2" onClick={()=> openCourier(rowData)} />}
             </>
         );
+    };
+
+    const getFormErrorMessage = (name) => {
+        return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
     const deleteProfileDialogFooter = (
@@ -382,9 +451,6 @@ const List = () => {
             <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiles} />
         </>
     );
-
-
-
 
     return (
         <div className="grid crud-demo">
@@ -440,6 +506,15 @@ const List = () => {
                             {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
+
+                    <CourierDialog 
+                      isCourierVisible = {isCourierVisible}
+                      courierDialogFooter = {courierDialogFooter}
+                      hideDialog = {hideDialog}
+                      onInputChange = {onInputChange}
+                      control={control}
+                      getFormErrorMessage={getFormErrorMessage}
+                      />
                 </div>
             </div>
         </div>
