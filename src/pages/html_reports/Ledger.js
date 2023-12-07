@@ -11,6 +11,7 @@ import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
 import { MasterDataService } from '../../services/MasterDataService';
 import { TransactionService } from '../../services/TransactionService';
+import CacheMasterDataService from '../../services/CacheMasterDataService';
 
 import { 
     BANK_ACCOUNT_MODEL,
@@ -73,6 +74,7 @@ export const HtmlLedger = ({type, header}) => {
                     "line1": party.name||party.contact_name||party.accName,
                     "line2": party.address||party.branch,
                     "line3": party.accNumber||party.refNumber||party.phone,
+                    "line4": CacheMasterDataService.getShortnameById(party.dtBank_id+"-dtBank")
                 });
             });
         }
@@ -293,6 +295,7 @@ export const HtmlLedger = ({type, header}) => {
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
             {partyData && <header class="line">
+                {type === "bank" && <p>{partyData["line4"]}</p>}
                 <p>{partyData["line1"]}</p>
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
