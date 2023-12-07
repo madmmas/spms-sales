@@ -510,7 +510,7 @@ const Form = React.memo(({ sales }) => {
     const addSalesItem = item => {
         let _newSales = [...salesItems];
         item['index'] = salesItems.length;
-        _newSales.push(item);
+        _newSales.unshift(item);
         setSalesItems(_newSales);
     };
 

@@ -144,7 +144,7 @@ const SalesProductDetail = ({
     const serialBodyTemplate = (rowData) =>{
         return(
             <>
-               {rowData.index + 1}
+               {salesRows.length - rowData.index}
             </>
         )
     } 
@@ -246,7 +246,7 @@ const SalesProductDetail = ({
                 stripedRows showGridlines scrollable scrollHeight="25rem" 
             >
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
-                <Column field="index" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
+                <Column field="" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
                 <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '18rem' }}></Column>
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '3rem' }}></Column>
                 <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
