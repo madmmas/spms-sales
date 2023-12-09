@@ -188,7 +188,7 @@ const StockStatus = () => {
                     <Toast ref={toast} />
 
                     <DataTable
-                        ref={dt} value={dtStockStatus} dataKey="_id" 
+                        ref={dt} value={dtStockStatus} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

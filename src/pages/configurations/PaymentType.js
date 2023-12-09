@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { PAYMENT_TYPE_MODEL } from '../../constants/models';
 
 const PaymentType = () => {
@@ -22,7 +23,7 @@ const PaymentType = () => {
     const contextPath = '~';
 
     let emptyPaymentType = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -55,6 +56,7 @@ const PaymentType = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const configurationManagementService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -75,7 +77,7 @@ const PaymentType = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setPaymentTypes(data.rows);
@@ -107,8 +109,8 @@ const PaymentType = () => {
         setSubmitted(true);
 
         if (paymentType.name.trim()) {
-            if (paymentType._id) {
-                configurationManagementService.update(modelName, paymentType._id, paymentType).then(data => {
+            if (paymentType.id) {
+                configurationManagementService.update(modelName, paymentType.id, paymentType).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Updated', life: 3000 });
@@ -138,7 +140,7 @@ const PaymentType = () => {
     };
 
     const deletePaymentType = () => {
-        configurationManagementService.delete(modelName, paymentType._id).then(data => {
+        configurationManagementService.delete(modelName, paymentType.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Deleted', life: 3000 });
@@ -264,7 +266,7 @@ const PaymentType = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

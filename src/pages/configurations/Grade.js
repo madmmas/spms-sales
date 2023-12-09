@@ -22,7 +22,7 @@ const Grade = () => {
     const contextPath = '~';
 
     let emptyGrade = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -106,8 +106,8 @@ const Grade = () => {
         setSubmitted(true);
 
         if (grade.name.trim()) {
-            if (grade._id) {
-                configurationManagementService.update(modelName, grade._id, grade).then(data => {
+            if (grade.id) {
+                configurationManagementService.update(modelName, grade.id, grade).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Grade Updated', life: 3000 });
@@ -137,7 +137,7 @@ const Grade = () => {
     };
 
     const deleteGrade = () => {
-        configurationManagementService.delete(modelName, grade._id).then(data => {
+        configurationManagementService.delete(modelName, grade.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
@@ -263,7 +263,7 @@ const Grade = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

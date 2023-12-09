@@ -12,8 +12,6 @@ import SelectMasterData from './SelectMasterData';
 
 import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
 
-import CacheMasterDataService from '../../services/CacheMasterDataService';
-
 const PaymentDialog = ( { 
     trigger, initPayment, onPaymnetCallback, 
     readOnly = false 
@@ -142,7 +140,7 @@ const PaymentDialog = ( {
     const bankNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+                {rowData.dtBank_id_shortname}
             </>
         );
     };
@@ -150,7 +148,7 @@ const PaymentDialog = ( {
     const mfsNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+                {rowData.dtMFS_id_shortname}
             </>
         );
     };
@@ -205,7 +203,7 @@ const PaymentDialog = ( {
                             <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
                                 // displayField="dtBank_id_shortname"
                                 displayFunc={(data) => {
-                                    return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
+                                    return `${data.dtBank_id_shortname} - [${data.accNumber}]`;
                                 }}
                                 onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
@@ -216,6 +214,7 @@ const PaymentDialog = ( {
                                 ]} 
                                 defaultFilters={{
                                     fields: ["dtBank_id", "accNumber", "accName"],
+                                    nameField: "accName",
                                     first: 0,
                                     rows: 10,
                                     page: 1,
@@ -263,7 +262,7 @@ const PaymentDialog = ( {
                             <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
                                 // displayField="dtMFS_id_shortname"
                                 displayFunc={(data) => {
-                                    return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
+                                    return `${data.dtMFS_id_shortname} - [${data.refNumber}]`;
                                 }}
                                 onSelect={(e) => {console.log(e);}}
                                 className={classNames({ 'p-invalid': fieldState.error })} 
@@ -274,6 +273,7 @@ const PaymentDialog = ( {
                                 ]} 
                                 defaultFilters={{
                                     fields: ["dtMFS_id", "refNumber", "accName"],
+                                    nameField: "accName",
                                     first: 0,
                                     rows: 10,
                                     page: 1,

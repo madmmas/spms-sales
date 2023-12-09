@@ -6,9 +6,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Badge } from 'primereact/badge';
 import { Dialog } from 'primereact/dialog';
 
-import RProductService from '../../../../services/RProductService';
-import { all } from 'axios';
-import { get, set } from 'react-hook-form';
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 const SalesProductDetail = ({
     salesItems, 
@@ -36,6 +34,8 @@ const SalesProductDetail = ({
 
     //// STATE DeleteProductDialog ////
     const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
+
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         console.log("HELOO:::",salesItems);
@@ -187,7 +187,7 @@ const SalesProductDetail = ({
 
     const getProductName = async (product_id) => {
 
-        let product = await RProductService.getProductById(product_id);
+        let product = await masterDataDBService.getById("dtProduct", product_id);
         // return product ? product.name : "";
         return product;
     }

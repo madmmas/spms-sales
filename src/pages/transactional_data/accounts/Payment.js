@@ -176,7 +176,7 @@ const Payment = () => {
                 <div className="card">
                     <Toast ref={toast} />
                     <DataTable
-                        ref={dt} value={dtPayment} dataKey="_id" 
+                        ref={dt} value={dtPayment} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

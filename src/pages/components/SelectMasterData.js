@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import SelectMasterDataTable from './SelectMasterDataTable';
 
-import { MasterDataService } from '../../services/MasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterData({ 
-    field, displayField,
+    field, displayField="shortname",
     showFields=[], modelName, className, 
     columns, caption="Select", onSelect, 
     defaultFilters={
@@ -24,7 +24,7 @@ export default function SelectMasterData({
     }
 }) {
 
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const [selectedRow, setSelectedRow] = useState('');
     const [trigger, setTrigger] = useState(0);
@@ -35,7 +35,7 @@ export default function SelectMasterData({
             setSelectedRow("");
             return;
         }
-        masterDataService.getById(modelName, field.value).then(data => {
+        masterDataDBService.getById(modelName, field.value).then(data => {
             if(data===null || data.length===0) {
                 console.log("data is null");
                 setSelectedRow("");
@@ -47,7 +47,7 @@ export default function SelectMasterData({
 
     const onSelection = (e) => {
         setSelectedRow(displayFunc(e.value))
-        field.onChange(e.value._id);
+        field.onChange(e.value.id);
         onSelect(e.value)
     }
 

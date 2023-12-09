@@ -15,7 +15,7 @@ const MyDocument = ({ customerProfile }) => {
     const transactionService = new TransactionService();
 
     useEffect(() => {
-        // transactionService.getLedgerByParty(partyType, customerProfile._id).then(data => {
+        // transactionService.getLedgerByParty(partyType, customerProfile.id).then(data => {
         //     setLedger(data);
         // });
     }, []);

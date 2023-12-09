@@ -48,7 +48,7 @@ const Form = ({warehouseProfile}) => {
                 navigate("/warehouses");
             });
         }else{
-            hrManagementService.update(modelName, formData._id, formData).then(data => {
+            hrManagementService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/warehouses/" + data.ID);

@@ -60,7 +60,7 @@ const Form = ({mfsAccountProfile}) => {
                 navigate("/mfs_accounts");
             });
         }else{
-            hrManagementService.update(modelName, formData._id, formData).then(data => {
+            hrManagementService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/mfs_accounts/" + data.ID);

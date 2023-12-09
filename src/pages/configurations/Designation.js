@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { DESIGNATION_MODEL } from '../../constants/models';
 
 const Designation = () => {
@@ -22,7 +23,7 @@ const Designation = () => {
     const contextPath = '~';
 
     let emptyDesignation = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -53,6 +54,7 @@ const Designation = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const configurationManagementService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -73,7 +75,7 @@ const Designation = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setDesignations(data.rows);
@@ -105,8 +107,8 @@ const Designation = () => {
         setSubmitted(true);
 
         if (designation.name.trim()) {
-            if (designation._id) {
-                configurationManagementService.update(modelName, designation._id, designation).then(data => {
+            if (designation.id) {
+                configurationManagementService.update(modelName, designation.id, designation).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Designation Updated', life: 3000 });
@@ -136,7 +138,7 @@ const Designation = () => {
     };
 
     const deleteDesignation = () => {
-        configurationManagementService.delete(modelName, designation._id).then(data => {
+        configurationManagementService.delete(modelName, designation.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Designation Deleted', life: 3000 });
@@ -262,7 +264,7 @@ const Designation = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -4,7 +4,8 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { MasterDataService } from '../../services/MasterDataService';
+
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterDataTable({ 
     trigger, fieldValue, onSelect, modelName, 
@@ -22,13 +23,14 @@ export default function SelectMasterDataTable({
     const [selectedRow, setSelectedRow] = useState({});
     const [tableDialog, setTableDialog] = useState(false);
 
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
+    
     
     const loadLazyData = () => {
         setLoading(true);
 
         if(lazyParams!==null && lazyParams!==undefined){
-            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            masterDataDBService.getAll(modelName, lazyParams).then(async data => {
                 console.log(data)
                 setTotalRecords(data.total);
                 setTmpData(data.rows);
@@ -121,7 +123,7 @@ export default function SelectMasterDataTable({
         onSelect(e)
     }
 
-    const isSelectable = (data) => data._id !== fieldValue;
+    const isSelectable = (data) => data.id !== fieldValue;
 
     const isRowSelectable = (event) => (event.data ? isSelectable(event.data) : true);
 
@@ -148,7 +150,7 @@ export default function SelectMasterDataTable({
             style={{ width: dialogWidth }} maximizable contentStyle={{ height: dialogHeight }}
             onHide={hideDialog}>
                 <DataTable
-                    ref={dt} value={tmpData} dataKey="_id"
+                    ref={dt} value={tmpData} dataKey="id"
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -15,10 +15,11 @@ import { Toolbar } from 'primereact/toolbar';
 
 import OrderFilter from '../../components/OrderFilter';
 import CourierDialog from '../../components/CourierDialog';
-import { HRService } from '../../../services/HRService';
-import { OrderService } from '../../../services/OrderService';
 import { SALES_MODEL } from '../../../constants/models';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
+import { OrderService } from '../../../services/OrderService';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
 
@@ -63,7 +64,7 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const orderService = new OrderService();
 
     useEffect(() => {
@@ -206,13 +207,13 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile.id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
-        });
-        setDeleteProfileDialog(false);
-        setProfile(null)
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null)
     };
 
     
@@ -282,7 +283,8 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         let name = "";
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
-            name = CacheMasterDataService.getShortnameById(rowData.party_id+"-dtCustomer");
+            // name = CacheMasterDataService.getShortnameById(rowData.party_id+"-dtCustomer");
+            // name = masterDataDBService.getShortnameById("dtCustomer", rowData.party_id);
         } else {
             name = rowData.customer_name;
         }

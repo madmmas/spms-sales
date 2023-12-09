@@ -26,7 +26,7 @@ const CashRegister = () => {
 
     let emptyCashRegister = {
         transfer_to: 'BANK',
-        to_ref_id: null,
+        dr_ref_id: null,
         trx_date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
@@ -75,6 +75,8 @@ const CashRegister = () => {
 
     useEffect(() => {
         initFilters();
+        // set date
+        setValue("trx_date", new Date());
     }, []);
     
     const clearFilter = () => {
@@ -218,7 +220,7 @@ const CashRegister = () => {
         }
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-"+refName)}
+                {CacheMasterDataService.getShortnameById(rowData.dr_ref_id+"-"+refName)}
             </>
         );
     };
@@ -231,7 +233,7 @@ const CashRegister = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtCashRegister} dataKey="_id" 
+                        ref={dt} value={dtCashRegister} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -245,7 +247,7 @@ const CashRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="dr_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
@@ -261,7 +263,6 @@ const CashRegister = () => {
                                     <>
                                         <div className="flex align-items-center">
                                             <RadioButton inputId="f5" {...field} inputRef={field.ref} value="BANK" 
-                                                // checked={transferTo === 'BANK'}
                                                 checked={field.value === 'BANK'}
                                                 onChange={(e) => {
                                                     field.onChange(e);
@@ -291,7 +292,7 @@ const CashRegister = () => {
 
                             <div hidden={transferTo !== "BANK"} className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="dr_ref_id"
                                 control={control}
                                 rules={{ 
                                     validate: (value) => ((transferTo === "MFS" ) || (transferTo === "BANK" && value !== null) ) || 'Bank Account is required.'
@@ -300,7 +301,6 @@ const CashRegister = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                                     <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                        //displayField="dtBank_id_shortname" 
                                         displayFunc={(data) => {
                                             return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
                                         }}
@@ -331,7 +331,7 @@ const CashRegister = () => {
                             </div>
                             <div hidden={transferTo !== "MFS"} className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="dr_ref_id"
                                 control={control}
                                 rules={{ 
                                     validate: (value) => ((transferTo === "BANK" ) || (transferTo === "MFS" && value !== null) ) || 'Bank Account is required.'
@@ -340,7 +340,6 @@ const CashRegister = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                                     <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                        //displayField="dtMFS_id_shortname"
                                         displayFunc={(data) => {
                                             return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
                                         }}
@@ -404,7 +403,6 @@ const CashRegister = () => {
                             <Controller
                                 name="remarks"
                                 control={control}
-                                // rules={{ required: 'Remarks is required.' }}
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="remarks">Remarks</label>

@@ -89,7 +89,7 @@ const Form = ({ packageData }) => {
         masterDataService.getDefaultItem('dtWarehouse').then(data => {
             if(data){
                 console.log("DEFAULT WAREHOUSE::", data);
-                setDefaultWarehouse(data._id);    
+                setDefaultWarehouse(data.id);    
             }
         });
     },[])

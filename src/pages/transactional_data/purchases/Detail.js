@@ -6,6 +6,7 @@ import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
 import { PURCHASE_MODEL } from '../../../constants/models';
+
 import { OrderService } from '../../../services/OrderService';
 
 const PurchaseForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "purchaseProfile" */ './Form'), "purchaseProfile"));

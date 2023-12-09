@@ -12,9 +12,9 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { MFS_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
 
 const List = ({ ledger = false }) => {
@@ -28,23 +28,23 @@ const List = ({ ledger = false }) => {
 
     let defaultFilters = {
         fields: ["dtMFS_id", "branch", "refNumber", "accName", "initBalance", "balance", "address", "phone", "note", "status"],
+        nameField: "accName",
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'dtMFS_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'branch': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'refNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'accName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'initBalance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'balance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'note': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            dtMFS_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            branch: { value: null, matchMode: FilterMatchMode.EQUALS },
+            refNumber: { value: null, matchMode: FilterMatchMode.EQUALS },
+            accName: { value: null, matchMode: FilterMatchMode.EQUALS },
+            initBalance: { value: null, matchMode: FilterMatchMode.EQUALS },
+            balance: { value: null, matchMode: FilterMatchMode.EQUALS },
+            address: { value: null, matchMode: FilterMatchMode.EQUALS },
+            phone: { value: null, matchMode: FilterMatchMode.EQUALS },
+            note: { value: null, matchMode: FilterMatchMode.EQUALS },
+            status: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
 
@@ -59,8 +59,8 @@ const List = ({ ledger = false }) => {
 
     const [dtMFS, setDtMFS] = useState([]);
 
-    const hrManagementService = new HRService();
     const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -84,7 +84,7 @@ const List = ({ ledger = false }) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -117,7 +117,7 @@ const List = ({ ledger = false }) => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/mfs_accounts/" + dtProfile._id);
+        navigate("/mfs_accounts/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -142,13 +142,13 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Profile Deleted', life: 3000 });
-        });
-        setDeleteProfileDialog(false);
-        setProfile(null);
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -172,7 +172,7 @@ const List = ({ ledger = false }) => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+                {rowData.dtMFS_id_shortname}
             </>
         );
     };
@@ -241,7 +241,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
 
     
@@ -251,25 +251,25 @@ const List = ({ ledger = false }) => {
                 <label htmlFor="status-filter" className="font-bold">
                     MFS Account Status
                 </label>
-                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
             </div>
         );
     };
 
     const initBalanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const balanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const mfsFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" showClear />;
     };
 
     const showLedger = (dtProfile) => {
-        navigate("/mfs_accounts/ledger/" + dtProfile._id);
+        navigate("/mfs_accounts/ledger/" + dtProfile.id);
     };
 
     const renderHeader = () => {
@@ -315,7 +315,7 @@ const List = ({ ledger = false }) => {
                     {!ledger && <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>}
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -22,7 +22,7 @@ const Group = () => {
     const contextPath = '~';
 
     let emptyGroup = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -105,8 +105,8 @@ const Group = () => {
         setSubmitted(true);
 
         if (group.name.trim()) {
-            if (group._id) {
-                configurationManagementService.update(modelName, group._id, group).then(data => {
+            if (group.id) {
+                configurationManagementService.update(modelName, group.id, group).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Group Updated', life: 3000 });
@@ -136,7 +136,7 @@ const Group = () => {
     };
 
     const deleteGroup = () => {
-        configurationManagementService.delete(modelName, group._id).then(data => {
+        configurationManagementService.delete(modelName, group.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -261,7 +261,7 @@ const Group = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
