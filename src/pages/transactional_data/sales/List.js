@@ -498,7 +498,9 @@ const List = () => {
                         </div>
                     </Dialog>
 
-                    <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>                    
+                    <Dialog visible={isCourierVisible} style={{ width: '450px' }} 
+                        header="Courier Information" modal className="p-fluid" 
+                        footer={courierDialogFooter} onHide={hideDialog}>                    
                             <div className="field">
                                     <label htmlFor="name">Courier Name*</label>
                                     <InputText id="name" value={courierName} onChange={(e) => onInputChange(e, 'name')} required autoFocus />

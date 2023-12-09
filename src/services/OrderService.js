@@ -54,6 +54,12 @@ export class OrderService {
         return resp.data;
     }
 
+    async updateCourier(orderType, id, data) {
+        const resp = await axiosInstance.put(`/orders/${orderType}/${id}/courier`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async commit(orderType, id, data) {
         const resp = await axiosInstance.patch(`/orders/${orderType}/` + id, data);
         console.log(resp.data);
