@@ -154,25 +154,6 @@ export const HtmlLedger = ({type, header}) => {
         });
     }
 
-    /* useEffect(()=>{
-        let newLedgerData=ledgerData;
-        console.log(ledgerData)
-        for(let i = 0; i < ledgerData.length; i++){
-            let selectedString = '';
-            if(ledgerData[i]?.particular?.includes(partyData?.line1) === true){
-                console.log("hi")
-                for(let j=ledgerData[i]?.particular?.indexOf(partyData?.line1) - 1; j < ledgerData[i]?.particular?.length; j++){
-                    selectedString = selectedString + ledgerData[i]?.particular[j];
-                };
-                console.log(selectedString)
-                newLedgerData[i].particular = ledgerData[i]?.particular.replace(selectedString,'')
-            }
-        }
-        setRender((prevState)=>!prevState)
-        console.log(newLedgerData);
-        setLedgerData(newLedgerData);
-    },[]) */
-
     const calculateBalance = (opening, data) => {
         let dataMap = new Map();
         let drTotal = 0;
