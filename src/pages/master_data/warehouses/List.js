@@ -10,8 +10,8 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
-import { ConfigurationService } from '../../../services/ConfigurationService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { WAREHOUSE_MODEL } from '../../../constants/models';
 
 const List = () => {
@@ -31,11 +31,11 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },                        
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            '_default': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            description: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            address: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            status: { value: null, matchMode: FilterMatchMode.EQUALS },
+            _default: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
 
@@ -47,9 +47,8 @@ const List = () => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
 
-    const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
     
 
     
@@ -68,7 +67,7 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -124,13 +123,13 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Profile Deleted', life: 3000 });
-        });
-        setDeleteProfileDialog(false);
-        setProfile(null);
+        // hrManagementService.delete(modelName, dtProfile._id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -185,7 +184,7 @@ const List = () => {
                 <label htmlFor="status-filter" className="font-bold">
                     Warehouse Status
                 </label>
-                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
             </div>
         );
     };
@@ -200,7 +199,7 @@ const List = () => {
                 <label htmlFor="status-filter" className="font-bold">
                     Default Warehouse
                 </label>
-                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
             </div>
         );
     };

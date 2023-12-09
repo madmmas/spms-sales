@@ -229,7 +229,7 @@ const List = () => {
         );
     };
     const departmentCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtDepartmentCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtDepartmentCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
     const departmentBodyTemplate = (rowData) => {
         return (
@@ -240,7 +240,7 @@ const List = () => {
         );
     };
     const designationCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={designationCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={designationCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
     const designationBodyTemplate = (rowData) => {
         return (

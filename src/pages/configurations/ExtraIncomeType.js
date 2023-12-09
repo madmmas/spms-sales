@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { INCOME_TYPE_MODEL } from '../../constants/models';
 
 const ExtraIncomeType = () => {
@@ -53,6 +54,7 @@ const ExtraIncomeType = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const configurationManagementService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -73,7 +75,7 @@ const ExtraIncomeType = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setExtraIncomeTypes(data.rows);

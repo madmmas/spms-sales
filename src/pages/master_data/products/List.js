@@ -12,7 +12,6 @@ import { InputText } from 'primereact/inputtext';
 
 import { PRODUCT_MODEL } from '../../../constants/models';
 import { ProductService } from '../../../services/ProductService';
-import db from '../../../db';
 
 const List = () => {
 

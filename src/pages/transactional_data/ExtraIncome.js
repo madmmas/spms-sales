@@ -208,7 +208,7 @@ const Income = () => {
     };
 
     const incomeTypeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={incomeType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={incomeType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const incomeBodyTemplate = (rowData) => {
@@ -244,7 +244,7 @@ const Income = () => {
     };
 
     const bankorcashFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={BANK_CASH} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={BANK_CASH} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const bankorcashBodyTemplate = (rowData) => {

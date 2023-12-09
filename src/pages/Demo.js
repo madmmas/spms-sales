@@ -169,7 +169,7 @@ const DemoData = () => {
     }
 
     const representativeFilterTemplate = (options) => {
-        return <MultiSelect value={options.value} options={representatives} itemTemplate={representativesItemTemplate} onChange={(e) => options.filterCallback(e.value)} optionLabel="name" placeholder="Any" className="p-column-filter" />;
+        return <MultiSelect value={options.value} options={representatives} itemTemplate={representativesItemTemplate} onChange={(e) => options.filterApplyCallback(e.value)} optionLabel="name" placeholder="Any" className="p-column-filter" />;
     }
 
     const representativesItemTemplate = (option) => {
@@ -186,7 +186,7 @@ const DemoData = () => {
     }
 
     const dateFilterTemplate = (options) => {
-        return <Calendar value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
+        return <Calendar value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} dateFormat="mm/dd/yy" placeholder="mm/dd/yyyy" mask="99/99/9999" />
     }
 
     const balanceBodyTemplate = (rowData) => {
@@ -194,7 +194,7 @@ const DemoData = () => {
     }
 
     const balanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />
+        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />
     }
 
     const statusBodyTemplate = (rowData) => {
@@ -202,7 +202,7 @@ const DemoData = () => {
     }
 
     const statusFilterTemplate = (options) => {
-        return <Dropdown value={options.value} options={statuses} onChange={(e) => options.filterCallback(e.value, options.index)} itemTemplate={statusItemTemplate} placeholder="Select a Status" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} options={statuses} onChange={(e) => options.filterApplyCallback(e.value, options.index)} itemTemplate={statusItemTemplate} placeholder="Select a Status" className="p-column-filter" showClear />;
     }
 
     const statusItemTemplate = (option) => {
@@ -216,7 +216,7 @@ const DemoData = () => {
     const activityFilterTemplate = (options) => {
         return (
             <React.Fragment>
-                <Slider value={options.value} onChange={(e) => options.filterCallback(e.value)} range className="m-3"></Slider>
+                <Slider value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} range className="m-3"></Slider>
                 <div className="flex align-items-center justify-content-between px-2">
                     <span>{options.value ? options.value[0] : 0}</span>
                     <span>{options.value ? options.value[1] : 100}</span>
@@ -230,7 +230,7 @@ const DemoData = () => {
     }
 
     const verifiedFilterTemplate = (options) => {
-        return <TriStateCheckbox value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+        return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
     const representativeRowFilterTemplate = (options) => {

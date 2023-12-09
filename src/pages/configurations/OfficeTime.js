@@ -210,7 +210,7 @@ const OfficeTime = () => {
     }
 
     const startTimeFilterTemplate = (options) => {
-        return <InputMask value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)}
+        return <InputMask value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)}
                     mask="99:99" placeholder="23:59"/>   
     }
 
@@ -219,7 +219,7 @@ const OfficeTime = () => {
     }
 
     const endTimeFilterTemplate = (options) => {
-        return <InputMask value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)}
+        return <InputMask value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)}
                     mask="99:99" placeholder="23:59"/>   
     }
 

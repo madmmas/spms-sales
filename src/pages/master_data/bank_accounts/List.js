@@ -12,7 +12,7 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
@@ -27,24 +27,24 @@ const List = ({ ledger = false }) => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ["dtBank_id", "branch", "accNumber", "accName", "initBalance", "balance", "address", "phone", "note", "status"],
+        fields: ["dtBank_id", "branch", "accNumber", "accName", "initBalance", "balance", "phone", "address", "note", "status", "last_trx_id"],
+        nameField: "accName",
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'dtBank_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'branch': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'accNumber': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'accName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'initBalance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'balance': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'note': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            dtBank_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            branch: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            accNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            accName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            initBalance: { value: null, matchMode: FilterMatchMode.EQUALS },
+            balance: { value: null, matchMode: FilterMatchMode.EQUALS },
+            address: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            phone: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            note: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            status: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
 
@@ -59,7 +59,7 @@ const List = ({ ledger = false }) => {
 
     const [dtBank, setDtBank] = useState([]);
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const configurationService = new ConfigurationService();
 
     useEffect(() => {
@@ -84,8 +84,7 @@ const List = ({ ledger = false }) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
-            console.log(data)
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             setTotalRecords(data.total);
             setProfiles(data.rows);
             setLoading(false);
@@ -97,7 +96,7 @@ const List = ({ ledger = false }) => {
     };
 
     const showLedger = (dtProfile) => {
-        navigate("/bank_accounts/ledger/" + dtProfile._id);
+        navigate("/bank_accounts/ledger/" + dtProfile.id);
     };
 
     const onPage = (event) => {
@@ -121,7 +120,7 @@ const List = ({ ledger = false }) => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/bank_accounts/" + dtProfile._id);
+        navigate("/bank_accounts/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -146,13 +145,13 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Profile Deleted', life: 3000 });
-        });
-        setDeleteProfileDialog(false);
-        setProfile(null);
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -255,21 +254,21 @@ const List = ({ ledger = false }) => {
                 <label htmlFor="status-filter" className="font-bold">
                     Bank Account Status
                 </label>
-                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
             </div>
         );
     };
 
     const initBalanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const balanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const bankFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtBank} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtBank} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
     };
 
     const renderHeader = () => {
@@ -315,7 +314,7 @@ const List = ({ ledger = false }) => {
                     {!ledger && <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>}
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

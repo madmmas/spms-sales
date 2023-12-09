@@ -435,7 +435,7 @@ const Adjustments = () => {
     )}
 
     const expenseTypeFilterTemplate = (options) => {
-        // return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        // return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const partyNameBodyTemplate = (rowData) => {

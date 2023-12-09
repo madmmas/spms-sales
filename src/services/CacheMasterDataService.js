@@ -62,16 +62,10 @@ const checkAndLoadAllMasterData = async () => {
 }
 
 const getShortnameById = (id) => {
-
-    // update the cache
     let masterData = window['__all_masterData'];
-    console.log("masterData retrived my getShortnameById:: ", masterData);
     if (masterData) {
-        console.log("masterData", masterData);
-        console.log("id", id);
         for (var i = 0; i < masterData.length; i++) {
             if (masterData[i].id == id) {
-                console.log("masterData[i]", masterData[i]);
                 return masterData[i].shortname;
             }
         }
