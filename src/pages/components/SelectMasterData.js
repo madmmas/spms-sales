@@ -46,7 +46,7 @@ export default function SelectMasterData({
     }, [field.value]);
 
     const onSelection = (e) => {
-        setSelectedRow(displayFunc(e.value));
+        setSelectedRow(displayFunc(e.value))
         field.onChange(e.value._id);
         onSelect(e.value)
     }
