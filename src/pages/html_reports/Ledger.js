@@ -136,23 +136,20 @@ export const HtmlLedger = ({type, header}) => {
             });
             let dataWithBalance = calculateBalance(openingData, ledgerData);
 
-            let newLedgerData=dataWithBalance;
             console.log(dataWithBalance)
             for(let i = 0; i < dataWithBalance.length; i++){
                 let selectedString = '';
                 if(dataWithBalance[i]?.particular?.includes(partyData?.line1) === true){
-                    console.log("hi")
+                    console.log("selected string");
                     for(let j=dataWithBalance[i]?.particular?.indexOf(partyData?.line1) - 1; j < dataWithBalance[i]?.particular?.length; j++){
                         selectedString = selectedString + dataWithBalance[i]?.particular[j];
                     };
                     console.log(selectedString)
-                    newLedgerData[i].particular = dataWithBalance[i]?.particular.replace(selectedString,'')
+                    dataWithBalance[i].particular = dataWithBalance[i]?.particular.replace(selectedString,'')
                 }
             }
-            console.log(newLedgerData);
-            setLedgerData(newLedgerData);
             setRender((prevState)=>!prevState)
-            //setLedgerData(dataWithBalance);
+            setLedgerData(dataWithBalance);
             // console.log("LEDGER DATA::=>>>", openingData, dataWithBalance);
         });
     }
