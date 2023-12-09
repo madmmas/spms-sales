@@ -166,7 +166,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                         <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                            displayField="accName"
+                            displayField="dtBank_id_shortname"
                             onSelect={(e) => {console.log(e);}}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
@@ -203,7 +203,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
                         <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                            displayField="accName"
+                            displayField="dtMFS_id_shortname"
                             onSelect={(e) => {console.log(e);}}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[

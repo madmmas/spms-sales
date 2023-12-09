@@ -271,7 +271,7 @@ const MFSRegister = () => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Transfer From MFS Account*</label>
                                 <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                    displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                    displayField="dtMFS_id_shortname" showFields={["dtMFS_id", "refNumber", "accName"]}
                                     onSelect={(e) => {
                                         console.log(e);
                                     }}
@@ -356,7 +356,7 @@ const MFSRegister = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                                     <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                        displayField="accName" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        displayField="dtBank_id_shortname" showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {
                                             console.log(e);
                                         }}
@@ -394,7 +394,7 @@ const MFSRegister = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
                                     <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                        displayField="accName" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        displayField="dtMFS_id_shortname" showFields={["dtMFS_id", "refNumber", "accName"]}
                                         onSelect={(e) => {
                                             console.log(e);
                                         }}
