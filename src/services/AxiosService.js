@@ -35,7 +35,7 @@ axiosInstance.interceptors.response.use(function(response) {
 }, function(error) {
    console.log("AXIOS-ERROR:::", error)
    if(error.response) {
-      if (error.response.status === 401 || (error.response.status === 400)) {
+      if (error.response.status === 401) {
          clearLocalStorage();
          window.location.href = "#/login";
       }

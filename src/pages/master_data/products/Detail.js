@@ -4,9 +4,10 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+
 import { PRODUCT_MODEL } from '../../../constants/models';
-import { ProductService } from '../../../services/ProductService';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const ProductForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "productForm" */ './Form'), "productForm"));
 
@@ -35,7 +36,7 @@ const Detail = () => {
 
     const modelName = PRODUCT_MODEL;
 
-    const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
     const [productData, setProductData] = useState(null);
 
     const tabs = [
@@ -55,7 +56,7 @@ const Detail = () => {
         if(id=="new"){
             setProductData(null);
         }else{
-            productService.getById(id).then(data => {
+            masterDataDBService.getById("dtProduct", id).then(data => {
                 setProductData(data);
             });    
         }

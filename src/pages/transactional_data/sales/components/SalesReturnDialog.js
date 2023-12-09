@@ -52,7 +52,7 @@ const SalesReturnDialog = ( { trigger, selectedItem, addToSalesReturn }) => {
     const addToReturn = (d) => {
         console.log("addToReturn:::   ", d);
         let data = {
-            productId: selectedItem._id,
+            productId: selectedItem.id,
             returnReason: d.returnReason,
             returnQuantity: d.returnQuantity,
             returnAmount: selectedItem.itemUnitPrice * d.returnQuantity,

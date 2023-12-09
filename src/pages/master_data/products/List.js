@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { classNames } from 'primereact/utils';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -11,8 +11,8 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
 
 import { PRODUCT_MODEL } from '../../../constants/models';
-import { ProductService } from '../../../services/ProductService';
-import db from '../../../db';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
 
@@ -24,27 +24,19 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['id', 'name', 'category_id', 'warehouse_id', 'code', 'brand_id', 'model_id', 'part_number', 'unit', 'cost', 'price', 'active'],
+        fields: ['id', 'name', 'dtCategory_id', 'dtWarehouse_id', 'code', 'dtProductBrand_id', 'dtProductModel_id', 'part_number', 'unit', 'cost', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            type: { value: "GENERAL", matchMode: FilterMatchMode.EQUALS },
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            
+            dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS }, // GENERAL            
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
-
-            // 'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
-            // 'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'part_number': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
@@ -58,15 +50,11 @@ const List = () => {
     const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
-    const productService = new ProductService();
-
-    useEffect(() => {
-        initFilters();
-    }, []);
+    const masterDataDBService = new MasterDataDBService();
     
     const clearCache = async () => {
-        await productService.clearCache();
         loadLazyData();
     }
 
@@ -75,21 +63,34 @@ const List = () => {
     }
 
     const initFilters = () => {
-        setLazyParams(defaultFilters);
+        // setLazyParams(defaultFilters);
     }
 
     useEffect(() => {
-        loadLazyData();
+        setLoadCount(loadCount+1);
+        console.log('useEffect-loaded', loadCount);
+    }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            console.log('useEffect-lazyParams', loadCount);
+            masterDataDBService.getAllUpto(modelName).then(()=> {
+                loadLazyData();
+                setLoadCount(loadCount+1);
+            });
+        }
+    }, [loadCount]);
+
+    useEffect(() => {
+        if(loadCount>1){
+            console.log('useEffect-lazyParams', lazyParams);
+            loadLazyData();
+        }
     }, [lazyParams]);
 
     const loadLazyData = async () => {
         setLoading(true);
-        // let [rows, total] = await db.getProducts(lazyParams.first, lazyParams.rows);
-        // console.log(total);
-        // setTotalRecords(total);
-        // setProducts(rows);
-        // setLoading(false);
-        productService.getAll(lazyParams).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
@@ -132,7 +133,6 @@ const List = () => {
         _lazyParams['filters']['global'].value = value;
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
-
     };
 
     const openNew = () => {
@@ -228,8 +228,7 @@ const List = () => {
     const brandNameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Brand Name </span>
-                {rowData.brand_name}
+                {rowData.dtProductBrand_id_shortname}
             </>
         );
     };
@@ -237,8 +236,7 @@ const List = () => {
     const modelNoBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Model No</span>
-                {rowData.model_no}
+                {rowData.dtProductModel_id_shortname}
             </>
         );
     };
@@ -344,8 +342,8 @@ const List = () => {
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         {/* <Column field="category_id" header="Product Category" filter filterPlaceholder="Search by Category" sortable body={dtProductCategory_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
-                        <Column field="brand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="model_id" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name " sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
                         {/* <Column field="low_stock_qty" header="Low Stock Qty" filter filterPlaceholder="Search by Qty" sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                     */}
                         {/* <Column field="cost" header="Unit Cost" filter filterPlaceholder="Search by Last Purchase Price" sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}

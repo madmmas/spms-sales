@@ -1,8 +1,6 @@
 import { axiosInstance } from "./AxiosService";
 import moment from 'moment';
 
-import db from "../db";
-
 const loadAllProducts = async () => {
     let allProducts = [];
     let page = 0;

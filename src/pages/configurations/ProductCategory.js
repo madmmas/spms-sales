@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { PRODUCT_CATEGORY_MODEL } from '../../constants/models';
 
 const ProductCategory = () => {
@@ -22,7 +23,7 @@ const ProductCategory = () => {
     const contextPath = '~';
 
     let emptyProductCategory = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -55,6 +56,7 @@ const ProductCategory = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const configurationManagementService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -75,7 +77,7 @@ const ProductCategory = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProductCategorys(data.rows);
@@ -107,8 +109,8 @@ const ProductCategory = () => {
         setSubmitted(true);
 
         if (ProductCategory.name.trim()) {
-            if (ProductCategory._id) {
-                configurationManagementService.update(modelName, ProductCategory._id, ProductCategory).then(data => {
+            if (ProductCategory.id) {
+                configurationManagementService.update(modelName, ProductCategory.id, ProductCategory).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Updated', life: 3000 });
@@ -138,7 +140,7 @@ const ProductCategory = () => {
     };
 
     const deleteProductCategory = () => {
-        configurationManagementService.delete(modelName, ProductCategory._id).then(data => {
+        configurationManagementService.delete(modelName, ProductCategory.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Deleted', life: 3000 });
@@ -264,7 +266,7 @@ const ProductCategory = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

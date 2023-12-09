@@ -3,7 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 
-import { ProductService } from '../../services/ProductService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterDataTableList({ defaultFilters, selectedItem, fieldValue, onSelect, modelName, columns, showFields=[]}) {
 
@@ -17,13 +17,12 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
     const [tmpData, setTmpData] = useState([]);
     // const [selectedRow, setSelectedRow] = useState(selectedItem);
 
-    const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
 
     
     const loadLazyData = () => {
         setLoading(true);
-        productService.getAll(lazyParams).then(data => {
-        // productService.getAll({ params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
             setTmpData(data.rows);

@@ -61,7 +61,7 @@ const Form = ({bankAccountProfile}) => {
                 navigate("/bank_accounts");
             });
         }else{
-            hrManagementService.update(modelName, formData._id, formData).then(data => {
+            hrManagementService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/bank_accounts/" + data.ID);

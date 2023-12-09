@@ -11,6 +11,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ConfigurationService } from '../../services/ConfigurationService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { PRODMODEL_MODEL } from '../../constants/models';
 
 const ProdModel = () => {
@@ -22,7 +23,7 @@ const ProdModel = () => {
     const contextPath = '~';
 
     let emptyProdModel = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -53,6 +54,7 @@ const ProdModel = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const configurationManagementService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -73,7 +75,7 @@ const ProdModel = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProdModels(data.rows);
@@ -105,8 +107,8 @@ const ProdModel = () => {
         setSubmitted(true);
 
         if (prodModel.name.trim()) {
-            if (prodModel._id) {
-                configurationManagementService.update(modelName, prodModel._id, prodModel).then(data => {
+            if (prodModel.id) {
+                configurationManagementService.update(modelName, prodModel.id, prodModel).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'ProdModel Updated', life: 3000 });
@@ -136,7 +138,7 @@ const ProdModel = () => {
     };
 
     const deleteProdModel = () => {
-        configurationManagementService.delete(modelName, prodModel._id).then(data => {
+        configurationManagementService.delete(modelName, prodModel.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -261,7 +263,7 @@ const ProdModel = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

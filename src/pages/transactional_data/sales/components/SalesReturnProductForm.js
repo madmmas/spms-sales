@@ -61,7 +61,7 @@ export default function SalesReturnProductForm({
     };
 
     useEffect(() => {
-        if (selectedItem._id) {
+        if (selectedItem.id) {
             setIsEdit(false);
             onProductSelect(selectedItem);
         }else{
@@ -110,11 +110,11 @@ export default function SalesReturnProductForm({
 
     const onProductSelect = async (productSelected) => {
         // get product current stock
-        let productStock = await productService.getProductCurrentStock(productSelected._id);
+        let productStock = await productService.getProductCurrentStock(productSelected.id);
 
         // set focus to quantity
         let _saleProduct = { ...salesProduct };
-        _saleProduct['dtProduct_id'] = productSelected._id;
+        _saleProduct['dtProduct_id'] = productSelected.id;
         _saleProduct['productName'] = productSelected.name;
         _saleProduct['brandName'] = productSelected.brandName;
         _saleProduct['modelNo'] = productSelected.modelNo;

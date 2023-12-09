@@ -9,10 +9,13 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 
-import { ProductService } from '../../../services/ProductService';
+import { PRODUCT_MODEL } from '../../../constants/models';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
 
+    const modelName = PRODUCT_MODEL;
 
     let navigate = useNavigate();
 
@@ -46,7 +49,8 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
+
 
     useEffect(() => {
         initFilters();
@@ -66,8 +70,7 @@ const List = () => {
 
     const loadLazyData = () => {
         setLoading(true);
-
-        productService.getAll(lazyParams).then(async data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
@@ -180,7 +183,7 @@ const List = () => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
 
     const nameBodyTemplate = (rowData) => {

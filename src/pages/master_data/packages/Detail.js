@@ -5,7 +5,7 @@ import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
-import { ProductService } from '../../../services/ProductService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const PackageForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfile" */ './Form'), "packageProfile"));
 // const PackageView = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "packageProfileView" */ './View'), "packageProfileView"));
@@ -17,7 +17,7 @@ const Detail = () => {
 
     let navigate = useNavigate();
 
-    const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
     const [packageData, setPackageData] = useState(null);
 
     const tabs = [
@@ -36,7 +36,7 @@ const Detail = () => {
         if(id=="new"){
             setPackageData(null);
         }else{
-            productService.getById(id).then(data => {
+            masterDataDBService.getById("dtProduct", id).then(data => {
                 console.log("PACKAGE-DATA:::",data)
 
                 setPackageData(data);

@@ -22,7 +22,7 @@ const EmploymentHistory = ({empProfile}) => {
     const contextPath = '~';
 
     let emptyEmploymentHistory = {
-        _id: null,
+        id: null,
         empId: '',
         designation: '',
         department: '',
@@ -121,8 +121,8 @@ const EmploymentHistory = ({empProfile}) => {
         setSubmitted(true);
 
         if (employmentHistory.name.trim()) {
-            if (employmentHistory._id) {
-                hrManagementService.update(modelName, employmentHistory._id, employmentHistory).then(data => {
+            if (employmentHistory.id) {
+                hrManagementService.update(modelName, employmentHistory.id, employmentHistory).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistory Updated', life: 3000 });
@@ -152,7 +152,7 @@ const EmploymentHistory = ({empProfile}) => {
     };
 
     const deleteEmploymentHistory = () => {
-        hrManagementService.delete(modelName, employmentHistory._id).then(data => {
+        hrManagementService.delete(modelName, employmentHistory.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
@@ -278,7 +278,7 @@ const EmploymentHistory = ({empProfile}) => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -1,7 +1,7 @@
 import {axiosInstance, clearLocalStorage} from "./AxiosService";
 import env from "react-dotenv";
 
-const Login = (username, password) => {
+const Login = async (username, password) => {
   return axiosInstance
     .post(env.AUTH_API_URL + "/login", {
       username,

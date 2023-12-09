@@ -11,9 +11,9 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-import { HRService } from '../../../services/HRService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
 import { CURRENCY } from '../../../constants/lookupData';
 
@@ -54,18 +54,19 @@ const List = ({ ledger = false }) => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    const hrManagementService = new HRService();
+    // const hrManagementService = new HRService();
 
     const [dtSupplierCategory, setDtSupplierCategory] = useState([]);
 
     const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
         configurationService.getAllWithoutParams(SUPPLIER_CATEGORY_MODEL).then(data => {
             setDtSupplierCategory(data);
         });
-    }, []);
+    }, [dtSupplierCategory]);
     
     const clearFilter = () => {
         initFilters();
@@ -82,7 +83,7 @@ const List = ({ ledger = false }) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
@@ -113,11 +114,11 @@ const List = ({ ledger = false }) => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/suppliers/" + dtProfile._id);
+        navigate("/suppliers/" + dtProfile.id);
     };
 
     const showLedger = (dtProfile) => {
-        navigate("/suppliers/ledger/" + dtProfile._id);
+        navigate("/suppliers/ledger/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -142,13 +143,19 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Profile Deleted', life: 3000 });
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
+    };
+
+    const reloadData = () => {
+        masterDataDBService.getAllMD(modelName, lazyParams).then(data => {
+            console.log("dtSupplier::=>>",data);
         });
-        setDeleteProfileDialog(false);
-        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -180,13 +187,13 @@ const List = ({ ledger = false }) => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtSupplierCategory_id+"-dtSupplierCategory")}
+                {rowData.dtSupplierCategory_id_shortname}
             </>
         );
     };
 
     const supplierCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const addressBodyTemplate = (rowData) => {
@@ -237,11 +244,11 @@ const List = ({ ledger = false }) => {
     };
 
     const currencyFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CURRENCY} onChange={(e) => options.filterCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CURRENCY} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
     
     const statusFilterTemplate = (options) => {
@@ -250,7 +257,7 @@ const List = ({ ledger = false }) => {
                 <label htmlFor="status-filter" className="font-bold">
                     Supplier Status
                 </label>
-                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterCallback(e.value)} />
+                <TriStateCheckbox inputId="status-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
             </div>
         );
     };
@@ -258,7 +265,9 @@ const List = ({ ledger = false }) => {
         return (
             <div className="flex justify-content-between">
                 {!ledger && <><h5 className="m-0">Manage Suppliers</h5>
-                <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} /></>}
+                <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
+                <Button type="button" icon="pi pi-filter-slash" label="Reload" className="p-button-outlined" onClick={reloadData} />
+                </>}
                 {ledger && <h5 className="m-0">Supplier Ledger</h5>}
             </div>
         )
@@ -297,7 +306,7 @@ const List = ({ ledger = false }) => {
                     {!ledger && <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>}
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
