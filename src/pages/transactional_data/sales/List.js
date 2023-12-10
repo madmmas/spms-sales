@@ -9,14 +9,12 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
-import { InputText } from 'primereact/inputtext';
-import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
-import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import OrderFilter from '../../components/OrderFilter';
+import CourierDialog from '../../components/CourierDialog';
 import { HRService } from '../../../services/HRService';
 import { OrderService } from '../../../services/OrderService';
 import { SALES_MODEL } from '../../../constants/models';
@@ -61,10 +59,7 @@ const List = () => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [isCourierVisible, setIsCourierVisible] = useState(false);
-    const [isParamMissing, setIsParamMissing] = useState(false);
-    const [courierName, setCourierName] = useState('');
-    const [courierMemoNumber, setCourierMemoNumber] = useState('');
-    const [courierDate, setCourierDate] = useState('');
+    const [id, setID] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -138,51 +133,54 @@ const List = () => {
         navigate("/sales/new");
     };
 
-    const openCourier = () => {
+    const openCourier = (dtProfile1) => {
         setIsCourierVisible(true);
+        setID(dtProfile1.id)
     }
 
-    const onInputChange = (e, param) => {
-           if(param === "name"){
-            setCourierName(e.target.value)
-           }
-           if(param === "number"){
-            setCourierMemoNumber(e.target.value)
-           }
-           if(param === "date"){
-            setCourierDate(e.target.value)
-           }
-           if(e.target.value === "" && param === "name"){
-            setCourierName("")
-           }
-           if(e.target.value === "" && param === "number"){
-            setCourierMemoNumber("")
-           }
-           if(e.target.value === "" && param === "date"){
-            setCourierDate("")
-           }
-    }
+   
+        const onInputChange = (e, name) => {
+            const val = e.target.value;
+            setValue(`${name}`, val);
+        };
+    
 
     const hideDialog = () => {
         setIsCourierVisible(false);
-        setCourierName('')
-        setCourierMemoNumber("")
-        setCourierDate("")
-        setIsParamMissing(false)
+        setValue('courier_name', '');
+        setValue('courier_memo_number', '');
+        setValue('date', '');
     }
 
-    const saveCourier = () => {
-        if(courierName === "" || courierMemoNumber === "" || courierDate === ""){
-            setIsParamMissing(true)
-        }else{
-            setIsParamMissing(false)
+    const saveCourier = async (data) => {
+        console.log(data)
+        let valid = true;
+        if(!data.courier_name){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Name is required.', life: 3000 });
+            valid = false;
+        }else if(!data.courier_memo_number){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Memo Number is required.', life: 3000 });
+            valid = false;
+        }else if(!data.date){
+            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Date is required.', life: 3000 });
+            valid = false;
         }
+        if(!valid){
+            return
+        }
+        await orderService.updateCourier(SALES_MODEL, id , data).then(result => {
+            if(result){
+                console.log(result)
+            }
+        });
+        hideDialog();
+        
     }
 
     const courierDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveCourier} />
+            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => saveCourier(d))} />
         </>
     );
 
@@ -214,7 +212,7 @@ const List = () => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });
         });
         setDeleteProfileDialog(false);
-        setProfile(null);
+        setProfile(null)
     };
 
     
@@ -431,7 +429,7 @@ const List = () => {
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
                 <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} />
-                {rowData.trx_status==="pending" && <Button icon="pi pi-pencil" className="p-button-rounded p-button-secondary mr-2" onClick={openCourier} />}
+                {rowData.trx_status==="pending" && <Button icon="pi pi-pencil" className="p-button-rounded p-button-secondary mr-2" onClick={()=> openCourier(rowData)} />}
             </>
         );
     };
@@ -512,45 +510,14 @@ const List = () => {
                         </div>
                     </Dialog>
 
-                    <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>                    
-                            {/* <div className="field">
-                                    <label htmlFor="name">Courier Name*</label>
-                                    <InputText id="name" value={courierName} onChange={(e) => onInputChange(e, 'name')} required autoFocus />
-                                    {isParamMissing && !courierName && <small>Name is required.</small>}
-                                    <br></br>
-                                    <br></br>
-                                    <label htmlFor="number">Courier Memo Number*</label>
-                                    <InputText id="number" value={courierMemoNumber} onChange={(e) => onInputChange(e, 'number')} required />
-                                    {isParamMissing && !courierMemoNumber && <small>Number is required.</small>}
-                                    <br></br>
-                                    <br></br>
-                                    <label htmlFor="name">Date*</label>
-                                    <Calendar dateFormat="dd/mm/yy" value={courierDate} onChange={(e) => onInputChange(e, 'date')}/>
-                                    {isParamMissing && !courierDate && <small>Date is required.</small>}
-                                    
-                            </div> */}
-
-                   <div className="field col-5 md:col-5">
-                        <Controller
-                            name="bank_amount"
-                            control={control}
-                            rules={{
-                                validate: (value) => (value >= 0) || 'Enter a valid amount.'
-                            }}
-                            render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor="Name">Courier Name</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
-                                    onValueChange={(e) => onInputChange(e, "bank_amount")} 
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    min={0} maxFractionDigits={2}
-                                    />
-                                {getFormErrorMessage(field.name)}
-                            </>
-                    )}/>
-                    </div> 
-
-                    </Dialog>
+                    <CourierDialog 
+                      isCourierVisible = {isCourierVisible}
+                      courierDialogFooter = {courierDialogFooter}
+                      hideDialog = {hideDialog}
+                      onInputChange = {onInputChange}
+                      control={control}
+                      getFormErrorMessage={getFormErrorMessage}
+                      />
                 </div>
             </div>
         </div>
