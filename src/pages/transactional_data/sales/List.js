@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { useForm, Controller, set } from 'react-hook-form';
 import { getDateFormatted } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Tag } from 'primereact/tag';
+import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
@@ -28,6 +30,14 @@ const List = () => {
 
     const toast = useRef(null);
     const dt = useRef(null);
+
+    const {
+        control,
+        formState: { errors },
+        setValue,
+        reset,
+        handleSubmit
+    } = useForm({});
 
     let defaultFilters = {
         fields: [],
@@ -426,6 +436,10 @@ const List = () => {
         );
     };
 
+    const getFormErrorMessage = (name) => {
+        return errors[name] && <small className="p-error">{errors[name].message}</small>
+    };
+
     const deleteProfileDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfileDialog} />
@@ -499,7 +513,7 @@ const List = () => {
                     </Dialog>
 
                     <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>                    
-                            <div className="field">
+                            {/* <div className="field">
                                     <label htmlFor="name">Courier Name*</label>
                                     <InputText id="name" value={courierName} onChange={(e) => onInputChange(e, 'name')} required autoFocus />
                                     {isParamMissing && !courierName && <small>Name is required.</small>}
@@ -514,7 +528,28 @@ const List = () => {
                                     <Calendar dateFormat="dd/mm/yy" value={courierDate} onChange={(e) => onInputChange(e, 'date')}/>
                                     {isParamMissing && !courierDate && <small>Date is required.</small>}
                                     
-                            </div>       
+                            </div> */}
+
+                   <div className="field col-5 md:col-5">
+                        <Controller
+                            name="bank_amount"
+                            control={control}
+                            rules={{
+                                validate: (value) => (value >= 0) || 'Enter a valid amount.'
+                            }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor="Name">Courier Name</label>
+                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    onValueChange={(e) => onInputChange(e, "bank_amount")} 
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    min={0} maxFractionDigits={2}
+                                    />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                    )}/>
+                    </div> 
+
                     </Dialog>
                 </div>
             </div>
