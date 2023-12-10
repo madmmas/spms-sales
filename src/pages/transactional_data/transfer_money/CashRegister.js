@@ -298,9 +298,13 @@ const CashRegister = () => {
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                                     <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                        displayField="dtBank_id_shortname" showFields={["dtBank_id", "accNumber", "accName"]}
+                                        //displayField="dtBank_id_shortname" 
+                                        displayFunc={(data) => {
+                                            return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
+                                        }}
+                                        showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {
                                             console.log(e);
                                         }}
@@ -334,9 +338,13 @@ const CashRegister = () => {
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
-                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                                    <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                                     <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                        displayField="dtMFS_id_shortname" showFields={["dtMFS_id", "refNumber", "accName"]}
+                                        //displayField="dtMFS_id_shortname"
+                                        displayFunc={(data) => {
+                                            return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
+                                        }}
+                                        showFields={["dtMFS_id", "refNumber", "accName"]}
                                         onSelect={(e) => {
                                             console.log(e);
                                         }}

@@ -164,9 +164,12 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                         <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                            displayField="dtBank_id_shortname"
+                            //displayField="dtBank_id_shortname"
+                            displayFunc={(data) => {
+                                return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
+                            }}
                             onSelect={(e) => {console.log(e);}}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
@@ -201,9 +204,12 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     }}
                     render={({ field, fieldState }) => (
                     <>
-                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Name*</label>
+                        <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                         <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                            displayField="dtMFS_id_shortname"
+                            //displayField="dtMFS_id_shortname"
+                            displayFunc={(data) => {
+                                return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
+                            }}
                             onSelect={(e) => {console.log(e);}}
                             className={classNames({ 'p-invalid': fieldState.error })} 
                             columns={[
