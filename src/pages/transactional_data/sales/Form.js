@@ -829,7 +829,7 @@ const Form = React.memo(({ sales }) => {
         )
     }
     
-    const [withPayment, setWithPayment] = useState(false);
+    const [withPayment, setWithPayment] = useState(true);
 
     const [includeDueAmount, setIncludeDueAmount] = useState(false);
 
