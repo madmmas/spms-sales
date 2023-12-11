@@ -410,6 +410,41 @@ const List = () => {
             </>
         );
     };
+    
+    const courierNameBodyTemplate = (rowData) => {
+
+        if(rowData.customer_category==="CONDITIONAL"){
+            let obj = JSON.parse(rowData.courier_info);
+            return (
+                <>
+                    {obj?.courier_name}
+                </>
+            );
+        }
+
+        return (
+            <>
+                ''
+            </>
+        );
+    };
+
+    const courierMemoBodyTemplate = (rowData) => {
+        if(rowData.customer_category==="CONDITIONAL"){
+            let obj = JSON.parse(rowData.courier_info);
+            return (
+                <>
+                    {obj?.courier_memo_number}
+                </>
+            );
+        }
+
+        return (
+            <>
+                ''
+            </>
+        );
+    };
 
     const renderHeader = () => {
         return (
@@ -483,6 +518,8 @@ const List = () => {
                         <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="due" header="Due Balance" filter filterPlaceholder="Search by Net Amount" sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="" header="Courier Name" filter filterPlaceholder="Search by courier name" sortable body={courierNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="" header="Courier Memo Number" filter filterPlaceholder="Search by courier memo number" sortable body={courierMemoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="duty_vat" header="VAT" filter filterPlaceholder="Search by Vat Amount" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
