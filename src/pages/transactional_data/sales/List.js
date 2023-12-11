@@ -424,7 +424,7 @@ const List = () => {
 
         return (
             <>
-                ''
+                <p>N/A</p>
             </>
         );
     };
@@ -441,7 +441,7 @@ const List = () => {
 
         return (
             <>
-                ''
+                <p>N/A</p>
             </>
         );
     };
