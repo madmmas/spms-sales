@@ -111,14 +111,14 @@ const Form = ({productData}) => {
     const onSubmit = (formData) => {
 
         let data = buildFormData(formData);
-        let valid = validateData(data);
-        if(!valid){
-            return;
-        }
 
         try{
             setSubmitted(true);
             if(productData==null){
+                let valid = validateData(data);
+                if(!valid){
+                    return;
+                }
                 productService.create(data).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
                     // navigate("/products/" + data.ID);

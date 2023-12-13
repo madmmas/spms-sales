@@ -116,33 +116,49 @@ const PurchaseProductDetail = ({
     };
 
     const codeNameBodyTemplate = (rowData) =>{
+        let code = "";
+        if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
+            code = displayProducts[rowData.product_id].code;
+        }
         return(
             <>
-               {displayProducts[rowData.product_id].code}
+               {code}
             </>
         )
     }
 
     const brandNameBodyTemplate = (rowData) =>{
+        let brand_name = "";
+        if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
+            brand_name = displayProducts[rowData.product_id].brand_name;
+        }
         return(
             <>
-               {displayProducts[rowData.product_id].brand_name}
+                {brand_name}       
             </>
         )
     }
 
     const partNumberBodyTemplate = (rowData) =>{
+        let part_number = "";
+        if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
+            part_number = displayProducts[rowData.product_id].part_number;
+        }
         return(
             <>
-               {displayProducts[rowData.product_id].part_number}
+                {part_number}
             </>
         )
     }
 
     const modelNumberBodyTemplate = (rowData) =>{
+        let model_no = "";
+        if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
+            model_no = displayProducts[rowData.product_id].model_no;
+        }
         return(
             <>
-               {displayProducts[rowData.product_id].model_no}
+                {model_no}
             </>
         )
     }
