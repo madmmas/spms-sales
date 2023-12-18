@@ -7,7 +7,7 @@ import modelDef from './ModelDef';
 
 const DB_NAME = "spms_org_v1";
 
-const DEL_DB_NAME = "spms_org";
+const DEL_DB_NAME = "spms_org_v2";
 const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
 DBDeleteRequest.onerror = (event) => {
   console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);
@@ -91,6 +91,9 @@ export class MasterDataDBService {
             data.rows.forEach(row => {
                 let doc = JSON.parse(row.doc);
                 let result = self.buildData(modelName, doc);
+                result.last_trx_id = row.last_trx_id;
+                result.shortname = row.shortname;
+                result.deleted = row.deleted;
                 table.update(row.id, result);
             });
         }
@@ -114,6 +117,8 @@ export class MasterDataDBService {
                 let result = self.buildData(modelName, doc);
                 result.id = row.id;
                 result.last_trx_id = row.last_trx_id;
+                result.shortname = row.shortname;
+                result.deleted = row.deleted;
                 table.put(result);
             });
         }
@@ -318,10 +323,56 @@ export class MasterDataDBService {
         // result = result.slice(first, first + limit);
         
         console.log("getAll result:::", result);
-
+        // need to populate the shortname fields here
+        let fields = modelDef.getFields(modelName);
+        for (let i = 0; i < fields.length; i++) {
+            let field = fields[i];
+            if(field.startsWith("dt") && field.endsWith("_id")) {
+                let fieldModelName = field.substring(0, field.length - 3);
+                await this.populateFieldData(fieldModelName, field, result);
+            }
+        }        
         return {
             rows: result,
             total: total,
         };
+    }
+
+    // get model data by id
+    async getById(modelName, id) {
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let result = await table.get(id);
+        console.log("getById result:::", result);
+        return result;
+    }
+
+    // get model shortname by id
+    async getShortnameById(modelName, id) {
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let result = await table.get(id);
+        console.log("getShortnameById result:::", result);
+        return result.shortname;
+    }
+
+    async populateFieldData(modelName, fieldName, rows) {
+        let prevId = null;
+        let shortname = null;
+        console.log("populateFieldData:::", modelName, fieldName, rows);
+        for (let i = 0; i < rows.length; i++) {
+            let row = rows[i];
+            if (row[fieldName] != undefined && row[fieldName] != null) {
+                if(row[fieldName] != prevId) {
+                    shortname = await this.getShortnameById(modelName, row[fieldName]);
+                    rows[i][fieldName + '_shortname'] = shortname;
+                } else {    
+                    rows[i][fieldName + '_shortname'] = shortname;
+                }
+                prevId = row[fieldName];
+            } else {
+                rows[i][fieldName + '_shortname'] = "";
+            }
+        }
     }
 }

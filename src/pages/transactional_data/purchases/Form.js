@@ -372,7 +372,7 @@ const Form = ({ purchase }) => {
     const categoryNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtSupplierCategory_id+"-dtSupplierCategory")}
+                {rowData.dtSupplierCategory_id_shortname}
             </>
         );
     };

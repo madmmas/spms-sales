@@ -10,7 +10,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
 
-import { PRODUCT_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL } from '../../../constants/models';
 
 // import { ProductService } from '../../../services/ProductService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
@@ -79,8 +79,7 @@ const List = () => {
 
     const loadLazyData = async () => {
         setLoading(true);
-        masterDataDBService.getAll(modelName, lazyParams).then(data => {
-        // productService.getAll(lazyParams).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
@@ -219,8 +218,7 @@ const List = () => {
     const brandNameBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Brand Name </span>
-                {rowData.brand_name}
+                {rowData.dtProductBrand_id_shortname}
             </>
         );
     };
@@ -228,8 +226,7 @@ const List = () => {
     const modelNoBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Model No</span>
-                {rowData.model_no}
+                {rowData.dtProductModel_id_shortname}
             </>
         );
     };

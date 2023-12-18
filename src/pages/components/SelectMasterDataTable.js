@@ -4,7 +4,8 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
-import { MasterDataService } from '../../services/MasterDataService';
+
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterDataTable({ 
     trigger, fieldValue, onSelect, modelName, 
@@ -22,13 +23,14 @@ export default function SelectMasterDataTable({
     const [selectedRow, setSelectedRow] = useState({});
     const [tableDialog, setTableDialog] = useState(false);
 
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
+    
     
     const loadLazyData = () => {
         setLoading(true);
 
         if(lazyParams!==null && lazyParams!==undefined){
-            masterDataService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+            masterDataDBService.getAll(modelName, lazyParams).then(async data => {
                 console.log(data)
                 setTotalRecords(data.total);
                 setTmpData(data.rows);

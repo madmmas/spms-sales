@@ -18,8 +18,6 @@ import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/model
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-
 const List = ({ ledger = false }) => {
 
     const modelName = CUSTOMER_MODEL;
@@ -87,9 +85,10 @@ const List = ({ ledger = false }) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        masterDataDBService.getAll(modelName, lazyParams).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
+            // await masterDataDBService.populateFieldData(CUSTOMER_CATEGORY_MODEL, 'dtCustomerCategory_id', data.rows);
             setProfiles(data.rows);
             setLoading(false);
         });
@@ -181,9 +180,10 @@ const List = ({ ledger = false }) => {
     };
 
     const categoryBodyTemplate = (rowData) => {
+        
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtCustomerCategory_id+"-dtCustomerCategory")}
+                {rowData.dtCustomerCategory_id_shortname}
             </>
         );
     };
