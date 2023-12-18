@@ -1,10 +1,21 @@
 import * as moment from 'moment';
 import Dexie from 'dexie';
 import axiosInstance from "./AxiosService";
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import CacheMasterDataService from './CacheMasterDataService';
+import { FilterMatchMode } from 'primereact/api';
 
 import modelDef from './ModelDef';
+
+const DB_NAME = "spms_org_v1";
+
+const DEL_DB_NAME = "spms_org";
+const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
+DBDeleteRequest.onerror = (event) => {
+  console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);
+};
+DBDeleteRequest.onsuccess = (event) => {
+  console.log("Database deleted successfully");
+  console.log(event.result);
+};
 
 export class MasterDataDBService {
     db = null;
@@ -38,14 +49,14 @@ export class MasterDataDBService {
 
     async openDB() {
         console.log("openDB:::dtBankAccount:::", modelDef.getJoinedFields('dtBankAccount'));
-        this.db = new Dexie('spms_org_test_v1');
+        this.db = new Dexie(DB_NAME);
         this.db.version(1).stores({
             dtBank: modelDef.getJoinedFields('dtBank'),
             dtBankAccount: modelDef.getJoinedFields('dtBankAccount'),
             dtCustomer: modelDef.getJoinedFields('dtCustomer'),
             dtCustomerCategory: modelDef.getJoinedFields('dtCustomerCategory'),
             dtExpenseType: modelDef.getJoinedFields('dtExpenseType'),
-            dtExtraIncomeType: modelDef.getJoinedFields('dtExtraIncomeType'),
+            dtIncomeType: modelDef.getJoinedFields('dtIncomeType'),
             dtMFS: modelDef.getJoinedFields('dtMFS'),
             dtMFSAccount: modelDef.getJoinedFields('dtMFSAccount'),
             dtPaymentType: modelDef.getJoinedFields('dtPaymentType'),
@@ -128,6 +139,51 @@ export class MasterDataDBService {
         return tblResult;
     }
 
+    async getAllProductDataUpto() {
+        this.openDB();
+        let table = this.db.table('dtProduct');
+
+        let upto = this.getModelLastUpdated("dtProduct");
+        if (upto === null || !upto) {
+            upto = "0"
+
+            // clear the table
+            await table.clear();
+        }
+        console.log("getAllUpto:::", upto);
+        let uri = `/all_products/${upto}`;
+        let limit = 500;
+        let offset = 0;
+        let result = await axiosInstance.get(uri + "/" + limit + "/" + offset).then(res => res.data);
+        if(upto === "0") {
+            result.rows.forEach(row => {
+                table.put(row);
+            });
+        } else {
+            result.rows.forEach(row => {
+                table.update(row.id, row);
+            });
+        }
+        let total = result.total;
+
+        while(result.rows.length > 0 && result.rows.length == limit && offset < total) {
+            offset += limit;
+            result = await axiosInstance.get(uri + "/" + limit + "/" + offset).then(res => res.data);
+            if(upto === "0") {
+                result.rows.forEach(row => {
+                    table.put(row);
+                });
+            } else {
+                result.rows.forEach(row => {
+                    table.update(row.id, row);
+                });
+            }
+        }
+
+        // set the last updated time
+        this.setModelLastUpdated("dtProduct");
+    }
+
     async getAllMasterDataUpto(modelName) {
         let upto = this.getModelLastUpdated(modelName);
         if (upto === null || !upto) {
@@ -203,13 +259,37 @@ export class MasterDataDBService {
         switch(modelName) {
             case "dtProduct":
                 data = await this.getAllProductDataUpto();
-            case "trxLedger":
-                data = await this.getAllLedgerDataUpto();
+                break;
+            // case "trxLedger":
+            //     data = await this.getAllLedgerDataUpto();
+            //     break;
             default:
                 data = await this.getAllMasterDataUpto(modelName);
         }
 
         return data;
+    }
+
+    async loadProductData() {
+        await this.getAllProductDataUpto();
+        await this.openDB();
+        await this.db.table("dtProduct").orderBy("name");
+    }
+
+    async loadAllInitData() {
+        await this.getAllMasterDataUpto("dtBank");
+        await this.getAllMasterDataUpto("dtCustomerCategory");
+        await this.getAllMasterDataUpto("dtExpenseType");
+        await this.getAllMasterDataUpto("dtIncomeType");
+        await this.getAllMasterDataUpto("dtMFS");
+        await this.getAllMasterDataUpto("dtPaymentType");
+        await this.getAllMasterDataUpto("dtProductBrand");
+        await this.getAllMasterDataUpto("dtProductCategory");
+        await this.getAllMasterDataUpto("dtProductModel");
+        await this.getAllMasterDataUpto("dtSupplierCategory");
+        await this.getAllMasterDataUpto("dtRoute");
+        await this.getAllMasterDataUpto("dtWarehouse");
+        await this.loadProductData()
     }
 
     async getAll(modelName, params) {
@@ -223,8 +303,8 @@ export class MasterDataDBService {
         console.log("getAll params:::", first, limit);
         console.log("getAll params:::", modelName, params);
         
-        this.openDB();
-        let table = this.db.table(modelName).orderBy(name);
+        await this.openDB();
+        let table = await this.db.table(modelName).orderBy(name);
         
         // apply filter on the table
         table = await this.applyFilter(table, params.filters);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { classNames } from 'primereact/utils';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -11,7 +11,9 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
 
 import { PRODUCT_MODEL } from '../../../constants/models';
-import { ProductService } from '../../../services/ProductService';
+
+// import { ProductService } from '../../../services/ProductService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
 
@@ -37,13 +39,6 @@ const List = () => {
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
-
-            // 'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
-            // 'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'brand_name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'model_no': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'part_number': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            // 'dtProductCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
         }
     };
 
@@ -58,14 +53,15 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const productService = new ProductService();
+    // const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
     }, []);
     
     const clearCache = async () => {
-        await productService.clearCache();
+        // await productService.clearCache();
         loadLazyData();
     }
 
@@ -83,12 +79,8 @@ const List = () => {
 
     const loadLazyData = async () => {
         setLoading(true);
-        // let [rows, total] = await db.getProducts(lazyParams.first, lazyParams.rows);
-        // console.log(total);
-        // setTotalRecords(total);
-        // setProducts(rows);
-        // setLoading(false);
-        productService.getAll(lazyParams).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(data => {
+        // productService.getAll(lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);

@@ -14,7 +14,7 @@ const getFields = function(modelName) {
             return masterDef.customer_category_fields;
         case "dtExpenseType":
             return masterDef.expense_type_fields;
-        case "dtExtraIncomeType":
+        case "dtIncomeType":
             return masterDef.extra_income_type_fields;
         case "dtMFS":
             return masterDef.mfs_fields;

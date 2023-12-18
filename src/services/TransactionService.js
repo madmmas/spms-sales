@@ -114,17 +114,19 @@ export class TransactionService {
         return resp.data;
     }
 
+    // TODO : remove this method
     async getLedgerByPartyId(partyId) {
-        let uri = `/ledger_by_id/${partyId}`;
-        const resp = await axiosInstance.get(uri, {
-            timeout: 15000,
-            id: uri,
-            cache: {
-                ttl: 1000 * 20 // 20 seconds.
-            }
-        });
-        console.log(resp.data);
-        return resp.data;
+        // let uri = `/ledger_by_id/${partyId}`;
+        // const resp = await axiosInstance.get(uri, {
+        //     timeout: 15000,
+        //     id: uri,
+        //     cache: {
+        //         ttl: 1000 * 20 // 20 seconds.
+        //     }
+        // });
+        // console.log(resp.data);
+        // return resp.data;
+        return []
     }
 
     async stockAdjustment(data) {

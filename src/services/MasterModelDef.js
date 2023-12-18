@@ -4,7 +4,7 @@ export const banks_fields = ["id", "name", "description", "status"];
 export const customer_category_fields = ["id", "name", "description", "status"];
 // dtExpenseType
 export const expense_type_fields = ["id", "name", "description", "status"];
-// dtExtraIncomeType
+// dtIncomeType
 export const extra_income_type_fields = ["id", "name", "description", "status"];
 // dtPaymentType
 export const payment_type_fields = ["id", "name", "description", "status"];

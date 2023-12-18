@@ -11,6 +11,8 @@ import store from './store'
 import RProductService from "./services/RProductService";
 import CacheMasterDataService from "./services/CacheMasterDataService";
 
+import { MasterDataDBService } from './services/MasterDataDBService';
+
 moment.tz.setDefault("Asia/Dhaka");
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -20,25 +22,33 @@ const loadAllData = async () => {
   const newContent = document.createTextNode("Please wait while we are loading the application...");
   newDiv.appendChild(newContent);
 
+  const masterDataDBService = new MasterDataDBService();
+
+  await masterDataDBService.loadAllInitData();
+
   // db.initDB();
   // load the product data here
-  let products = window['__all_products'];
+  // let products = window['__all_products'];
   
-  // if products undefined or empty load all from server limit 1000 until no more
-  if (!products || products.length == 0) {
-    RProductService.loadAllProductsFromLocalStorage();
-  }
+  // // if products undefined or empty load all from server limit 1000 until no more
+  // if (!products || products.length == 0) {
+  //   RProductService.loadAllProductsFromLocalStorage();
+  // }
 
-  let masterData = window['__all_masterData'];
+  // let masterData = window['__all_masterData'];
 
-  // if masterData undefined or empty load all from server limit 1000 until no more
-  if (masterData === undefined || masterData.length == 0) {
-    console.log("masterData is undefined or empty");
-    CacheMasterDataService.checkAndLoadAllMasterData();
-  }
+  // // if masterData undefined or empty load all from server limit 1000 until no more
+  // if (masterData === undefined || masterData.length == 0) {
+  //   console.log("masterData is undefined or empty");
+  //   CacheMasterDataService.checkAndLoadAllMasterData();
+  // }  
 }
 
 const waitThenRun = async () => {
+  // check if logged in
+  // if not logged in redirect to login page
+  // if logged in load all data
+
   await loadAllData();
   root.render(
     <React.StrictMode>
