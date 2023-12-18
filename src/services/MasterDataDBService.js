@@ -56,6 +56,10 @@ export class MasterDataDBService {
             dtSupplierCategory: modelDef.getJoinedFields('dtSupplierCategory'),
             dtRoute: modelDef.getJoinedFields('dtRoute'),
             dtWarehouse: modelDef.getJoinedFields('dtWarehouse'),
+
+            dtProduct: modelDef.getJoinedFields('dtProduct'),
+
+            trxLedger: modelDef.getJoinedFields('trxLedger'),
         });
         this.db.open().then(function (db) {
             // Database opened successfully
@@ -124,7 +128,7 @@ export class MasterDataDBService {
         return tblResult;
     }
 
-    async getAllUpto(modelName) {
+    async getAllMasterDataUpto(modelName) {
         let upto = this.getModelLastUpdated(modelName);
         if (upto === null || !upto) {
             upto = "0"
@@ -192,6 +196,20 @@ export class MasterDataDBService {
         } // end of for loop
 
         return table;
+    }
+
+    async getAllUpto(modelName) {
+        var data = [];
+        switch(modelName) {
+            case "dtProduct":
+                data = await this.getAllProductDataUpto();
+            case "trxLedger":
+                data = await this.getAllLedgerDataUpto();
+            default:
+                data = await this.getAllMasterDataUpto(modelName);
+        }
+
+        return data;
     }
 
     async getAll(modelName, params) {

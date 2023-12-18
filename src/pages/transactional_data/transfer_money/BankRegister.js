@@ -26,7 +26,7 @@ const BankRegister = () => {
 
     let emptyBankRegister = {
         transfer_to: 'CASH',
-        to_ref_id: null,
+        cr_ref_id: null,
         trx_date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
@@ -215,9 +215,9 @@ const BankRegister = () => {
     const refBodyTemplate = (rowData) => {
         let ref = "CASH";
         if(rowData.trx_type === "BANK_TO_MFS") {
-            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtMFSAccount");
+            ref = CacheMasterDataService.getShortnameById(rowData.cr_ref_id+"-dtMFSAccount");
         } else if(rowData.trx_type === "BANK_TO_BANK") {
-            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtBankAccount");
+            ref = CacheMasterDataService.getShortnameById(rowData.cr_ref_id+"-dtBankAccount");
         }
         return (
             <>
@@ -229,7 +229,7 @@ const BankRegister = () => {
     const fromBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.from_ref_id+"-dtBankAccount")}
+                {CacheMasterDataService.getShortnameById(rowData.dr_ref_id+"-dtBankAccount")}
             </>
         );
     };
@@ -256,8 +256,8 @@ const BankRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="from_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="dr_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="cr_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
@@ -265,7 +265,7 @@ const BankRegister = () => {
                         <div className="p-fluid formgrid grid">
                         <div className="field col-12 md:col-12">
                         <Controller
-                            name="from_ref_id"
+                            name="dr_ref_id"
                             control={control}
                             rules={{ required: 'Bank Account is required.' }}
                             render={({ field, fieldState }) => (
@@ -351,11 +351,11 @@ const BankRegister = () => {
                             {transferTo === "BANK" &&
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="cr_ref_id"
                                 control={control}
                                 rules={{
                                     required: 'Bank Account is required.', 
-                                    validate: (value) => (value !== getValues("from_ref_id")) || 'Bank Account is same as Transfer From Bank Account.'
+                                    validate: (value) => (value !== getValues("dr_ref_id")) || 'Bank Account is same as Transfer From Bank Account.'
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
@@ -393,7 +393,7 @@ const BankRegister = () => {
                             {transferTo === "MFS" &&
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="cr_ref_id"
                                 control={control}
                                 rules={{ 
                                         validate: (value) => (transferTo === "MFS" && value !== null) || 'MFS Account is required.'
