@@ -21,6 +21,13 @@ export default function SalesProductForm({
     vat, deliveryCost, addDiscount, gross, net, discount, lastTradePrice, Id
 }) {
 
+    const css = `
+           .addBtn:focus{
+               background : green;
+               color:white;
+        }
+    `
+
     const {
         register,
         control,
@@ -345,7 +352,7 @@ export default function SalesProductForm({
             <div className=" field col-12 md:col-2 align-items-center">
                 {isEdit && <Button  label="Update" className="p-button-primary mr-2" onClick={handleSubmit((d) => updateItem(d))}></Button>}
 
-                {!isEdit && <Button type="submit" label="Add" className="p-button-primary" onClick={handleSubmit((d) => addItem(d))}/>}                
+                {!isEdit && <Button type="submit" label="Add" className="p-button-primary addBtn" onClick={handleSubmit((d) => addItem(d))}><style>{css}</style></Button>}               
                 <Button label="Cancel" className="p-button-outlined p-button-warning mt-2" onClick={() => onCancelEditItem()}></Button>
             </div>
         </div>
