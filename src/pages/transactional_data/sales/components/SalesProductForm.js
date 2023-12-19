@@ -8,8 +8,6 @@ import { classNames } from 'primereact/utils';
 
 import SalesProductDetail from './SalesProductDetail';
 
-import { ProductService } from '../../../../services/ProductService';
-
 export default function SalesProductForm({
     salesItems,
     editMode, returnMode, onReturnItem,

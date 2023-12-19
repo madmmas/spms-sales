@@ -30,8 +30,10 @@ import ReturnItemDialog from '../../components/ReturnItemDialog';
 import SalesProductForm from './components/SalesProductForm';
 
 import { ConfigurationService } from '../../../services/ConfigurationService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { OrderService } from '../../../services/OrderService';
-import { ProductService } from '../../../services/ProductService';
+
 import CancellationFeeDialog from '../../components/CancellationFeeDialog';
 
 const Form = React.memo(({ sales }) => {
@@ -143,7 +145,7 @@ const Form = React.memo(({ sales }) => {
 
     ///// Initialization -- Start /////
     const orderService = new OrderService();
-    const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
     const configurationService = new ConfigurationService();
 
     const {
@@ -426,7 +428,7 @@ const Form = React.memo(({ sales }) => {
         
         let _productSelected = e.value;
         // fetch current stock
-        let data = await productService.getById(_productSelected.id);
+        let data = await masterDataDBService.getById("dtProduct", _productSelected.id);
         _productSelected['current_stock'] = data.current_stock;
         _productSelected['price'] = data.price;
         _productSelected['min_trade_price'] = data.min_trade_price;
@@ -767,8 +769,8 @@ const Form = React.memo(({ sales }) => {
                     columns={[
                         {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                         {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
-                        {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                        {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                        {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                        {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                         {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                     ]} 
                     />

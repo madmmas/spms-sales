@@ -9,13 +9,12 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { Tag } from 'primereact/tag';
-import { HRService } from '../../../services/HRService';
-import { OrderService } from '../../../services/OrderService';
 
 import { PURCHASE_MODEL } from '../../../constants/models';
 
 import OrderFilter from '../../components/OrderFilter';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
+import { OrderService } from '../../../services/OrderService';
 
 const List = () => {
 
@@ -54,7 +53,7 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    // const hrManagementService = new HRService();
     const orderService = new OrderService();
 
     useEffect(() => {
@@ -147,13 +146,13 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile.id).then(data => {
-            console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Profile Deleted', life: 3000 });
-        });
-        setDeleteProfileDialog(false);
-        setProfile(null);
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
     };
 
     
@@ -210,7 +209,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.party_id+"-dtSupplier")}
+                {rowData.party_id}
             </>
         );
     };

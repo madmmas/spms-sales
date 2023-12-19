@@ -244,6 +244,11 @@ export default function PurchaseProductForm({
         setValue('warehouse_id', defaultWarehouse);
     };
 
+    const onWarehouseSelect = (selectedRow) => {
+        console.log("WAREHOUSE SELECTED::", selectedRow);
+        setValue('warehouse_id', selectedRow.id);
+    };
+
     const onAddItem = (dt) => {
         // calculateCost();
         console.log("PRODUCT-GOING-TOBE-ADDED",dt);
@@ -321,7 +326,7 @@ export default function PurchaseProductForm({
                         <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
                             displayField="name"
                             className={classNames({ 'p-invalid': fieldState.error })} 
-                            // onSelect={onWarehouseSelect}
+                            onSelect={onWarehouseSelect}
                             columns={[
                                 {field: 'name', header: 'Warehouse', filterPlaceholder: 'Filter by Warehouse'}, 
                             ]} />

@@ -48,7 +48,6 @@ export class MasterDataDBService {
     }
 
     async openDB() {
-        console.log("openDB:::dtBankAccount:::", modelDef.getJoinedFields('dtBankAccount'));
         this.db = new Dexie(DB_NAME);
         this.db.version(1).stores({
             dtBank: modelDef.getJoinedFields('dtBank'),
@@ -344,12 +343,12 @@ export class MasterDataDBService {
     }
         
     async getAll(modelName, params) {
-
+        
         // check if the model is updated
         await this.getAllUpto(modelName);
 
-        let first = params.first;
-        let limit = params.rows;
+        let first = params.first || 0;
+        let limit = params.rows || 10;
         let name = params.nameField || "name";
         console.log("getAll params:::", first, limit);
         console.log("getAll params:::", modelName, params);
@@ -358,7 +357,9 @@ export class MasterDataDBService {
         let table = await this.db.table(modelName).orderBy(name);
         
         // apply filter on the table
-        table = await this.applyFilter(table, params.filters);
+        if (params.filters) {
+            table = await this.applyFilter(table, params.filters);
+        }
         let total = await table.count();
         let result = await table.offset(first).limit(limit).toArray();
         

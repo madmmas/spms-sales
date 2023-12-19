@@ -59,7 +59,6 @@ const List = () => {
     }, []);
     
     const clearCache = async () => {
-        // await productService.clearCache();
         loadLazyData();
     }
 
