@@ -8,7 +8,7 @@ import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputNumber } from 'primereact/inputnumber';
-import { DataTable } from 'primereact/datatable';
+import { DataTable } from 'primereact/datatable'
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
