@@ -176,7 +176,7 @@ const List = ({ ledger = false }) => {
         );
     };
     const customerCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={customerCategory} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={customerCategory} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const categoryBodyTemplate = (rowData) => {
@@ -252,7 +252,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': (rowData.status=="true" || rowData.status==true), 'text-red-500 pi-times-circle': (rowData.status=="false" || rowData.status==false) })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': (rowData.status==true || rowData.status==true), 'text-red-500 pi-times-circle': (rowData.status==false || rowData.status==false) })}></i>;
     };
     const statusFilterTemplate = (options) => {
         return (

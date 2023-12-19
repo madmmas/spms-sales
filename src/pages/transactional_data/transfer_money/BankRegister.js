@@ -242,7 +242,7 @@ const BankRegister = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtBankRegister} dataKey="_id" 
+                        ref={dt} value={dtBankRegister} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

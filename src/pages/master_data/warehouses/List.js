@@ -98,7 +98,7 @@ const List = () => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/warehouses/" + dtProfile._id);
+        navigate("/warehouses/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -123,7 +123,7 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile._id).then(data => {
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
         //     console.log(data);
         //     loadLazyData();
         //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Profile Deleted', life: 3000 });
@@ -175,7 +175,7 @@ const List = () => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
   
     const statusFilterTemplate = (options) => {
@@ -190,7 +190,7 @@ const List = () => {
     };
 
     const defaultBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default=="true", 'text-red-500 pi-times-circle': rowData._default=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default==true, 'text-red-500 pi-times-circle': rowData._default==false })}></i>;
     };
 
     const defaultFilterTemplate = (options) => {
@@ -243,7 +243,7 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

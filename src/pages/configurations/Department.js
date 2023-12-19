@@ -23,7 +23,7 @@ const Department = () => {
     const contextPath = '~';
 
     let emptyDepartment = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -107,8 +107,8 @@ const Department = () => {
         setSubmitted(true);
 
         if (department.name.trim()) {
-            if (department._id) {
-                configurationManagementService.update(modelName, department._id, department).then(data => {
+            if (department.id) {
+                configurationManagementService.update(modelName, department.id, department).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Department Updated', life: 3000 });
@@ -138,7 +138,7 @@ const Department = () => {
     };
 
     const deleteDepartment = () => {
-        configurationManagementService.delete(modelName, department._id).then(data => {
+        configurationManagementService.delete(modelName, department.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Department Deleted', life: 3000 });
@@ -264,7 +264,7 @@ const Department = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

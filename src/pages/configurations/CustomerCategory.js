@@ -24,7 +24,7 @@ const CustomerCategory = () => {
     const contextPath = '~';
 
     let emptyCustomerCategory = {
-        _id: null,
+        id: null,
         description: '',
         name: '',
         _default: false,
@@ -109,8 +109,8 @@ const CustomerCategory = () => {
         setSubmitted(true);
 
         if (CustomerCategory.name.trim()) {
-            if (CustomerCategory._id) {
-                configurationManagementService.update(modelName, CustomerCategory._id, CustomerCategory).then(data => {
+            if (CustomerCategory.id) {
+                configurationManagementService.update(modelName, CustomerCategory.id, CustomerCategory).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Updated', life: 3000 });
@@ -140,7 +140,7 @@ const CustomerCategory = () => {
     };
 
     const deleteCustomerCategory = () => {
-        configurationManagementService.delete(modelName, CustomerCategory._id).then(data => {
+        configurationManagementService.delete(modelName, CustomerCategory.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Deleted', life: 3000 });
@@ -270,7 +270,7 @@ const CustomerCategory = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

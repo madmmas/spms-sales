@@ -221,7 +221,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                             caption='Select Customer'
                             displayField="name" showFields={["name"]}
                             onSelect={(e) => {
-                                field.onChange(e._id);                                
+                                field.onChange(e.id);                                
                             }}
                             defaultFilters={{
                                 fields: ["name","address","route","phone","contact_name"],
@@ -264,7 +264,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                             caption='Select Supplier'
                             displayField="name" showFields={["name"]}
                             onSelect={(e) => {
-                                field.onChange(e._id);
+                                field.onChange(e.id);
                             }}
                             defaultFilters={{
                                 fields: ["name","address","phone"],

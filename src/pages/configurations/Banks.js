@@ -23,7 +23,7 @@ const Banks = () => {
     const contextPath = '~';
 
     let emptyBanks = {
-        _id: null,
+        id: null,
         empID: '',
         name: ''
     };
@@ -107,8 +107,8 @@ const Banks = () => {
         setSubmitted(true);
 
         if (banks.name.trim()) {
-            if (banks._id) {
-                configurationManagementService.update(modelName, banks._id, banks).then(data => {
+            if (banks.id) {
+                configurationManagementService.update(modelName, banks.id, banks).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Banks Updated', life: 3000 });
@@ -138,7 +138,7 @@ const Banks = () => {
     };
 
     const deleteBanks = () => {
-        configurationManagementService.delete(modelName, banks._id).then(data => {
+        configurationManagementService.delete(modelName, banks.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -263,7 +263,7 @@ const Banks = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -10,9 +10,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { InputText } from 'primereact/inputtext';
 
-import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL } from '../../../constants/models';
 
-// import { ProductService } from '../../../services/ProductService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
@@ -53,7 +52,6 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    // const productService = new ProductService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {

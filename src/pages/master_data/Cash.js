@@ -22,7 +22,7 @@ const Cash = () => {
     const contextPath = '~';
 
     let emptyCash = {
-        _id: null,
+        id: null,
         empID: '',
         name: ''
     };
@@ -104,8 +104,8 @@ const Cash = () => {
         setSubmitted(true);
 
         if (cash.name.trim()) {
-            if (cash._id) {
-                configurationManagementService.update(modelName, cash._id, cash).then(data => {
+            if (cash.id) {
+                configurationManagementService.update(modelName, cash.id, cash).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Cash Updated', life: 3000 });
@@ -135,7 +135,7 @@ const Cash = () => {
     };
 
     const deleteCash = () => {
-        configurationManagementService.delete(modelName, cash._id).then(data => {
+        configurationManagementService.delete(modelName, cash.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -260,7 +260,7 @@ const Cash = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -13,8 +13,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
+
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
 const List = ({ ledger = false }) => {
@@ -175,7 +175,7 @@ const List = ({ ledger = false }) => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+                {rowData.dtBank_id_shortname}
             </>
         );
     };
@@ -244,7 +244,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
 
     
@@ -268,7 +268,7 @@ const List = ({ ledger = false }) => {
     };    
 
     const bankFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtBank} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtBank} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
     };
 
     const renderHeader = () => {

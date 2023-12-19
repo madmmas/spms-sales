@@ -186,7 +186,7 @@ const Detail = () => {
                                     caption='Select Customer'
                                     displayField="name" showFields={["name"]}
                                     onSelect={(e) => {
-                                        getPartyBalance(e._id);
+                                        getPartyBalance(e.id);
                                     }}
                                     defaultFilters={{
                                         fields: ["name","address","route","phone","contact_name"],
@@ -228,7 +228,7 @@ const Detail = () => {
                                     caption='Select Supplier'
                                     displayField="name" showFields={["name"]}
                                     onSelect={(e) => {
-                                        getPartyBalance(e._id);
+                                        getPartyBalance(e.id);
                                     }}
                                     defaultFilters={{
                                         fields: ["name","address","phone"],

@@ -113,7 +113,7 @@ const LeaveHistory = ({empID}) => {
                 {/* <Toolbar className="mb-4" right={rightToolbarTemplate}></Toolbar> */}
 
                 <DataTable
-                    ref={dt} value={empProfiles} dataKey="_id" 
+                    ref={dt} value={empProfiles} dataKey="id" 
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

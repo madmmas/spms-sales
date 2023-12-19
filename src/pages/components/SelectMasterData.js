@@ -5,7 +5,7 @@ import SelectMasterDataTable from './SelectMasterDataTable';
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterData({ 
-    field, displayField,
+    field, displayField="shortname",
     showFields=[], modelName, className, 
     columns, caption="Select", onSelect, 
     defaultFilters={
@@ -47,7 +47,7 @@ export default function SelectMasterData({
 
     const onSelection = (e) => {
         setSelectedRow(displayFunc(e.value))
-        field.onChange(e.value._id);
+        field.onChange(e.value.id);
         onSelect(e.value)
     }
 

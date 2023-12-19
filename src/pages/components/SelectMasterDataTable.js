@@ -123,7 +123,7 @@ export default function SelectMasterDataTable({
         onSelect(e)
     }
 
-    const isSelectable = (data) => data._id !== fieldValue;
+    const isSelectable = (data) => data.id !== fieldValue;
 
     const isRowSelectable = (event) => (event.data ? isSelectable(event.data) : true);
 
@@ -150,7 +150,7 @@ export default function SelectMasterDataTable({
             style={{ width: dialogWidth }} maximizable contentStyle={{ height: dialogHeight }}
             onHide={hideDialog}>
                 <DataTable
-                    ref={dt} value={tmpData} dataKey="_id"
+                    ref={dt} value={tmpData} dataKey="id"
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

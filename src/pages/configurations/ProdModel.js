@@ -23,7 +23,7 @@ const ProdModel = () => {
     const contextPath = '~';
 
     let emptyProdModel = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -107,8 +107,8 @@ const ProdModel = () => {
         setSubmitted(true);
 
         if (prodModel.name.trim()) {
-            if (prodModel._id) {
-                configurationManagementService.update(modelName, prodModel._id, prodModel).then(data => {
+            if (prodModel.id) {
+                configurationManagementService.update(modelName, prodModel.id, prodModel).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'ProdModel Updated', life: 3000 });
@@ -138,7 +138,7 @@ const ProdModel = () => {
     };
 
     const deleteProdModel = () => {
-        configurationManagementService.delete(modelName, prodModel._id).then(data => {
+        configurationManagementService.delete(modelName, prodModel.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -263,7 +263,7 @@ const ProdModel = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -145,7 +145,7 @@ const List = () => {
     };
 
     const editEmpProfile = (empProfile) => {
-        navigate("/employees/" + empProfile._id);
+        navigate("/employees/" + empProfile.id);
     };
 
     const confirmDeleteEmpProfile = (empProfile) => {
@@ -170,7 +170,7 @@ const List = () => {
     };
 
     const deleteEmpProfile = () => {
-        hrManagementService.delete(modelName, empProfile._id).then(data => {
+        hrManagementService.delete(modelName, empProfile.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
@@ -229,7 +229,7 @@ const List = () => {
         );
     };
     const departmentCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtDepartmentCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtDepartmentCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
     const departmentBodyTemplate = (rowData) => {
         return (
@@ -240,7 +240,7 @@ const List = () => {
         );
     };
     const designationCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={designationCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={designationCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
     const designationBodyTemplate = (rowData) => {
         return (
@@ -289,7 +289,7 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

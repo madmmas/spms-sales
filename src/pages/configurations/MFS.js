@@ -23,7 +23,7 @@ const MFS = () => {
     const contextPath = '~';
 
     let emptyMFSs = {
-        _id: null,
+        id: null,
         empID: '',
         name: ''
     };
@@ -106,8 +106,8 @@ const MFS = () => {
         setSubmitted(true);
 
         if (mfs.name.trim()) {
-            if (mfs._id) {
-                configurationManagementService.update(modelName, mfs._id, mfs).then(data => {
+            if (mfs.id) {
+                configurationManagementService.update(modelName, mfs.id, mfs).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFSs Updated', life: 3000 });
@@ -137,7 +137,7 @@ const MFS = () => {
     };
 
     const deleteMFSs = () => {
-        configurationManagementService.delete(modelName, mfs._id).then(data => {
+        configurationManagementService.delete(modelName, mfs.id).then(data => {
             console.log(data);
             loadLazyData();
         });
@@ -262,7 +262,7 @@ const MFS = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

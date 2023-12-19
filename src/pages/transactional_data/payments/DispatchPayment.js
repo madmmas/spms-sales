@@ -102,7 +102,7 @@ const DispatchPayment = ({trigger}) => {
     };
 
     const expenseTypeFilterTemplate = (options) => {
-        // return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        // return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const partyNameBodyTemplate = (rowData) => {
@@ -165,7 +165,7 @@ const DispatchPayment = ({trigger}) => {
                 <div className="card">
                     
                     <DataTable
-                        ref={dt} value={paymentData} dataKey="_id" 
+                        ref={dt} value={paymentData} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

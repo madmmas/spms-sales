@@ -11,8 +11,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-// import { HRService } from '../../../services/HRService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
@@ -85,7 +83,6 @@ const List = ({ ledger = false }) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        // hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
         masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
@@ -190,13 +187,13 @@ const List = ({ ledger = false }) => {
     const categoryBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtSupplierCategory_id+"-dtSupplierCategory")}
+                {rowData.dtSupplierCategory_id_shortname}
             </>
         );
     };
 
     const supplierCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const addressBodyTemplate = (rowData) => {
@@ -251,7 +248,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
     
     const statusFilterTemplate = (options) => {

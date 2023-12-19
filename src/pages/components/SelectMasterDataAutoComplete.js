@@ -25,7 +25,7 @@ export default function SelectMasterDataAutoComplete({ field, displayField, show
 
     const onSelection = (e) => {
         setSelectedRow(e.value[displayField]);
-        field.onChange(e.value._id);
+        field.onChange(e.value.id);
         onSelect(e.value)
     }
 

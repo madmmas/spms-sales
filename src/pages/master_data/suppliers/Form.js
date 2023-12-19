@@ -53,7 +53,7 @@ const Form = ({supplierProfile}) => {
                     navigate("/suppliers");
                 });
             }else{
-                hrManagementService.update(modelName, formData._id, formData).then(data => {
+                hrManagementService.update(modelName, formData.id, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Updated', life: 3000 });
                     setSubmitted(false);
                     // navigate("/suppliers/" + data.ID);

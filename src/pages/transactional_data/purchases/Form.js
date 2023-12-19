@@ -113,7 +113,7 @@ const Form = ({ purchase }) => {
         masterDataService.getDefaultItem('dtWarehouse').then(data => {
             if(data){
                 console.log("DEFAULT WAREHOUSE::", data);
-                setDefaultWarehouse(data._id);    
+                setDefaultWarehouse(data.id);    
             }
         });
         if (purchase===null || purchase===undefined) {
@@ -320,8 +320,8 @@ const Form = ({ purchase }) => {
     );
 
     const onSupplierSelect = (selectedRow) => {
-        console.log("SELECTED SUPPLIER::", selectedRow, selectedRow._id);
-        setSupplierId(selectedRow._id);
+        console.log("SELECTED SUPPLIER::", selectedRow, selectedRow.id);
+        setSupplierId(selectedRow.id);
         setSelectedSupplier_currency(selectedRow.currency);
     };
 

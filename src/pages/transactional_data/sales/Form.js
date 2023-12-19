@@ -171,8 +171,8 @@ const Form = React.memo(({ sales }) => {
                     }
                 });
             }else{
-                // lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id);
-                orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer._id).then(data => {
+                // lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer.id);
+                orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
                         setLastTradePrice(data.prev_price);
@@ -502,7 +502,7 @@ const Form = React.memo(({ sales }) => {
         let _voucher_no = item.last_trx_id?item.last_trx_id:"";
         setCustomerLastOrder(_voucher_no);
         setSelectedCustomer(item);
-        getPartyBalance(item._id);
+        getPartyBalance(item.id);
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
     };
 

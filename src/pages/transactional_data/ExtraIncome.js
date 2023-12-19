@@ -32,7 +32,7 @@ const Income = () => {
     const modelName = INCOME_MODEL;
 
     let emptyIncome = {
-        _id: null,
+        id: null,
         dtBankAccount_id: null,
         dtMFSAccount_id : null,
         dtIncomeType_id: null,
@@ -208,7 +208,7 @@ const Income = () => {
     };
 
     const incomeTypeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={incomeType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={incomeType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const incomeBodyTemplate = (rowData) => {
@@ -312,7 +312,7 @@ const Income = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={incomeData} dataKey="_id" 
+                        ref={dt} value={incomeData} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

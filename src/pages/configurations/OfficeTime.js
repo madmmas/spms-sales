@@ -23,7 +23,7 @@ const OfficeTime = () => {
     const contextPath = '~';
 
     let emptyOfficeTime = {
-        _id: null,
+        id: null,
         start_time: '',
         end_time: '',
         description: '',
@@ -111,8 +111,8 @@ const OfficeTime = () => {
         setSubmitted(true);
 
         if (office_time.name.trim()) {
-            if (office_time._id) {
-                configurationManagementService.update(modelName, office_time._id, office_time).then(data => {
+            if (office_time.id) {
+                configurationManagementService.update(modelName, office_time.id, office_time).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Office Time Updated', life: 3000 });
@@ -142,7 +142,7 @@ const OfficeTime = () => {
     };
 
     const deleteOfficeTime = () => {
-        configurationManagementService.delete(modelName, office_time._id).then(data => {
+        configurationManagementService.delete(modelName, office_time.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
@@ -286,7 +286,7 @@ const OfficeTime = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

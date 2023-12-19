@@ -12,7 +12,6 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
@@ -29,6 +28,7 @@ const List = ({ ledger = false }) => {
 
     let defaultFilters = {
         fields: ["dtMFS_id", "branch", "refNumber", "accName", "initBalance", "balance", "address", "phone", "note", "status"],
+        nameField: "accName",
         first: 0,
         rows: 10,
         page: 1,
@@ -117,7 +117,7 @@ const List = ({ ledger = false }) => {
     };
 
     const editProfile = (dtProfile) => {
-        navigate("/mfs_accounts/" + dtProfile._id);
+        navigate("/mfs_accounts/" + dtProfile.id);
     };
 
     const confirmDeleteProfile = (dtProfile) => {
@@ -142,7 +142,7 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile._id).then(data => {
+        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
         //     console.log(data);
         //     loadLazyData();
         //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Profile Deleted', life: 3000 });
@@ -172,7 +172,7 @@ const List = ({ ledger = false }) => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+                {rowData.dtMFS_id_shortname}
             </>
         );
     };
@@ -241,7 +241,7 @@ const List = ({ ledger = false }) => {
     };
 
     const statusBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status=="true", 'text-red-500 pi-times-circle': rowData.status=="false" })}></i>;
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.status==true, 'text-red-500 pi-times-circle': rowData.status==false })}></i>;
     };
 
     
@@ -265,11 +265,11 @@ const List = ({ ledger = false }) => {
     };    
 
     const mfsFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" showClear />;
     };
 
     const showLedger = (dtProfile) => {
-        navigate("/mfs_accounts/ledger/" + dtProfile._id);
+        navigate("/mfs_accounts/ledger/" + dtProfile.id);
     };
 
     const renderHeader = () => {
@@ -315,7 +315,7 @@ const List = ({ ledger = false }) => {
                     {!ledger && <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>}
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

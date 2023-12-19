@@ -23,7 +23,7 @@ export default function SelectMasterDataList({ field, displayField, showFields=[
 
     const onSelection = (e) => {
         setSelectedRow(e.value[displayField]);
-        field.onChange(e.value._id);
+        field.onChange(e.value.id);
         onSelect(e.value)
     }
 

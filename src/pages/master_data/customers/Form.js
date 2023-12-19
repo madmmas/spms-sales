@@ -48,7 +48,7 @@ const Form = ({customerProfile}) => {
                 navigate("/customers");
             });
         }else{
-            hrManagementService.update(modelName, formData._id, formData).then(data => {
+            hrManagementService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Updated', life: 3000 });
                 navigate("/customers");
             });

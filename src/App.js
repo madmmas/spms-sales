@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 
 import 'primeflex/primeflex.css';
 import "primeicons/primeicons.css";
@@ -7,6 +8,9 @@ import "primereact/resources/primereact.min.css"; //core css
 import './styles/demo/Demos.scss';
 import './styles/layout/layout.scss';
 
+import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
+        
 import RequireAuth from "./auth/RequireAuth";
 import Layout from './layout/layout';
 import About from "./pages/About";
@@ -21,6 +25,7 @@ import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
 import { CashFlow } from "./pages/html_reports/CashFlow";
 
+import { MasterDataDBService } from './services/MasterDataDBService';
 
 function App() {
 
@@ -88,7 +93,52 @@ function App() {
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
 
+  const { user: currentUser } = useSelector((state) => state.auth);
+  const [visible, setVisible] = useState(false);
+
+  const loadAllData = async () => {
+    // const newDiv = document.getElementById('root');
+    // const newContent = document.createTextNode("Please wait while we are loading the application...");
+    // newDiv.appendChild(newContent);
+  
+    const masterDataDBService = new MasterDataDBService();
+    
+    setVisible(true);
+    await masterDataDBService.loadAllInitData();
+    setVisible(false);
+    // db.initDB();
+    // load the product data here
+    // let products = window['__all_products'];
+    
+    // // if products undefined or empty load all from server limit 1000 until no more
+    // if (!products || products.length == 0) {
+    //   RProductService.loadAllProductsFromLocalStorage();
+    // }
+  
+    // let masterData = window['__all_masterData'];
+  
+    // // if masterData undefined or empty load all from server limit 1000 until no more
+    // if (masterData === undefined || masterData.length == 0) {
+    //   console.log("masterData is undefined or empty");
+    //   CacheMasterDataService.checkAndLoadAllMasterData();
+    // }  
+  }
+
+  useEffect(() => {
+    if (currentUser) {
+      console.log("currentUser::", currentUser);
+      loadAllData();
+    }
+  }, [currentUser]);
+
   return (
+    <>
+    <Dialog header="Loading..." visible={visible} style={{ width: '50vw' }} onHide={()=>console.log("wait...")} >
+        <p className="m-0">
+          Please wait while we are loading the application...
+        </p>
+        <ProgressSpinner />
+    </Dialog>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/pos" element={<POS />} />
@@ -217,6 +267,7 @@ function App() {
 
       </Route>
     </Routes>
+    </>
   );
 }
 

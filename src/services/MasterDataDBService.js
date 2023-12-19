@@ -81,51 +81,60 @@ export class MasterDataDBService {
         });
     }
 
-    async updateModelTable(modelName, data) {
-        this.openDB();
-        let table = this.db.table(modelName);
-
-        console.log("updateCustomerTable result:::", data);
-        if (data.rows) {
-            let self = this;
-            data.rows.forEach(row => {
-                let doc = JSON.parse(row.doc);
-                let result = self.buildData(modelName, doc);
-                result.last_trx_id = row.last_trx_id;
-                result.shortname = row.shortname;
-                result.deleted = row.deleted;
-                table.update(row.id, result);
-            });
-        }
-
-        // set the last updated time
-        this.setModelLastUpdated(modelName);
-    }
-
     async addToModelTable(modelName, data) {
         this.openDB();
         let table = this.db.table(modelName);
 
-        // clear the table
-        await table.clear();
-
         console.log("addToCustomerTable result:::", data);
+        if (data.rows) {
+            let self = this;
+            let result = [];
+            data.rows.forEach(row => {
+                let doc = JSON.parse(row.doc);
+                let _result = self.buildData(modelName, doc);
+                _result.id = row.id;
+                _result.last_trx_id = row.last_trx_id;
+                _result.shortname = row.shortname;
+                _result.deleted = row.deleted;
+                result.push(_result);
+            });
+            table.bulkPut(result);
+        }
+
+        // set the last updated time
+        this.setModelLastUpdated(modelName);
+    }
+
+    async addOrUpdateModelTable(modelName, data) {
+        this.openDB();
+        let table = this.db.table(modelName);
+
+        console.log("addOrUpdateCustomerTable result:::", data);
         if (data.rows) {
             let self = this;
             data.rows.forEach(row => {
                 let doc = JSON.parse(row.doc);
                 let result = self.buildData(modelName, doc);
-                result.id = row.id;
                 result.last_trx_id = row.last_trx_id;
                 result.shortname = row.shortname;
                 result.deleted = row.deleted;
-                table.put(result);
+                // check if the row exists
+                let found = table.get(row.id)
+                if(found) {
+                    console.log("addOrUpdateCustomerTable:::Found", modelName, row.id, result);
+                    table.update(row.id, result);
+                } else {
+                    console.log("addOrUpdateCustomerTable:::NotFound", modelName, row.id, result);
+                    result.id = row.id;
+                    table.put(result);
+                }
             });
         }
 
         // set the last updated time
         this.setModelLastUpdated(modelName);
     }
+
 
     async getAllMD(modelName, params) {
         let uri = `/all/${modelName}`;
@@ -153,36 +162,21 @@ export class MasterDataDBService {
             upto = "0"
 
             // clear the table
-            await table.clear();
+            // await table.clear();
         }
         console.log("getAllUpto:::", upto);
         let uri = `/all_products/${upto}`;
         let limit = 500;
         let offset = 0;
         let result = await axiosInstance.get(uri + "/" + limit + "/" + offset).then(res => res.data);
-        if(upto === "0") {
-            result.rows.forEach(row => {
-                table.put(row);
-            });
-        } else {
-            result.rows.forEach(row => {
-                table.update(row.id, row);
-            });
-        }
+        table.bulkPut(result.rows);
+
         let total = result.total;
 
         while(result.rows.length > 0 && result.rows.length == limit && offset < total) {
             offset += limit;
             result = await axiosInstance.get(uri + "/" + limit + "/" + offset).then(res => res.data);
-            if(upto === "0") {
-                result.rows.forEach(row => {
-                    table.put(row);
-                });
-            } else {
-                result.rows.forEach(row => {
-                    table.update(row.id, row);
-                });
-            }
+            table.bulkPut(result.rows);
         }
 
         // set the last updated time
@@ -204,13 +198,7 @@ export class MasterDataDBService {
             }
         }).then(res => res.data);
 
-        if(upto === "0") {
-            // save the result in indexedDB
-            await this.addToModelTable(modelName, result);
-        } else {
-            // save the result in indexedDB
-            this.updateModelTable(modelName, result);
-        }
+        await this.addToModelTable(modelName, result);
     }
 
     async applyFilter(table, filters) {
@@ -282,21 +270,79 @@ export class MasterDataDBService {
     }
 
     async loadAllInitData() {
-        await this.getAllMasterDataUpto("dtBank");
-        await this.getAllMasterDataUpto("dtCustomerCategory");
-        await this.getAllMasterDataUpto("dtExpenseType");
-        await this.getAllMasterDataUpto("dtIncomeType");
-        await this.getAllMasterDataUpto("dtMFS");
-        await this.getAllMasterDataUpto("dtPaymentType");
-        await this.getAllMasterDataUpto("dtProductBrand");
-        await this.getAllMasterDataUpto("dtProductCategory");
-        await this.getAllMasterDataUpto("dtProductModel");
-        await this.getAllMasterDataUpto("dtSupplierCategory");
-        await this.getAllMasterDataUpto("dtRoute");
-        await this.getAllMasterDataUpto("dtWarehouse");
         await this.loadProductData()
+
+        this.getAllMasterDataUpto("dtBank");
+        this.getAllMasterDataUpto("dtCustomerCategory");
+        this.getAllMasterDataUpto("dtExpenseType");
+        this.getAllMasterDataUpto("dtIncomeType");
+        this.getAllMasterDataUpto("dtMFS");
+        this.getAllMasterDataUpto("dtPaymentType");
+        this.getAllMasterDataUpto("dtProductBrand");
+        this.getAllMasterDataUpto("dtProductCategory");
+        this.getAllMasterDataUpto("dtProductModel");
+        this.getAllMasterDataUpto("dtSupplierCategory");
+        this.getAllMasterDataUpto("dtRoute");
+        this.getAllMasterDataUpto("dtWarehouse");
+    
+        this.getAllMasterDataUpto("dtBankAccount");
+        this.getAllMasterDataUpto("dtMFSAccount");
+        
+        this.getAllMasterDataUpto("dtCustomer");
+        this.getAllMasterDataUpto("dtSupplier");    
     }
 
+    async clearCache() {
+        // clear specific model cache
+        localStorage.removeItem("dtBank_last_updated");
+        localStorage.removeItem("dtCustomerCategory_last_updated");
+        localStorage.removeItem("dtExpenseType_last_updated");
+        localStorage.removeItem("dtIncomeType_last_updated");
+        localStorage.removeItem("dtMFS_last_updated");
+        localStorage.removeItem("dtPaymentType_last_updated");
+        localStorage.removeItem("dtProductBrand_last_updated");
+        localStorage.removeItem("dtProductCategory_last_updated");
+        localStorage.removeItem("dtProductModel_last_updated");
+        localStorage.removeItem("dtSupplierCategory_last_updated");
+        localStorage.removeItem("dtRoute_last_updated");
+        localStorage.removeItem("dtWarehouse_last_updated");
+
+        localStorage.removeItem("dtBankAccount_last_updated");
+        localStorage.removeItem("dtMFSAccount_last_updated");
+
+        localStorage.removeItem("dtCustomer_last_updated");
+        localStorage.removeItem("dtSupplier_last_updated");
+
+        localStorage.removeItem("dtProduct_last_updated");
+
+        localStorage.removeItem("trxLedger_last_updated");
+
+        // clear all tables
+        await this.openDB();
+        await this.db.dtBank.clear();
+        await this.db.dtCustomerCategory.clear();
+        await this.db.dtExpenseType.clear();
+        await this.db.dtIncomeType.clear();
+        await this.db.dtMFS.clear();
+        await this.db.dtPaymentType.clear();
+        await this.db.dtProductBrand.clear();
+        await this.db.dtProductCategory.clear();
+        await this.db.dtProductModel.clear();
+        await this.db.dtSupplierCategory.clear();
+        await this.db.dtRoute.clear();
+        await this.db.dtWarehouse.clear();
+
+        await this.db.dtBankAccount.clear();
+        await this.db.dtMFSAccount.clear();
+
+        await this.db.dtCustomer.clear();
+        await this.db.dtSupplier.clear();
+
+        await this.db.dtProduct.clear();
+
+        await this.db.trxLedger.clear();
+    }
+        
     async getAll(modelName, params) {
 
         // check if the model is updated
@@ -327,7 +373,7 @@ export class MasterDataDBService {
         let fields = modelDef.getFields(modelName);
         for (let i = 0; i < fields.length; i++) {
             let field = fields[i];
-            if(field.startsWith("dt") && field.endsWith("_id")) {
+            if(field.startsWith("dt") && field.endsWith("id")) {
                 let fieldModelName = field.substring(0, field.length - 3);
                 await this.populateFieldData(fieldModelName, field, result);
             }

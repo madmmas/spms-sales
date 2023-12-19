@@ -32,7 +32,7 @@ const Expenses = () => {
     const modelName = EXPENSE_MODEL;
 
     let emptyExpenses = {
-        _id: null,
+        id: null,
         dtBankAccount_id: null,
         dtMFSAccount_id: null,
         dtExpenseType_id: null,
@@ -210,7 +210,7 @@ const Expenses = () => {
     };
 
     const expenseTypeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="_id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
     };
 
     const expenseBodyTemplate = (rowData) => {
@@ -314,7 +314,7 @@ const Expenses = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={expenseData} dataKey="_id" 
+                        ref={dt} value={expenseData} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

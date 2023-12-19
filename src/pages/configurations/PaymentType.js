@@ -23,7 +23,7 @@ const PaymentType = () => {
     const contextPath = '~';
 
     let emptyPaymentType = {
-        _id: null,
+        id: null,
         description: '',
         name: ''
     };
@@ -109,8 +109,8 @@ const PaymentType = () => {
         setSubmitted(true);
 
         if (paymentType.name.trim()) {
-            if (paymentType._id) {
-                configurationManagementService.update(modelName, paymentType._id, paymentType).then(data => {
+            if (paymentType.id) {
+                configurationManagementService.update(modelName, paymentType.id, paymentType).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Updated', life: 3000 });
@@ -140,7 +140,7 @@ const PaymentType = () => {
     };
 
     const deletePaymentType = () => {
-        configurationManagementService.delete(modelName, paymentType._id).then(data => {
+        configurationManagementService.delete(modelName, paymentType.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Deleted', life: 3000 });
@@ -266,7 +266,7 @@ const PaymentType = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="_id" 
+                        ref={dt} value={empProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}

@@ -147,7 +147,7 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        hrManagementService.delete(modelName, dtProfile._id).then(data => {
+        hrManagementService.delete(modelName, dtProfile.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Profile Deleted', life: 3000 });
@@ -332,7 +332,7 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProfiles} dataKey="_id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
