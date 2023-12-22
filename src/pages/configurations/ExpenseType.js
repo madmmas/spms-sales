@@ -36,7 +36,7 @@ const ExpenseType = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -83,6 +83,12 @@ const ExpenseType = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setExpenseType(emptyExpenseType);
@@ -110,13 +116,13 @@ const ExpenseType = () => {
             if (task_type.id) {
                 configurationManagementService.update(modelName, task_type.id, task_type).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expense Type Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, task_type).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Expense Type Created', life: 3000 });
                 });
             }
@@ -140,8 +146,10 @@ const ExpenseType = () => {
     const deleteExpenseType = () => {
         configurationManagementService.delete(modelName, task_type.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, task_type.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
+            });            
         });
         setDeleteExpenseTypeDialog(false);
         setExpenseType(emptyExpenseType);
@@ -268,7 +276,7 @@ const ExpenseType = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -300,7 +308,7 @@ const ExpenseType = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {task_type && (
                                 <span>
-                                    Are you sure you want to delete <b>{task_type.empID}</b>?
+                                    Are you sure you want to delete <b>{task_type.id}</b>?
                                 </span>
                             )}
                         </div>

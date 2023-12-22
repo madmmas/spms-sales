@@ -36,8 +36,7 @@ const ProdModel = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
     const [loading, setLoading] = useState(false);
@@ -83,6 +82,12 @@ const ProdModel = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setProdModel(emptyProdModel);
@@ -110,13 +115,13 @@ const ProdModel = () => {
             if (prodModel.id) {
                 configurationManagementService.update(modelName, prodModel.id, prodModel).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'ProdModel Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, prodModel).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'ProdModel Created', life: 3000 });
                 });
             }
@@ -140,7 +145,10 @@ const ProdModel = () => {
     const deleteProdModel = () => {
         configurationManagementService.delete(modelName, prodModel.id).then(data => {
             console.log(data);
-            loadLazyData();
+            masterDataDBService.deleteFromModelTable(modelName, prodModel.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Model Deleted', life: 3000 });
+            });
         });
         setDeleteProdModelDialog(false);
         setProdModel(emptyProdModel);
@@ -267,7 +275,7 @@ const ProdModel = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -278,7 +286,7 @@ const ProdModel = () => {
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} ProdModel`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
@@ -299,7 +307,7 @@ const ProdModel = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {prodModel && (
                                 <span>
-                                    Are you sure you want to delete <b>{prodModel.empID}</b>?
+                                    Are you sure you want to delete <b>{prodModel.id}</b>?
                                 </span>
                             )}
                         </div>

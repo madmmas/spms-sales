@@ -88,7 +88,6 @@ const List = ({ ledger = false }) => {
         masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             console.log(data)
             setTotalRecords(data.total);
-            // await masterDataDBService.populateFieldData(CUSTOMER_CATEGORY_MODEL, 'dtCustomerCategory_id', data.rows);
             setProfiles(data.rows);
             setLoading(false);
         });

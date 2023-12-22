@@ -36,10 +36,8 @@ const getFields = function(modelName) {
             return masterDef.supplier_category_fields;
         case "dtWarehouse":
             return masterDef.warehouse_fields;         
-
         case "dtProduct":
             return productDef.product_fields;
-
         case "trxLedger":
             return transDef.ledger_fields;   
 

@@ -36,7 +36,7 @@ const BusinessRoute = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -46,7 +46,7 @@ const BusinessRoute = () => {
     const [empProfileDialog, setBusinessRouteDialog] = useState(false);
     const [deleteBusinessRouteDialog, setDeleteBusinessRouteDialog] = useState(false);
     const [deleteBusinessRoutesDialog, setDeleteBusinessRoutesDialog] = useState(false);
-    const [task_type, setBusinessRoute] = useState(emptyBusinessRoute);
+    const [businessRoute, setBusinessRoute] = useState(emptyBusinessRoute);
     const [selectedBusinessRoutes, setSelectedBusinessRoutes] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -83,6 +83,12 @@ const BusinessRoute = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setBusinessRoute(emptyBusinessRoute);
@@ -106,17 +112,17 @@ const BusinessRoute = () => {
     const saveBusinessRoute = () => {
         setSubmitted(true);
 
-        if (task_type.name.trim()) {
-            if (task_type.id) {
-                configurationManagementService.update(modelName, task_type.id, task_type).then(data => {
+        if (businessRoute.name.trim()) {
+            if (businessRoute.id) {
+                configurationManagementService.update(modelName, businessRoute.id, businessRoute).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, task_type).then(data => {
+                configurationManagementService.create(modelName, businessRoute).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Created', life: 3000 });
                 });
             }
@@ -126,22 +132,24 @@ const BusinessRoute = () => {
         }
     };
 
-    const editBusinessRoute = (task_type) => {
+    const editBusinessRoute = (businessRoute) => {
         setCreateEdit(false);
-        setBusinessRoute({ ...task_type });
+        setBusinessRoute({ ...businessRoute });
         setBusinessRouteDialog(true);
     };
 
-    const confirmDeleteBusinessRoute = (task_type) => {
-        setBusinessRoute(task_type);
+    const confirmDeleteBusinessRoute = (businessRoute) => {
+        setBusinessRoute(businessRoute);
         setDeleteBusinessRouteDialog(true);
     };
 
     const deleteBusinessRoute = () => {
-        configurationManagementService.delete(modelName, task_type.id).then(data => {
+        configurationManagementService.delete(modelName, businessRoute.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, businessRoute.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Deleted', life: 3000 });
+            });
         });
         setDeleteBusinessRouteDialog(false);
         setBusinessRoute(emptyBusinessRoute);
@@ -161,7 +169,7 @@ const BusinessRoute = () => {
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...task_type };
+        let _empProfile = { ...businessRoute };
         _empProfile[`${name}`] = val;
 
         setBusinessRoute(_empProfile);
@@ -270,7 +278,7 @@ const BusinessRoute = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -285,24 +293,24 @@ const BusinessRoute = () => {
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Business Route`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
-                        {task_type.image && <img src={`${contextPath}/demo/images/task_type/${task_type.image}`} alt={task_type.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                        {businessRoute.image && <img src={`${contextPath}/demo/images/businessRoute/${businessRoute.image}`} alt={businessRoute.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
-                            <InputText id="name" value={task_type.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !task_type.name })} />
-                            {submitted && !task_type.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={businessRoute.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !businessRoute.name })} />
+                            {submitted && !businessRoute.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={task_type.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={businessRoute.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 
                     <Dialog visible={deleteBusinessRouteDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteBusinessRouteDialogFooter} onHide={hideDeleteBusinessRouteDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {task_type && (
+                            {businessRoute && (
                                 <span>
-                                    Are you sure you want to delete <b>{task_type.empID}</b>?
+                                    Are you sure you want to delete <b>{businessRoute.id}</b>?
                                 </span>
                             )}
                         </div>
@@ -311,7 +319,7 @@ const BusinessRoute = () => {
                     <Dialog visible={deleteBusinessRoutesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteBusinessRoutesDialogFooter} onHide={hideDeleteBusinessRoutesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {task_type && <span>Are you sure you want to delete the selected items?</span>}
+                            {businessRoute && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>

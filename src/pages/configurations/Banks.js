@@ -24,18 +24,19 @@ const Banks = () => {
 
     let emptyBanks = {
         id: null,
-        empID: '',
-        name: ''
+        name: '',
+        description: '',
     };
 
     let defaultFilters = {
+        fields: ['name', 'description'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },                    
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -74,7 +75,6 @@ const Banks = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        // configurationManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
         masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
@@ -82,6 +82,12 @@ const Banks = () => {
             setLoading(false);
         });
     }
+
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const openNew = () => {
         setCreateEdit(true);
@@ -110,13 +116,13 @@ const Banks = () => {
             if (banks.id) {
                 configurationManagementService.update(modelName, banks.id, banks).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Banks Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, banks).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Banks Created', life: 3000 });
                 });
             }
@@ -140,7 +146,10 @@ const Banks = () => {
     const deleteBanks = () => {
         configurationManagementService.delete(modelName, banks.id).then(data => {
             console.log(data);
-            loadLazyData();
+            masterDataDBService.deleteFromModelTable(modelName, banks.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
+            });
         });
         setDeleteBanksDialog(false);
         setBanks(emptyBanks);
@@ -267,7 +276,7 @@ const Banks = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -299,7 +308,7 @@ const Banks = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {banks && (
                                 <span>
-                                    Are you sure you want to delete <b>{banks.empID}</b>?
+                                    Are you sure you want to delete <b>{banks.id}</b>?
                                 </span>
                             )}
                         </div>

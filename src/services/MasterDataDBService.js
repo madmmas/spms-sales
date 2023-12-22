@@ -31,7 +31,7 @@ export class MasterDataDBService {
         // let updatedTime = moment().format('YYYY-MM-DD HH:mm:ss');
         // 2 minutes before
         // updatedTime = moment().subtract(1, 'minutes').format('YYYY-MM-DD HH:mm:ss');
-        updatedTime = moment(updatedTime).format('YYYY-MM-DD HH:mm:ss');
+        // updatedTime = moment(updatedTime).format('YYYY-MM-DD HH:mm:ss');
         console.log("setModelLastUpdated:::", modelName, updatedTime);
         localStorage.setItem(modelName + "_last_updated", updatedTime);
     }
@@ -90,6 +90,7 @@ export class MasterDataDBService {
         if (data && data.rows) {
             let self = this;
             let result = [];
+            let deleted = [];
             data.rows.forEach(row => {
                 let doc = JSON.parse(row.doc);
                 let _result = self.buildData(modelName, doc);
@@ -97,9 +98,14 @@ export class MasterDataDBService {
                 _result.last_trx_id = row.last_trx_id;
                 _result.shortname = row.shortname;
                 _result.deleted = row.deleted;
-                result.push(_result);
+                if(row.deleted) {
+                    deleted.push(row.id);
+                } else {
+                    result.push(_result);
+                }
             });
             table.bulkPut(result);
+            table.bulkDelete(deleted);
             let _last_updated = data.last_updated;
             console.log("addToCustomerTable_last_updated:::", _last_updated);
             if(_last_updated) {
@@ -108,6 +114,11 @@ export class MasterDataDBService {
         }
     }
 
+    async deleteFromModelTable(modelName, id) {
+        this.openDB();
+        let table = this.db.table(modelName);
+        table.delete(id);
+    }
 
     async getAllMD(modelName, params) {
         let uri = `/all/${modelName}`;

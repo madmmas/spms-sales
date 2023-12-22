@@ -36,9 +36,7 @@ const ProductCategory = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -48,7 +46,7 @@ const ProductCategory = () => {
     const [empProfileDialog, setProductCategoryDialog] = useState(false);
     const [deleteProductCategoryDialog, setDeleteProductCategoryDialog] = useState(false);
     const [deleteProductCategorysDialog, setDeleteProductCategorysDialog] = useState(false);
-    const [ProductCategory, setProductCategory] = useState(emptyProductCategory);
+    const [productCategory, setProductCategory] = useState(emptyProductCategory);
     const [selectedProductCategorys, setSelectedProductCategorys] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -85,6 +83,12 @@ const ProductCategory = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setProductCategory(emptyProductCategory);
@@ -108,17 +112,17 @@ const ProductCategory = () => {
     const saveProductCategory = () => {
         setSubmitted(true);
 
-        if (ProductCategory.name.trim()) {
-            if (ProductCategory.id) {
-                configurationManagementService.update(modelName, ProductCategory.id, ProductCategory).then(data => {
+        if (productCategory.name.trim()) {
+            if (productCategory.id) {
+                configurationManagementService.update(modelName, productCategory.id, productCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, ProductCategory).then(data => {
+                configurationManagementService.create(modelName, productCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Created', life: 3000 });
                 });
             }
@@ -140,10 +144,12 @@ const ProductCategory = () => {
     };
 
     const deleteProductCategory = () => {
-        configurationManagementService.delete(modelName, ProductCategory.id).then(data => {
+        configurationManagementService.delete(modelName, productCategory.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, productCategory.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Category Deleted', life: 3000 });
+            });
         });
         setDeleteProductCategoryDialog(false);
         setProductCategory(emptyProductCategory);
@@ -163,7 +169,7 @@ const ProductCategory = () => {
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...ProductCategory };
+        let _empProfile = { ...productCategory };
         _empProfile[`${name}`] = val;
 
         setProductCategory(_empProfile);
@@ -270,7 +276,7 @@ const ProductCategory = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -281,28 +287,28 @@ const ProductCategory = () => {
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Product Category`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                                            
-                        {ProductCategory.image && <img src={`${contextPath}/demo/images/ProductCategory/${ProductCategory.image}`} alt={ProductCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                        {productCategory.image && <img src={`${contextPath}/demo/images/productCategory/${productCategory.image}`} alt={productCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name*</label>
-                            <InputText id="name" value={ProductCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !ProductCategory.name })} />
-                            {submitted && !ProductCategory.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={productCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !ProductCategory.name })} />
+                            {submitted && !productCategory.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={ProductCategory.description} onChange={(e) => onInputChange(e, 'description')} rows={3} cols={20} />
+                            <InputTextarea id="description" value={productCategory.description} onChange={(e) => onInputChange(e, 'description')} rows={3} cols={20} />
                         </div>
                     </Dialog>
 
                     <Dialog visible={deleteProductCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductCategoryDialogFooter} onHide={hideDeleteProductCategoryDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {ProductCategory && (
+                            {productCategory && (
                                 <span>
-                                    Are you sure you want to delete <b>{ProductCategory.empID}</b>?
+                                    Are you sure you want to delete <b>{productCategory.id}</b>?
                                 </span>
                             )}
                         </div>
@@ -311,7 +317,7 @@ const ProductCategory = () => {
                     <Dialog visible={deleteProductCategorysDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductCategorysDialogFooter} onHide={hideDeleteProductCategorysDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {ProductCategory && <span>Are you sure you want to delete the selected items?</span>}
+                            {productCategory && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>

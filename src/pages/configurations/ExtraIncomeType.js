@@ -36,7 +36,7 @@ const ExtraIncomeType = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -46,7 +46,7 @@ const ExtraIncomeType = () => {
     const [empProfileDialog, setExtraIncomeTypeDialog] = useState(false);
     const [deleteExtraIncomeTypeDialog, setDeleteExtraIncomeTypeDialog] = useState(false);
     const [deleteExtraIncomeTypesDialog, setDeleteExtraIncomeTypesDialog] = useState(false);
-    const [task_type, setExtraIncomeType] = useState(emptyExtraIncomeType);
+    const [income_type, setExtraIncomeType] = useState(emptyExtraIncomeType);
     const [selectedExtraIncomeTypes, setSelectedExtraIncomeTypes] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -83,6 +83,12 @@ const ExtraIncomeType = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setExtraIncomeType(emptyExtraIncomeType);
@@ -106,17 +112,17 @@ const ExtraIncomeType = () => {
     const saveExtraIncomeType = () => {
         setSubmitted(true);
 
-        if (task_type.name.trim()) {
-            if (task_type.id) {
-                configurationManagementService.update(modelName, task_type.id, task_type).then(data => {
+        if (income_type.name.trim()) {
+            if (income_type.id) {
+                configurationManagementService.update(modelName, income_type.id, income_type).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Type Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, task_type).then(data => {
+                configurationManagementService.create(modelName, income_type).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Extra Income Type Created', life: 3000 });
                 });
             }
@@ -126,22 +132,24 @@ const ExtraIncomeType = () => {
         }
     };
 
-    const editExtraIncomeType = (task_type) => {
+    const editExtraIncomeType = (income_type) => {
         setCreateEdit(false);
-        setExtraIncomeType({ ...task_type });
+        setExtraIncomeType({ ...income_type });
         setExtraIncomeTypeDialog(true);
     };
 
-    const confirmDeleteExtraIncomeType = (task_type) => {
-        setExtraIncomeType(task_type);
+    const confirmDeleteExtraIncomeType = (income_type) => {
+        setExtraIncomeType(income_type);
         setDeleteExtraIncomeTypeDialog(true);
     };
 
     const deleteExtraIncomeType = () => {
-        configurationManagementService.delete(modelName, task_type.id).then(data => {
+        configurationManagementService.delete(modelName, income_type.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, income_type.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Income Type Deleted', life: 3000 });
+            });
         });
         setDeleteExtraIncomeTypeDialog(false);
         setExtraIncomeType(emptyExtraIncomeType);
@@ -161,7 +169,7 @@ const ExtraIncomeType = () => {
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...task_type };
+        let _empProfile = { ...income_type };
         _empProfile[`${name}`] = val;
 
         setExtraIncomeType(_empProfile);
@@ -268,7 +276,7 @@ const ExtraIncomeType = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -283,24 +291,24 @@ const ExtraIncomeType = () => {
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Extra Income Type`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
-                        {task_type.image && <img src={`${contextPath}/demo/images/task_type/${task_type.image}`} alt={task_type.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                        {income_type.image && <img src={`${contextPath}/demo/images/income_type/${income_type.image}`} alt={income_type.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
-                            <InputText id="name" value={task_type.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !task_type.name })} />
-                            {submitted && !task_type.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={income_type.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !income_type.name })} />
+                            {submitted && !income_type.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={task_type.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={income_type.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 
                     <Dialog visible={deleteExtraIncomeTypeDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExtraIncomeTypeDialogFooter} onHide={hideDeleteExtraIncomeTypeDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {task_type && (
+                            {income_type && (
                                 <span>
-                                    Are you sure you want to delete <b>{task_type.empID}</b>?
+                                    Are you sure you want to delete <b>{income_type.id}</b>?
                                 </span>
                             )}
                         </div>
@@ -309,7 +317,7 @@ const ExtraIncomeType = () => {
                     <Dialog visible={deleteExtraIncomeTypesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteExtraIncomeTypesDialogFooter} onHide={hideDeleteExtraIncomeTypesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {task_type && <span>Are you sure you want to delete the selected items?</span>}
+                            {income_type && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>

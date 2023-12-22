@@ -24,18 +24,19 @@ const MFS = () => {
 
     let emptyMFSs = {
         id: null,
-        empID: '',
+        id: '',
         name: ''
     };
 
     let defaultFilters = {
+        fields: ['name', 'description'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },                    
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -82,6 +83,12 @@ const MFS = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setMFSs(emptyMFSs);
@@ -109,13 +116,13 @@ const MFS = () => {
             if (mfs.id) {
                 configurationManagementService.update(modelName, mfs.id, mfs).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFSs Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, mfs).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFSs Created', life: 3000 });
                 });
             }
@@ -139,7 +146,10 @@ const MFS = () => {
     const deleteMFSs = () => {
         configurationManagementService.delete(modelName, mfs.id).then(data => {
             console.log(data);
-            loadLazyData();
+            masterDataDBService.deleteFromModelTable(modelName, mfs.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Deleted', life: 3000 });
+            });
         });
         setDeleteMFSsDialog(false);
         setMFSs(emptyMFSs);
@@ -266,7 +276,7 @@ const MFS = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -298,7 +308,7 @@ const MFS = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {mfs && (
                                 <span>
-                                    Are you sure you want to delete <b>{mfs.empID}</b>?
+                                    Are you sure you want to delete <b>{mfs.id}</b>?
                                 </span>
                             )}
                         </div>

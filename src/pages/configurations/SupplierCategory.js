@@ -36,8 +36,7 @@ const SupplierCategory = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -47,7 +46,7 @@ const SupplierCategory = () => {
     const [empProfileDialog, setSupplierCategoryDialog] = useState(false);
     const [deleteSupplierCategoryDialog, setDeleteSupplierCategoryDialog] = useState(false);
     const [deleteSupplierCategorysDialog, setDeleteSupplierCategorysDialog] = useState(false);
-    const [SupplierCategory, setSupplierCategory] = useState(emptySupplierCategory);
+    const [supplierCategory, setSupplierCategory] = useState(emptySupplierCategory);
     const [selectedSupplierCategorys, setSelectedSupplierCategorys] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -84,6 +83,12 @@ const SupplierCategory = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setSupplierCategory(emptySupplierCategory);
@@ -107,17 +112,17 @@ const SupplierCategory = () => {
     const saveSupplierCategory = () => {
         setSubmitted(true);
 
-        if (SupplierCategory.name.trim()) {
+        if (supplierCategory.name.trim()) {
             if (SupplierCategory.id) {
-                configurationManagementService.update(modelName, SupplierCategory.id, SupplierCategory).then(data => {
+                configurationManagementService.update(modelName, supplierCategory.id, supplierCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Category Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, SupplierCategory).then(data => {
+                configurationManagementService.create(modelName, supplierCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Category Created', life: 3000 });
                 });
             }
@@ -139,10 +144,12 @@ const SupplierCategory = () => {
     };
 
     const deleteSupplierCategory = () => {
-        configurationManagementService.delete(modelName, SupplierCategory.id).then(data => {
+        configurationManagementService.delete(modelName, supplierCategory.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Category Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, supplierCategory.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Category Deleted', life: 3000 });
+            });
         });
         setDeleteSupplierCategoryDialog(false);
         setSupplierCategory(emptySupplierCategory);
@@ -162,7 +169,7 @@ const SupplierCategory = () => {
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...SupplierCategory };
+        let _empProfile = { ...supplierCategory };
         _empProfile[`${name}`] = val;
 
         setSupplierCategory(_empProfile);
@@ -269,7 +276,7 @@ const SupplierCategory = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -280,28 +287,28 @@ const SupplierCategory = () => {
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" filter filterPlaceholder="Search by description" sortable header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Supplier Category`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                                            
-                        {SupplierCategory.image && <img src={`${contextPath}/demo/images/SupplierCategory/${SupplierCategory.image}`} alt={SupplierCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                        {supplierCategory.image && <img src={`${contextPath}/demo/images/supplierCategory/${supplierCategory.image}`} alt={supplierCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name*</label>
-                            <InputText id="name" value={SupplierCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !SupplierCategory.name })} />
-                            {submitted && !SupplierCategory.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={supplierCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !supplierCategory.name })} />
+                            {submitted && !supplierCategory.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={SupplierCategory.description} onChange={(e) => onInputChange(e, 'description')}  rows={3} cols={20} />
+                            <InputTextarea id="description" value={supplierCategory.description} onChange={(e) => onInputChange(e, 'description')}  rows={3} cols={20} />
                         </div>
                     </Dialog>
 
                     <Dialog visible={deleteSupplierCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteSupplierCategoryDialogFooter} onHide={hideDeleteSupplierCategoryDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {SupplierCategory && (
+                            {supplierCategory && (
                                 <span>
-                                    Are you sure you want to delete <b>{SupplierCategory.empID}</b>?
+                                    Are you sure you want to delete <b>{supplierCategory.id}</b>?
                                 </span>
                             )}
                         </div>

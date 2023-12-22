@@ -36,9 +36,7 @@ const PaymentType = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'description': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -85,6 +83,12 @@ const PaymentType = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setPaymentType(emptyPaymentType);
@@ -112,13 +116,13 @@ const PaymentType = () => {
             if (paymentType.id) {
                 configurationManagementService.update(modelName, paymentType.id, paymentType).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Updated', life: 3000 });
                 });
             } else {
                 configurationManagementService.create(modelName, paymentType).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Created', life: 3000 });
                 });
             }
@@ -142,8 +146,11 @@ const PaymentType = () => {
     const deletePaymentType = () => {
         configurationManagementService.delete(modelName, paymentType.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, paymentType.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Type Deleted', life: 3000 });
+            });
+
         });
         setDeletePaymentTypeDialog(false);
         setPaymentType(emptyPaymentType);
@@ -270,7 +277,7 @@ const PaymentType = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -281,7 +288,7 @@ const PaymentType = () => {
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="description" header="Description" filter filterPlaceholder="Search by description" sortable body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Payment Type`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>
@@ -302,7 +309,7 @@ const PaymentType = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {paymentType && (
                                 <span>
-                                    Are you sure you want to delete <b>{paymentType.empID}</b>?
+                                    Are you sure you want to delete <b>{paymentType.id}</b>?
                                 </span>
                             )}
                         </div>

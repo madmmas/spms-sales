@@ -38,7 +38,7 @@ const CustomerCategory = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     };
 
@@ -48,7 +48,7 @@ const CustomerCategory = () => {
     const [empProfileDialog, setCustomerCategoryDialog] = useState(false);
     const [deleteCustomerCategoryDialog, setDeleteCustomerCategoryDialog] = useState(false);
     const [deleteCustomerCategorysDialog, setDeleteCustomerCategorysDialog] = useState(false);
-    const [CustomerCategory, setCustomerCategory] = useState(emptyCustomerCategory);
+    const [customerCategory, setCustomerCategory] = useState(emptyCustomerCategory);
     const [selectedCustomerCategorys, setSelectedCustomerCategorys] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -85,6 +85,12 @@ const CustomerCategory = () => {
         });
     }
 
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
+
     const openNew = () => {
         setCreateEdit(true);
         setCustomerCategory(emptyCustomerCategory);
@@ -108,17 +114,17 @@ const CustomerCategory = () => {
     const saveCustomerCategory = () => {
         setSubmitted(true);
 
-        if (CustomerCategory.name.trim()) {
-            if (CustomerCategory.id) {
-                configurationManagementService.update(modelName, CustomerCategory.id, CustomerCategory).then(data => {
+        if (customerCategory.name.trim()) {
+            if (customerCategory.id) {
+                configurationManagementService.update(modelName, customerCategory.id, customerCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, CustomerCategory).then(data => {
+                configurationManagementService.create(modelName, customerCategory).then(data => {
                     console.log(data);
-                    loadLazyData();
+                    reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Created', life: 3000 });
                 });
             }
@@ -140,10 +146,12 @@ const CustomerCategory = () => {
     };
 
     const deleteCustomerCategory = () => {
-        configurationManagementService.delete(modelName, CustomerCategory.id).then(data => {
+        configurationManagementService.delete(modelName, customerCategory.id).then(data => {
             console.log(data);
-            loadLazyData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Deleted', life: 3000 });
+            masterDataDBService.deleteFromModelTable(modelName, customerCategory.id).then(() => {
+                reloadData();
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Category Deleted', life: 3000 });
+            });
         });
         setDeleteCustomerCategoryDialog(false);
         setCustomerCategory(emptyCustomerCategory);
@@ -163,7 +171,7 @@ const CustomerCategory = () => {
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...CustomerCategory };
+        let _empProfile = { ...customerCategory };
         _empProfile[`${name}`] = val;
         console.log(_empProfile);
         setCustomerCategory(_empProfile);
@@ -222,7 +230,8 @@ const CustomerCategory = () => {
     };
 
     const defaultBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default=="true", 'text-red-500 pi-times-circle': rowData._default!=="true" })}></i>;
+        console.log("defaultBodyTemplate::", rowData);
+        return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default==true, 'text-red-500 pi-times-circle': rowData._default!=true })}></i>;
     };
 
     const actionBodyTemplate = (rowData) => {
@@ -274,7 +283,7 @@ const CustomerCategory = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -290,28 +299,28 @@ const CustomerCategory = () => {
                     </DataTable>
 
                     <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Customer Category`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                                        
-                        {CustomerCategory.image && <img src={`${contextPath}/demo/images/CustomerCategory/${CustomerCategory.image}`} alt={CustomerCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                        {customerCategory.image && <img src={`${contextPath}/demo/images/customerCategory/${customerCategory.image}`} alt={customerCategory.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
-                            <InputText id="name" value={CustomerCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !CustomerCategory.name })} />
-                            {submitted && !CustomerCategory.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={customerCategory.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !customerCategory.name })} />
+                            {submitted && !customerCategory.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={CustomerCategory.description} onChange={(e) => onInputChange(e, 'description')} rows={3} cols={20} />
+                            <InputTextarea id="description" value={customerCategory.description} onChange={(e) => onInputChange(e, 'description')} rows={3} cols={20} />
                         </div>
                         <div className="field">
                             <label htmlFor="default">Default</label>
-                            <InputSwitch id="default" checked={CustomerCategory._default==="true"} onChange={(e) => onInputChange(e, '_default')} />
+                            <InputSwitch id="default" checked={customerCategory._default===true} onChange={(e) => onInputChange(e, '_default')} />
                         </div>
                     </Dialog>
 
                     <Dialog visible={deleteCustomerCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCustomerCategoryDialogFooter} onHide={hideDeleteCustomerCategoryDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {CustomerCategory && (
+                            {customerCategory && (
                                 <span>
-                                    Are you sure you want to delete <b>{CustomerCategory.empID}</b>?
+                                    Are you sure you want to delete <b>{customerCategory.id}</b>?
                                 </span>
                             )}
                         </div>
@@ -320,7 +329,7 @@ const CustomerCategory = () => {
                     <Dialog visible={deleteCustomerCategorysDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCustomerCategorysDialogFooter} onHide={hideDeleteCustomerCategorysDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {CustomerCategory && <span>Are you sure you want to delete the selected items?</span>}
+                            {customerCategory && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>
