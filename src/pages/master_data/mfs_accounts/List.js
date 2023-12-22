@@ -12,7 +12,6 @@ import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { MFS_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
@@ -56,19 +55,32 @@ const List = ({ ledger = false }) => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
     const [dtMFS, setDtMFS] = useState([]);
 
-    const configurationService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
+    
+    useEffect(() => {
+        setLoadCount(loadCount+1);
+    }, []);
 
     useEffect(() => {
-        initFilters();
-        configurationService.getAllWithoutParams(MFS_MODEL).then(data => {
-            setDtMFS(data);
-        });
-    }, []);
+        if(loadCount==1){
+            masterDataDBService.getAll(MFS_MODEL).then(data => {
+                setDtMFS(data.rows);
+            });
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
     
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
+
     const clearFilter = () => {
         initFilters();
     }
@@ -91,6 +103,11 @@ const List = ({ ledger = false }) => {
             setLoading(false);
         });
     }
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -142,13 +159,12 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
-        //     console.log(data);
-        //     loadLazyData();
-        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Profile Deleted', life: 3000 });
-        // });
-        // setDeleteProfileDialog(false);
-        // setProfile(null);
+        masterDataDBService.delete(modelName, dtProfile.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Profile Deleted', life: 3000 });
+        });
+        setDeleteProfileDialog(false);
+        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -173,14 +189,6 @@ const List = ({ ledger = false }) => {
         return (
             <>
                 {rowData.dtMFS_id_shortname}
-            </>
-        );
-    };
-
-    const branchBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.branch}
             </>
         );
     };
@@ -213,21 +221,6 @@ const List = ({ ledger = false }) => {
         return (
             <>
                 {rowData.balance}
-            </>
-        );
-    };
-
-    const addressBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.address}
-            </>
-        );
-    };
-    const phoneBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.phone}
             </>
         );
     };
@@ -319,7 +312,7 @@ const List = ({ ledger = false }) => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
                         scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -341,7 +334,7 @@ const List = ({ ledger = false }) => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.mfsAccountId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

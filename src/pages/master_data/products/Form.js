@@ -6,12 +6,13 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { InputNumber } from 'primereact/inputnumber';
 import { classNames } from 'primereact/utils';
 
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 
-import { PRODUCT_CATEGORY_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
+import { WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 import { MEASUREMENT_UNITS } from '../../../constants/lookupData';
 import { ProductService } from '../../../services/ProductService';
 
@@ -37,16 +38,16 @@ const Form = ({productData}) => {
             id: null,
             code: "",
             name: "",
-            price: 0.00,
-            type: "GENERAL",
-            category_id: "",
-            // warehouse_id: "",
+            category_id: "", // as GENERAL
+            warehouse_id: "",
             brand_name: "",
             model_no: "",
             brand_id: "",
             model_id: "",
             part_number: "",
             unit: MEASUREMENT_UNITS[0].id,
+            price: 0.00,
+            min_trade_price: 0.00,
             low_stock_qty: 0,
             remarks: "",
             active: true
@@ -64,18 +65,17 @@ const Form = ({productData}) => {
     const buildFormData = (data) => {
         return {
             id: data.id,
-            // code: data.code,
             name: data.name,
-            price: Number(data.price),
-            type: 'GENERAL',
-            category_id: data.category_id,
-            // warehouse_id: data.warehouse_id,
+            category_id: data.category_id, // as GENERAL
+            warehouse_id: data.warehouse_id,
             brand_name: data.brand_name,
             model_no: data.model_no,
             brand_id: data.brand_id,
             model_id: data.model_id,
             part_number: data.part_number,
             unit: data.unit,
+            price: Number(data.price),
+            min_trade_price: Number(data.min_trade_price),
             low_stock_qty: Number(data.low_stock_qty),
             remarks: data.remarks,
             items: data.items,
@@ -170,19 +170,19 @@ const Form = ({productData}) => {
                     </div>
                     <div className="field col-12 md:col-4">
                         <Controller
-                            name="category_id"
+                            name="warehouse_id"
                             control={control}
-                            rules={{ required: 'Product Category is required.' }}
+                            rules={{ required: 'Warehouse is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Category*</label>
-                                <SelectLookupData field={field} model={PRODUCT_CATEGORY_MODEL}
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
+                                <SelectLookupData field={field} model={WAREHOUSE_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>
-                     <div className="field col-12 md:col-4">
+                    <div className="field col-12 md:col-4">
                          <Controller
                              name="code"
                              control={control} 
@@ -194,7 +194,6 @@ const Form = ({productData}) => {
                             </>
                         )}/>
                     </div>
-
                     <div className="field col-12 md:col-4">
                         <Controller
                             name="brand_id"
@@ -235,6 +234,51 @@ const Form = ({productData}) => {
                         )}/>
                     </div>
                     <div className="field col-12 md:col-4">
+                         <Controller
+                             name="cost"
+                             control={control} 
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Purchase Price</label>
+                                <InputText readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    onChange={(e) => field.onChange(e.value)}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    min={0} maxFractionDigits={2}
+                                    />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-4">
+                        <Controller
+                            name="min_trade_price"
+                            control={control}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Minimum Trade Price</label>
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    onChange={(e) => field.onChange(e.value)}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    min={0} maxFractionDigits={2}
+                                    />
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+
+                    <div className="field col-12 md:col-4">
                         <Controller
                             name="unit"
                             control={control}
@@ -255,12 +299,15 @@ const Form = ({productData}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
-                                <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
+                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
+                                    onChange={(e) => field.onChange(e.value)}
+                                    className={classNames({ 'p-invalid': fieldState.error })} 
+                                    min={0} maxFractionDigits={2}
+                                    />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
-                    </div>
-                    
+                    </div>                    
                     <div className="field col-12 md:col-8">
                         <Controller
                             name="remarks"

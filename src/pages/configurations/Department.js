@@ -268,7 +268,7 @@ const Department = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 

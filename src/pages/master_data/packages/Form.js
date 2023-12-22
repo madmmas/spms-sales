@@ -75,7 +75,7 @@ const Form = ({ packageData }) => {
             code: "",
             name: "",
             price: 0.00,
-            type: "PACKAGE",
+            category_id: 2,
             warehouse_id: "",
             low_stock_qty: 0,
             remarks: "",
@@ -116,8 +116,8 @@ const Form = ({ packageData }) => {
             id: data.id,
             name: data.name,
             price: Number(data.price),
-            // min_trade_price: Number(data.min_trade_price),
-            type: 'PACKAGE',
+            min_trade_price: Number(data.min_trade_price),
+            category_id: 2,
             warehouse_id: data.warehouse_id,
             brand_id: Number(data.brand_id),
             model_id: Number(data.model_id),
@@ -244,6 +244,7 @@ const Form = ({ packageData }) => {
     }
 
     let defaultFilters = {
+        globalFilterFields: ['name', 'brand_name', 'model_no', 'part_number'],
         fields: ['id', 'name', 'code',  'brand_name', 'model_no', 'part_number', 'price'],
         first: 0,
         rows: 10,
@@ -252,7 +253,7 @@ const Form = ({ packageData }) => {
         sortOrder: null,
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            'type': { operator: FilterOperator.AND, constraints: [{ value: "GENERAL", matchMode: FilterMatchMode.EQUALS }] },
+            dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
             modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -291,8 +292,8 @@ const Form = ({ packageData }) => {
                 showFields={[]} onSelect={onSelection}
                 columns={[
                     {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
-                    {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
-                    {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
+                    {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
+                    {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
                     {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
                     {field: 'price', header: 'Trade Price', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
                 ]} 

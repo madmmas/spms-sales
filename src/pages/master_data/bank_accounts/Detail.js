@@ -36,7 +36,7 @@ const Detail = () => {
         }else{
             hrManagementService.getById(modelName, id).then(data => {
                 setBankAccountData(data);
-            });    
+            });
         }
     }, []);
 

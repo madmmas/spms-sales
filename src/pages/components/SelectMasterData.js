@@ -9,6 +9,7 @@ export default function SelectMasterData({
     showFields=[], modelName, className, 
     columns, caption="Select", onSelect, 
     defaultFilters={
+        globalFilterFields: ['shortname', 'name'],
         fields: [],
         first: 0,
         rows: 10,

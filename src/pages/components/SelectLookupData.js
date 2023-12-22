@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Dropdown } from 'primereact/dropdown';
-import { ConfigurationService } from '../../services/ConfigurationService';
+
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectLookupData( { field, className, model, onChangeItem, placeholder = "" }) {
 
     const [data, setData] = useState([]);
 
-    const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        configurationService.getAllWithoutParams(model).then(data => {
-            setData(data);
-            // if(data.length > 0) { field.onChange(data[0].id); }
+        masterDataDBService.getAll(model).then(data => {
+            setData(data.rows);
         });
     }, []);
 

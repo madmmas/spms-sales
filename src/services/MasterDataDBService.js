@@ -114,6 +114,28 @@ export class MasterDataDBService {
         }
     }
 
+    async create(modelName, data) {
+        const resp = await axiosInstance.post(`/data/${modelName}`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async update(modelName, id, data) {
+        const resp = await axiosInstance.put(`/data/${modelName}/` + id, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
+    async delete(modelName, id) {
+        let uri = `/data/${modelName}/` + id;
+        if(modelName === "dtProduct") {
+            uri = `/products/` + id;
+        }
+        const resp = await axiosInstance.delete(uri);
+        await this.deleteFromModelTable(modelName, id);
+        return resp.data;
+    }
+
     async deleteFromModelTable(modelName, id) {
         this.openDB();
         let table = this.db.table(modelName);
@@ -202,27 +224,48 @@ export class MasterDataDBService {
     }
 
     async applyFilter(table, filters) {
-
+        console.log("getAll filter:::", filters);
         for(const filter in filters) {
+            if(filters[filter].value===null || filters[filter].value==="") {
+                continue;
+            }
+
             let filterField = filter;
             let filterValue = filters[filter].value;    
             let filterMatchMode = filters[filter].matchMode;
 
-            if(filterValue===null || filterValue===undefined || filterValue==="") {
-                continue;
+            if(typeof filterValue === 'string') {
+                filterValue = filterValue.toLowerCase();
             }
 
             console.log("getAll filter:::", filterField, filterValue, filterMatchMode);
 
+            // STARTS_WITH = 'startsWith',
+            // CONTAINS = 'contains',
+            // NOT_CONTAINS = 'notContains',
+            // ENDS_WITH = 'endsWith',
+            // EQUALS = 'equals',
+            // NOT_EQUALS = 'notEquals',
+            // IN = 'in',
+            // LESS_THAN = 'lt',
+            // LESS_THAN_OR_EQUAL_TO = 'lte',
+            // GREATER_THAN = 'gt',
+            // GREATER_THAN_OR_EQUAL_TO = 'gte',
+            // BETWEEN = 'between',
+            // DATE_IS = 'dateIs',
+            // DATE_IS_NOT = 'dateIsNot',
+            // DATE_BEFORE = 'dateBefore',
+            // DATE_AFTER = 'dateAfter',
+
             switch (filterMatchMode) {
                 case FilterMatchMode.STARTS_WITH:
-                    table = table.filter(row => row[filterField] && row[filterField].startsWith(filterValue));
+                    table = table.filter(row => row[filterField] && row[filterField].toLowerCase().startsWith(filterValue));
                     break;
                 case FilterMatchMode.ENDS_WITH:
-                    table = table.filter(row => row[filterField] && row[filterField].endsWith(filterValue));
+                    table = table.filter(row => row[filterField] && row[filterField].toLowerCase().endsWith(filterValue));
                     break;
                 case FilterMatchMode.CONTAINS:
-                    table = table.filter(row => row[filterField] && row[filterField].includes(filterValue));
+                    table = table.filter(row => row[filterField] && row[filterField].toLowerCase().includes(filterValue));
                     break;
                 case FilterMatchMode.EQUALS:
                     table = table.filter(row => row[filterField] === filterValue);
@@ -233,11 +276,17 @@ export class MasterDataDBService {
                 case FilterMatchMode.IN:
                     table = table.filter(row => row[filterField] && filterValue.includes(row[filterField]));
                     break;
-                case FilterMatchMode.GTE:
-                    table = table.filter(row => row[filterField] >= filterValue);
+                case FilterMatchMode.GREATER_THAN:
+                    table = table.filter(row => row[filterField] && row[filterField] > filterValue);
                     break;
-                case FilterMatchMode.LTE:
-                    table = table.filter(row => row[filterField] <= filterValue);
+                case FilterMatchMode.GREATER_THAN_OR_EQUAL_TO:
+                    table = table.filter(row => row[filterField] && row[filterField] >= filterValue);
+                    break;
+                case FilterMatchMode.LESS_THAN:
+                    table = table.filter(row => row[filterField] && row[filterField] < filterValue);
+                    break;
+                case FilterMatchMode.LESS_THAN_OR_EQUAL_TO:
+                    table = table.filter(row => row[filterField] && row[filterField] <= filterValue);
                     break;
                 default:
                     break;
@@ -344,30 +393,34 @@ export class MasterDataDBService {
     }
         
     async getAll(modelName, params) {
+        let first = params && params.first || 0;
+        let limit = params && params.rows || 10;
+        console.log("getAll params:::", modelName, first, limit, params);
 
-        let first = params.first || 0;
-        let limit = params.rows || 10;
-
-        // check if the model is updated
-        // this will be check only when a list is loaded for the first time
-        // if(first === 0){
-        //     await this.getAllUpto(modelName);
-        // }
-
-        let name = params.nameField || "name";
-        console.log("getAll params:::", first, limit);
-        console.log("getAll params:::", modelName, params);
+        // let name = params && params.nameField || "name";
         
         await this.openDB();
         // let table = await this.db.table(modelName).orderBy(name);
         let table = await this.db.table(modelName);
         
         // apply filter on the table
-        // check global filter
-        if (params.filters.global) {
-            // table = await this.applyFilter(table, params.globalFilter);
-        } else if (params.filters) {
-            table = await this.applyFilter(table, params.filters);
+        if (params && params.filters) {
+            // check global filter
+            if (params.filters.global && params.filters.global.value  && params.globalFilterFields) {
+                console.log("getAll globalFilterFields:::", params.filters.global, params.globalFilterFields);
+                let filterValue = params.filters.global.value.toLowerCase();
+                table = table.filter(row => {
+                    for (let i = 0; i < params.globalFilterFields.length; i++) {
+                        let field = params.globalFilterFields[i];
+                        if(row[field] && row[field].toLowerCase().includes(filterValue)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            } else  {
+                table = await this.applyFilter(table, params.filters);
+            }
         }
         let total = await table.count();
         let result = await table.offset(first).limit(limit).toArray();
@@ -396,20 +449,29 @@ export class MasterDataDBService {
 
     // get model data by id
     async getById(modelName, id) {
+        if(id===null || id===undefined) {
+            return null;
+        }
         await this.openDB();
         let table = this.db.table(modelName);
         let result = await table.get(id);
-        console.log("getById result:::", result);
+        console.log("getById:::", modelName, id, result);
         return result;
     }
 
     // get model shortname by id
     async getShortnameById(modelName, id) {
+        if(id===null || id===undefined) {
+            return "";
+        }
         await this.openDB();
         let table = this.db.table(modelName);
         let result = await table.get(id);
-        console.log("getShortnameById result:::", result);
-        return result.shortname;
+        console.log("getShortnameById result:::", modelName, id, result);
+        if(result) {
+            return result.shortname || "";
+        }
+        return "";
     }
 
     async populateFieldData(modelName, fieldName, rows) {

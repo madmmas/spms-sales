@@ -10,7 +10,6 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { ConfigurationService } from '../../services/ConfigurationService';
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { BANK_MODEL } from '../../constants/models';
 
@@ -53,7 +52,6 @@ const Banks = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const configurationManagementService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
@@ -114,13 +112,13 @@ const Banks = () => {
 
         if (banks.name.trim()) {
             if (banks.id) {
-                configurationManagementService.update(modelName, banks.id, banks).then(data => {
+                masterDataDBService.update(modelName, banks.id, banks).then(data => {
                     console.log(data);
                     reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Banks Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, banks).then(data => {
+                masterDataDBService.create(modelName, banks).then(data => {
                     console.log(data);
                     reloadData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Banks Created', life: 3000 });
@@ -144,12 +142,9 @@ const Banks = () => {
     };
 
     const deleteBanks = () => {
-        configurationManagementService.delete(modelName, banks.id).then(data => {
-            console.log(data);
-            masterDataDBService.deleteFromModelTable(modelName, banks.id).then(() => {
-                reloadData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
-            });
+        masterDataDBService.delete(modelName, banks.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
         });
         setDeleteBanksDialog(false);
         setBanks(emptyBanks);

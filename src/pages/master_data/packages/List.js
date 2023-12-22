@@ -23,6 +23,7 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
+        globalFilterFields: ['name', 'brand_name', 'model_no', 'part_number'],
         fields: ['id', 'name', 'warehouse_id', 'code', 'price', 'active'],
         first: 0,
         rows: 10,
@@ -30,8 +31,8 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            type: { value: "PACKAGE", matchMode: FilterMatchMode.EQUALS },
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            dtCategory_id: { value: 2, matchMode: FilterMatchMode.EQUALS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -247,7 +248,7 @@ const List = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
 
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -269,7 +270,7 @@ const List = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.packageId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

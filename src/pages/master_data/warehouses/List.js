@@ -47,11 +47,27 @@ const List = () => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
     const masterDataDBService = new MasterDataDBService();
-    
 
+    useEffect(() => {
+        setLoadCount(loadCount+1);
+    }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
     
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
+
     const clearFilter = () => {
         initFilters();
     }
@@ -59,10 +75,6 @@ const List = () => {
     const initFilters = () => {
         setLazyParams(defaultFilters);
     }
-
-    useEffect(() => {
-        loadLazyData();
-    }, [lazyParams]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -74,6 +86,12 @@ const List = () => {
             setLoading(false);
         });
     }
+
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -123,13 +141,12 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
-        //     console.log(data);
-        //     loadLazyData();
-        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Profile Deleted', life: 3000 });
-        // });
-        // setDeleteProfileDialog(false);
-        // setProfile(null);
+        masterDataDBService.delete(modelName, dtProfile.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Profile Deleted', life: 3000 });
+        });
+        setDeleteProfileDialog(false);
+        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -247,7 +264,7 @@ const List = () => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
                         scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -267,7 +284,7 @@ const List = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.warehouseId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

@@ -11,7 +11,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
-import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { SUPPLIER_CATEGORY_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
@@ -54,19 +53,32 @@ const List = ({ ledger = false }) => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
-    // const hrManagementService = new HRService();
+    const [loadCount, setLoadCount] = useState(0);
 
     const [dtSupplierCategory, setDtSupplierCategory] = useState([]);
 
-    const configurationService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        initFilters();
-        configurationService.getAllWithoutParams(SUPPLIER_CATEGORY_MODEL).then(data => {
-            setDtSupplierCategory(data);
-        });
-    }, [dtSupplierCategory]);
+        setLoadCount(loadCount+1);
+    }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(SUPPLIER_CATEGORY_MODEL).then(data => {
+                setDtSupplierCategory(data.rows);
+            });
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
+    
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
+
     
     const clearFilter = () => {
         initFilters();
@@ -90,6 +102,12 @@ const List = ({ ledger = false }) => {
             setLoading(false);
         });
     }
+
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -143,19 +161,12 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
-        //     console.log(data);
-        //     loadLazyData();
-        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Profile Deleted', life: 3000 });
-        // });
-        // setDeleteProfileDialog(false);
-        // setProfile(null);
-    };
-
-    const reloadData = () => {
-        masterDataDBService.getAllMD(modelName, lazyParams).then(data => {
-            console.log("dtSupplier::=>>",data);
+        masterDataDBService.delete(modelName, dtProfile.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Profile Deleted', life: 3000 });
         });
+        setDeleteProfileDialog(false);
+        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -310,7 +321,7 @@ const List = ({ ledger = false }) => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
                         scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -334,7 +345,7 @@ const List = ({ ledger = false }) => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.supplierId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

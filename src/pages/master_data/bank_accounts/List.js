@@ -13,7 +13,6 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
-import { ConfigurationService } from '../../../services/ConfigurationService';
 
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
@@ -56,19 +55,32 @@ const List = ({ ledger = false }) => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
     const [dtBank, setDtBank] = useState([]);
 
     const masterDataDBService = new MasterDataDBService();
-    const configurationService = new ConfigurationService();
 
     useEffect(() => {
-        initFilters();
-        configurationService.getAllWithoutParams(BANK_MODEL).then(data => {
-            setDtBank(data);
-        });
+        setLoadCount(loadCount+1);
     }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(BANK_MODEL).then(data => {
+                setDtBank(data.rows);
+            });
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
     
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
+
     const clearFilter = () => {
         initFilters();
     }
@@ -76,10 +88,6 @@ const List = ({ ledger = false }) => {
     const initFilters = () => {
         setLazyParams(defaultFilters);
     }
-
-    useEffect(() => {
-        loadLazyData();
-    }, [lazyParams]);
 
     const loadLazyData = () => {
         setLoading(true);
@@ -90,6 +98,12 @@ const List = ({ ledger = false }) => {
             setLoading(false);
         });
     }
+
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -145,13 +159,12 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
-        //     console.log(data);
-        //     loadLazyData();
-        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Profile Deleted', life: 3000 });
-        // });
-        // setDeleteProfileDialog(false);
-        // setProfile(null);
+        masterDataDBService.delete(modelName, dtProfile.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Profile Deleted', life: 3000 });
+        });
+        setDeleteProfileDialog(false);
+        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -318,7 +331,7 @@ const List = ({ ledger = false }) => {
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="menu"
+                        onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
                         scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
@@ -343,7 +356,7 @@ const List = ({ ledger = false }) => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.bankAccountId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

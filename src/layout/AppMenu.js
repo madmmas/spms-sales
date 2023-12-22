@@ -85,7 +85,6 @@ const AppMenu = () => {
                         { label: 'MFS Companies', icon: 'pi pi-fw pi-list', to: '/mfs_types' },
                         // { label: 'Office Time', icon: 'pi pi-fw pi-list', to: '/office_time' },
                         { label: 'Payment Type', icon: 'pi pi-fw pi-list', to: '/payment_type' },
-                        { label: 'Product Category', icon: 'pi pi-fw pi-list', to: '/product_category' },
                         { label: 'Product Brand', icon: 'pi pi-fw pi-list', to: '/product_brand' },
                         { label: 'Product Model', icon: 'pi pi-fw pi-list', to: '/product_model' },
                         { label: 'Route', icon: 'pi pi-fw pi-list', to: '/route' },

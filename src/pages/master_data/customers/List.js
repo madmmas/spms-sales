@@ -13,18 +13,14 @@ import { Dropdown } from 'primereact/dropdown';
 
 import { CITIES } from '../../../constants/lookupData';
 import { DISTRICT } from '../../../constants/districts';
-import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { CUSTOMER_MODEL, CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 
-import { ConfigurationService } from '../../../services/ConfigurationService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = ({ ledger = false }) => {
 
     const modelName = CUSTOMER_MODEL;
     const [customerCategory, setCustomerCategory] = useState([]);
-    const [District, setDistrict] = useState([]);
-    console.log(District)
-    const [route, setRoute] = useState([]);
 
     let navigate = useNavigate();
     const toast = useRef(null);
@@ -56,19 +52,30 @@ const List = ({ ledger = false }) => {
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
-    
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
     
-    const configurationService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        initFilters();
-        configurationService.getAllWithoutParams(CUSTOMER_CATEGORY_MODEL).then(data => {
-            console.log("setCustomerCategory::",data)
-            setCustomerCategory(data);
-        });
-    }, [customerCategory]);
+        setLoadCount(loadCount+1);
+    }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(CUSTOMER_CATEGORY_MODEL).then(data => {
+                setCustomerCategory(data.rows);
+            });
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
+    
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
 
     const clearFilter = () => {
         initFilters();
@@ -86,7 +93,6 @@ const List = ({ ledger = false }) => {
         setLoading(true);
 
         masterDataDBService.getAll(modelName, lazyParams).then(async data => {
-            console.log(data)
             setTotalRecords(data.total);
             setProfiles(data.rows);
             setLoading(false);
@@ -94,8 +100,8 @@ const List = ({ ledger = false }) => {
     }
 
     const reloadData = () => {
-        masterDataDBService.getAllMD(modelName, lazyParams).then(data => {
-            console.log("dtCustomer::=>>",data);
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
         });
     };
 
@@ -149,13 +155,12 @@ const List = ({ ledger = false }) => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
-        //     console.log(data);
-        //     loadLazyData();
-        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Profile Deleted', life: 3000 });
-        // });
-        // setDeleteProfileDialog(false);
-        // setProfile(null);
+        masterDataDBService.delete(modelName, dtProfile.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Profile Deleted', life: 3000 });
+        });
+        setDeleteProfileDialog(false);
+        setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -340,7 +345,7 @@ const List = ({ ledger = false }) => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProfile.customerId}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>

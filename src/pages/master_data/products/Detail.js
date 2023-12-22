@@ -7,7 +7,7 @@ import { lazyRetry } from '../../components/LazyWithRetry';
 
 import { PRODUCT_MODEL } from '../../../constants/models';
 
-import { MasterDataDBService } from '../../../services/MasterDataDBService';
+import { ProductService } from '../../../services/ProductService';
 
 const ProductForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "productForm" */ './Form'), "productForm"));
 
@@ -36,7 +36,7 @@ const Detail = () => {
 
     const modelName = PRODUCT_MODEL;
 
-    const masterDataDBService = new MasterDataDBService();
+    const productService = new ProductService();
     const [productData, setProductData] = useState(null);
 
     const tabs = [
@@ -56,7 +56,7 @@ const Detail = () => {
         if(id=="new"){
             setProductData(null);
         }else{
-            masterDataDBService.getById("dtProduct", id).then(data => {
+            productService.getById(id).then(data => {
                 setProductData(data);
             });    
         }

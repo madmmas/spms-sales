@@ -254,7 +254,7 @@ const DemoData = () => {
                 <h5>Filter Menu</h5>
                 <p>Filters are displayed in an overlay.</p>
                 <DataTable value={customers1} paginator className="p-datatable-customers" showGridlines rows={10}
-                    dataKey="id" filters={filters1} filterDisplay="menu" loading={loading1} responsiveLayout="scroll"
+                    dataKey="id" filters={filters1} filterDisplay="row" loading={loading1} responsiveLayout="scroll"
                     globalFilterFields={['name', 'country.name', 'representative.name', 'balance', 'status']} header={header1} emptyMessage="No customers found.">
                     <Column field="name" header="Name" filter filterPlaceholder="Search by name" style={{ minWidth: '12rem' }} />
                     <Column header="Country" filterField="country.name" style={{ minWidth: '12rem' }} body={countryBodyTemplate} filter filterPlaceholder="Search by country"
