@@ -468,24 +468,30 @@ export class MasterDataDBService {
         if (params && params.filters) {
             // check global filter
             if (params.filters.global && params.filters.global.value) {
-                // console.log("getAll globalFilterFields:::", params.filters.global, params.globalFilterFields);
-                // let filterValue = params.filters.global.value.toLowerCase();
-                // table = table.filter(row => {
-                //     for (let i = 0; i < params.globalFilterFields.length; i++) {
-                //         let field = params.globalFilterFields[i];
-                //         if(row[field] && row[field].toLowerCase().includes(filterValue)) {
-                //             return true;
-                //         }
-                //     }
-                //     return false;
-                // });
-                // search in dtProductSearch table
-                let filterValue = params.filters.global.value.toLowerCase();
-                let productSearchTable = this.db.table('dtProductSearch');
-                let productIds = await productSearchTable.filter(row => row.search.includes(filterValue)).primaryKeys();
-                // console.log("getAll_productIds:::", productIds);
-                total = await table.count();
-                result = await table.where('id').anyOf(productIds).offset(first).limit(limit).toArray();
+                //
+                if(modelName === "dtProduct") {
+                    // search in dtProductSearch table
+                    let filterValue = params.filters.global.value.toLowerCase();
+                    let productSearchTable = this.db.table('dtProductSearch');
+                    let productIds = await productSearchTable.filter(row => row.search.includes(filterValue)).primaryKeys();
+                    // console.log("getAll_productIds:::", productIds);
+                    total = await table.count();
+                    result = await table.where('id').anyOf(productIds).offset(first).limit(limit).toArray();
+                } else {
+                    console.log("getAll globalFilterFields:::", params.filters.global, params.globalFilterFields);
+                    let filterValue = params.filters.global.value.toLowerCase();
+                    table = table.filter(row => {
+                        for (let i = 0; i < params.globalFilterFields.length; i++) {
+                            let field = params.globalFilterFields[i];
+                            if(row[field] && row[field].toLowerCase().includes(filterValue)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                    total = await table.count();
+                    result = await table.offset(first).limit(limit).toArray();  
+                }
             } else  {
                 table = await this.applyFilter(table, params.filters);
                 total = await table.count();
