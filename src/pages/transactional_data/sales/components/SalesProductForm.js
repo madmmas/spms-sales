@@ -131,6 +131,7 @@ export default function SalesProductForm({
         _saleProduct['qty'] = item.qty || 1;
         _saleProduct['discount_profit'] = item.discount_profit || 0.00;
         _saleProduct['remarks'] = item.remarks || '';
+        _saleProduct['brand_name'] = item.dtProductBrand_id_shortname || '';
         // _saleProduct['lastTradePrice'] = item.lastTradePrice;
 
         setSalesProduct(_saleProduct);

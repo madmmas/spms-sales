@@ -4,7 +4,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 
-import RProductService from '../../../../services/RProductService';
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 const PurchaseProductDetail = ({
     purchases, supplierCurrency, conversion_rate,
@@ -82,13 +82,11 @@ const PurchaseProductDetail = ({
                 productIds.push(purchases[i].product_id);
             }
         }
-        // get all products from cache
-        RProductService.getProductMapByIds(productIds).then(
-            (data) => {
-                console.log("PRODUCTS-FETCHED-FROM-CACHE::", data);
-                setDisplayProducts(data);
-            }
-        );
+        const masterDataDBService = new MasterDataDBService();
+        masterDataDBService.getAllByIdsInMap("dtProduct", productIds).then((data) => {
+            // console.log("PRODUCTS-FETCHED-FROM-CACHE::", data);
+            setDisplayProducts(data);
+        });
     }, [purchases]);
 
     const footer = (
@@ -117,6 +115,7 @@ const PurchaseProductDetail = ({
 
     const codeNameBodyTemplate = (rowData) =>{
         let code = "";
+        console.log("displayProducts::code", displayProducts)
         if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
             code = displayProducts[rowData.product_id].code;
         }
@@ -129,8 +128,9 @@ const PurchaseProductDetail = ({
 
     const brandNameBodyTemplate = (rowData) =>{
         let brand_name = "";
+        console.log("displayProducts::brand", displayProducts)
         if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
-            brand_name = displayProducts[rowData.product_id].brand_name;
+            brand_name = displayProducts[rowData.product_id].dtProductBrand_id_shortname;
         }
         return(
             <>
@@ -141,6 +141,7 @@ const PurchaseProductDetail = ({
 
     const partNumberBodyTemplate = (rowData) =>{
         let part_number = "";
+        console.log("displayProducts::partnumber", displayProducts)
         if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
             part_number = displayProducts[rowData.product_id].part_number;
         }
@@ -153,8 +154,9 @@ const PurchaseProductDetail = ({
 
     const modelNumberBodyTemplate = (rowData) =>{
         let model_no = "";
+        console.log("displayProducts::model", displayProducts)
         if(displayProducts !== undefined && displayProducts[rowData.product_id] !== undefined) {
-            model_no = displayProducts[rowData.product_id].model_no;
+            model_no = displayProducts[rowData.product_id].dtProductModel_id_shortname;
         }
         return(
             <>
@@ -171,8 +173,8 @@ const PurchaseProductDetail = ({
             <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
             <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '10rem' }}></Column>
             <Column field="code" header="Code" body={codeNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-            <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
+            <Column field="dtProductBrand_id" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+            <Column field="dtProductModel_id" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
             <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
 
             <Column field="qty" header="Quantity" headerStyle={{ minWidth: '10rem' }}></Column>

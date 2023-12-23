@@ -103,6 +103,7 @@ const SalesProductDetail = ({
     const recalculateAllRows = async (allsales) => {
         if(allsales && allsales.length > 0) {
             for(let i=0; i<allsales.length; i++) {
+                console.log("ALLSALES::",i,allsales[i]);
                 let product = await getProductName(allsales[i].product_id);
                 allsales[i].product_name = product.name;
                 allsales[i].brand_name = product.brand_name;
@@ -150,6 +151,7 @@ const SalesProductDetail = ({
     } 
 
     const brandNameBodyTemplate = (rowData) =>{
+        console.log("BRAND::",rowData);
         return(
             <>
                {rowData.brand_name}
@@ -188,6 +190,10 @@ const SalesProductDetail = ({
     const getProductName = async (product_id) => {
 
         let product = await masterDataDBService.getById("dtProduct", product_id);
+        let brand_name = await masterDataDBService.getShortnameById("dtProductBrand", product.dtProductBrand_id);
+        let model_no = await masterDataDBService.getShortnameById("dtProductModel", product.dtProductModel_id);
+        product.brand_name = brand_name;
+        product.model_no = model_no;
         // return product ? product.name : "";
         return product;
     }

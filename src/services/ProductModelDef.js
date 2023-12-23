@@ -9,3 +9,8 @@ export const product_fields = [
     "current_stock", "prev_stock", "total_stock_in", "total_stock_out", "total_damage_stock",
     "created_at", "updated_at", "created_by", "updated_by"
 ];
+
+export const product_search_fields = [
+    "id", 
+    "search", // name, code, part_number, brand_name, model_no
+];

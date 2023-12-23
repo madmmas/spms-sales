@@ -22,6 +22,7 @@ export default function SelectMasterDataTable({
     const [tmpData, setTmpData] = useState([]);
     const [selectedRow, setSelectedRow] = useState({});
     const [tableDialog, setTableDialog] = useState(false);
+    const [initDefaultFilters, setInitDefaultFilters] = useState({});
 
     const masterDataDBService = new MasterDataDBService();
     
@@ -44,6 +45,7 @@ export default function SelectMasterDataTable({
     };
 
     useEffect(() => {
+        setInitDefaultFilters({...defaultFilters});
         initFilters();
     }, []);
 
@@ -68,7 +70,8 @@ export default function SelectMasterDataTable({
     };
 
     const initFilters = () => {
-        setLazyParams(defaultFilters);
+        console.log("initFilters:::", initDefaultFilters);
+        setLazyParams(initDefaultFilters);
         setGlobalFilterValue('');
     };
 
@@ -99,15 +102,17 @@ export default function SelectMasterDataTable({
     }
 
     const onGlobalFilterChange = (e) => {
-        if(lazyParams!==null && lazyParams!==undefined){
+        
+        if(lazyParams===null && lazyParams===undefined){
             return
         }
         let _lazyParams = { ...lazyParams };
-        console.log(_lazyParams);
 
+        console.log("onGlobalFilterChange::", _lazyParams)
         const value = e.target.value;
         
         setGlobalFilterValue(value);
+        console.log("onGlobalFilterChange:::", e.target.value);
 
         if(value === null || value === undefined) {
             return;

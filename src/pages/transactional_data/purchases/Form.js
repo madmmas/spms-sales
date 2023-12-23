@@ -413,6 +413,7 @@ const Form = ({ purchase }) => {
                                         {field: 'contactPersonPhone', header: 'Contact Person Phone', filterPlaceholder: 'Filter by Contact Person Phone'},
                                     ]}
                                     defaultFilters= {{
+                                        globalFilterFields: ['name', 'contactPersonName', 'contactPersonPhone'],
                                         fields: ["name", "dtSupplierCategory_id", "address", "contactPersonName", "contactPersonPhone", "currency"],
                                         first: 0,
                                         rows: 10,

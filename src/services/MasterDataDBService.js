@@ -5,9 +5,9 @@ import { FilterMatchMode } from 'primereact/api';
 
 import modelDef from './ModelDef';
 
-const DB_NAME = "spms_org_v1";
+const DB_NAME = "spms_org_v2";
 
-const DEL_DB_NAME = "spms_org_v2";
+const DEL_DB_NAME = "spms_org_v1";
 const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
 DBDeleteRequest.onerror = (event) => {
   console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);
@@ -70,6 +70,7 @@ export class MasterDataDBService {
             dtWarehouse: modelDef.getJoinedFields('dtWarehouse'),
 
             dtProduct: modelDef.getJoinedFields('dtProduct'),
+            dtProductSearch: modelDef.getJoinedFields('dtProductSearch'),
 
             trxLedger: modelDef.getJoinedFields('trxLedger'),
         });
@@ -166,9 +167,6 @@ export class MasterDataDBService {
         let upto = this.getModelLastUpdated("dtProduct");
         if (upto === null || !upto) {
             upto = "0"
-
-            // clear the table
-            // await table.clear();
         }
         console.log("getAllUpto:::", upto);
         let uri = `/all_products/${upto}`;
@@ -178,10 +176,10 @@ export class MasterDataDBService {
             timeout: 30000,
             cache: false,
         }).then(res => res.data);
-        if(result && result.rows) {
-            // TODO here will some changes
-            table.bulkPut(result.rows);
 
+        //
+        if(result && result.rows) {
+            table.bulkPut(result.rows);
             let total = result.total;
 
             while(result && result.rows && result.rows.length > 0 && result.rows.length == limit && offset < total) {
@@ -203,6 +201,42 @@ export class MasterDataDBService {
                 this.setModelLastUpdated("dtProduct", _last_updated);
             }
         }
+    }
+
+    async populateProductSearch() {
+        this.openDB();
+        let brand_names = {};
+        let brandTable = this.db.table('dtProductBrand');
+        let brands = await brandTable.toArray();
+        for(let i=0; i<brands.length; i++) {
+            brand_names[brands[i].id] = brands[i].name;
+        }
+        let model_names = {};
+        let modelTable = this.db.table('dtProductModel');
+        let models = await modelTable.toArray();
+        for(let i=0; i<models.length; i++) {
+            model_names[models[i].id] = models[i].name;
+        }
+
+        let table = this.db.table('dtProduct');
+
+        let result = await table.toArray();
+        let productSearch = [];
+        for(let i=0; i<result.length; i++) {
+            let brand_name = brand_names[result[i].dtProductBrand_id] || "";
+            let model_no = model_names[result[i].dtProductModel_id] || "";
+            let code = result[i].code || "";
+            let part_number = result[i].part_number || "";
+            let search = result[i].name + " " + 
+                code + " " + part_number + " " + brand_name + " " + model_no;
+            productSearch.push({
+                id: result[i].id,
+                search: search.toLowerCase(),
+            });
+        }
+        console.log("populateProductSearch:::", productSearch);
+        let productSearchTable = this.db.table('dtProductSearch');
+        productSearchTable.bulkPut(productSearch);
     }
 
     async getAllMasterDataUpto(modelName) {
@@ -327,18 +361,20 @@ export class MasterDataDBService {
         this.getAllMasterDataUpto("dtIncomeType");
         this.getAllMasterDataUpto("dtMFS");
         this.getAllMasterDataUpto("dtPaymentType");
-        this.getAllMasterDataUpto("dtProductBrand");
         this.getAllMasterDataUpto("dtProductCategory");
-        this.getAllMasterDataUpto("dtProductModel");
         this.getAllMasterDataUpto("dtSupplierCategory");
         this.getAllMasterDataUpto("dtRoute");
         this.getAllMasterDataUpto("dtWarehouse");
-    
+        
         this.getAllMasterDataUpto("dtBankAccount");
         this.getAllMasterDataUpto("dtMFSAccount");
         
         this.getAllMasterDataUpto("dtCustomer");
-        this.getAllMasterDataUpto("dtSupplier");    
+        this.getAllMasterDataUpto("dtSupplier");
+        
+        await this.getAllMasterDataUpto("dtProductBrand");
+        await this.getAllMasterDataUpto("dtProductModel");
+        this.populateProductSearch();
     }
 
     async clearCache() {
@@ -391,11 +427,34 @@ export class MasterDataDBService {
 
         await this.db.trxLedger.clear();
     }
-        
+    
+    async getAllByIds(modelName, ids) {
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let result = await table.where('id').anyOf(ids).toArray();
+        console.log("getAllByIds:::", modelName, ids, result);
+        await this.populateShornames(modelName, result);
+        return result;
+    }
+
+    async getAllByIdsInMap(modelName, ids) {
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let result = await table.where('id').anyOf(ids).toArray();
+        console.log("getAllByIds:::", modelName, ids, result);
+        await this.populateShornames(modelName, result);
+        // convert to map
+        let map = {};
+        for (let i = 0; i < result.length; i++) {
+            let row = result[i];
+            map[row.id] = row;
+        }
+        return map;
+    }
+    
     async getAll(modelName, params) {
         let first = params && params.first || 0;
         let limit = params && params.rows || 10;
-        console.log("getAll params:::", modelName, first, limit, params);
 
         // let name = params && params.nameField || "name";
         
@@ -403,27 +462,39 @@ export class MasterDataDBService {
         // let table = await this.db.table(modelName).orderBy(name);
         let table = await this.db.table(modelName);
         
+        let total = 0;
+        let result = [];
         // apply filter on the table
         if (params && params.filters) {
             // check global filter
-            if (params.filters.global && params.filters.global.value  && params.globalFilterFields) {
-                console.log("getAll globalFilterFields:::", params.filters.global, params.globalFilterFields);
+            if (params.filters.global && params.filters.global.value) {
+                // console.log("getAll globalFilterFields:::", params.filters.global, params.globalFilterFields);
+                // let filterValue = params.filters.global.value.toLowerCase();
+                // table = table.filter(row => {
+                //     for (let i = 0; i < params.globalFilterFields.length; i++) {
+                //         let field = params.globalFilterFields[i];
+                //         if(row[field] && row[field].toLowerCase().includes(filterValue)) {
+                //             return true;
+                //         }
+                //     }
+                //     return false;
+                // });
+                // search in dtProductSearch table
                 let filterValue = params.filters.global.value.toLowerCase();
-                table = table.filter(row => {
-                    for (let i = 0; i < params.globalFilterFields.length; i++) {
-                        let field = params.globalFilterFields[i];
-                        if(row[field] && row[field].toLowerCase().includes(filterValue)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+                let productSearchTable = this.db.table('dtProductSearch');
+                let productIds = await productSearchTable.filter(row => row.search.includes(filterValue)).primaryKeys();
+                // console.log("getAll_productIds:::", productIds);
+                total = await table.count();
+                result = await table.where('id').anyOf(productIds).offset(first).limit(limit).toArray();
             } else  {
                 table = await this.applyFilter(table, params.filters);
+                total = await table.count();
+                result = await table.offset(first).limit(limit).toArray();  
             }
+        } else {
+            total = await table.count();
+            result = await table.offset(first).limit(limit).toArray();    
         }
-        let total = await table.count();
-        let result = await table.offset(first).limit(limit).toArray();
         
         // apply filter on the result
         // let result = await table.toArray();
@@ -431,8 +502,25 @@ export class MasterDataDBService {
         // let total = await table.count();
         // result = result.slice(first, first + limit);
         
-        console.log("getAll result:::", result);
+        // console.log("getAll_result:::", result);
+        console.log("getAll_result:::", modelName, first, limit, params, result);
         // need to populate the shortname fields here
+        // let fields = modelDef.getFields(modelName);
+        // for (let i = 0; i < fields.length; i++) {
+        //     let field = fields[i];
+        //     if(field.startsWith("dt") && field.endsWith("id")) {
+        //         let fieldModelName = field.substring(0, field.length - 3);
+        //         await this.populateFieldData(fieldModelName, field, result);
+        //     }
+        // }
+        await this.populateShornames(modelName, result);
+        return {
+            rows: result,
+            total: total,
+        };
+    }
+
+    async populateShornames(modelName, result) {
         let fields = modelDef.getFields(modelName);
         for (let i = 0; i < fields.length; i++) {
             let field = fields[i];
@@ -440,13 +528,8 @@ export class MasterDataDBService {
                 let fieldModelName = field.substring(0, field.length - 3);
                 await this.populateFieldData(fieldModelName, field, result);
             }
-        }        
-        return {
-            rows: result,
-            total: total,
-        };
+        }
     }
-
     // get model data by id
     async getById(modelName, id) {
         if(id===null || id===undefined) {

@@ -275,6 +275,7 @@ export default function PurchaseProductForm({
     };
 
     let defaultFilters = {
+        globalFilterFields: ['name', 'code', 'part_number'],
         fields: ['id', 'name', 'brand_name', 'model_no', 'part_number'],
         first: 0,
         rows: 10,
@@ -307,8 +308,8 @@ export default function PurchaseProductForm({
                             columns={[
                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                                 {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
-                                {field: 'brand_name', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                {field: 'model_no', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                                 {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                             ]} />
                         {getFormErrorMessage(field.name)}
