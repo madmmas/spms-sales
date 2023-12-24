@@ -15,7 +15,7 @@ export default function Supplier({
             caption='Select Supplier'
             displayField="name" showFields={["name"]}
             onSelect={(e) => {
-                field.onChange(e.id);
+                onSelect(e);
             }}
             defaultFilters={{
                 globalFilterFields: ['name', 'phone'],

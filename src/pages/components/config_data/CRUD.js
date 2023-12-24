@@ -1,4 +1,5 @@
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import React, { useEffect, useRef, useState } from 'react';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -8,27 +9,22 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
-import React, { useEffect, useRef, useState } from 'react';
 
-import { ConfigurationService } from '../../services/ConfigurationService';
-import { MasterDataDBService } from '../../services/MasterDataDBService';
-import { ROUTE_MODEL } from '../../constants/models';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
-const BusinessRoute = () => {
-
-    const modelName = ROUTE_MODEL;
+const CRUD = ({ modelName }) => {
 
     const toast = useRef(null);
     const dt = useRef(null);
     const contextPath = '~';
 
-    let emptyBusinessRoute = {
+    const emptyProfiles = {
         id: null,
+        name: '',
         description: '',
-        name: ''
-    };
+    }
 
-    let defaultFilters = {
+    const defaultFilters = {
         fields: ['name', 'description'],
         first: 0,
         rows: 10,
@@ -38,27 +34,28 @@ const BusinessRoute = () => {
         filters: {
             'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
-    };
+    }
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [empProfiles, setBusinessRoutes] = useState(null);
-    const [empProfileDialog, setBusinessRouteDialog] = useState(false);
-    const [deleteBusinessRouteDialog, setDeleteBusinessRouteDialog] = useState(false);
-    const [deleteBusinessRoutesDialog, setDeleteBusinessRoutesDialog] = useState(false);
-    const [businessRoute, setBusinessRoute] = useState(emptyBusinessRoute);
-    const [selectedBusinessRoutes, setSelectedBusinessRoutes] = useState(null);
+    const [profileData, setProfileData] = useState(null);
+    const [empProfileDialog, setProfilesDialog] = useState(false);
+
+    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
+    const [deleteProfilessDialog, setDeleteProfilessDialog] = useState(false);
+    
+    const [profiles, setProfiles] = useState(emptyProfiles);
+    const [selectedProfiless, setSelectedProfiless] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const configurationManagementService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
-    }, []);
+    }, [modelName]);
     
     const clearFilter = () => {
         initFilters();
@@ -78,7 +75,7 @@ const BusinessRoute = () => {
         masterDataDBService.getAll(modelName, lazyParams).then(data => {
             console.log(data)
             setTotalRecords(data.total);
-            setBusinessRoutes(data.rows);
+            setProfileData(data.rows);
             setLoading(false);
         });
     }
@@ -91,88 +88,85 @@ const BusinessRoute = () => {
 
     const openNew = () => {
         setCreateEdit(true);
-        setBusinessRoute(emptyBusinessRoute);
+        setProfiles(emptyProfiles);
         setSubmitted(false);
-        setBusinessRouteDialog(true);
+        setProfilesDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setBusinessRouteDialog(false);
+        setProfilesDialog(false);
     };
 
-    const hideDeleteBusinessRouteDialog = () => {
-        setDeleteBusinessRouteDialog(false);
+    const hideDeleteProfilesDialog = () => {
+        setDeleteProfilesDialog(false);
     };
 
-    const hideDeleteBusinessRoutesDialog = () => {
-        setDeleteBusinessRoutesDialog(false);
+    const hideDeleteProfilessDialog = () => {
+        setDeleteProfilessDialog(false);
     };
 
-    const saveBusinessRoute = () => {
+    const saveProfiles = () => {
         setSubmitted(true);
 
-        if (businessRoute.name.trim()) {
-            if (businessRoute.id) {
-                configurationManagementService.update(modelName, businessRoute.id, businessRoute).then(data => {
+        if (profiles.name.trim()) {
+            if (profiles.id) {
+                masterDataDBService.update(modelName, profiles.id, profiles).then(data => {
                     console.log(data);
                     reloadData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Updated', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Updated', life: 3000 });
                 });
             } else {
-                configurationManagementService.create(modelName, businessRoute).then(data => {
+                masterDataDBService.create(modelName, profiles).then(data => {
                     console.log(data);
                     reloadData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Created', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Created', life: 3000 });
                 });
             }
 
-            setBusinessRouteDialog(false);
-            setBusinessRoute(emptyBusinessRoute);
+            setProfilesDialog(false);
+            setProfiles(emptyProfiles);
         }
     };
 
-    const editBusinessRoute = (businessRoute) => {
+    const editProfiles = (profiles) => {
         setCreateEdit(false);
-        setBusinessRoute({ ...businessRoute });
-        setBusinessRouteDialog(true);
+        setProfiles({ ...profiles });
+        setProfilesDialog(true);
     };
 
-    const confirmDeleteBusinessRoute = (businessRoute) => {
-        setBusinessRoute(businessRoute);
-        setDeleteBusinessRouteDialog(true);
+    const confirmDeleteProfiles = (profiles) => {
+        setProfiles(profiles);
+        setDeleteProfilesDialog(true);
     };
 
-    const deleteBusinessRoute = () => {
-        configurationManagementService.delete(modelName, businessRoute.id).then(data => {
-            console.log(data);
-            masterDataDBService.deleteFromModelTable(modelName, businessRoute.id).then(() => {
-                reloadData();
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoute Deleted', life: 3000 });
-            });
+    const deleteProfiles = () => {
+        masterDataDBService.delete(modelName, profiles.id).then(() => {
+            reloadData();
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
         });
-        setDeleteBusinessRouteDialog(false);
-        setBusinessRoute(emptyBusinessRoute);
+        setDeleteProfilesDialog(false);
+        setProfiles(emptyProfiles);
     };
 
     const exportCSV = () => {
         dt.current.exportCSV();
     };
 
-    const deleteSelectedBusinessRoutes = () => {
-        let _empProfiles = empProfiles.filter((val) => !selectedBusinessRoutes.includes(val));
-        setBusinessRoutes(_empProfiles);
-        setDeleteBusinessRoutesDialog(false);
-        setSelectedBusinessRoutes(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'BusinessRoutes Deleted', life: 3000 });
+    const deleteSelectedProfiless = () => {
+        let _empProfiles = profileData.filter((val) => !selectedProfiless.includes(val));
+        setProfileData(_empProfiles);
+        setDeleteProfilessDialog(false);
+        setSelectedProfiless(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiless Deleted', life: 3000 });
     };
 
     const onInputChange = (e, name) => {
         const val = (e.target && e.target.value) || '';
-        let _empProfile = { ...businessRoute };
+        let _empProfile = { ...profiles };
         _empProfile[`${name}`] = val;
 
-        setBusinessRoute(_empProfile);
+        setProfiles(_empProfile);
     };
 
     const onPage = (event) => {
@@ -230,8 +224,8 @@ const BusinessRoute = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editBusinessRoute(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteBusinessRoute(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfiles(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfiles(rowData)} />
             </>
         );
     };
@@ -239,7 +233,7 @@ const BusinessRoute = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Business Route</h5>
+                <h5 className="m-0">Manage Profiles</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -248,21 +242,21 @@ const BusinessRoute = () => {
     const empProfileDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveBusinessRoute} />
+            <Button label="Save" icon="pi pi-check" className="p-button-text" onClick={saveProfiles} />
         </>
     );
 
-    const deleteBusinessRouteDialogFooter = (
+    const deleteProfilesDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteBusinessRouteDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteBusinessRoute} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProfiles} />
         </>
     );
 
-    const deleteBusinessRoutesDialogFooter = (
+    const deleteProfilessDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteBusinessRoutesDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedBusinessRoutes} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilessDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiless} />
         </>
     );
 
@@ -274,7 +268,7 @@ const BusinessRoute = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={empProfiles} dataKey="id" 
+                        ref={dt} value={profileData} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
@@ -292,34 +286,34 @@ const BusinessRoute = () => {
                         <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Business Route`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
-                        {businessRoute.image && <img src={`${contextPath}/demo/images/businessRoute/${businessRoute.image}`} alt={businessRoute.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Profiles`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
+                        {profiles.image && <img src={`${contextPath}/demo/images/profiles/${profiles.image}`} alt={profiles.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
-                            <InputText id="name" value={businessRoute.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !businessRoute.name })} />
-                            {submitted && !businessRoute.name && <small className="p-invalid">Name is required.</small>}
+                            <InputText id="name" value={profiles.name} onChange={(e) => onInputChange(e, 'name')} required autoFocus className={classNames({ 'p-invalid': submitted && !profiles.name })} />
+                            {submitted && !profiles.name && <small className="p-invalid">Name is required.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={businessRoute.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
+                            <InputTextarea id="description" value={profiles.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteBusinessRouteDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteBusinessRouteDialogFooter} onHide={hideDeleteBusinessRouteDialog}>
+                    <Dialog visible={deleteProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDeleteProfilesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {businessRoute && (
+                            {profiles && (
                                 <span>
-                                    Are you sure you want to delete <b>{businessRoute.id}</b>?
+                                    Are you sure you want to delete <b>{profiles.id}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteBusinessRoutesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteBusinessRoutesDialogFooter} onHide={hideDeleteBusinessRoutesDialog}>
+                    <Dialog visible={deleteProfilessDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilessDialogFooter} onHide={hideDeleteProfilessDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {businessRoute && <span>Are you sure you want to delete the selected items?</span>}
+                            {profiles && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>
@@ -328,4 +322,4 @@ const BusinessRoute = () => {
     );
 };
 
-export default BusinessRoute;
+export default CRUD;

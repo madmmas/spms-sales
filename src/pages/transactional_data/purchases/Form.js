@@ -319,7 +319,7 @@ const Form = ({ purchase }) => {
     );
 
     const onSupplierSelect = (selectedRow) => {
-        console.log("SELECTED SUPPLIER::", selectedRow, selectedRow.id);
+        console.log("SELECTED SUPPLIER::", selectedRow);
         setSupplierId(selectedRow.id);
         setSelectedSupplier_currency(selectedRow.currency);
     };

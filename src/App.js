@@ -71,24 +71,8 @@ function App() {
   const ExtraIncome = React.lazy(() => import("./pages/transactional_data/ExtraIncome"));
   const CashBank = React.lazy(() => import("./pages/transactional_data/transfer_money/Detail"));
 
-  const CustomerCategory = React.lazy(() => import("./pages/configurations/CustomerCategory"));
-  const SupplierCategory = React.lazy(() => import("./pages/configurations/SupplierCategory"));
-  const ProductCategory = React.lazy(() => import("./pages/configurations/ProductCategory"));
-  const Banks = React.lazy(() => import("./pages/configurations/Banks"));
-  const MFSs = React.lazy(() => import("./pages/configurations/MFS"));
-  const ExtraIncomeType = React.lazy(() => import("./pages/configurations/ExtraIncomeType"));
-  const ExpenseType = React.lazy(() => import("./pages/configurations/ExpenseType"));
-  const PaymentType = React.lazy(() => import("./pages/configurations/PaymentType"));
-  const Department = React.lazy(() => import("./pages/configurations/Department"));
-  const Designation = React.lazy(() => import("./pages/configurations/Designation"));
-  const Grade = React.lazy(() => import("./pages/configurations/Grade"));
-  const Group = React.lazy(() => import("./pages/configurations/Group"));
-  const ProdBrand = React.lazy(() => import("./pages/configurations/ProdBrand"));
-  const ProdModel = React.lazy(() => import("./pages/configurations/ProdModel"));
-  const OfficeTime = React.lazy(() => import("./pages/configurations/OfficeTime"));
-  const BusinessRoute = React.lazy(() => import("./pages/configurations/BusinessRoute"));
+  const CRUD = React.lazy(() => import("./pages/components/config_data/CRUD"));
 
-  const Ledger = React.lazy(() => import("./pages/reports/ReportLedger"));
   const Invoice = React.lazy(() => import("./pages/transactional_data/sales/Invoice"));
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
@@ -96,11 +80,7 @@ function App() {
   const { user: currentUser } = useSelector((state) => state.auth);
   const [visible, setVisible] = useState(false);
 
-  const loadAllData = async () => {
-    // const newDiv = document.getElementById('root');
-    // const newContent = document.createTextNode("Please wait while we are loading the application...");
-    // newDiv.appendChild(newContent);
-  
+  const loadAllData = async () => {  
     const masterDataDBService = new MasterDataDBService();
     
     setVisible(true);
@@ -110,22 +90,6 @@ function App() {
       await masterDataDBService.loadAllInitData();
     }
     setVisible(false);
-    // db.initDB();
-    // load the product data here
-    // let products = window['__all_products'];
-    
-    // // if products undefined or empty load all from server limit 1000 until no more
-    // if (!products || products.length == 0) {
-    //   RProductService.loadAllProductsFromLocalStorage();
-    // }
-  
-    // let masterData = window['__all_masterData'];
-  
-    // // if masterData undefined or empty load all from server limit 1000 until no more
-    // if (masterData === undefined || masterData.length == 0) {
-    //   console.log("masterData is undefined or empty");
-    //   CacheMasterDataService.checkAndLoadAllMasterData();
-    // }  
   }
 
   useEffect(() => {
@@ -252,22 +216,24 @@ function App() {
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
         <Route path="/transfer" element={<RouteAuth pageComponent={<CashBank />} />} />
 
-        <Route path="/customer_category" element={<RouteAuth pageComponent={<CustomerCategory />} />} />
-        <Route path="/designation" element={<RouteAuth pageComponent={<Designation />} />} />
-        <Route path="/department" element={<RouteAuth pageComponent={<Department />} />} />
-        <Route path="/banks" element={<RouteAuth pageComponent={<Banks />} />} />
-        <Route path="/mfs_types" element={<RouteAuth pageComponent={<MFSs />} />} />
-        <Route path="/expense_type" element={<RouteAuth pageComponent={<ExpenseType />} />} />
-        <Route path="/extra_income_type" element={<RouteAuth pageComponent={<ExtraIncomeType />} />} />
-        <Route path="/grade" element={<RouteAuth pageComponent={<Grade />} />} />
-        <Route path="/group" element={<RouteAuth pageComponent={<Group />} />} />
-        <Route path="/office_time" element={<RouteAuth pageComponent={<OfficeTime />} />} />
-        <Route path="/payment_type" element={<RouteAuth pageComponent={<PaymentType />} />} />
-        <Route path="/product_category" element={<RouteAuth pageComponent={<ProductCategory />} />} />
-        <Route path="/product_brand" element={<RouteAuth pageComponent={<ProdBrand />} />} />
-        <Route path="/product_model" element={<RouteAuth pageComponent={<ProdModel />} />} />
-        <Route path="/route" element={<RouteAuth pageComponent={<BusinessRoute />} />} />
-        <Route path="/supplier_category" element={<RouteAuth pageComponent={<SupplierCategory />} />} />
+        <Route path="/banks" element={<RouteAuth pageComponent={<CRUD modelName="dtBank" />} />} />
+        <Route path="/customer_category" element={<RouteAuth pageComponent={<CRUD modelName="dtCustomerCategory" />} />} />
+        <Route path="/expense_type" element={<RouteAuth pageComponent={<CRUD modelName="dtExpenseType" />} />} />    
+
+        <Route path="/designation" element={<RouteAuth pageComponent={<CRUD modelName="dtDesignation" />} />} />
+        <Route path="/department" element={<RouteAuth pageComponent={<CRUD modelName="dtDepartment" />} />} />
+        
+        <Route path="/mfs_types" element={<RouteAuth pageComponent={<CRUD modelName="dtMFS" />} />} />
+        <Route path="/extra_income_type" element={<RouteAuth pageComponent={<CRUD modelName="dtIncomeType" />} />} />
+        <Route path="/grade" element={<RouteAuth pageComponent={<CRUD modelName="dtGrade" />} />} />
+        <Route path="/group" element={<RouteAuth pageComponent={<CRUD modelName="dtGroup" />} />} />
+        <Route path="/office_time" element={<RouteAuth pageComponent={<CRUD modelName="dtOfficeTime" />} />} />
+        <Route path="/payment_type" element={<RouteAuth pageComponent={<CRUD modelName="dtPaymentType" />} />} />
+        <Route path="/product_category" element={<RouteAuth pageComponent={<CRUD modelName="dtProductCategory" />} />} />
+        <Route path="/product_brand" element={<RouteAuth pageComponent={<CRUD modelName="dtProductBrand" />} />} />
+        <Route path="/product_model" element={<RouteAuth pageComponent={<CRUD modelName="dtProductModel" />} />} />
+        <Route path="/route" element={<RouteAuth pageComponent={<CRUD modelName="dtRoute" />} />} />
+        <Route path="/supplier_category" element={<RouteAuth pageComponent={<CRUD modelName="dtSupplierCategory" />} />} />
 
       </Route>
     </Routes>
