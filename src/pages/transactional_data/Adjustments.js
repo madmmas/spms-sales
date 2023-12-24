@@ -13,7 +13,8 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-import SelectMasterData from '../components/SelectMasterData';
+import Custmer from '../components/master_data/Custmer';
+import Supplier from '../components/master_data/Supplier';
 
 import CacheMasterDataService from '../../services/CacheMasterDataService';
 import { RegisterService } from '../../services/RegisterService';
@@ -291,38 +292,11 @@ const Adjustments = () => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
-                                <SelectMasterData field={field} modelName="dtCustomer"
-                                    caption='Select Customer'
-                                    displayField="name" showFields={["name"]}
+                                <Custmer field={field} fieldState={fieldState} 
                                     onSelect={(e) => {
-                                        console.log("selected Party:::", e);
-                                        getPartyBalance(e.id);
-                                    }}
-                                    defaultFilters={{
-                                        fields: ["name","address","route","phone","contact_name"],
-                                        first: 0,
-                                        rows: 10,
-                                        page: 1,
-                                        sortField: null,
-                                        sortOrder: null,
-                                        filters: {
-                                            global: { value: null, matchMode: 'contains' },
-                                            name: { value: null, matchMode: 'contains' },
-                                            address: { value: null, matchMode: 'contains' },
-                                            route: { value: null, matchMode: 'contains' },
-                                            phone: { value: null, matchMode: 'contains' },
-                                            contact_name: { value: null, matchMode: 'contains' },
-                                        }
-                                    }}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
-                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                        {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
-                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
-                                        {field: 'contact_name', header: 'Contact Person', filterPlaceholder: 'Filter by Contact Person'},
-                                    ]} />
-                                    {getFormErrorMessage(field.name)}
+                                        field.onChange(e.id);
+                                    }}/>
+                                {getFormErrorMessage(field.name)}
                             </>
                         )}/>
                     </div>}
@@ -334,33 +308,10 @@ const Adjustments = () => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
-                                <SelectMasterData field={field} modelName="dtSupplier"
-                                    caption='Select Supplier'
-                                    displayField="name" showFields={["name"]}
+                                <Supplier field={field} fieldState={fieldState}
                                     onSelect={(e) => {
-                                        console.log("selected Party:::", e);
-                                        getPartyBalance(e.id);
-                                    }}
-                                    defaultFilters={{
-                                        fields: ["name","address","phone"],
-                                        first: 0,
-                                        rows: 10,
-                                        page: 1,
-                                        sortField: null,
-                                        sortOrder: null,
-                                        filters: {
-                                            global: { value: null, matchMode: 'contains' },
-                                            name: { value: null, matchMode: 'contains' },
-                                            address: { value: null, matchMode: 'contains' },
-                                            phone: { value: null, matchMode: 'contains' },
-                                        }
-                                    }}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Name', filterPlaceholder: 'Filter by Shop Name'},
-                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                        {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
-                                    ]} />
+                                        field.onChange(e.id);
+                                    }}/>
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

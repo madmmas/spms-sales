@@ -10,11 +10,10 @@ import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
-import { InputNumber } from 'primereact/inputnumber';
-import { FilterMatchMode } from 'primereact/api';
-import SelectMasterData from '../../components/SelectMasterData';
 
-import { PURCHASE_MODEL, SUPPLIER_MODEL } from '../../../constants/models';
+import Supplier from '../../components/master_data/Supplier';
+
+import { PURCHASE_MODEL } from '../../../constants/models';
 
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { OrderService } from '../../../services/OrderService';
@@ -401,35 +400,7 @@ const Form = ({ purchase }) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Supplier*</label>
-                                <SelectMasterData field={field} modelName={SUPPLIER_MODEL}
-                                    displayField="name"
-                                    onSelect={onSupplierSelect}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Supplier Name', filterPlaceholder: 'Filter by Supplier Name'},
-                                        {field: 'dtSupplierCategory_id', header: 'Supplier Category', body: categoryNameBodyTemplate, filterPlaceholder: 'Filter by Supplier Category'},
-                                        {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                        {field: 'contactPersonName', header: 'Contact Person Name', filterPlaceholder: 'Filter by Contact Person Name'},
-                                        {field: 'contactPersonPhone', header: 'Contact Person Phone', filterPlaceholder: 'Filter by Contact Person Phone'},
-                                    ]}
-                                    defaultFilters= {{
-                                        globalFilterFields: ['name', 'contactPersonName', 'contactPersonPhone'],
-                                        fields: ["name", "dtSupplierCategory_id", "address", "contactPersonName", "contactPersonPhone", "currency"],
-                                        first: 0,
-                                        rows: 10,
-                                        page: 1,
-                                        sortField: null,
-                                        sortOrder: null,
-                                        filters: {
-                                            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                            name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                            dtSupplierCategory_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                            address: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                            contactPersonName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                            contactPersonPhone: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                        }
-                                    }}
-                                    />
+                                <Supplier field={field} fieldState={fieldState} onSelect={onSupplierSelect} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>}

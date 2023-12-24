@@ -11,8 +11,8 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-import SelectMasterData from '../../components/SelectMasterData';
+import Warehouse from '../../components/master_data/Warehouse';
+
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 import SelectLookupData from '../../components/SelectLookupData';
 
@@ -439,12 +439,7 @@ const Form = ({ packageData }) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
-                                <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
-                                    displayField="name"
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'name', header: 'Warehouse Name', filterPlaceholder: 'Filter by Warehouse Name'}, 
-                                    ]} />
+                                <Warehouse field={field} fieldState={fieldState} onSelect={(e) => field.onChange(e.id)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

@@ -18,11 +18,13 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
-import SelectMasterData from '../../components/SelectMasterData';
+
+import Customer from '../../components/master_data/Custmer';
+
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
-import { PRODUCT_MODEL, CUSTOMER_MODEL, SALES_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, SALES_MODEL } from '../../../constants/models';
 
 import PaymentDialog from '../../components/PaymentDialog';
 import ReturnItemDialog from '../../components/ReturnItemDialog';
@@ -915,31 +917,7 @@ const Form = React.memo(({ sales }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>
-                        <SelectMasterData field={field} modelName={CUSTOMER_MODEL}
-                            displayField="name"
-                            onSelect={onCustomerSelect}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
-                                {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
-                                {field: 'phone', header: 'Phone', filterPlaceholder: 'Filter by Phone'},
-                                {field: 'contact_name', header: 'Contact Name', filterPlaceholder: 'Filter by Contact Name'},
-                            ]}
-                            defaultFilters= {{
-                                fields: ["name", "contact_name", "last_trx_id", "address", "route", "phone"],
-                                first: 0,
-                                rows: 10,
-                                page: 1,
-                                sortField: null,
-                                sortOrder: null,
-                                filters: {
-                                    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    contact_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                }
-                            }}
-                             />
+                        <Customer field={field} fieldState={fieldState} onSelect={onCustomerSelect} />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>}

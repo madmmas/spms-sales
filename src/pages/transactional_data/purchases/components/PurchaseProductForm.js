@@ -6,7 +6,8 @@ import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
 import { classNames } from 'primereact/utils';
 
-import SelectMasterData from '../../../components/SelectMasterData';
+import Warehouse from '../../../components/master_data/Warehouse';
+
 import SelectMasterDataOL from '../../../components/SelectMasterDataOL';
 
 import { OrderService } from '../../../../services/OrderService';
@@ -324,13 +325,7 @@ export default function PurchaseProductForm({
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
-                        <SelectMasterData field={field} modelName={WAREHOUSE_MODEL}
-                            displayField="name"
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            onSelect={onWarehouseSelect}
-                            columns={[
-                                {field: 'name', header: 'Warehouse', filterPlaceholder: 'Filter by Warehouse'}, 
-                            ]} />
+                        <Warehouse field={field} fieldState={fieldState} onSelect={onWarehouseSelect} />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>

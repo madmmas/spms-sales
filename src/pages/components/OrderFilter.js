@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Calendar } from 'primereact/calendar';
 import { InputText } from 'primereact/inputtext';
@@ -7,18 +7,17 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 
-import SelectMasterData from '../components/SelectMasterData';
+import Custmer from '../components/master_data/Custmer';
+import Supplier from '../components/master_data/Supplier';
 
 const OrderFilter = ({ reloadData, isSales }) => {
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
         setValue,
         handleSubmit,
-        getValues,
     } = useForm({
         defaultValues: {}
     });
@@ -217,38 +216,11 @@ const OrderFilter = ({ reloadData, isSales }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Customer</label>
-                        <SelectMasterData field={field} modelName="dtCustomer"
-                            caption='Select Customer'
-                            displayField="name" showFields={["name"]}
+                        <Custmer field={field} fieldState={fieldState} 
                             onSelect={(e) => {
-                                field.onChange(e.id);                                
-                            }}
-                            defaultFilters={{
-                                globalFilterFields: ['name', 'contact_name'],
-                                fields: ["name","address","route","phone","contact_name"],
-                                first: 0,
-                                rows: 10,
-                                page: 1,
-                                sortField: null,
-                                sortOrder: null,
-                                filters: {
-                                    global: { value: null, matchMode: 'contains' },
-                                    name: { value: null, matchMode: 'contains' },
-                                    address: { value: null, matchMode: 'contains' },
-                                    route: { value: null, matchMode: 'contains' },
-                                    phone: { value: null, matchMode: 'contains' },
-                                    contact_name: { value: null, matchMode: 'contains' },
-                                }
-                            }}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'name', header: 'Shop Name', filterPlaceholder: 'Filter by Shop Name'},
-                                {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                {field: 'route', header: 'Route', filterPlaceholder: 'Filter by Route'},
-                                {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
-                                {field: 'contact_name', header: 'Contact Person', filterPlaceholder: 'Filter by Contact Person'},
-                            ]} />
-                            {getFormErrorMessage(field.name)}
+                                field.onChange(e.id);
+                            }}/>
+                        {getFormErrorMessage(field.name)}
                     </>
                 )}/>
                 </div>}
@@ -261,34 +233,11 @@ const OrderFilter = ({ reloadData, isSales }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Supplier</label>
-                        <SelectMasterData field={field} modelName="dtSupplier"
-                            caption='Select Supplier'
-                            displayField="name" showFields={["name"]}
+                        <Supplier field={field} fieldState={fieldState}
                             onSelect={(e) => {
                                 field.onChange(e.id);
-                            }}
-                            defaultFilters={{
-                                globalFilterFields: ['name', 'phone'],
-                                fields: ["name","address","phone"],
-                                first: 0,
-                                rows: 10,
-                                page: 1,
-                                sortField: null,
-                                sortOrder: null,
-                                filters: {
-                                    global: { value: null, matchMode: 'contains' },
-                                    name: { value: null, matchMode: 'contains' },
-                                    address: { value: null, matchMode: 'contains' },
-                                    phone: { value: null, matchMode: 'contains' },
-                                }
-                            }}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'name', header: 'Name', filterPlaceholder: 'Filter by Shop Name'},
-                                {field: 'address', header: 'Address', filterPlaceholder: 'Filter by Address'},
-                                {field: 'phone', header: 'phone', filterPlaceholder: 'Filter by Phone'},
-                            ]} />
-                            {getFormErrorMessage(field.name)}
+                            }}/>
+                        {getFormErrorMessage(field.name)}
                     </>)}/>
                     </div>
                     <div className="field col-12 md:col-2">
