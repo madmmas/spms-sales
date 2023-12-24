@@ -83,6 +83,17 @@ export class MasterDataDBService {
         });
     }
 
+    async populateShortnameInMemory(modelName, rows) {
+        let masterData = window['__all_shortname_'] || {};
+        if (rows && rows.length > 0) {
+            rows.forEach(row => {
+                masterData[row.id+"-"+modelName] = row.shortname;
+            });
+            window['__all_shortname_'] = masterData;
+        }
+        window['__all_shortname_'] = masterData;
+    }
+
     async addToModelTable(modelName, data) {
         this.openDB();
         let table = this.db.table(modelName);
@@ -112,6 +123,7 @@ export class MasterDataDBService {
             if(_last_updated) {
                 this.setModelLastUpdated(modelName, _last_updated);
             }
+            this.populateShortnameInMemory(modelName, result);
         }
     }
 
@@ -549,7 +561,7 @@ export class MasterDataDBService {
     }
 
     // get model shortname by id
-    async getShortnameById(modelName, id) {
+    async getShortnameByIdFromDB(modelName, id) {
         if(id===null || id===undefined) {
             return "";
         }
@@ -560,6 +572,22 @@ export class MasterDataDBService {
         if(result) {
             return result.shortname || "";
         }
+        return "";
+    }
+
+    // get model shortname by id
+    getShortnameById(modelName, id) {
+        if(id===null || id===undefined) {
+            return "";
+        }
+        let masterData = window['__all_shortname_'];
+        if (masterData) {
+            let key = id+"-"+modelName;
+            if(masterData[key]) {
+                return masterData[key];
+            }
+        }
+
         return "";
     }
 

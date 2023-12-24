@@ -224,6 +224,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                                 field.onChange(e.id);                                
                             }}
                             defaultFilters={{
+                                globalFilterFields: ['name', 'contact_name'],
                                 fields: ["name","address","route","phone","contact_name"],
                                 first: 0,
                                 rows: 10,
@@ -267,6 +268,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                                 field.onChange(e.id);
                             }}
                             defaultFilters={{
+                                globalFilterFields: ['name', 'phone'],
                                 fields: ["name","address","phone"],
                                 first: 0,
                                 rows: 10,

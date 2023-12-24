@@ -18,12 +18,13 @@ import SelectLookupData from '../components/SelectLookupData';
 import SelectMasterData from '../components/SelectMasterData';
 import React, { useEffect, useRef, useState } from 'react';
 
-import CacheMasterDataService from '../../services/CacheMasterDataService';
-import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
+
 import { BANK_CASH } from '../../constants/lookupData';
 import { INCOME_MODEL, INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
+
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 import { getFormattedNumber } from '../../utils';
 
@@ -94,11 +95,11 @@ const Income = () => {
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
-    const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
-        configurationService.getAllWithoutParams(INCOME_TYPE_MODEL).then(data => {
+        masterDataDBService.getAllUpto(INCOME_TYPE_MODEL).then(data => {
             setIncomeType(data);
         });
     }, []);
@@ -214,7 +215,7 @@ const Income = () => {
     const incomeBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtIncomeType_id+"-dtIncomeType")}
+                {rowData.dtIncomeType_id_name}
             </>
         );
     };
@@ -250,9 +251,9 @@ const Income = () => {
     const bankorcashBodyTemplate = (rowData) => {
         let incomeTo = "CASH";
         if(rowData.income_to === "BANK") {
-            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
+            incomeTo = masterDataDBService.getShortnameById("dtBankAccount", rowData.dtBankAccount_id)
         } else if(rowData.income_to === "MFS") {
-            incomeTo = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMFSAccount")
+            incomeTo = masterDataDBService.getShortnameById("dtMFSAccount", rowData.dtMFSAccount_id)
         }
         return (
             <>
@@ -291,7 +292,7 @@ const Income = () => {
     const bankNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
+                {rowData.dtBank_id_shortname}
             </>
         );
     };
@@ -299,7 +300,7 @@ const Income = () => {
     const mfsNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
+                {rowData.dtMFS_id_shortname}
             </>
         );
     };
@@ -418,9 +419,9 @@ const Income = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
                                     <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                        //displayField="dtBank_id_shortname"
+                                        // displayField="dtBank_id_shortname"
                                         displayFunc={(data) => {
-                                            return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
+                                            return `${masterDataDBService.getShortnameById("dtBank", data.dtBank_id)} - [${data.accNumber}]`;
                                         }}
                                         showFields={["dtBank_id", "accNumber", "accName"]}
                                         onSelect={(e) => {console.log(e);}}
@@ -456,9 +457,9 @@ const Income = () => {
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
                                     <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                        //displayField="dtMFS_id_shortname"
+                                        // displayField="dtMFS_id_shortname"
                                         displayFunc={(data) => {
-                                            return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
+                                            return `${masterDataDBService.getShortnameById("dtMFS", data.dtMFS_id)} - [${data.refNumber}]`;
                                         }}
                                         showFields={["dtMFS_id", "refNumber", "accName"]}
                                         onSelect={(e) => {console.log(e);}}

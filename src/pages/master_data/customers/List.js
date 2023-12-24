@@ -27,6 +27,7 @@ const List = ({ ledger = false }) => {
     const dt = useRef(null);
     
     let defaultFilters = {
+        globalFilterFields: ['name', 'contact_name'],
         fields:['dtCustomerCategory_id','name','address','phone','email','contact_name','district','route', 'status'],
         first: 0,
         rows: 10,
@@ -318,7 +319,7 @@ const List = ({ ledger = false }) => {
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} 
-                        filterDisplay="row" globalFilterFields={['name', 'contact_name']}
+                        filterDisplay="row"
                         scrollable columnResizeMode="expand" resizableColumns showGridlines
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
