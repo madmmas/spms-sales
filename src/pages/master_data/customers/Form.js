@@ -11,7 +11,7 @@ import { CITIES } from '../../../constants/lookupData';
 import { DISTRICT } from '../../../constants/districts';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
 
 const Form = ({customerProfile}) => {
@@ -21,7 +21,7 @@ const Form = ({customerProfile}) => {
     let navigate = useNavigate();
 
     const toast = useRef(null);
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
 
     const {
         register,
@@ -31,7 +31,7 @@ const Form = ({customerProfile}) => {
         resetField,
         handleSubmit
     } = useForm({
-        defaultValues: customerProfile //async () =>  hrManagementService.getById(modelName, CustomerProfile)
+        defaultValues: customerProfile //async () =>  masterDataDBService.getById(modelName, CustomerProfile)
       });
 
     useEffect(() => {
@@ -42,13 +42,13 @@ const Form = ({customerProfile}) => {
 
     const onSubmit = (formData) => {
         if(customerProfile==null){
-            hrManagementService.create(modelName, formData).then(data => {
+            masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Created', life: 3000 });
                 // navigate("/customers/" + data.ID);
                 navigate("/customers");
             });
         }else{
-            hrManagementService.update(modelName, formData.id, formData).then(data => {
+            masterDataDBService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Customer Updated', life: 3000 });
                 navigate("/customers");
             });

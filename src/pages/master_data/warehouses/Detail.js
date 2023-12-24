@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
-import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { WAREHOUSE_MODEL } from '../../../constants/models';
 
-const WarehouseForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "warehouseProfile" */ './Form'), "warehouseProfile"));
+import WarehouseForm from './Form';
 
 const Detail = () => {
     
@@ -17,28 +18,28 @@ const Detail = () => {
 
     const modelName = WAREHOUSE_MODEL;
 
-    const hrManagementService = new HRService();
-    const [empData, setWarehouseData] = useState(null);
-
+    const masterDataDBService = new MasterDataDBService();
+    
     const tabs = [
         { component: WarehouseForm },
     ];
-
+    
     const [activeIndex, setActiveIndex] = useState(0);
+    const [detailData, setDetailData] = useState(null);
+
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {
-        console.log(id)
         if(id=="new"){
-            setWarehouseData(null);
-        }else{
-            hrManagementService.getById(modelName, id).then(data => {
-                setWarehouseData(data);
-            });    
+            setDetailData(null);
+        }else {
+            masterDataDBService.getById(modelName, id).then(data => {
+                setDetailData(data);
+            });
         }
-    }, []);
+    }, [id]);
 
     const gotoList = () => {
         navigate("/warehouses");
@@ -50,7 +51,7 @@ const Detail = () => {
 
     const renderTabPanel = () => {
         const TabPanel = tabs[activeIndex].component;
-        return <TabPanel warehouseProfile={empData}/>;
+        return <TabPanel warehouseProfile={detailData}/>;
     };
 
     return (
@@ -60,7 +61,7 @@ const Detail = () => {
                     <Button onClick={() => gotoList()} className="p-button-outlined" label="Go Back to List" />
                     {id!="new" && <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />}
                     <Suspense fallback={<div>Loading...</div>}>
-                        {id=="new"?renderWarehouseForm():(empData && renderTabPanel())}
+                        {id=="new"?renderWarehouseForm():(detailData && renderTabPanel())}
                     </Suspense>
                 </div>
             </div>

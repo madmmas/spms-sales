@@ -6,7 +6,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { HRService } from '../../services/HRService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 const Attendance = ({empProfile}) => {
 
@@ -32,7 +32,7 @@ const Attendance = ({empProfile}) => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -53,7 +53,7 @@ const Attendance = ({empProfile}) => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setAttendances(data.rows);

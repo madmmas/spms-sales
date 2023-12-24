@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
 const BankAccountForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "bankAccountProfile" */ './Form'), "bankAccountProfile"));
@@ -17,7 +17,7 @@ const Detail = () => {
 
     const modelName = BANK_ACCOUNT_MODEL;
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [empData, setBankAccountData] = useState(null);
 
     const tabs = [
@@ -34,7 +34,7 @@ const Detail = () => {
         if(id=="new"){
             setBankAccountData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            masterDataDBService.getById(modelName, id).then(data => {
                 setBankAccountData(data);
             });
         }

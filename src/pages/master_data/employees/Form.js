@@ -12,7 +12,7 @@ import { classNames } from 'primereact/utils';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import { InputNumber } from 'primereact/inputnumber';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { BLOOD_GROUP, EMPLOYMENT_STATUS, GENDER, MARITAL_STATUS, RELIGION } from '../../../constants/lookupData';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 
@@ -24,7 +24,7 @@ const Form = ({empProfile}) => {
     let navigate = useNavigate();
 
     const toast = useRef(null);
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [submitted, setSubmitted] = useState(false);
     const {
         register,
@@ -34,7 +34,7 @@ const Form = ({empProfile}) => {
         resetField,
         handleSubmit
     } = useForm({
-        defaultValues: empProfile //async () =>  hrManagementService.getById(modelName, empProfile)
+        defaultValues: empProfile //async () =>  masterDataDBService.getById(modelName, empProfile)
       });
 
     useEffect(() => {
@@ -45,13 +45,13 @@ const Form = ({empProfile}) => {
 
     const onSubmit = (formData) => {
         if(empProfile==null){
-            hrManagementService.create(modelName, formData).then(data => {
+            masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Created', life: 3000 });
                 // navigate("/employees/" + data.ID);
                 navigate("/employees");
             });
         }else{
-            hrManagementService.update(modelName, formData.id, formData).then(data => {
+            masterDataDBService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Updated', life: 3000 });
             });
         }

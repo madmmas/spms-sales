@@ -293,22 +293,6 @@ const Expenses = () => {
         </>
     );
 
-    const bankNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
-            </>
-        );
-    };
-
-    const mfsNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
-            </>
-        );
-    };
-
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -333,7 +317,7 @@ const Expenses = () => {
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="expense_from" header="Expense Paid From" filter filterElement={bankorcashFilterTemplate} sortable body={bankorcashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter filterElement={expenseTypeFilterTemplate} body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column dataType="numeric" style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Amount" filter body={amountBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterPlaceholder="Search by remarks" sortable body={remarksBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 

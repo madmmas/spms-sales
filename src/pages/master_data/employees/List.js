@@ -10,7 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Toolbar } from 'primereact/toolbar';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 const List = () => {
 
@@ -59,7 +59,7 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -112,7 +112,7 @@ const List = () => {
     const loadLazyData = () => {
         setLoading(true);
 
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setEmpProfiles(data.rows);
@@ -170,7 +170,7 @@ const List = () => {
     };
 
     const deleteEmpProfile = () => {
-        hrManagementService.delete(modelName, empProfile.id).then(data => {
+        masterDataDBService.delete(modelName, empProfile.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });

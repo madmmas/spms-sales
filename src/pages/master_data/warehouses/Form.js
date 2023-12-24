@@ -7,9 +7,8 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { Fieldset } from 'primereact/fieldset';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { WAREHOUSE_MODEL } from '../../../constants/models';
 
@@ -18,16 +17,13 @@ const Form = ({warehouseProfile}) => {
     const modelName = WAREHOUSE_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);
-    const hrManagementService = new HRService();
-    const [status, setStatus] = useState('');
+    const masterDataDBService = new MasterDataDBService();
     const [submitted, setSubmitted] = useState(false);
 
     const {
-        register,
         control,
         formState: { errors },
         setValue,
-        resetField,
         handleSubmit
     } = useForm({
         defaultValues: warehouseProfile
@@ -42,13 +38,13 @@ const Form = ({warehouseProfile}) => {
     const onSubmit = (formData) => {
         setSubmitted(true);
         if(warehouseProfile==null){
-            hrManagementService.create(modelName, formData).then(data => {
+            masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Created', life: 3000 });
                 // navigate("/warehouses/" + data.ID);
                 navigate("/warehouses");
             });
         }else{
-            hrManagementService.update(modelName, formData.id, formData).then(data => {
+            masterDataDBService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/warehouses/" + data.ID);

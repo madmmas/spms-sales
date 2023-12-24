@@ -6,7 +6,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { HRService } from '../../services/HRService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 const LeaveHistory = ({empID}) => {
 
@@ -30,7 +30,7 @@ const LeaveHistory = ({empID}) => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const employeeManagementService = new HRService();
+    const employeeManagementService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();

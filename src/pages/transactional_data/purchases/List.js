@@ -18,8 +18,6 @@ import { OrderService } from '../../../services/OrderService';
 
 const List = () => {
 
-    const modelName = PURCHASE_MODEL;
-
     let navigate = useNavigate();
 
     const toast = useRef(null);
@@ -53,7 +51,6 @@ const List = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    // const hrManagementService = new HRService();
     const orderService = new OrderService();
 
     useEffect(() => {
@@ -146,7 +143,7 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        // masterDataDBService.delete(modelName, dtProfile.id).then(data => {
         //     console.log(data);
         //     loadLazyData();
         //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Purchase Profile Deleted', life: 3000 });

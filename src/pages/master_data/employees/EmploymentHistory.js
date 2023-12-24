@@ -10,7 +10,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { EMP_HISTORY_MODEL } from '../../../constants/models';
 
 const EmploymentHistory = ({empProfile}) => {
@@ -69,7 +69,7 @@ const EmploymentHistory = ({empProfile}) => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -89,7 +89,7 @@ const EmploymentHistory = ({empProfile}) => {
 
     const loadLazyData = () => {
         setLoading(true);
-        hrManagementService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
+        masterDataDBService.getAll(modelName, { params: JSON.stringify(lazyParams) }).then(data => {
             console.log(data)
             setTotalRecords(data.total);
             setEmploymentHistorys(data.rows);
@@ -122,13 +122,13 @@ const EmploymentHistory = ({empProfile}) => {
 
         if (employmentHistory.name.trim()) {
             if (employmentHistory.id) {
-                hrManagementService.update(modelName, employmentHistory.id, employmentHistory).then(data => {
+                masterDataDBService.update(modelName, employmentHistory.id, employmentHistory).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistory Updated', life: 3000 });
                 });
             } else {
-                hrManagementService.create(modelName, employmentHistory).then(data => {
+                masterDataDBService.create(modelName, employmentHistory).then(data => {
                     console.log(data);
                     loadLazyData();
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'EmploymentHistory Created', life: 3000 });
@@ -152,7 +152,7 @@ const EmploymentHistory = ({empProfile}) => {
     };
 
     const deleteEmploymentHistory = () => {
-        hrManagementService.delete(modelName, employmentHistory.id).then(data => {
+        masterDataDBService.delete(modelName, employmentHistory.id).then(data => {
             console.log(data);
             loadLazyData();
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Employee Profile Deleted', life: 3000 });

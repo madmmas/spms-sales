@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { MFS_ACCOUNT_MODEL } from '../../../constants/models';
 
 const MFSAccountForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "mfsAccountProfile" */ './Form'), "mfsAccountProfile"));
@@ -17,7 +17,7 @@ const Detail = () => {
 
     const modelName = MFS_ACCOUNT_MODEL;
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [empData, setMFSAccountData] = useState(null);
 
     const tabs = [
@@ -34,7 +34,7 @@ const Detail = () => {
         if(id=="new"){
             setMFSAccountData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            masterDataDBService.getById(modelName, id).then(data => {
                 setMFSAccountData(data);
             });    
         }

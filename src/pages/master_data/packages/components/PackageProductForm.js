@@ -25,7 +25,7 @@ export default function PackageProductForm({
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: emptyPackageProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: emptyPackageProduct //async () =>  masterDataDBService.getById(modelName, ProductProfile)
     });
 
     const quantityRef = useRef(null);

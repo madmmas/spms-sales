@@ -57,7 +57,7 @@ export default function PurchaseProductForm({
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: emptyPurchaseProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: emptyPurchaseProduct //async () =>  masterDataDBService.getById(modelName, ProductProfile)
     });
 
     const quantityRef = useRef(null);

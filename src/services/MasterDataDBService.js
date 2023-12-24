@@ -516,24 +516,10 @@ export class MasterDataDBService {
             total = await table.count();
             result = await table.offset(first).limit(limit).toArray();    
         }
-        
-        // apply filter on the result
-        // let result = await table.toArray();
-        // result = await this.applyFilter(result, params.filters);
-        // let total = await table.count();
-        // result = result.slice(first, first + limit);
-        
+                
         // console.log("getAll_result:::", result);
-        console.log("getAll_result:::", modelName, first, limit, params, result);
-        // need to populate the shortname fields here
-        // let fields = modelDef.getFields(modelName);
-        // for (let i = 0; i < fields.length; i++) {
-        //     let field = fields[i];
-        //     if(field.startsWith("dt") && field.endsWith("id")) {
-        //         let fieldModelName = field.substring(0, field.length - 3);
-        //         await this.populateFieldData(fieldModelName, field, result);
-        //     }
-        // }
+        // console.log("getAll_result:::", modelName, first, limit, params, result);
+
         await this.populateShornames(modelName, result);
         return {
             rows: result,
@@ -553,12 +539,12 @@ export class MasterDataDBService {
     }
     // get model data by id
     async getById(modelName, id) {
-        if(id===null || id===undefined) {
+        let _id = parseInt(id);
+        if(_id===null || _id===undefined || isNaN(_id) || _id===0) {
             return null;
         }
         await this.openDB();
-        let table = this.db.table(modelName);
-        let result = await table.get(id);
+        let result = await this.db.table(modelName).get(_id);
         console.log("getById:::", modelName, id, result);
         return result;
     }

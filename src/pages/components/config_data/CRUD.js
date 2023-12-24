@@ -56,6 +56,7 @@ const CRUD = ({
 
     useEffect(() => {
         initFilters();
+        reloadData();
     }, [modelName]);
     
     const clearFilter = () => {

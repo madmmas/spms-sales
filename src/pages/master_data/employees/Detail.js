@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { EMPLOYEE_MODEL } from '../../../constants/models';
 
 const EmpForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "empProfile" */ './Form'), "empProfile"));
@@ -19,7 +19,7 @@ const Detail = () => {
 
     const modelName = EMPLOYEE_MODEL;
 
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [empData, setEmpData] = useState(null);
 
     const tabs = [
@@ -40,7 +40,7 @@ const Detail = () => {
         if(id=="new"){
             setEmpData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            masterDataDBService.getById(modelName, id).then(data => {
                 setEmpData(data);
             });    
         }

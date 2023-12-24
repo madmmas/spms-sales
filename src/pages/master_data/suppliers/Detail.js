@@ -4,7 +4,9 @@ import { useParams } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
-import { HRService } from '../../../services/HRService';
+
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
+
 import { SUPPLIER_MODEL } from '../../../constants/models';
 
 const SupplierForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "supplierProfile" */ './Form'), "supplierProfile"));
@@ -17,13 +19,13 @@ const Detail = () => {
 
     const modelName = SUPPLIER_MODEL;
 
-    const hrManagementService = new HRService();
-    const [empData, setSupplierData] = useState(null);
+    const masterDataDBService = new MasterDataDBService();
 
     const tabs = [
         { component: SupplierForm },
     ];
-
+    
+    const [empData, setSupplierData] = useState(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
@@ -36,7 +38,7 @@ const Detail = () => {
         if(id=="new"){
             setSupplierData(null);
         }else{
-            hrManagementService.getById(modelName, id).then(data => {
+            masterDataDBService.getById(modelName, id).then(data => {
                 setSupplierData(data);
             });    
         }

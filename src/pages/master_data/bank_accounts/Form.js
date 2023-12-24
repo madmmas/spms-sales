@@ -11,7 +11,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import SelectLookupData from '../../components/SelectLookupData';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { BANK_MODEL, BANK_ACCOUNT_MODEL } from '../../../constants/models';
 
@@ -20,7 +20,7 @@ const Form = ({bankAccountProfile}) => {
     const modelName = BANK_ACCOUNT_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [isEdit, setIsEdit] = useState(bankAccountProfile!=null);
     const [submitted, setSubmitted] = useState(false);
 
@@ -55,13 +55,13 @@ const Form = ({bankAccountProfile}) => {
         setSubmitted(true);
         if(!isEdit){
             formData.balance = formData.initBalance;
-            hrManagementService.create(modelName, formData).then(data => {
+            masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Created', life: 3000 });
                 // navigate("/bank_accounts/" + data.ID);
                 navigate("/bank_accounts");
             });
         }else{
-            hrManagementService.update(modelName, formData.id, formData).then(data => {
+            masterDataDBService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Account Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/bank_accounts/" + data.ID);

@@ -11,7 +11,7 @@ import { Fieldset } from 'primereact/fieldset';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { SUPPLIER_MODEL, SUPPLIER_CATEGORY_MODEL } from '../../../constants/models';
 import { CURRENCY } from '../../../constants/lookupData';
@@ -23,9 +23,11 @@ const Form = ({supplierProfile}) => {
     const modelName = SUPPLIER_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);
-    const hrManagementService = new HRService();
-    const [status, setStatus] = useState('');
+    
+    const masterDataDBService = new MasterDataDBService();
+
     const [submitted, setSubmitted] = useState(false);
+
     const {
         register,
         control,
@@ -47,13 +49,13 @@ const Form = ({supplierProfile}) => {
         try{        
             setSubmitted(true);
             if(supplierProfile==null){
-                hrManagementService.create(modelName, formData).then(data => {
+                masterDataDBService.create(modelName, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Created', life: 3000 });
                     // navigate("/suppliers/" + data.ID);
                     navigate("/suppliers");
                 });
             }else{
-                hrManagementService.update(modelName, formData.id, formData).then(data => {
+                masterDataDBService.update(modelName, formData.id, formData).then(data => {
                     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Supplier Updated', life: 3000 });
                     setSubmitted(false);
                     // navigate("/suppliers/" + data.ID);

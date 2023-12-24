@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
-import { InputMask } from "primereact/inputmask";
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
@@ -11,7 +10,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { InputTextarea } from 'primereact/inputtextarea';
 import SelectLookupData from '../../components/SelectLookupData';
 
-import { HRService } from '../../../services/HRService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { MFS_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
 
@@ -20,7 +19,7 @@ const Form = ({mfsAccountProfile}) => {
     const modelName = MFS_ACCOUNT_MODEL;
     let navigate = useNavigate();
     const toast = useRef(null);
-    const hrManagementService = new HRService();
+    const masterDataDBService = new MasterDataDBService();
     const [isEdit, setIsEdit] = useState(mfsAccountProfile!=null);
     const [submitted, setSubmitted] = useState(false);
 
@@ -54,13 +53,13 @@ const Form = ({mfsAccountProfile}) => {
         setSubmitted(true);
         if(!isEdit){
             formData.balance = formData.initBalance;
-            hrManagementService.create(modelName, formData).then(data => {
+            masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Created', life: 3000 });
                 // navigate("/mfs_accounts/" + data.ID);
                 navigate("/mfs_accounts");
             });
         }else{
-            hrManagementService.update(modelName, formData.id, formData).then(data => {
+            masterDataDBService.update(modelName, formData.id, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'MFS Account Updated', life: 3000 });
                 setSubmitted(false);
                 // navigate("/mfs_accounts/" + data.ID);

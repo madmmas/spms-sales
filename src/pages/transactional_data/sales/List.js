@@ -207,7 +207,7 @@ const List = () => {
     };
 
     const deleteProfile = () => {
-        // hrManagementService.delete(modelName, dtProfile.id).then(data => {
+        // masterDataDBService.delete(modelName, dtProfile.id).then(data => {
         //     console.log(data);
         //     loadLazyData();
         //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Sales Profile Deleted', life: 3000 });

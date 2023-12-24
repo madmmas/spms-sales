@@ -36,7 +36,7 @@ export default function SalesReturnProductForm({
         setValue,
         handleSubmit
     } = useForm({
-        defaultValues: emptySalesProduct //async () =>  hrManagementService.getById(modelName, ProductProfile)
+        defaultValues: emptySalesProduct //async () =>  masterDataDBService.getById(modelName, ProductProfile)
     });
 
     const quantityRef = useRef(null);
