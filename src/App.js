@@ -71,7 +71,7 @@ function App() {
   const ExtraIncome = React.lazy(() => import("./pages/transactional_data/ExtraIncome"));
   const CashBank = React.lazy(() => import("./pages/transactional_data/transfer_money/Detail"));
 
-  const CRUD = React.lazy(() => import("./pages/components/config_data/CRUD"));
+  const Configuration = React.lazy(() => import("./pages/configurations/Configuration"));
 
   const Invoice = React.lazy(() => import("./pages/transactional_data/sales/Invoice"));
 
@@ -216,24 +216,24 @@ function App() {
         <Route path="/extra_income" element={<RouteAuth pageComponent={<ExtraIncome />} />} />
         <Route path="/transfer" element={<RouteAuth pageComponent={<CashBank />} />} />
 
-        <Route path="/banks" element={<RouteAuth pageComponent={<CRUD modelName="dtBank" />} />} />
-        <Route path="/customer_category" element={<RouteAuth pageComponent={<CRUD modelName="dtCustomerCategory" />} />} />
-        <Route path="/expense_type" element={<RouteAuth pageComponent={<CRUD modelName="dtExpenseType" />} />} />    
+        <Route path="/banks" element={<RouteAuth pageComponent={<Configuration modelName="dtBank" />} />} />
+        <Route path="/customer_category" element={<RouteAuth pageComponent={<Configuration modelName="dtCustomerCategory" />} />} />
+        <Route path="/expense_type" element={<RouteAuth pageComponent={<Configuration modelName="dtExpenseType" />} />} />    
 
-        <Route path="/designation" element={<RouteAuth pageComponent={<CRUD modelName="dtDesignation" />} />} />
-        <Route path="/department" element={<RouteAuth pageComponent={<CRUD modelName="dtDepartment" />} />} />
+        <Route path="/designation" element={<RouteAuth pageComponent={<Configuration modelName="dtDesignation" />} />} />
+        <Route path="/department" element={<RouteAuth pageComponent={<Configuration modelName="dtDepartment" />} />} />
         
-        <Route path="/mfs_types" element={<RouteAuth pageComponent={<CRUD modelName="dtMFS" />} />} />
-        <Route path="/extra_income_type" element={<RouteAuth pageComponent={<CRUD modelName="dtIncomeType" />} />} />
-        <Route path="/grade" element={<RouteAuth pageComponent={<CRUD modelName="dtGrade" />} />} />
-        <Route path="/group" element={<RouteAuth pageComponent={<CRUD modelName="dtGroup" />} />} />
-        <Route path="/office_time" element={<RouteAuth pageComponent={<CRUD modelName="dtOfficeTime" />} />} />
-        <Route path="/payment_type" element={<RouteAuth pageComponent={<CRUD modelName="dtPaymentType" />} />} />
-        <Route path="/product_category" element={<RouteAuth pageComponent={<CRUD modelName="dtProductCategory" />} />} />
-        <Route path="/product_brand" element={<RouteAuth pageComponent={<CRUD modelName="dtProductBrand" />} />} />
-        <Route path="/product_model" element={<RouteAuth pageComponent={<CRUD modelName="dtProductModel" />} />} />
-        <Route path="/route" element={<RouteAuth pageComponent={<CRUD modelName="dtRoute" />} />} />
-        <Route path="/supplier_category" element={<RouteAuth pageComponent={<CRUD modelName="dtSupplierCategory" />} />} />
+        <Route path="/mfs_types" element={<RouteAuth pageComponent={<Configuration modelName="dtMFS" />} />} />
+        <Route path="/extra_income_type" element={<RouteAuth pageComponent={<Configuration modelName="dtIncomeType" />} />} />
+        <Route path="/grade" element={<RouteAuth pageComponent={<Configuration modelName="dtGrade" />} />} />
+        <Route path="/group" element={<RouteAuth pageComponent={<Configuration modelName="dtGroup" />} />} />
+        <Route path="/office_time" element={<RouteAuth pageComponent={<Configuration modelName="dtOfficeTime" />} />} />
+        <Route path="/payment_type" element={<RouteAuth pageComponent={<Configuration modelName="dtPaymentType" />} />} />
+        <Route path="/product_category" element={<RouteAuth pageComponent={<Configuration modelName="dtProductCategory" />} />} />
+        <Route path="/product_brand" element={<RouteAuth pageComponent={<Configuration modelName="dtProductBrand" />} />} />
+        <Route path="/product_model" element={<RouteAuth pageComponent={<Configuration modelName="dtProductModel" />} />} />
+        <Route path="/route" element={<RouteAuth pageComponent={<Configuration modelName="dtRoute" />} />} />
+        <Route path="/supplier_category" element={<RouteAuth pageComponent={<Configuration modelName="dtSupplierCategory" />} />} />
 
       </Route>
     </Routes>

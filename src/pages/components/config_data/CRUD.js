@@ -12,19 +12,15 @@ import { classNames } from 'primereact/utils';
 
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
-const CRUD = ({ modelName }) => {
-
-    const toast = useRef(null);
-    const dt = useRef(null);
-    const contextPath = '~';
-
-    const emptyProfiles = {
+const CRUD = ({ 
+    modelName,
+    headerTitle="Manage Data",
+    emptyData = {
         id: null,
         name: '',
         description: '',
-    }
-
-    const defaultFilters = {
+    },
+    defaultFilters = {
         fields: ['name', 'description'],
         first: 0,
         rows: 10,
@@ -35,6 +31,11 @@ const CRUD = ({ modelName }) => {
             'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
         }
     }
+}) => {
+
+    const toast = useRef(null);
+    const dt = useRef(null);
+    const contextPath = '~';
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
@@ -44,7 +45,7 @@ const CRUD = ({ modelName }) => {
     const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
     const [deleteProfilessDialog, setDeleteProfilessDialog] = useState(false);
     
-    const [profiles, setProfiles] = useState(emptyProfiles);
+    const [profiles, setProfiles] = useState(emptyData);
     const [selectedProfiless, setSelectedProfiless] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
@@ -88,7 +89,7 @@ const CRUD = ({ modelName }) => {
 
     const openNew = () => {
         setCreateEdit(true);
-        setProfiles(emptyProfiles);
+        setProfiles(emptyData);
         setSubmitted(false);
         setProfilesDialog(true);
     };
@@ -125,7 +126,7 @@ const CRUD = ({ modelName }) => {
             }
 
             setProfilesDialog(false);
-            setProfiles(emptyProfiles);
+            setProfiles(emptyData);
         }
     };
 
@@ -146,7 +147,7 @@ const CRUD = ({ modelName }) => {
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
         });
         setDeleteProfilesDialog(false);
-        setProfiles(emptyProfiles);
+        setProfiles(emptyData);
     };
 
     const exportCSV = () => {
@@ -233,7 +234,7 @@ const CRUD = ({ modelName }) => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Manage Profiles</h5>
+                <h5 className="m-0">{headerTitle}</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
