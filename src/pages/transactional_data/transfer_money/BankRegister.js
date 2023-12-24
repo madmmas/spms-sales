@@ -16,10 +16,13 @@ import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
 import CacheMasterDataService from '../../../services/CacheMasterDataService';
-import SelectMasterData from '../../components/SelectMasterData';
+
+import BankAccount from '../../components/master_data/BankAccount';
+import MFSAccount from '../../components/master_data/MFSAccount';
+
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../../constants/models';
+
 import { getFormattedNumber } from '../../../utils';
 
 const BankRegister = () => {
@@ -271,32 +274,9 @@ const BankRegister = () => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Transfer From Bank Account*</label>
-                                <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                    //displayField="dtBank_id_shortname"
-                                    displayFunc={(data) => {
-                                        return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
-                                    }}
-                                    showFields={["dtBank_id", "accNumber", "accName"]}
-                                    onSelect={(e) => {
-                                        console.log(e);
-                                    }}
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    columns={[
-                                        {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
-                                        {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
-                                        {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                    ]} 
-                                    defaultFilters={{
-                                        fields: ['dtBank_id', 'accNumber', 'accName'],
-                                        first: 0,
-                                        rows: 10,
-                                        page: 1,
-                                        sortField: null,
-                                        sortOrder: null,
-                                        filters: {
-                                            global: { value: null, matchMode: 'contains' }
-                                        }
-                                    }}/>
+                                <BankAccount field={field} fieldState={fieldState}
+                                    onSelect={(e) => {console.log(e);}}
+                                    />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -360,32 +340,9 @@ const BankRegister = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
-                                    <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                                        //displayField="dtBank_id_shortname"
-                                        displayFunc={(data) => {
-                                            return `${CacheMasterDataService.getShortnameById(data.dtBank_id+"-dtBank")} - [${data.accNumber}]`;
-                                        }} 
-                                        showFields={["dtBank_id", "accNumber", "accName"]}
-                                        onSelect={(e) => {
-                                            console.log(e);
-                                        }}
-                                        className={classNames({ 'p-invalid': fieldState.error })} 
-                                        columns={[
-                                            {field: 'dtBank_id', header: 'Bank Name', body: bankNameBodyTemplate, filterPlaceholder: 'Filter by Bank Name'},
-                                            {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
-                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                        ]} 
-                                        defaultFilters={{
-                                            fields: ['dtBank_id', 'accNumber', 'accName'],
-                                            first: 0,
-                                            rows: 10,
-                                            page: 1,
-                                            sortField: null,
-                                            sortOrder: null,
-                                            filters: {
-                                                global: { value: null, matchMode: 'contains' }
-                                            }
-                                        }}/>
+                                    <BankAccount field={field} fieldState={fieldState}
+                                        onSelect={(e) => {console.log(e);}}
+                                        />
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>
@@ -401,32 +358,9 @@ const BankRegister = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
-                                    <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                                        //displayField="dtMFS_id_shortname"
-                                        displayFunc={(data) => {
-                                            return `${CacheMasterDataService.getShortnameById(data.dtMFS_id+"-dtMFS")} - [${data.refNumber}]`;
-                                        }}
-                                        showFields={["dtMFS_id", "refNumber", "accName"]}
-                                        onSelect={(e) => {
-                                            console.log(e);
-                                        }}
-                                        className={classNames({ 'p-invalid': fieldState.error })} 
-                                        columns={[
-                                            {field: 'dtMFS_id', header: 'MFS Name', body: mfsNameBodyTemplate, filterPlaceholder: 'Filter by MFS Name'}, 
-                                            {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
-                                            {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                                        ]} 
-                                        defaultFilters={{
-                                            fields: ['dtMFS_id', 'refNumber', 'accName'],
-                                            first: 0,
-                                            rows: 10,
-                                            page: 1,
-                                            sortField: null,
-                                            sortOrder: null,
-                                            filters: {
-                                                global: { value: null, matchMode: 'contains' }
-                                            }
-                                        }}/>
+                                    <MFSAccount field={field} fieldState={fieldState}
+                                        onSelect={(e) => {console.log(e);}}
+                                        />
                                     {getFormErrorMessage(field.name)}
                                 </>
                             )}/>

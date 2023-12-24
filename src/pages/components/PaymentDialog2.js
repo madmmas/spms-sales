@@ -10,6 +10,9 @@ import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import SelectConstData from './SelectConstData';
 import SelectMasterData from './SelectMasterData';
+import BankAccount from './master_data/BankAccount';
+import MFSAccount from './master_data/MFSAccount';
+
 
 import { PAYMENT_TYPES } from '../../constants/lookupData';
 import { BANK_ACCOUNT_MODEL, MFS_ACCOUNT_MODEL } from '../../constants/models';
@@ -163,33 +166,9 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Account*</label>
-                        <SelectMasterData field={field} modelName={BANK_ACCOUNT_MODEL}
-                            //displayField="dtBank_id_shortname"
-                            displayFunc={(data) => {
-                                return `${data.dtBank_id_shortname} - [${data.accNumber}]`;
-                            }}
+                        <BankAccount field={field} fieldState={fieldState}
                             onSelect={(e) => {console.log(e);}}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'dtBank_id', header: 'Bank Name', filterPlaceholder: 'Filter by Bank Name', body: bankNameBodyTemplate}, 
-                                {field: 'accNumber', header: 'Account Number', filterPlaceholder: 'Filter by Account Number'},
-                                {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                            ]} 
-                            defaultFilters={{
-                                fields: ["dtBank_id", "accNumber", "accName"],
-                                nameField: "accName",
-                                first: 0,
-                                rows: 10,
-                                page: 1,
-                                sortField: null,
-                                sortOrder: null,
-                                filters: {
-                                    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    accName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    accNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    dtBank_id: { value: null, matchMode: FilterMatchMode.EQUALS },
-                                }
-                            }}/>
+                            />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>
@@ -204,33 +183,9 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>MFS Account*</label>
-                        <SelectMasterData field={field} modelName={MFS_ACCOUNT_MODEL}
-                            //displayField="dtMFS_id_shortname"
-                            displayFunc={(data) => {
-                                return `${data.dtMFS_id_shortname} - [${data.refNumber}]`;
-                            }}
+                        <MFSAccount field={field} fieldState={fieldState}
                             onSelect={(e) => {console.log(e);}}
-                            className={classNames({ 'p-invalid': fieldState.error })} 
-                            columns={[
-                                {field: 'dtMFS_id', header: 'MFS Name', filterPlaceholder: 'Filter by MFS Name', body: mfsNameBodyTemplate}, 
-                                {field: 'refNumber', header: 'Reference Number', filterPlaceholder: 'Filter by Reference Number'},
-                                {field: 'accName', header: 'Account Name', filterPlaceholder: 'Filter by Account Name'}
-                            ]} 
-                            defaultFilters={{
-                                fields: ["dtMFS_id", "refNumber", "accName"],
-                                nameField: "accName",
-                                first: 0,
-                                rows: 10,
-                                page: 1,
-                                sortField: null,
-                                sortOrder: null,
-                                filters: {
-                                    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    accName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    refNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
-                                    dtMFS_id: { value: null, matchMode: FilterMatchMode.EQUALS },
-                                }
-                            }}/>
+                            />
                         {getFormErrorMessage(field.name)}
                     </>
                 )}/>

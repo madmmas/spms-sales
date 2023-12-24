@@ -365,18 +365,21 @@ export class MasterDataDBService {
     }
 
     async loadAllInitData() {
+        await this.getAllMasterDataUpto("dtProductBrand");
+        await this.getAllMasterDataUpto("dtProductModel");
+
         await this.loadProductData()
 
-        this.getAllMasterDataUpto("dtBank");
-        this.getAllMasterDataUpto("dtCustomerCategory");
-        this.getAllMasterDataUpto("dtExpenseType");
-        this.getAllMasterDataUpto("dtIncomeType");
-        this.getAllMasterDataUpto("dtMFS");
-        this.getAllMasterDataUpto("dtPaymentType");
-        this.getAllMasterDataUpto("dtProductCategory");
-        this.getAllMasterDataUpto("dtSupplierCategory");
-        this.getAllMasterDataUpto("dtRoute");
-        this.getAllMasterDataUpto("dtWarehouse");
+        await this.getAllMasterDataUpto("dtBank");
+        await this.getAllMasterDataUpto("dtCustomerCategory");
+        await this.getAllMasterDataUpto("dtExpenseType");
+        await this.getAllMasterDataUpto("dtIncomeType");
+        await this.getAllMasterDataUpto("dtMFS");
+        await this.getAllMasterDataUpto("dtPaymentType");
+        await this.getAllMasterDataUpto("dtProductCategory");
+        await this.getAllMasterDataUpto("dtSupplierCategory");
+        await this.getAllMasterDataUpto("dtRoute");
+        await this.getAllMasterDataUpto("dtWarehouse");
         
         this.getAllMasterDataUpto("dtBankAccount");
         this.getAllMasterDataUpto("dtMFSAccount");
@@ -384,8 +387,6 @@ export class MasterDataDBService {
         this.getAllMasterDataUpto("dtCustomer");
         this.getAllMasterDataUpto("dtSupplier");
         
-        await this.getAllMasterDataUpto("dtProductBrand");
-        await this.getAllMasterDataUpto("dtProductModel");
         this.populateProductSearch();
     }
 
@@ -413,8 +414,10 @@ export class MasterDataDBService {
         localStorage.removeItem("dtProduct_last_updated");
 
         localStorage.removeItem("trxLedger_last_updated");
+    }
+    
+    async clearAllDBTables() {
 
-        // clear all tables
         await this.openDB();
         await this.db.dtBank.clear();
         await this.db.dtCustomerCategory.clear();
@@ -439,7 +442,7 @@ export class MasterDataDBService {
 
         await this.db.trxLedger.clear();
     }
-    
+
     async getAllByIds(modelName, ids) {
         await this.openDB();
         let table = this.db.table(modelName);
@@ -568,7 +571,6 @@ export class MasterDataDBService {
         await this.openDB();
         let table = this.db.table(modelName);
         let result = await table.get(id);
-        console.log("getShortnameById result:::", modelName, id, result);
         if(result) {
             return result.shortname || "";
         }
@@ -599,7 +601,10 @@ export class MasterDataDBService {
             let row = rows[i];
             if (row[fieldName] != undefined && row[fieldName] != null) {
                 if(row[fieldName] != prevId) {
-                    shortname = await this.getShortnameById(modelName, row[fieldName]);
+                    shortname = this.getShortnameById(modelName, row[fieldName]);
+                    if(shortname === "") {
+                        shortname = await this.getShortnameByIdFromDB(modelName, row[fieldName]);
+                    }
                     rows[i][fieldName + '_shortname'] = shortname;
                 } else {    
                     rows[i][fieldName + '_shortname'] = shortname;

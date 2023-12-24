@@ -7,7 +7,7 @@ import { MasterDataDBService } from '../../services/MasterDataDBService';
 export default function SelectMasterData({ 
     field, displayField="shortname",
     showFields=[], modelName, className, 
-    columns, caption="Select", onSelect, 
+    columns, caption="Select", onSelect,
     defaultFilters={
         globalFilterFields: ['name'],
         fields: [],

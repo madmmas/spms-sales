@@ -159,8 +159,9 @@ export default function SelectMasterDataTable({
                     className="datatable-responsive" responsiveLayout="scroll"
                     lazy loading={loading} rows={lazyParams.rows}
                     onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
-                    onFilter={onFilter} filterDisplay="row"
-                    filters={lazyParams.filters}
+                    
+                    onFilter={onFilter} filterDisplay="row" filters={lazyParams.filters}
+
                     isDataSelectable={isRowSelectable} rowClassName={rowClassName}
                     scrollable scrollHeight="flex" tableStyle={{ minWidth: '50rem' }}
                     paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
@@ -176,7 +177,10 @@ export default function SelectMasterDataTable({
                     <Column selectionMode="single" headerStyle={{ width: '3rem' }}></Column>
                     {columns.map((col, index) => {
                         return (
-                            <Column key={index} field={col.field} header={col.header} body={col.body} filter filterPlaceholder={col.filterPlaceholder} sortable></Column>
+                            <Column key={index} field={col.field} header={col.header} body={col.body} 
+                                filter={col.filter} filterPlaceholder={col.filterPlaceholder} 
+                                sortable={col.sortable}
+                            ></Column>
                         )
                     })}
                 </DataTable>
