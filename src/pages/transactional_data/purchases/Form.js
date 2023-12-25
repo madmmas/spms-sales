@@ -13,10 +13,9 @@ import { DataTable } from 'primereact/datatable';
 
 import Supplier from '../../components/master_data/Supplier';
 
-import { PURCHASE_MODEL } from '../../../constants/models';
+import { PURCHASE_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
 import { OrderService } from '../../../services/OrderService';
-import { MasterDataService } from '../../../services/MasterDataService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 
@@ -94,7 +93,6 @@ const Form = ({ purchase }) => {
     const [triggerRemoveItem, setTriggerRemoveItem] = useState(0);
 
     const orderService = new OrderService();
-    const masterDataService = new MasterDataService();
     const configurationService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
@@ -110,7 +108,7 @@ const Form = ({ purchase }) => {
 
     useEffect(() => {
         // get default warehouse
-        masterDataService.getDefaultItem('dtWarehouse').then(data => {
+        masterDataDBService.getDefaultItem(WAREHOUSE_MODEL).then(data => {
             if(data){
                 console.log("DEFAULT WAREHOUSE::", data);
                 setDefaultWarehouse(data.id);    

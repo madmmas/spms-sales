@@ -9,7 +9,6 @@ import { classNames } from 'primereact/utils';
 
 import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
-import { MasterDataService } from '../../services/MasterDataService';
 import { TransactionService } from '../../services/TransactionService';
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
@@ -47,7 +46,6 @@ export const HtmlLedger = ({type, header}) => {
     const [toDate, setToDate] = useState(new Date())
 
     const transactionService = new TransactionService();
-    const masterDataService = new MasterDataService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
@@ -59,7 +57,7 @@ export const HtmlLedger = ({type, header}) => {
             if(partyType === null || partyType === ""){
                 return;
             }                
-            masterDataService.getById(partyType, id).then(party => {
+            masterDataDBService.getById(partyType, id).then(party => {
                 setPartyData({
                     "line1": party.name||party.contact_name||party.accName,
                     "line2": party.address||party.branch,

@@ -4,11 +4,11 @@ import { AutoComplete } from 'primereact/autocomplete';
         
 import SelectMasterDataTableOL from './SelectMasterDataTableOL';
 
-import { MasterDataService } from '../../services/MasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterDataAutoComplete({ field, displayField, showFields=[], modelName, className, columns, caption="Select", onSelect }) {
 
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const [selectedRow, setSelectedRow] = useState('');
     const [trigger, setTrigger] = useState(0);
@@ -18,7 +18,7 @@ export default function SelectMasterDataAutoComplete({ field, displayField, show
             setSelectedRow("");
             return;
         }
-        masterDataService.getById(modelName, field.value).then(data => {
+        masterDataDBService.getById(modelName, field.value).then(data => {
             setSelectedRow(data[displayField]);
         });
     }, [field.value]);

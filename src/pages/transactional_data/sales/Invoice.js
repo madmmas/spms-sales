@@ -5,14 +5,14 @@ import Invoice from '../../reports/components/invoice/Invoice'
 
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../constants/models';
 import { OrderService } from '../../../services/OrderService';
-import { MasterDataService } from '../../../services/MasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const MyDocument = () => {
 
     let { id } = useParams();
     
     const orderService = new OrderService();
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
     const [sales, setSales] = useState(null);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ const MyDocument = () => {
         }else{
             orderService.getById(SALES_MODEL, id).then(data => {
                 if(data && data.customer_category!=="WALKIN"){
-                    masterDataService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
+                    masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
                         data.party = {
                             "line1": party.name,
                             "line2": party.address,

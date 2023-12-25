@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import SelectMasterDataTableList from './SelectMasterDataTableList';
 
-import { MasterDataService } from '../../services/MasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 export default function SelectMasterDataList({ field, displayField, showFields=[], modelName, className, columns, caption="Select", onSelect }) {
 
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const [selectedRow, setSelectedRow] = useState('');
     const [trigger, setTrigger] = useState(0);
@@ -16,7 +16,7 @@ export default function SelectMasterDataList({ field, displayField, showFields=[
             setSelectedRow("");
             return;
         }
-        masterDataService.getById(modelName, field.value).then(data => {
+        masterDataDBService.getById(modelName, field.value).then(data => {
             setSelectedRow(data[displayField]);
         });
     }, [field.value]);

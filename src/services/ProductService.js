@@ -1,13 +1,11 @@
 import axiosInstance from "./AxiosService";
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { MasterDataService } from './MasterDataService';
 import { TransactionService } from './TransactionService';
 import RProductService from './RProductService';
 
 export class ProductService {
 
     constructor() {
-        this.masterDataService = new MasterDataService();
         this.transactionService = new TransactionService();
     }
 
@@ -150,16 +148,5 @@ export class ProductService {
         const resp = await axiosInstance.post(`/products/stock/` + id, data);
         console.log(resp.data);
         return resp.data;
-    }
-
-    async getProductCustomerLastPrice(productId, customerId) {
-        let filters = {
-            'dtProduct_id': { "operator": FilterOperator.AND, "constraints": [{ "value": productId, "matchMode": FilterMatchMode.EQUALS }] },
-            'dtCustomer_id': { "operator": FilterOperator.AND, "constraints": [{ "value": customerId, "matchMode": FilterMatchMode.EQUALS }] },
-        }
-
-        let data = await this.masterDataService.getByFilters("dtProductSalesCustomer", filters)
-        console.log(data)
-        return data.lastTradePrice
     }
 }

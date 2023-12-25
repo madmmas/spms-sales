@@ -19,7 +19,7 @@ import SelectLookupData from '../../components/SelectLookupData';
 import { PRODUCT_MODEL, WAREHOUSE_MODEL, PRODMODEL_MODEL, PRODBRAND_MODEL } from '../../../constants/models';
 
 import { ProductService } from '../../../services/ProductService';
-import { MasterDataService } from '../../../services/MasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import PackageProductForm from './components/PackageProductForm';
 import PackageProductDetail from './components/PackageProductDetail';
@@ -55,7 +55,7 @@ const Form = ({ packageData }) => {
     const [defaultWarehouse, setDefaultWarehouse] = useState(null);
 
     const productService = new ProductService();
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const {
         control,
@@ -86,7 +86,7 @@ const Form = ({ packageData }) => {
 
     useEffect(() => {
         // get default warehouse
-        masterDataService.getDefaultItem('dtWarehouse').then(data => {
+        masterDataDBService.getDefaultItem(WAREHOUSE_MODEL).then(data => {
             if(data){
                 console.log("DEFAULT WAREHOUSE::", data);
                 setDefaultWarehouse(data.id);    

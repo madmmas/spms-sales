@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
-import { MasterDataService } from '../../../../services/MasterDataService'
 
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
@@ -17,7 +16,6 @@ export const PrintInvoice = () => {
     let { id } = useParams();
 
     const orderService = new OrderService();
-    const masterDataService = new MasterDataService();
     const masterDataDBService = new MasterDataDBService();
 
     const [invoice, setInvoice] = useState(null);
@@ -34,7 +32,7 @@ export const PrintInvoice = () => {
         console.log("ID CHANGED::", id)
         orderService.getById(SALES_MODEL, id).then(data => {
             if(data && data.customer_category!=="WALKIN"){
-                masterDataService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
+                masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
                     data.party = {
                         "line1": party.name,
                         "line2": party.address,

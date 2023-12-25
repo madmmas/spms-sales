@@ -4,7 +4,7 @@ import { PDFViewer } from '@react-pdf/renderer'
 import Ledger from './components/ledger/common/Ledger'
 
 import { TransactionService } from '../../services/TransactionService';
-import { MasterDataService } from '../../services/MasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 import { 
     PURCHASE_MODEL,
@@ -24,7 +24,7 @@ const ReportLedger = ({ type, header }) => {
     const [ledger, setLedger] = useState(null);
 
     const transactionService = new TransactionService();
-    const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         let partyType = getPartyModel(type);
@@ -33,7 +33,7 @@ const ReportLedger = ({ type, header }) => {
                 transactionService.getLedgerByPartyTypeAndId(partyType, id).then(data => {
                     // get party info
                     let modelName = partyType === ACC_PAYABLE ? SUPPLIER_MODEL : CUSTOMER_MODEL;
-                    masterDataService.getById(modelName, id).then(party => {
+                    masterDataDBService.getById(modelName, id).then(party => {
                         let ledger = {
                             "party": {
                                 "line1": party.name||party.name,

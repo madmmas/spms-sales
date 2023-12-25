@@ -4,7 +4,6 @@ import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../u
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 
 import { OrderService } from '../../../../services/OrderService';
-import { MasterDataService } from '../../../../services/MasterDataService'
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 import InvoiceCss from './InvoiceCss'
@@ -17,7 +16,6 @@ export const PrintInvoiceSalesReturn = () => {
     let { id } = useParams();
 
     const orderService = new OrderService();
-    const masterDataService = new MasterDataService();
     const masterDataDBService = new MasterDataDBService();
 
     const [invoice, setInvoice] = useState(null);
@@ -32,7 +30,7 @@ export const PrintInvoiceSalesReturn = () => {
         console.log("ID CHANGED::", id)
         orderService.getById(SALES_MODEL, id).then(data => {
             if(data && data.customer_category!=="WALKIN"){
-                masterDataService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
+                masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
                     data.party = {
                         "line1": party.name,
                         "line2": party.address,
