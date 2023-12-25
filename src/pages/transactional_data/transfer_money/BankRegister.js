@@ -5,7 +5,6 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { RadioButton } from "primereact/radiobutton";
 import { Column } from 'primereact/column';
-import { Dropdown } from 'primereact/dropdown';
 import { useForm, Controller } from 'react-hook-form';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -15,11 +14,10 @@ import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-
 import BankAccount from '../../components/master_data/BankAccount';
 import MFSAccount from '../../components/master_data/MFSAccount';
 
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
 
@@ -36,7 +34,6 @@ const BankRegister = () => {
     };
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -76,6 +73,7 @@ const BankRegister = () => {
 
     const registerService = new RegisterService();
     const transactionService = new TransactionService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -191,22 +189,6 @@ const BankRegister = () => {
         )
     }
 
-    const bankNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
-            </>
-        );
-    };
-
-    const mfsNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
-            </>
-        );
-    };
-
     const amountBodyTemplate = (rowData) => {
         return (
             <>
@@ -218,9 +200,9 @@ const BankRegister = () => {
     const refBodyTemplate = (rowData) => {
         let ref = "CASH";
         if(rowData.trx_type === "BANK_TO_MFS") {
-            ref = CacheMasterDataService.getShortnameById(rowData.cr_ref_id+"-dtMFSAccount");
+            ref = masterDataDBService.getShortnameById("dtMFSAccount", rowData.cr_ref_id)
         } else if(rowData.trx_type === "BANK_TO_BANK") {
-            ref = CacheMasterDataService.getShortnameById(rowData.cr_ref_id+"-dtBankAccount");
+            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.cr_ref_id)
         }
         return (
             <>
@@ -232,7 +214,7 @@ const BankRegister = () => {
     const fromBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dr_ref_id+"-dtBankAccount")}
+                {masterDataDBService.getShortnameById("dtBankAccount", rowData.dr_ref_id)}
             </>
         );
     };

@@ -6,7 +6,7 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 
 import { RegisterService } from '../../../services/RegisterService';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { getFormattedNumber, getDateTimeFormatted } from '../../../utils';
 
@@ -36,6 +36,7 @@ const ReceivePayment = ({ trigger }) => {
 
 
     const registerService = new RegisterService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -124,7 +125,7 @@ const ReceivePayment = ({ trigger }) => {
     const partyNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.party_id+"-"+rowData.party_type)}
+                {masterDataDBService.getShortnameById(rowData.party_type, rowData.party_id)}
             </>
         );
     };
@@ -148,9 +149,9 @@ const ReceivePayment = ({ trigger }) => {
     const paymentNameBodyTemplate = (rowData) => {
         let paymentName = "CASH";
         if(rowData.payment_method === "BANK") {
-            paymentName = CacheMasterDataService.getShortnameById(rowData.bank_account_id+"-dtBankAccount")
+            paymentName = masterDataDBService.getShortnameById(rowData.bank_account_id, "dtBankAccount")
         } else if(rowData.payment_method === "MFS") {
-            paymentName = CacheMasterDataService.getShortnameById(rowData.mfs_account_id+"-dtMFSAccount")
+            paymentName = masterDataDBService.getShortnameById(rowData.mfs_account_id, "dtMFSAccount")
         }
         return (
             <>

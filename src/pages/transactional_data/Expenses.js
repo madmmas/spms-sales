@@ -21,7 +21,8 @@ import MFSAccount from '../components/master_data/MFSAccount';
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import CacheMasterDataService from '../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
+
 import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
@@ -99,6 +100,7 @@ const Expenses = () => {
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
     const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -219,7 +221,7 @@ const Expenses = () => {
     const expenseBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dtExpenseType_id+"-dtExpenseType")}
+                {masterDataDBService.getShortnameById(EXPENSE_TYPE_MODEL, rowData.dtExpenseType_id)}
             </>
         );
     };
@@ -255,9 +257,9 @@ const Expenses = () => {
     const bankorcashBodyTemplate = (rowData) => {
         let expenseFrom = "CASH";
         if(rowData.expense_from === "BANK") {
-            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtBankAccount_id+"-dtBankAccount")
+            expenseFrom = masterDataDBService.getShortnameById("dtBankAccount", rowData.dtBankAccount_id)
         } else if(rowData.expense_from === "MFS") {
-            expenseFrom = CacheMasterDataService.getShortnameById(rowData.dtMFSAccount_id+"-dtMFSAccount")
+            expenseFrom = masterDataDBService.getShortnameById("dtMFSAccount", rowData.dtMFSAccount_id)
         }
         return (
             <>

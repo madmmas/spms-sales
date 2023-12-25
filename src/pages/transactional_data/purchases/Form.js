@@ -15,9 +15,9 @@ import Supplier from '../../components/master_data/Supplier';
 
 import { PURCHASE_MODEL } from '../../../constants/models';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { OrderService } from '../../../services/OrderService';
 import { MasterDataService } from '../../../services/MasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { ConfigurationService } from '../../../services/ConfigurationService';
 
 import PurchaseProductForm from './components/PurchaseProductForm';
@@ -96,6 +96,7 @@ const Form = ({ purchase }) => {
     const orderService = new OrderService();
     const masterDataService = new MasterDataService();
     const configurationService = new ConfigurationService();
+    const masterDataDBService = new MasterDataDBService();
 
     const {
         reset,
@@ -391,7 +392,7 @@ const Form = ({ purchase }) => {
                     <div className="field col-12">
                         {!editMode && <>
                             <label>Supplier Name</label>
-                            <InputText readonly="true" value={CacheMasterDataService.getShortnameById(purchase.party_id+"-dtSupplier")} placeholder="empty" />
+                            <InputText readonly="true" value={masterDataDBService.getShortnameById("dtSupplier", purchase.party_id)} placeholder="empty" />
                         </>}
                         {editMode && <Controller
                             name="party_id"

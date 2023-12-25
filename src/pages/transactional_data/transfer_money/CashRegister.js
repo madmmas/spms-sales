@@ -5,7 +5,6 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { RadioButton } from "primereact/radiobutton";
 import { Column } from 'primereact/column';
-import { Dropdown } from 'primereact/dropdown';
 import { useForm, Controller } from 'react-hook-form';
 import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -15,14 +14,14 @@ import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+import { getFormattedNumber } from '../../../utils';
 
 import BankAccount from '../../components/master_data/BankAccount';
 import MFSAccount from '../../components/master_data/MFSAccount';
 
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
-import { getFormattedNumber } from '../../../utils';
 
 const CashRegister = () => {
 
@@ -74,6 +73,7 @@ const CashRegister = () => {
 
     const registerService = new RegisterService();
     const transactionService = new TransactionService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -191,22 +191,6 @@ const CashRegister = () => {
         )
     }
 
-    const bankNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
-            </>
-        );
-    };
-
-    const mfsNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
-            </>
-        );
-    };
-
     const amountBodyTemplate = (rowData) => {
         return (
             <>
@@ -222,7 +206,7 @@ const CashRegister = () => {
         }
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.dr_ref_id+"-"+refName)}
+                {masterDataDBService.getShortnameById(refName, rowData.dr_ref_id)}
             </>
         );
     };

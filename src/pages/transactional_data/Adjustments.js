@@ -16,7 +16,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import Custmer from '../components/master_data/Custmer';
 import Supplier from '../components/master_data/Supplier';
 
-import CacheMasterDataService from '../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { RegisterService } from '../../services/RegisterService';
 import { OrderService } from '../../services/OrderService';
 import { TransactionService } from '../../services/TransactionService';
@@ -88,6 +88,7 @@ const Adjustments = () => {
     const transactionService = new TransactionService();
     const orderService = new OrderService();
     const registerService = new RegisterService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -392,7 +393,7 @@ const Adjustments = () => {
     const partyNameBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.ref_id+"-"+rowData.ref_type)}
+                {masterDataDBService.getShortnameById(rowData.party_type, rowData.party_id)}
             </>
         );
     };

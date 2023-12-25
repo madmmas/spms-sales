@@ -551,12 +551,12 @@ export class MasterDataDBService {
 
     // get model shortname by id
     async getShortnameByIdFromDB(modelName, id) {
-        if(id===null || id===undefined) {
-            return "";
+        let _id = parseInt(id);
+        if(_id===null || _id===undefined || isNaN(_id) || _id===0) {
+            return null;
         }
         await this.openDB();
-        let table = this.db.table(modelName);
-        let result = await table.get(id);
+        let result = await this.db.table(modelName).get(_id);
         if(result) {
             return result.shortname || "";
         }

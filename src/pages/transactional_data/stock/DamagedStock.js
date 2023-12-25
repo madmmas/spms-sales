@@ -1,7 +1,6 @@
-import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, Controller, set } from 'react-hook-form';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { useForm, Controller } from 'react-hook-form';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Column } from 'primereact/column';
@@ -14,7 +13,6 @@ import { Toolbar } from 'primereact/toolbar';
 
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import RProductService from '../../../services/RProductService';
 
 import { TransactionService } from '../../../services/TransactionService';
@@ -66,7 +64,6 @@ const DamagedStock = () => {
     const registerService = new RegisterService();
 
     const {
-        register,
         control,
         formState: { errors },
         resetField,
@@ -202,10 +199,6 @@ const DamagedStock = () => {
         )
     }
 
-    const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY hh:mm:ss');
-    }
-
     const dateBodyTemplate = (rowData) => {
         return (
             <>
@@ -251,14 +244,6 @@ const DamagedStock = () => {
             <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => addDamagedStock(d))} />
         </>
     );
-
-    const productCategoryBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtProductCategory_id+"-dtProductCategory")}
-            </>
-        );
-    };
 
     return (
         <div className="grid crud-demo">

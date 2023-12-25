@@ -1,6 +1,5 @@
-import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { getDateFormatted } from '../../../utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,7 +33,6 @@ const List = () => {
         control,
         formState: { errors },
         setValue,
-        reset,
         handleSubmit
     } = useForm({});
 
@@ -283,8 +281,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         let name = "";
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
-            // name = CacheMasterDataService.getShortnameById(rowData.party_id+"-dtCustomer");
-            // name = masterDataDBService.getShortnameById("dtCustomer", rowData.party_id);
+            name = masterDataDBService.getShortnameById("dtCustomer", rowData.party_id);
         } else {
             name = rowData.customer_name;
         }

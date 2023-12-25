@@ -1,7 +1,6 @@
-import * as moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, set } from 'react-hook-form';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { classNames } from 'primereact/utils';
 import { Column } from 'primereact/column';
@@ -15,9 +14,9 @@ import { Toolbar } from 'primereact/toolbar';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
+
 import { PRODUCT_MODEL, STOCK_ADJUSTMENT_MODEL } from '../../../constants/models';
 
 import { ADJUSTMENT_TYPE } from '../../../constants/lookupData';
@@ -207,10 +206,6 @@ const StockAdjustment = () => {
         )
     }
 
-    const getDate = (date) => {
-        return moment(parseInt(date)).format('DD/MM/YYYY hh:mm:ss');
-    }
-
     const dateBodyTemplate = (rowData) => {
         return (
             <>
@@ -242,13 +237,6 @@ const StockAdjustment = () => {
             </>
         );
     };
-    const transferByBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.transferBy}
-            </>
-        );
-    };
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
@@ -264,14 +252,6 @@ const StockAdjustment = () => {
             <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => addStockAdjustment(d))} />
         </>
     );
-
-    const productCategoryBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtProductCategory_id+"-dtProductCategory")}
-            </>
-        );
-    };
 
     return (
         <div className="grid crud-demo">

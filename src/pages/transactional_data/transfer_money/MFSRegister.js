@@ -17,7 +17,7 @@ import { Toast } from 'primereact/toast';
 import BankAccount from '../../components/master_data/BankAccount';
 import MFSAccount from '../../components/master_data/MFSAccount';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { TransactionService } from '../../../services/TransactionService';
 import { RegisterService } from '../../../services/RegisterService';
 
@@ -34,7 +34,6 @@ const MFSRegister = () => {
     };
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -74,6 +73,7 @@ const MFSRegister = () => {
 
     const registerService = new RegisterService();
     const transactionService = new TransactionService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -189,22 +189,6 @@ const MFSRegister = () => {
         )
     }
 
-    const bankNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtBank_id+"-dtBank")}
-            </>
-        );
-    };
-
-    const mfsNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {CacheMasterDataService.getShortnameById(rowData.dtMFS_id+"-dtMFS")}
-            </>
-        );
-    };
-
     const amountBodyTemplate = (rowData) => {
         return (
             <>
@@ -216,9 +200,9 @@ const MFSRegister = () => {
     const refBodyTemplate = (rowData) => {
         let ref = "CASH";
         if(rowData.trx_type === "MFS_TO_MFS") {
-            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtMFSAccount");
+            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.to_ref_id)
         } else if(rowData.trx_type === "MFS_TO_BANK") {
-            ref = CacheMasterDataService.getShortnameById(rowData.to_ref_id+"-dtBankAccount");
+            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.to_ref_id)
         }
         return (
             <>
@@ -230,7 +214,7 @@ const MFSRegister = () => {
     const fromBodyTemplate = (rowData) => {
         return (
             <>
-                {CacheMasterDataService.getShortnameById(rowData.from_ref_id+"-dtMFSAccount")}
+                {masterDataDBService.getShortnameById("dtMFSAccount", rowData.from_ref_id)}
             </>
         );
     };

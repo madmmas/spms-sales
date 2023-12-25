@@ -2,9 +2,10 @@ import React, {useEffect, useRef, useState} from 'react'
 import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
+
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataService } from '../../../../services/MasterDataService'
-import cacheMasterDataService from '../../../../services/CacheMasterDataService'
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 import InvoiceCss from './InvoiceCss'
 
@@ -17,6 +18,7 @@ export const PrintInvoiceSalesReturn = () => {
 
     const orderService = new OrderService();
     const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const [invoice, setInvoice] = useState(null);
     const [printme, setPrintme] = useState(true)
@@ -61,8 +63,8 @@ export const PrintInvoiceSalesReturn = () => {
                 if(invoice.items[i].product_id === invoice.return_items[j].product_id){
                        invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
                        invoice.return_items[j].trade_price = invoice.items[i].trade_price;
-                       invoice.return_items[j].product_model_no = cacheMasterDataService.getShortnameById(invoice.items[i].product_model_id + '-dtProductModel');
-                       invoice.return_items[j].product_brand_name = cacheMasterDataService.getShortnameById(invoice.items[i].product_brand_id + '-dtProductBrand');
+                       invoice.return_items[j].product_model_no = masterDataDBService.getShortnameById('dtProductModel', invoice.items[i].product_model_id);
+                       invoice.return_items[j].product_brand_name = masterDataDBService.getShortnameById('dtProductBrand', invoice.items[i].product_brand_id);
                }
             }
         }

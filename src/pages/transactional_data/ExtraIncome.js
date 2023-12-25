@@ -25,7 +25,7 @@ import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
 
 import { BANK_CASH } from '../../constants/lookupData';
-import { INCOME_MODEL, INCOME_TYPE_MODEL, BANK_ACCOUNT_MODEL } from '../../constants/models';
+import { INCOME_MODEL, INCOME_TYPE_MODEL } from '../../constants/models';
 
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 

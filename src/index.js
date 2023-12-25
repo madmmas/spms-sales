@@ -8,9 +8,6 @@ import { LayoutProvider } from './layout/context/layoutcontext';
 import App from './App';
 import store from './store'
 
-// import RProductService from "./services/RProductService";
-// import CacheMasterDataService from "./services/CacheMasterDataService";
-
 moment.tz.setDefault("Asia/Dhaka");
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

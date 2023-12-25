@@ -21,8 +21,6 @@ import SelectMasterDataTableList from '../../components/SelectMasterDataTableLis
 
 import Customer from '../../components/master_data/Custmer';
 
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
-
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { PRODUCT_MODEL, SALES_MODEL } from '../../../constants/models';
 
@@ -908,7 +906,7 @@ const Form = React.memo(({ sales }) => {
                 <div className="field col-12 md:col-6">
                 {readOnly && <>
                     <label>Customer</label>
-                    <InputText readonly="true" value={CacheMasterDataService.getShortnameById(sales.party_id+"-dtCustomer")} placeholder="empty" />
+                    <InputText readonly="true" value={masterDataDBService.getShortnameById("dtCustomer", sales.party_id)} placeholder="empty" />
                 </>}
                 {!readOnly && <Controller
                     name="party_id"

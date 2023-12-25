@@ -11,7 +11,7 @@ import ReportCss from './ReportCss'
 import { ComponentToPrint } from './ComponentToPrint'
 import { MasterDataService } from '../../services/MasterDataService';
 import { TransactionService } from '../../services/TransactionService';
-import CacheMasterDataService from '../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../services/MasterDataDBService';
 
 import { 
     BANK_ACCOUNT_MODEL,
@@ -25,23 +25,12 @@ export const HtmlLedger = ({type, header}) => {
     let { id } = useParams();
 
     const {
-        register,
         control,
         formState: { errors },
-        reset,
-        setValue,
         handleSubmit
     } = useForm({
         defaultValues: {}
     });
-
-    const resetForm = () => {
-        reset({ 
-            "netPrice": 0.00,
-            "lastTradePrice": 0.00,
-         });
-        // setSalesProduct(null);
-    };
 
     const [openingData, setOpeningData] = useState({});
     const [datesData, setDatesData] = useState({});
@@ -59,6 +48,7 @@ export const HtmlLedger = ({type, header}) => {
 
     const transactionService = new TransactionService();
     const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         // console.log("TYPE CHANGED::", type)
@@ -74,7 +64,7 @@ export const HtmlLedger = ({type, header}) => {
                     "line1": party.name||party.contact_name||party.accName,
                     "line2": party.address||party.branch,
                     "line3": party.accNumber||party.refNumber||party.phone,
-                    "line4": CacheMasterDataService.getShortnameById(party.dtBank_id+"-dtBank")
+                    "line4": masterDataDBService.getShortnameById("dtBank", party.dtBank_id)
                 });
             });
         }

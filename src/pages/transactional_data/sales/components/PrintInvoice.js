@@ -4,7 +4,8 @@ import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../u
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataService } from '../../../../services/MasterDataService'
-import cacheMasterDataService from '../../../../services/CacheMasterDataService'
+
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 import InvoiceCss from './InvoiceCss'
 
@@ -17,6 +18,7 @@ export const PrintInvoice = () => {
 
     const orderService = new OrderService();
     const masterDataService = new MasterDataService();
+    const masterDataDBService = new MasterDataDBService();
 
     const [invoice, setInvoice] = useState(null);
     const [printme, setPrintme] = useState(true)
@@ -63,8 +65,8 @@ export const PrintInvoice = () => {
                 if(invoice.items[i].product_id === invoice.return_items[j].product_id){
                        invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
                        invoice.return_items[j].trade_price = invoice.items[i].trade_price;
-                       invoice.return_items[j].product_model_no = cacheMasterDataService.getShortnameById(invoice.items[i].product_model_id + '-dtProductModel');
-                       invoice.return_items[j].product_brand_name = cacheMasterDataService.getShortnameById(invoice.items[i].product_brand_id + '-dtProductBrand');
+                       invoice.return_items[j].product_model_no = masterDataDBService.getShortnameById("dtProductModel", invoice.items[i].product_model_id);
+                       invoice.return_items[j].product_brand_name = masterDataDBService.getShortnameById("dtProductBrand", invoice.items[i].product_brand_id);
                }
             }
         }
@@ -204,9 +206,9 @@ export const PrintInvoice = () => {
                     <tr>
                         <td className="left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
                         <td className="left-align">{item.product_name}</td>
-                        <td className="left-align">{cacheMasterDataService.getShortnameById(item.product_brand_id + '-dtProductBrand')}</td>
+                        <td className="left-align">{masterDataDBService.getShortnameById("dtProductBrand", item.product_brand_id)}</td>
                         <td className="left-align">{item.product_part_number}</td>
-                        <td className="left-align">{cacheMasterDataService.getShortnameById(item.product_model_id + '-dtProductModel')}</td>
+                        <td className="left-align">{masterDataDBService.getShortnameById("dtProductModel", item.product_model_id)}</td>
                         <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
                         <td className="center-align">{item.discount_profit}</td>
                         <td className="right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>

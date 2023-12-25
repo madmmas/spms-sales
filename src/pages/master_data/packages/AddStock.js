@@ -7,7 +7,7 @@ import { Button } from 'primereact/button';
 import PackageProductView from './components/PackageProductView';
 
 import { ProductService } from '../../../services/ProductService';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const AddStock = ({ packageData }) => {
 
@@ -19,6 +19,7 @@ const AddStock = ({ packageData }) => {
     const [packageQuantity, setPackageQuantity] = useState(0);
 
     const productService = new ProductService();
+    const masterDataDBService = new MasterDataDBService();
 
     const fetchData = async (products) => {
         try {
@@ -70,10 +71,6 @@ const AddStock = ({ packageData }) => {
             }
             productService.addPackageToStock(id, data).then((response) => {
                 toast.current.show({ severity: 'success', summary: 'Success', detail: 'Stock Added', life: 3000 });
-                // reset package quantity
-                // setPackageQuantity(0);
-                // reset products
-                // fetchData(packageData.products);
                 navigate("/packages");
             }).catch((error) => {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 3000 });
@@ -104,7 +101,7 @@ const AddStock = ({ packageData }) => {
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>Warehouse:</div>
-                    <Chip label={CacheMasterDataService.getShortnameById(packageData.warehouse_id+"-dtWarehouse")} />
+                    <Chip label={masterDataDBService.getShortnameById(packageData.warehouse_type, packageData.warehouse_id)} />
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>remarks:</div>

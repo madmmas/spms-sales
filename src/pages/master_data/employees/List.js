@@ -9,7 +9,7 @@ import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { Toolbar } from 'primereact/toolbar';
 import { ConfigurationService } from '../../../services/ConfigurationService';
-import CacheMasterDataService from '../../../services/CacheMasterDataService';
+
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { EMPLOYEE_MODEL,DEPARTMENT_MODEL,GRADE_MODEL,DESIGNATION_MODEL,OFFICE_TIME_MODEL,GROUP_MODEL} from '../../../constants/models';
 const List = () => {
@@ -235,7 +235,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Department ID</span>
-                {CacheMasterDataService.getShortnameById(rowData.dtDepartment_id+"-dtDepartment")}
+                {masterDataDBService.getShortnameById("dtDepartment", rowData.dtDepartment_id)}
             </>
         );
     };
@@ -246,7 +246,7 @@ const List = () => {
         return (
             <>
                 <span className="p-column-title">Designation ID</span>
-                {CacheMasterDataService.getShortnameById(rowData.dtDesignation_id+"-dtDesignation")}
+                {masterDataDBService.getShortnameById("dtDesignation", rowData.dtDesignation_id)}
             </>
         );
     };
