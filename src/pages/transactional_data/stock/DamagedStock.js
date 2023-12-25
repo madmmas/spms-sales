@@ -13,12 +13,14 @@ import { Toolbar } from 'primereact/toolbar';
 
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
-import RProductService from '../../../services/RProductService';
+import { getDateFormatted } from '../../../utils';
 
 import { TransactionService } from '../../../services/TransactionService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { RegisterService } from '../../../services/RegisterService';
+
 import { PRODUCT_MODEL, DAMAGED_STOCK_MODEL } from '../../../constants/models';
-import { getDateFormatted } from '../../../utils';
+
 
 const DamagedStock = () => {
 
@@ -62,6 +64,7 @@ const DamagedStock = () => {
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
+    const masterDataDBService = new MasterDataDBService();
 
     const {
         control,
@@ -95,7 +98,7 @@ const DamagedStock = () => {
             console.log(data)
             setTotalRecords(data.total);
             for(let i=0; i<data.rows.length; i++) {
-                let product = await RProductService.getProductById(data.rows[i].dtProduct_id);
+                let product = await masterDataDBService.getById(PRODUCT_MODEL, data.rows[i].dtProduct_id);
                 data.rows[i]['product_name'] = product.name;
             }
             setDamagedStock(data.rows);

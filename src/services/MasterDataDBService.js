@@ -589,6 +589,15 @@ export class MasterDataDBService {
         return result;
     }
 
+    // get default value by table name
+    async getByFieldName(modelName, fieldName, fieldValue) {
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let result = await table.where(fieldName).equals(fieldValue).toArray();
+        console.log("getByFieldName:::", modelName, fieldName, fieldValue, result);
+        return result;
+    }
+
     async populateFieldData(modelName, fieldName, rows) {
         let prevId = null;
         let shortname = null;

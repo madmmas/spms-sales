@@ -15,12 +15,12 @@ import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
 
 import { TransactionService } from '../../../services/TransactionService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { RegisterService } from '../../../services/RegisterService';
 
 import { PRODUCT_MODEL, STOCK_ADJUSTMENT_MODEL } from '../../../constants/models';
-
 import { ADJUSTMENT_TYPE } from '../../../constants/lookupData';
-import RProductService from '../../../services/RProductService';
+
 import { getDateFormatted } from '../../../utils';
 
 const StockAdjustment = () => {
@@ -66,10 +66,10 @@ const StockAdjustment = () => {
     const [submitted, setSubmitted] = useState(false);
 
     const transactionService = new TransactionService();
+    const masterDataDBService = new MasterDataDBService();
     const registerService = new RegisterService();
 
     const {
-        register,
         control,
         formState: { errors },
         resetField,
@@ -101,7 +101,7 @@ const StockAdjustment = () => {
             console.log(data)
             setTotalRecords(data.total);
             for(let i=0; i<data.rows.length; i++) {
-                let product = await RProductService.getProductById(data.rows[i].dtProduct_id);
+                let product = await masterDataDBService.getById(PRODUCT_MODEL, data.rows[i].dtProduct_id);
                 data.rows[i]['product_name'] = product.name;
             }
             setStockAdjustment(data.rows);
