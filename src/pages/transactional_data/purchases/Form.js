@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
@@ -100,7 +100,6 @@ const Form = ({ purchase }) => {
         reset,
         control,
         formState: { errors },
-        setValue,
         handleSubmit
     } = useForm({
         defaultValues: defaultValue

@@ -2,18 +2,18 @@ import axiosInstance from "./AxiosService";
 
 export class OrderService {
 
-    async getById(orderType, id) {
-        let uri = `/orders/${orderType}/${id}`;
-        const resp = await axiosInstance.get(uri, {
-            timeout: 15000,
-            id: uri,
-            cache: {
-                ttl: 1000 * 10 // 20 seconds.
-            }
-        });
-        console.log(resp.data);
-        return resp.data;
-    }
+    // async getById(orderType, id) {
+    //     let uri = `/orders/${orderType}/${id}`;
+    //     const resp = await axiosInstance.get(uri, {
+    //         timeout: 15000,
+    //         id: uri,
+    //         cache: {
+    //             ttl: 1000 * 10 // 20 seconds.
+    //         }
+    //     });
+    //     console.log(resp.data);
+    //     return resp.data;
+    // }
 
     async getLastOrder() {
         let uri = `/orders/last_order`;

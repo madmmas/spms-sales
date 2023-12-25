@@ -581,7 +581,10 @@ export class MasterDataDBService {
 
     // get default value by table name
     async getDefaultItem(modelName) {
-        let result = await this.db.table(modelName).where('_default').equals(true).first();
+        await this.openDB();
+        let table = this.db.table(modelName);
+        let productIds = await table.filter(row => row['_default']===true).primaryKeys();
+        let result = await table.where('id').anyOf(productIds).first();
         console.log("getDefaultItem:::", modelName, result);
         return result;
     }

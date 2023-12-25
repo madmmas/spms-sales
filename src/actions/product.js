@@ -3,8 +3,6 @@ import {
     GET_PRODUCT_BY_ID,
 } from "./types";
 
-import RProductService from "../services/RProductService";
-
 export const getProducts = (limit=1000, offset=0) => (dispatch) => {
 
     let products = window['__products_data'];
@@ -17,20 +15,6 @@ export const getProducts = (limit=1000, offset=0) => (dispatch) => {
         return Promise.resolve();
     }
 
-    return RProductService.GetProducts().then(
-        (data) => {
-            window['__products_data'] = data.rows;
-            console.log("products loaded");
-            dispatch({
-                type: GET_PRODUCTS,
-                payload: products,
-            });
-            return Promise.resolve();
-        },
-        (error) => {
-            return Promise.reject();
-        }
-    );
 }
 
 export const getProductById = (id) => (dispatch) => {

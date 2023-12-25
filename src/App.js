@@ -17,7 +17,6 @@ import About from "./pages/About";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
-import POS from "./pages/POS";
 
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
 import { PrintInvoiceSalesReturn } from "./pages/transactional_data/sales/components/PrintInvoiceSalesReturn";
@@ -28,11 +27,6 @@ import { CashFlow } from "./pages/html_reports/CashFlow";
 import { MasterDataDBService } from './services/MasterDataDBService';
 
 function App() {
-
-  const Crud = React.lazy(() => import("./pages/Crud"));
-  const DemoData = React.lazy(() => import("./pages/Demo"));
-  const Form1 = React.lazy(() => import("./pages/Form1"));
-
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
   const BankAccountDetail = React.lazy(() => import("./pages/master_data/bank_accounts/Detail"));
   const BankAccountForm = React.lazy(() => import("./pages/master_data/bank_accounts/Form"));
@@ -109,7 +103,6 @@ function App() {
     </Dialog>
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/pos" element={<POS />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
       <Route path="/invoice/">
@@ -129,10 +122,6 @@ function App() {
         <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
         <Route path="/about" element={<RequireAuth><About /></RequireAuth>} />
         <Route path="/report/:id" element={<PrintReport />} />
-
-        <Route path="/crud" element={<RouteAuth pageComponent={<Crud />} />} />
-        <Route path="/demodata" element={<RouteAuth pageComponent={<DemoData />} />} />
-        <Route path="/form" element={<RouteAuth pageComponent={<Form1 />} />} />
 
         <Route path="/bank_accounts">
           <Route index element={<RouteAuth pageComponent={<BankAccountList />} />} />
