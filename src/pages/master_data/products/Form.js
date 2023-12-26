@@ -73,6 +73,7 @@ const Form = ({productData}) => {
             unit: data.unit,
             price: Number(data.price),
             min_trade_price: Number(data.min_trade_price),
+            cost:data.cost,
             low_stock_qty: Number(data.low_stock_qty),
             remarks: data.remarks,
             active: data.active
@@ -105,6 +106,16 @@ const Form = ({productData}) => {
         isExist = await productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
         if(isExist){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
+            valid = false;
+        }
+
+        if(data.price< data.cost){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Price cannot be less than Cost', life: 3000 });
+            valid = false;
+        }
+
+        if(data.min_trade_price < data.cost){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Minimum Trade Price cannot be less than Cost', life: 3000 });
             valid = false;
         }
 
