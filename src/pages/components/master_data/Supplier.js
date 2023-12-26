@@ -18,7 +18,7 @@ export default function Supplier({
                 onSelect(e);
             }}
             defaultFilters={{
-                globalFilterFields: ['name', 'phone'],
+                globalFilterFields: ['name', 'phone','address'],
                 fields: fields,
                 first: 0,
                 rows: 10,
