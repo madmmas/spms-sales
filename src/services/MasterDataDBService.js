@@ -83,17 +83,6 @@ export class MasterDataDBService {
         });
     }
 
-    async populateShortnameInMemory(modelName, rows) {
-        let masterData = window['__all_shortname_'] || {};
-        if (rows && rows.length > 0) {
-            rows.forEach(row => {
-                masterData[row.id+"-"+modelName] = row.shortname;
-            });
-            window['__all_shortname_'] = masterData;
-        }
-        window['__all_shortname_'] = masterData;
-    }
-
     async addToModelTable(modelName, data) {
         this.openDB();
         let table = this.db.table(modelName);
@@ -123,8 +112,37 @@ export class MasterDataDBService {
             if(_last_updated) {
                 this.setModelLastUpdated(modelName, _last_updated);
             }
-            this.populateShortnameInMemory(modelName, result);
+            // await this.populateShortnameInMemory(modelName, result);
         }
+    }
+
+    async populateAllShortnameInMemory() {
+        this.openDB();
+        let tables = [ 
+            "dtBank", "dtCustomerCategory", "dtExpenseType", "dtIncomeType", 
+            "dtMFS", "dtPaymentType", "dtProductBrand", "dtProductCategory", 
+            "dtProductModel", "dtSupplierCategory", "dtRoute", "dtWarehouse", 
+            "dtBankAccount", "dtMFSAccount", "dtCustomer", "dtSupplier", 
+        ];
+
+        for(let i=0; i<tables.length; i++) {
+            let table = this.db.table(tables[i]);
+            let result = await table.toArray();
+            if (result && result.length > 0) {
+                this.populateShortnameInMemory(tables[i], result);
+            }
+        }
+    }
+
+    async populateShortnameInMemory(modelName, rows) {
+        let masterData = window['__all_shortname_' + modelName] || {};
+        if (rows && rows.length > 0) {
+            rows.forEach(row => {
+                masterData[row.id+"-"+modelName] = row.shortname;
+            });
+            window['__all_shortname_' + modelName] = masterData;
+        }
+        window['__all_shortname_' + modelName] = masterData;
     }
 
     async create(modelName, data) {
@@ -140,13 +158,14 @@ export class MasterDataDBService {
     }
 
     async delete(modelName, id) {
-        let uri = `/data/${modelName}/` + id;
-        if(modelName === "dtProduct") {
-            uri = `/products/` + id;
-        }
-        const resp = await axiosInstance.delete(uri);
-        await this.deleteFromModelTable(modelName, id);
-        return resp.data;
+        // let uri = `/data/${modelName}/` + id;
+        // if(modelName === "dtProduct") {
+        //     uri = `/products/` + id;
+        // }
+        // const resp = await axiosInstance.delete(uri);
+        // await this.deleteFromModelTable(modelName, id);
+        // return resp.data;
+        return {};
     }
 
     async deleteFromModelTable(modelName, id) {
@@ -180,7 +199,7 @@ export class MasterDataDBService {
         if (upto === null || !upto) {
             upto = "0"
         }
-        console.log("getAllUpto:::", upto);
+
         let uri = `/all_products/${upto}`;
         let limit = 500;
         let offset = 0;
@@ -251,12 +270,14 @@ export class MasterDataDBService {
         productSearchTable.bulkPut(productSearch);
     }
 
-    async getAllMasterDataUpto(modelName) {
+    async getAllMasterDataUpto(modelName, init=false) {
         let upto = this.getModelLastUpdated(modelName);
         if (upto === null || !upto) {
             upto = "0"
+            // clear the model table
+            await this.clearDBTableByModel(modelName);
         }
-        console.log("getAllUpto:::", upto);
+
         let uri = `/all/${modelName}/${upto}`;
         let result = await axiosInstance.get(uri, {
             timeout: 30000,
@@ -265,8 +286,17 @@ export class MasterDataDBService {
         //
         if(result && result.rows) {
             await this.addToModelTable(modelName, result);
+            if(init==false){
+                await this.populateShortnameInMemory(modelName, result.rows);
+            }          
         }
-        //
+
+        // load all data and populate shortname memory
+        if(init) {
+            let table = this.db.table(modelName);
+            let _result = await table.toArray();
+            await this.populateShortnameInMemory(modelName, _result);
+        }        
     }
 
     async applyFilter(table, filters) {
@@ -365,29 +395,29 @@ export class MasterDataDBService {
     }
 
     async loadAllInitData() {
-        await this.getAllMasterDataUpto("dtProductBrand");
-        await this.getAllMasterDataUpto("dtProductModel");
-
+        await this.getAllMasterDataUpto("dtProductBrand", true);
+        await this.getAllMasterDataUpto("dtProductModel", true);
         await this.loadProductData()
 
-        await this.getAllMasterDataUpto("dtBank");
-        await this.getAllMasterDataUpto("dtCustomerCategory");
-        await this.getAllMasterDataUpto("dtExpenseType");
-        await this.getAllMasterDataUpto("dtIncomeType");
-        await this.getAllMasterDataUpto("dtMFS");
-        await this.getAllMasterDataUpto("dtPaymentType");
-        await this.getAllMasterDataUpto("dtProductCategory");
-        await this.getAllMasterDataUpto("dtSupplierCategory");
-        await this.getAllMasterDataUpto("dtRoute");
-        await this.getAllMasterDataUpto("dtWarehouse");
-        
-        this.getAllMasterDataUpto("dtBankAccount");
-        this.getAllMasterDataUpto("dtMFSAccount");
-        
-        this.getAllMasterDataUpto("dtCustomer");
-        this.getAllMasterDataUpto("dtSupplier");
-        
         this.populateProductSearch();
+
+        this.getAllMasterDataUpto("dtBank", true);
+        this.getAllMasterDataUpto("dtCustomerCategory", true);
+        this.getAllMasterDataUpto("dtExpenseType", true);
+        this.getAllMasterDataUpto("dtIncomeType", true);
+        this.getAllMasterDataUpto("dtMFS", true);
+        this.getAllMasterDataUpto("dtPaymentType", true);
+        this.getAllMasterDataUpto("dtProductCategory", true);
+        this.getAllMasterDataUpto("dtSupplierCategory", true);
+        this.getAllMasterDataUpto("dtRoute", true);
+        this.getAllMasterDataUpto("dtWarehouse", true);
+        
+        this.getAllMasterDataUpto("dtBankAccount", true);
+        this.getAllMasterDataUpto("dtMFSAccount", true);
+        this.getAllMasterDataUpto("dtCustomer", true);
+        this.getAllMasterDataUpto("dtSupplier", true);
+        
+        // this.populateAllShortnameInMemory();
     }
 
     async clearCache() {
@@ -416,6 +446,11 @@ export class MasterDataDBService {
         localStorage.removeItem("trxLedger_last_updated");
     }
     
+    async clearDBTableByModel(modelName) {
+        await this.openDB();
+        await this.db.table(modelName).clear();
+    }
+
     async clearAllDBTables() {
 
         await this.openDB();
@@ -568,10 +603,12 @@ export class MasterDataDBService {
         if(id===null || id===undefined) {
             return "";
         }
-        let masterData = window['__all_shortname_'];
+        let key = id+"-"+modelName;
+        // console.log("getShortnameById:::", key);
+        let masterData = window['__all_shortname_' + modelName];
         if (masterData) {
-            let key = id+"-"+modelName;
             if(masterData[key]) {
+                console.log("getShortnameById:::", key, masterData[key]);
                 return masterData[key];
             }
         }

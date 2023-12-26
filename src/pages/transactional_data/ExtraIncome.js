@@ -48,7 +48,6 @@ const Income = () => {
     };
     
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -218,7 +217,7 @@ const Income = () => {
     const incomeBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.dtIncomeType_id_name}
+                {masterDataDBService.getShortnameById("dtIncomeType", rowData.dtIncomeType_id)}
             </>
         );
     };
@@ -291,14 +290,6 @@ const Income = () => {
             <Button disabled={submitted} label="Save" icon="pi pi-check" className="p-button-text" onClick={handleSubmit((d) => saveIncome(d))} />
         </>
     );
-
-    const bankNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtBank_id_shortname}
-            </>
-        );
-    };
 
     return (
         <div className="grid crud-demo">
