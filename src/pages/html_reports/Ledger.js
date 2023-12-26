@@ -62,7 +62,8 @@ export const HtmlLedger = ({type, header}) => {
                     "line1": party.name||party.contact_name||party.accName,
                     "line2": party.address||party.branch,
                     "line3": party.accNumber||party.refNumber||party.phone,
-                    "line4": masterDataDBService.getShortnameById("dtBank", party.dtBank_id)
+                    "line4": masterDataDBService.getShortnameById("dtBank", party.dtBank_id),
+                    "line5": masterDataDBService.getShortnameById("dtMFS", party.dtMFS_id)
                 });
             });
         }
@@ -284,6 +285,7 @@ export const HtmlLedger = ({type, header}) => {
             </header>
             {partyData && <header class="line">
                 {type === "bank" && <p>{partyData["line4"]}</p>}
+                {type === "mfs" && <p>{partyData["line5"]}</p>}
                 <p>{partyData["line1"]}</p>
                 <p>{partyData["line2"]}</p>
                 <p>{partyData["line3"]}</p>
