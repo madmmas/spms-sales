@@ -15,6 +15,7 @@ import { PURCHASE_MODEL } from '../../../constants/models';
 import OrderFilter from '../../components/OrderFilter';
 
 import { OrderService } from '../../../services/OrderService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const List = () => {
 
@@ -52,6 +53,7 @@ const List = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
     const orderService = new OrderService();
+    const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
         initFilters();
@@ -206,7 +208,7 @@ const List = () => {
     const nameBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.party_id}
+                {masterDataDBService.getShortnameById("dtSupplier", rowData.party_id)}
             </>
         );
     };
