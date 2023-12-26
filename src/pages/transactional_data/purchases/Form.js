@@ -74,7 +74,7 @@ const Form = ({ purchase }) => {
     const [returnDialog, setReturnDialog] = useState(false);
     const [statusChangeDialog, setStatusChangeDialogFooter] = useState(false);
     const [supplierId, setSupplierId] = useState(null);
-    const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("INR");
+    const [selectedSupplier_currency, setSelectedSupplier_currency] = useState("");
     const [trxNo, setTrxNo] = useState('XXXXX');
     const [dialogMsg, setDialogMsg] = useState('');
     const [status, setStatus] = useState('draft');
