@@ -92,9 +92,9 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
 
     return (
         <div style={{minHeight: '30rem'}}>
-            <span className="p-input-icon-left">
+            <span className="p-input-icon-left" style={{width:"100%"}}>
                 <i className="pi pi-search" />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} 
+                <InputText style={{width:"100%"}} value={globalFilterValue} onChange={onGlobalFilterChange} 
                     // onClick={(e) => {op.current.show(e)}}
                     onFocus={(e) => {e.target.select()}}
                     placeholder="Search" />
