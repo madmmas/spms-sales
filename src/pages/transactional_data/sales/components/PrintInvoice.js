@@ -169,7 +169,8 @@ export const PrintInvoice = () => {
             <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
             <table className="bill-details">
                 <tbody>
-                    <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>
+                    {invoice.customer_category === "CONDITIONAL" && <tr><td class="line">Bill To <b>{getBillTo(invoice.customer_category)}</b>:</td></tr>}
+                    {invoice.customer_category !== "CONDITIONAL" && <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>}
                     {invoice.party && <tr>
                         <td  class="line"><span>{invoice.party.line1}</span><br/>
                             <span>{invoice.party.line2}</span><br/>
