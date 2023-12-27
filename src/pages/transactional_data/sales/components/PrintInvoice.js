@@ -179,8 +179,11 @@ export const PrintInvoice = () => {
                         <td><span>{invoice.customer_name}</span><br/>
                             <span>{invoice.customer_phone}</span></td>
                     </tr>}
-                    {printOnlySales && <tr>
+                    {printOnlySales && invoice.status !== 'draft' && <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE</span></th>
+                    </tr>}
+                    {printOnlySales && invoice.status === 'draft' && <tr>
+                        <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE [DRAFT]</span></th>
                     </tr>}
                 </tbody>
             </table>
