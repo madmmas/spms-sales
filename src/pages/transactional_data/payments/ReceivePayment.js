@@ -149,9 +149,9 @@ const ReceivePayment = ({ trigger }) => {
     const paymentNameBodyTemplate = (rowData) => {
         let paymentName = "CASH";
         if(rowData.payment_method === "BANK") {
-            paymentName = masterDataDBService.getShortnameById(rowData.bank_account_id, "dtBankAccount")
+            paymentName = masterDataDBService.getShortnameById("dtBankAccount", rowData.bank_account_id)
         } else if(rowData.payment_method === "MFS") {
-            paymentName = masterDataDBService.getShortnameById(rowData.mfs_account_id, "dtMFSAccount")
+            paymentName = masterDataDBService.getShortnameById("dtMFSAccount", rowData.mfs_account_id)
         }
         return (
             <>
