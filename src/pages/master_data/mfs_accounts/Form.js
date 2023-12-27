@@ -38,6 +38,7 @@ const Form = ({mfsAccountProfile}) => {
         if(mfsAccountProfile===undefined){
             setValue("status", true);
         }
+        setValue("initBalance", null)
     }, []);
 
     const onSubmit = (formData) => {
