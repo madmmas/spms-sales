@@ -205,6 +205,25 @@ const List = () => {
         );
     };
 
+    const brandNameBodyTemplate = (rowData) =>{
+        return (
+            <>
+                <span className="p-column-title">Brand Name</span>
+                {masterDataDBService.getShortnameById('dtProductBrand', rowData.dtProductBrand_id)}
+            </>
+        );
+    }
+
+    const modelNumberBodyTemplate = (rowData) =>{
+        return (
+            <>
+                <span className="p-column-title">Model Number</span>
+                {masterDataDBService.getShortnameById('dtProductModel', rowData.dtProductModel_id)}
+            </>
+        );
+    }
+
+
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
@@ -260,8 +279,8 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="brand_name" header="Brand Name" filter filterPlaceholder="Search by Brand Name" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="model_no" header="Model No" filter filterPlaceholder="Search by Model No" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" body={brandNameBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" body={modelNumberBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                     </DataTable>
 
