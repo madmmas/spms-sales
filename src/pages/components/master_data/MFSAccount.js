@@ -23,7 +23,7 @@ export default function MFSAccount({
             onSelect={(e) => onSelect(e)}
             className={classNames({ 'p-invalid': fieldState.error })} 
             defaultFilters={{
-                globalFilterFields: ["refNumber", "accName"],
+                globalFilterFields: ["refNumber", "accName", "shortname"],
                 fields: fields,
                 first: 0,
                 rows: 10,
