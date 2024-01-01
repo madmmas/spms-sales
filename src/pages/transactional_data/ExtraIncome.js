@@ -94,17 +94,30 @@ const Income = () => {
     const [bankCash, setBankCash] = useState("CASH");
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        initFilters();
-        masterDataDBService.getAllUpto(INCOME_TYPE_MODEL).then(data => {
-            setIncomeType(data);
-        });
+        setLoadCount(loadCount+1);
     }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(INCOME_TYPE_MODEL).then(data => {
+                setIncomeType(data.rows);
+            });
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
+    
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
     
     const clearFilter = () => {
         initFilters();
@@ -113,10 +126,6 @@ const Income = () => {
     const initFilters = () => {
         setLazyParams(defaultFilters);
     }
-
-    useEffect(() => {
-        loadLazyData();
-    }, [lazyParams]);
 
     const loadLazyData = async () => {
         setLoading(true);

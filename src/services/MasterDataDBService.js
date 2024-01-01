@@ -598,6 +598,19 @@ export class MasterDataDBService {
         return "";
     }
 
+    async getShortnameByIdFromAPI(modelName, id) {
+        let _id = parseInt(id);
+        if(_id===null || _id===undefined || isNaN(_id) || _id===0) {
+            return null;
+        }
+        let uri = `/shortname/${modelName}/${_id}`;
+        let result = await axiosInstance.get(uri).then(res => res.data);
+        if(result) {
+            return result.shortname || "";
+        }
+        return "";
+    }
+
     // get model shortname by id
     getShortnameById(modelName, id) {
         if(id===null || id===undefined) {

@@ -15,6 +15,9 @@ import { MasterDataDBService } from '../../../services/MasterDataDBService';
 const CRUD = ({ 
     modelName,
     headerTitle="Manage Data",
+    createMsg="Data created successfully",
+    updateMsg="Data updated successfully",
+    deleteMsg="Data deleted successfully",
     emptyData = {
         id: null,
         name: '',
@@ -41,12 +44,8 @@ const CRUD = ({
     const [totalRecords, setTotalRecords] = useState(0);
     const [profileData, setProfileData] = useState(null);
     const [empProfileDialog, setProfilesDialog] = useState(false);
-
-    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
-    const [deleteProfilessDialog, setDeleteProfilessDialog] = useState(false);
-    
+    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);    
     const [profiles, setProfiles] = useState(emptyData);
-    const [selectedProfiless, setSelectedProfiless] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [createEdit, setCreateEdit] = useState(true);
 
@@ -104,10 +103,6 @@ const CRUD = ({
         setDeleteProfilesDialog(false);
     };
 
-    const hideDeleteProfilessDialog = () => {
-        setDeleteProfilessDialog(false);
-    };
-
     const saveProfiles = () => {
         setSubmitted(true);
 
@@ -116,13 +111,13 @@ const CRUD = ({
                 masterDataDBService.update(modelName, profiles.id, profiles).then(data => {
                     console.log(data);
                     reloadData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Updated', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: updateMsg, life: 3000 });
                 });
             } else {
                 masterDataDBService.create(modelName, profiles).then(data => {
                     console.log(data);
                     reloadData();
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Created', life: 3000 });
+                    toast.current.show({ severity: 'success', summary: 'Successful', detail: createMsg, life: 3000 });
                 });
             }
 
@@ -145,7 +140,7 @@ const CRUD = ({
     const deleteProfiles = () => {
         masterDataDBService.delete(modelName, profiles.id).then(() => {
             reloadData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Bank Deleted', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Successful', detail: deleteMsg, life: 3000 });
         });
         setDeleteProfilesDialog(false);
         setProfiles(emptyData);
@@ -153,14 +148,6 @@ const CRUD = ({
 
     const exportCSV = () => {
         dt.current.exportCSV();
-    };
-
-    const deleteSelectedProfiless = () => {
-        let _empProfiles = profileData.filter((val) => !selectedProfiless.includes(val));
-        setProfileData(_empProfiles);
-        setDeleteProfilessDialog(false);
-        setSelectedProfiless(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiless Deleted', life: 3000 });
     };
 
     const onInputChange = (e, name) => {
@@ -255,13 +242,6 @@ const CRUD = ({
         </>
     );
 
-    const deleteProfilessDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilessDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiless} />
-        </>
-    );
-
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -309,13 +289,6 @@ const CRUD = ({
                                     Are you sure you want to delete <b>{profiles.id}</b>?
                                 </span>
                             )}
-                        </div>
-                    </Dialog>
-
-                    <Dialog visible={deleteProfilessDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilessDialogFooter} onHide={hideDeleteProfilessDialog}>
-                        <div className="flex align-items-center justify-content-center">
-                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {profiles && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
                 </div>

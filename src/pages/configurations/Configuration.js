@@ -16,6 +16,9 @@ const Configuration = ({ modelName }) => {
         <CRUD 
             modelName={modelName} 
             headerTitle={modelDef.headerTitle}
+            createMsg={modelDef.createMsg}
+            updateMsg={modelDef.updateMsg}
+            deleteMsg={modelDef.deleteMsg}
             />
     )
 }

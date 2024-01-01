@@ -23,7 +23,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
-import { ConfigurationService } from '../../services/ConfigurationService';
 import { TransactionService } from '../../services/TransactionService';
 import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
@@ -48,7 +47,6 @@ const Expenses = () => {
     };
     
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -96,18 +94,30 @@ const Expenses = () => {
     const [bankCash, setBankCash] = useState("CASH");
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
-    const configurationService = new ConfigurationService();
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        initFilters();
-        configurationService.getAllWithoutParams(EXPENSE_TYPE_MODEL).then(data => {
-            setExpenseType(data);
-        });
+        setLoadCount(loadCount+1);
     }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(EXPENSE_TYPE_MODEL).then(data => {
+                setExpenseType(data.rows);
+            });
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
+    
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
+    }, [lazyParams]);
     
     const clearFilter = () => {
         initFilters();
@@ -116,10 +126,6 @@ const Expenses = () => {
     const initFilters = () => {
         setLazyParams(defaultFilters);
     }
-
-    useEffect(() => {
-        loadLazyData();
-    }, [lazyParams]);
 
     const loadLazyData = async () => {
         setLoading(true);

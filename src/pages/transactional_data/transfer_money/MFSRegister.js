@@ -200,7 +200,7 @@ const MFSRegister = () => {
     const refBodyTemplate = (rowData) => {
         let ref = "CASH";
         if(rowData.trx_type === "MFS_TO_MFS") {
-            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.to_ref_id)
+            ref = masterDataDBService.getShortnameById("dtMFSAccount", rowData.to_ref_id)
         } else if(rowData.trx_type === "MFS_TO_BANK") {
             ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.to_ref_id)
         }
