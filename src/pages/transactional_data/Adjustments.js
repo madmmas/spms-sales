@@ -393,7 +393,7 @@ const Adjustments = () => {
     const partyNameBodyTemplate = (rowData) => {
         return (
             <>
-                {masterDataDBService.getShortnameById(rowData.party_type, rowData.party_id)}
+                {masterDataDBService.getShortnameById(rowData.ref_type, rowData.ref_id)}
             </>
         );
     };
