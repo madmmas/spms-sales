@@ -46,9 +46,9 @@ const Detail = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
-        {label: 'Suppliers', icon: 'pi pi-fw pi-home'},
-        {label: 'Purchase History', icon: 'pi pi-fw pi-home'},
-        {label: 'Sales History', icon: 'pi pi-fw pi-home'},
+        // {label: 'Suppliers', icon: 'pi pi-fw pi-home'},
+        // {label: 'Purchase History', icon: 'pi pi-fw pi-home'},
+        // {label: 'Sales History', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {

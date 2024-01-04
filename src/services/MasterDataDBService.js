@@ -99,6 +99,8 @@ export class MasterDataDBService {
                 _result.last_trx_id = row.last_trx_id;
                 _result.shortname = row.shortname;
                 _result.deleted = row.deleted;
+                _result._default = row._default;
+                // _result.parent_id = row.parent_id;
                 if(row.deleted) {
                     deleted.push(row.id);
                 } else {

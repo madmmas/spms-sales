@@ -38,6 +38,9 @@ const Form = ({warehouseProfile}) => {
     const onSubmit = (formData) => {
         setSubmitted(true);
         if(warehouseProfile==null){
+            if(formData._default===undefined || formData._default===null){
+                formData._default = false;
+            }
             masterDataDBService.create(modelName, formData).then(data => {
                 toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Warehouse Created', life: 3000 });
                 // navigate("/warehouses/" + data.ID);

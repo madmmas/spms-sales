@@ -10,8 +10,13 @@ export default function SelectLookupData( { field, className, model, onChangeIte
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        masterDataDBService.getAll(model).then(data => {
+        console.log("SelectLookupData:useEffect", field.value, model)
+        masterDataDBService.getAll(model, {
+            first: 0,
+            rows: 10000,
+        }).then(data => {
             setData(data.rows);
+
         });
     }, []);
 

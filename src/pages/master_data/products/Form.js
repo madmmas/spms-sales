@@ -63,13 +63,10 @@ const Form = ({productData}) => {
     }, [productData]);
 
     const buildFormData = (data) => {
-        return {
-            id: data.id,
+        let _data = {
             name: data.name,
-            category_id: data.category_id, // as GENERAL
+            category_id: 1, // as GENERAL
             warehouse_id: data.warehouse_id,
-            brand_name: data.brand_name,
-            model_no: data.model_no,
             brand_id: data.brand_id,
             model_id: data.model_id,
             part_number: data.part_number,
@@ -78,33 +75,39 @@ const Form = ({productData}) => {
             min_trade_price: Number(data.min_trade_price),
             low_stock_qty: Number(data.low_stock_qty),
             remarks: data.remarks,
-            items: data.items,
             active: data.active
         }
+
+        if(data.id){
+            _data.id = data.id;
+        }
+
+        return _data;
     }
 
-    const validateData = (data) => {
+    const validateData = async (data) => {
         console.log("validateData:::", data);
         let valid = true;
         // check if product name exist
-        let isExist = productService.isProductNameExist(data.id, data.name);
+        let isExist = await productService.isProductNameExist(data.id, data.name);
         if(isExist){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Name already exist', life: 3000 });
             valid = false;
         }
         // check if product code exist
-        isExist = productService.isProductCodeExist(data.id, data.code);
-        if(isExist){
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Code already exist', life: 3000 });
-            valid = false;
-        }
+        // isExist = await productService.isProductCodeExist(data.id, data.code);
+        // if(isExist){
+        //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Code already exist', life: 3000 });
+        //     valid = false;
+        // }
 
         // // check if product part number exist
-        isExist = productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
+        isExist = await productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
         if(isExist){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
             valid = false;
         }
+
         return valid;
     }
 
@@ -112,30 +115,23 @@ const Form = ({productData}) => {
 
         let data = buildFormData(formData);
 
-        try{
-            setSubmitted(true);
-            if(productData==null){
-                let valid = validateData(data);
-                if(!valid){
-                    return;
+        setSubmitted(true);
+        if(productData==null){
+            validateData(data).then(valid => {
+                if(valid){
+                    productService.create(data).then(data => {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                        // navigate("/products/" + data.ID);
+                        navigate("/products");
+                    });
                 }
-                productService.create(data).then(data => {
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    // navigate("/products/" + data.ID);
-                    navigate("/products");
-                });
-            }else{
-                productService.update(data.id, data).then(data => {
-                    toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                    // navigate("/products/" + data.ID);
-                    navigate("/products");
-                });
-            }
-        }
-        catch (err){
-            console.log(err)
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Action Performed', life: 3000 });
-            navigate("/products");
+            });
+        }else{
+            productService.update(data.id, data).then(data => {
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                // navigate("/products/" + data.ID);
+                navigate("/products");
+            });
         }
     };
 

@@ -37,8 +37,8 @@ export class ProductService {
         }).then(res => res.data);
     }
 
-    isProductNameExist(id, name) {
-        let products = this.masterDataDBService.getByFieldName("dtProduct", "name", name);
+    async isProductNameExist(id, name) {
+        let products = await this.masterDataDBService.getByFieldName("dtProduct", "name", name);
         console.log("name:::", name);
         if(products.length > 0) {
             for (var i = 0; i < products.length; i++) {
@@ -51,8 +51,8 @@ export class ProductService {
         return false;
     }
 
-    isProductCodeExist(id, code) {
-        let products = this.masterDataDBService.getByFieldName("dtProduct", "code", code);
+    async isProductCodeExist(id, code) {
+        let products = await this.masterDataDBService.getByFieldName("dtProduct", "code", code);
         console.log("code:::", code);
         for (var i = 0; i < products.length; i++) {
             if (products[i].id !== id && products[i].code == code) {
@@ -64,8 +64,8 @@ export class ProductService {
     }
 
     // check part number exist for product by brand_id
-    isProductPartNumberExist(id, partNumber, brandId) {
-        let products = this.masterDataDBService.getByFieldName("dtProduct", "dtProductBrand_id", brandId);   
+    async isProductPartNumberExist(id, partNumber, brandId) {
+        let products = await this.masterDataDBService.getByFieldName("dtProduct", "dtProductBrand_id", brandId);   
         let found = false;
         for (var i = 0; i < products.length; i++) {
             if (products[i].id !== id && products[i].part_number == partNumber) {
