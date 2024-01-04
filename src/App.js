@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from 'react-router-dom';
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import 'primeflex/primeflex.css';
 import "primeicons/primeicons.css";
 import "primereact/resources/primereact.min.css"; //core css
 import './styles/demo/Demos.scss';
 import './styles/layout/layout.scss';
+import './App.css';
 
 import { Dialog } from 'primereact/dialog';
 import { ProgressSpinner } from 'primereact/progressspinner';

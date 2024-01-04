@@ -8,12 +8,11 @@ import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import { InputText } from 'primereact/inputtext';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 
-import { getDateWithFormat, getFormattedNumber } from '../../../utils';
+import { getFormattedNumber } from '../../../utils';
 
 import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
@@ -63,7 +62,6 @@ const List = () => {
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
     const [dtProduct, setProduct] = useState({});
     const [selectedProducts, setSelectedProducts] = useState(null);
-    const [globalFilterValue, setGlobalFilterValue] = useState('');
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [loadCount, setLoadCount] = useState(0);

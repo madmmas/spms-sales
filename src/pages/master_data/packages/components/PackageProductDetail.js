@@ -1,10 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 import { Badge } from 'primereact/badge';
 
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
+
 const PackageProductDetail = ({products, totalPrice, onEdit, onDelete}) => {
+
+    const [productDetails, setProductDetails] = useState([]);
+    const masterDataDBService = new MasterDataDBService();
+
+    useEffect(() => {
+        console.log(products);
+        // get products by ids
+        let productIds = products.map(product => product.dtProduct_id);
+        console.log("productIds::", products, productIds);
+        masterDataDBService.getAllByIds("dtProduct", productIds).then(data => {
+            console.log("getAllByIds::", data);
+            // add brand name, model no, part number to products
+            let productsWithDetails = products.map(product => {
+                let productDetail = data.find(productDetail => productDetail.id == product.dtProduct_id);
+                return {
+                    ...product,
+                    brand_name: productDetail.dtProductBrand_id_shortname,
+                    model_no: productDetail.dtProductModel_id_shortname,
+                    part_number: productDetail.part_number,
+                };
+            });
+
+            setProductDetails(productsWithDetails);
+        });
+    }, [products]);
 
     const roundNumber = (num) => {
         return Math.round((num + Number.EPSILON) * 100) / 100;
@@ -28,7 +55,7 @@ const PackageProductDetail = ({products, totalPrice, onEdit, onDelete}) => {
     };
 
     return (
-        <DataTable value={products} 
+        <DataTable value={productDetails} 
             stripedRows showGridlines scrollable scrollHeight="25rem" 
             header={footer} 
         >

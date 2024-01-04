@@ -1,4 +1,3 @@
-import * as moment from 'moment';
 import Dexie from 'dexie';
 import axiosInstance from "./AxiosService";
 import { FilterMatchMode } from 'primereact/api';
@@ -200,6 +199,8 @@ export class MasterDataDBService {
         let upto = this.getModelLastUpdated("dtProduct");
         if (upto === null || !upto) {
             upto = "0"
+            // clear the model table
+            await this.clearDBTableByModel("dtProduct");
         }
 
         let uri = `/all_products/${upto}`;

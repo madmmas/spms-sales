@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -9,7 +9,7 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 
-import { PRODUCT_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
@@ -36,7 +36,8 @@ const List = () => {
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            active: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
 
@@ -48,15 +49,19 @@ const List = () => {
     const [dtProfile, setProfile] = useState({});
     const [selectedProfiles, setSelectedProfiles] = useState(null);
 
+    const [dtWarehouses, setDtWarehouses] = useState(null);
+    const [dtProductBrands, setDtProductBrands] = useState(null);
+    const [dtProductModels, setDtProductModels] = useState(null);
+
     const [lazyParams, setLazyParams] = useState(defaultFilters);
+    const [loadCount, setLoadCount] = useState(0);
 
-    const masterDataDBService = new MasterDataDBService();
-
+    const masterDataDBService = new MasterDataDBService();    
 
     useEffect(() => {
-        initFilters();
-    }, []);
-    
+        loadLazyData();
+    }, [lazyParams]);
+
     const clearFilter = () => {
         initFilters();
     }
@@ -66,18 +71,52 @@ const List = () => {
     }
 
     useEffect(() => {
-        loadLazyData();
+        setLoadCount(loadCount+1);
+    }, []);
+
+    useEffect(() => {
+        if(loadCount==1){
+            masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+                setDtProductBrands(data.rows);
+            });
+            masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+                setDtProductModels(data.rows);
+            });
+            masterDataDBService.getAll(WAREHOUSE_MODEL).then(data => {
+                setDtWarehouses(data.rows);
+            });
+            reloadData();
+            setLoadCount(loadCount+1);
+        }
+    }, [loadCount]);
+
+    useEffect(() => {
+        if(loadCount>1){
+            loadLazyData();
+        }
     }, [lazyParams]);
 
     const loadLazyData = () => {
         setLoading(true);
+
+        if(lazyParams.filters.active.value === true) {
+            lazyParams.filters.active.value = 1;
+        } else if(lazyParams.filters.active.value === false) {
+            lazyParams.filters.active.value = 0;
+        }
+
         masterDataDBService.getAll(modelName, lazyParams).then(async data => {
-            console.log(data)
             setTotalRecords(data.total);
             setProducts(data.rows);
             setLoading(false);
         });
     }
+
+    const reloadData = () => {
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            loadLazyData();
+        });
+    };
 
     const exportCSV = () => {
         dt.current.exportCSV();

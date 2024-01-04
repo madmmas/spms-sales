@@ -5,36 +5,15 @@ import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
-import { PRODUCT_MODEL } from '../../../constants/models';
-
 import { ProductService } from '../../../services/ProductService';
 
 const ProductForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "productForm" */ './Form'), "productForm"));
 
 const Detail = () => {
     
-    let { id } = useParams();
-
-        // name, dtProductCategory_id, code, barCode, brandName, partNumber, unitOfMeasurement, 
-    // lowStockQty, reorderQty, lastPurchasePrice, status, remarks
-    let emptyProductData = {
-        name: "",
-        dtProductCategory_id: "",
-        code: "",
-        barCode: "",
-        brandName: "",
-        partNumber: "",
-        unitOfMeasurement: "",
-        lowStockQty: 0,
-        reorderQty: 0,
-        lastPurchasePrice: 0.00,
-        status: true,
-        remarks: "",
-    };
+    let { id } = useParams();    
 
     let navigate = useNavigate();
-
-    const modelName = PRODUCT_MODEL;
 
     const productService = new ProductService();
     const [productData, setProductData] = useState(null);
@@ -58,7 +37,7 @@ const Detail = () => {
         }else{
             productService.getById(id).then(data => {
                 setProductData(data);
-            });    
+            });
         }
     }, []);
 
