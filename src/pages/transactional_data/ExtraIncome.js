@@ -101,22 +101,17 @@ const Income = () => {
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        setLoadCount(loadCount+1);
-    }, []);
-
-    useEffect(() => {
         if(loadCount==1){
             masterDataDBService.getAll(INCOME_TYPE_MODEL).then(data => {
                 setIncomeType(data.rows);
             });
             setLoadCount(loadCount+1);
+            loadLazyData();
         }
     }, [loadCount]);
     
     useEffect(() => {
-        if(loadCount>1){
-            loadLazyData();
-        }
+        loadLazyData();
     }, [lazyParams]);
     
     const clearFilter = () => {

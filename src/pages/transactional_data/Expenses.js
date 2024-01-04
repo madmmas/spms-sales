@@ -101,22 +101,17 @@ const Expenses = () => {
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
-        setLoadCount(loadCount+1);
-    }, []);
-
-    useEffect(() => {
-        if(loadCount==1){
+        if(loadCount==0){
             masterDataDBService.getAll(EXPENSE_TYPE_MODEL).then(data => {
                 setExpenseType(data.rows);
             });
             setLoadCount(loadCount+1);
+            loadLazyData();
         }
     }, [loadCount]);
     
     useEffect(() => {
-        if(loadCount>1){
-            loadLazyData();
-        }
+        loadLazyData();
     }, [lazyParams]);
     
     const clearFilter = () => {

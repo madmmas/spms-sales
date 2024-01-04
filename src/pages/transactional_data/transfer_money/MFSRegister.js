@@ -27,7 +27,7 @@ const MFSRegister = () => {
 
     let emptyMFSRegister = {
         transfer_to: 'CASH',
-        to_ref_id: null,
+        dr_ref_id: null,
         trx_date: moment().format('YYYY-MM-DD'),
         amount: 0,
         remarks: '',
@@ -200,9 +200,9 @@ const MFSRegister = () => {
     const refBodyTemplate = (rowData) => {
         let ref = "CASH";
         if(rowData.trx_type === "MFS_TO_MFS") {
-            ref = masterDataDBService.getShortnameById("dtMFSAccount", rowData.to_ref_id)
+            ref = masterDataDBService.getShortnameById("dtMFSAccount", rowData.dr_ref_id)
         } else if(rowData.trx_type === "MFS_TO_BANK") {
-            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.to_ref_id)
+            ref = masterDataDBService.getShortnameById("dtBankAccount", rowData.dr_ref_id)
         }
         return (
             <>
@@ -214,7 +214,7 @@ const MFSRegister = () => {
     const fromBodyTemplate = (rowData) => {
         return (
             <>
-                {masterDataDBService.getShortnameById("dtMFSAccount", rowData.from_ref_id)}
+                {masterDataDBService.getShortnameById("dtMFSAccount", rowData.cr_ref_id)}
             </>
         );
     };
@@ -241,8 +241,8 @@ const MFSRegister = () => {
                     >                       
                         <Column field="trx_no" header="Trx No" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="trx_date" header="Trx Date" filter  sortable  headerStyle={{ minWidth: '10rem' }} body={dateBodyTemplate}></Column>
-                        <Column field="from_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="to_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="cr_ref_id" header="Transfer From" body={fromBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="dr_ref_id" header="Transfer To" body={refBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="amount" header="Payment Amount" body={amountBodyTemplate} filter  sortable  headerStyle={{ minWidth: '10rem' }} style={{fontWeight: 'bold', textAlign: 'right'}}></Column>
                         <Column field="remarks" header="Remarks" filter  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable> 
@@ -250,7 +250,7 @@ const MFSRegister = () => {
                         <div className="p-fluid formgrid grid">
                         <div className="field col-12 md:col-12">
                         <Controller
-                            name="from_ref_id"
+                            name="cr_ref_id"
                             control={control}
                             rules={{ required: 'MFS Account is required.' }}
                             render={({ field, fieldState }) => (
@@ -314,7 +314,7 @@ const MFSRegister = () => {
                             {transferTo === "BANK" &&
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="dr_ref_id"
                                 control={control}
                                 rules={{
                                     required: 'Bank Account is required.',
@@ -332,11 +332,11 @@ const MFSRegister = () => {
                             {transferTo === "MFS" &&
                             <div className="field col-12 md:col-12">
                             <Controller
-                                name="to_ref_id"
+                                name="dr_ref_id"
                                 control={control}
                                 rules={{ 
                                     required: 'MFS Account is required.',
-                                    validate: (value) => (value !== getValues("from_ref_id")) || 'MFS Account is same as Transfer From MFS Account.'
+                                    validate: (value) => (value !== getValues("cr_ref_id")) || 'MFS Account is same as Transfer From MFS Account.'
                                 }}
                                 render={({ field, fieldState }) => (
                                 <>
