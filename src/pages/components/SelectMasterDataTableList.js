@@ -5,7 +5,10 @@ import { InputText } from 'primereact/inputtext';
 
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
-export default function SelectMasterDataTableList({ defaultFilters, selectedItem, fieldValue, onSelect, modelName, columns, showFields=[]}) {
+export default function SelectMasterDataTableList({ 
+    defaultFilters, selectedItem, fieldValue, 
+    onSelect, modelName, columns, globalFilter,
+}) {
 
     const dt = useRef(null);
     const op = useRef(null);
@@ -94,7 +97,7 @@ export default function SelectMasterDataTableList({ defaultFilters, selectedItem
         <div style={{minHeight: '30rem'}}>
             <span className="p-input-icon-left" style={{width:"100%"}}>
                 <i className="pi pi-search" />
-                <InputText style={{width:"100%"}} value={globalFilterValue} onChange={onGlobalFilterChange} 
+                <InputText ref={globalFilter} style={{width:"100%"}} value={globalFilterValue} onChange={onGlobalFilterChange} 
                     // onClick={(e) => {op.current.show(e)}}
                     onFocus={(e) => {e.target.select()}}
                     placeholder="Search" />

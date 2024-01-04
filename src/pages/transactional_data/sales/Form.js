@@ -49,6 +49,9 @@ const Form = React.memo(({ sales }) => {
     const [latestSaleVoucher, setLatestSaleVoucher] = useState('');
     const [Id, setId] = useState('');
 
+    // GlobalFilter Ref
+    const globalFilter = useRef(null);
+
     // STATES FOR SALE ITEMS
 
     const [salesItems, setSalesItems] = useState([]);
@@ -415,6 +418,10 @@ const Form = React.memo(({ sales }) => {
         setSelectedProductItem(null);
         setSelectedAddedProduct(null);
         setSelectProductTableItem(null);
+        // focus on global filter
+        if (globalFilter.current) {
+            globalFilter.current.focus();
+        }
     };
 
     const selectProductFromList = product_id => {
@@ -760,12 +767,14 @@ const Form = React.memo(({ sales }) => {
             <>
             {editMode && <div className="card col-12 md:col-12">
                 <SelectMasterDataTableList displayField="name"
+                    caption="Select Product"
+                    modelName={PRODUCT_MODEL} 
                     fieldValue=""
+                    globalFilter={globalFilter}
                     scrollHeight="300px"
                     defaultFilters={defaultProductFilters}
-                    modelName={PRODUCT_MODEL} caption="Select Product"
                     selectedItem={selectProductTableItem}
-                    showFields={[]} onSelect={onSelectProductFromTable}
+                    onSelect={onSelectProductFromTable}
                     columns={[
                         {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                         {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},

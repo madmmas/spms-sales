@@ -146,9 +146,10 @@ export default function SalesProductForm({
     };
 
     const addItem = item => {
-        resetForm();
-
         addSalesItem(item);
+
+        resetForm();
+        deselectProductFromList();
     };
 
     const updateItem = item => {
