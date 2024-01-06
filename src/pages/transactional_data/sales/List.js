@@ -317,6 +317,14 @@ const List = () => {
     };
 
     const  cashBodyTemplate = (rowData) => {
+        if(rowData.customer_category === "REGISTERED"){
+            return (
+                <>
+                    0
+                </>
+            );
+        }
+
         let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
             if(rowData.advance_payment !== null && rowData.advance_payment !== undefined && rowData.advance_payment !== ""){
@@ -343,6 +351,14 @@ const List = () => {
     };
 
     const  othersBodyTemplate = (rowData) => {
+        if(rowData.customer_category === "REGISTERED"){
+            return (
+                <>
+                    0
+                </>
+            );
+        }
+        
         let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
             if(rowData.advance_payment !== null && rowData.advance_payment !== undefined && rowData.advance_payment !== ""){
