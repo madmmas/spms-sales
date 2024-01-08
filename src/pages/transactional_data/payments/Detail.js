@@ -99,6 +99,7 @@ const Detail = () => {
     const onPaymnetCallback = (data) => {
         setSubmitted(true);
         let _paymentType = paymentType==="RECEIVE"?"trxACReceivable":"trxACPayable";
+        data.current_balance = Number(data.current_balance);
         transactionService.commitPayment(_paymentType, data).then(data => {
             setSubmitted(false);
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Created', life: 3000 });
@@ -113,6 +114,7 @@ const Detail = () => {
             }else{
                 setDispatchTrigger(dispatchTrigger+1);
             }
+            window.open("#/paymentinvoice/" + data.id, "_blank");
         }).catch(error => {
             setSubmitted(false);
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Payment Creation Failed', life: 3000 });

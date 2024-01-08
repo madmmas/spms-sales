@@ -159,6 +159,14 @@ const DispatchPayment = ({trigger}) => {
         );
     };
 
+    const paymentVoucherBodyTemplate = (rowData) => {
+        return (
+            <>
+                <a href={"#/paymentinvoice/"+rowData.id} target="_blank" rel="noopener noreferrer" >{rowData.payment_no}</a>
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             
@@ -178,7 +186,7 @@ const DispatchPayment = ({trigger}) => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >                        
-                        <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="payment_no" header="Trx No" filter filterElement={expenseTypeFilterTemplate} body={paymentVoucherBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_date" header="Payment Date" filter filterElement={expenseTypeFilterTemplate} body={paymentDateBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="party_id" header="Party Name" filter filterElement={expenseTypeFilterTemplate} body={partyNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="payment_method" header="Paid From" filter filterElement={expenseTypeFilterTemplate} body={paymentNameBodyTemplate} sortable  headerStyle={{ minWidth: '10rem' }}></Column>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from 'react-router-dom';
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 import 'primeflex/primeflex.css';
 import "primeicons/primeicons.css";
@@ -9,8 +9,8 @@ import './styles/demo/Demos.scss';
 import './styles/layout/layout.scss';
 import './App.css';
 
-import { Dialog } from 'primereact/dialog';
-import { ProgressSpinner } from 'primereact/progressspinner';
+// import { Dialog } from 'primereact/dialog';
+// import { ProgressSpinner } from 'primereact/progressspinner';
         
 import RequireAuth from "./auth/RequireAuth";
 import Layout from './layout/layout';
@@ -20,13 +20,13 @@ import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
 
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
-// import { PrintPaymentInvoice } from "./pages/transactional_data/payment/"
+import { PrintPaymentInvoice } from "./pages/transactional_data/payments/PrintPaymentInvoice";
 import { PrintInvoiceSalesReturn } from "./pages/transactional_data/sales/components/PrintInvoiceSalesReturn";
 import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
 import { CashFlow } from "./pages/html_reports/CashFlow";
 
-import { MasterDataDBService } from './services/MasterDataDBService';
+// import { MasterDataDBService } from './services/MasterDataDBService';
 
 function App() {
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
@@ -73,41 +73,41 @@ function App() {
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
 
-  const { user: currentUser } = useSelector((state) => state.auth);
-  const [visible, setVisible] = useState(false);
+  // const { user: currentUser } = useSelector((state) => state.auth);
+  // const [visible, setVisible] = useState(false);
 
-  const loadAllData = async () => {  
-    const masterDataDBService = new MasterDataDBService();
+  // const loadAllData = async () => {  
+  //   const masterDataDBService = new MasterDataDBService();
     
-    setVisible(true);
-    let response = await masterDataDBService.sessionPing();
-    console.log("Appjs-sessionPing::", response);
-    if (response===true) {
-      await masterDataDBService.loadAllInitData();
-    }
-    setVisible(false);
-  }
+  //   setVisible(true);
+  //   let response = await masterDataDBService.sessionPing();
+  //   console.log("Appjs-sessionPing::", response);
+  //   if (response===true) {
+  //     await masterDataDBService.loadAllInitData();
+  //   }
+  //   setVisible(false);
+  // }
 
-  useEffect(() => {
-    if (currentUser) {
-      console.log("currentUser::", currentUser);   
-      loadAllData();
-    }
-  }, [currentUser]);
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     console.log("currentUser::", currentUser);   
+  //     loadAllData();
+  //   }
+  // }, [currentUser]);
 
   return (
     <>
-    <Dialog header="Loading..." visible={visible} style={{ width: '50vw' }} onHide={()=>console.log("wait...")} >
+    {/* <Dialog header="Loading..." visible={visible} style={{ width: '50vw' }} onHide={()=>console.log("wait...")} >
         <p className="m-0">
           Please wait while we are loading the application...
         </p>
         <ProgressSpinner />
-    </Dialog>
+    </Dialog> */}
     <Routes>
       <Route path="/login" element={<Login />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
-      {/* <Route path="/paymentinvoice" element={<PrintPaymentInvoice />} /> */}
+      <Route path="/paymentinvoice/:id" element={<PrintPaymentInvoice />} />
       <Route path="/invoice/">
         <Route path=":id/R" element={<PrintInvoiceSalesReturn />} />
       </Route>

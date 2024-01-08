@@ -13,4 +13,15 @@ export class RegisterService {
             }
         }).then(res => res.data);
     }
+
+    async getById(id) {
+        let uri = `/register_by/` + id;
+        return axiosInstance.get(uri, {
+            timeout: 15000,
+            id: uri,
+            cache: {
+                ttl: 1000 * 1 // 1 seconds.
+            }
+        }).then(res => res.data);
+    }
 }

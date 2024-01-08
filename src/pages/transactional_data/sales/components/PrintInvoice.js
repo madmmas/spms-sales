@@ -8,8 +8,8 @@ import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 import InvoiceCss from './InvoiceCss'
 
-import { PrintPOS } from './PrintPOS'
-import { ComponentToPrint } from './ComponentToPrint'
+import { PrintPOS } from '../../../components/PrintPOS'
+import { ComponentToPrint } from '../../../components/ComponentToPrint'
 
 export const PrintInvoice = () => {
     

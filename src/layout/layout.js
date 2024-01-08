@@ -7,8 +7,6 @@ import AppTopbar from './AppTopbar';
 import { LayoutContext } from './context/layoutcontext';
 import PrimeReact from 'primereact/api';
 import { Outlet } from 'react-router-dom';
-  
-import AuthStatus from "../auth/AuthStatus";
 
 const Layout = (props) => {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);

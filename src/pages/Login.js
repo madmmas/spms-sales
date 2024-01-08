@@ -1,11 +1,15 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import { Dialog } from 'primereact/dialog';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
+
+import { MasterDataDBService } from '../services/MasterDataDBService';
 
 import { login } from "../actions/auth";
 
@@ -23,15 +27,37 @@ const LoginPage = () => {
   const handleLogin = (event) => {  
     event.preventDefault()
     dispatch(login(username, password))
-        .then(() => {
-           navigate(from);
+        .then(async () => {
+            await loadAllData();
+            navigate(from);
         })
         .catch(() => {
             // setLoading(false);
         });
     }
 
+    const [visible, setVisible] = useState(false);
+
+  const loadAllData = async () => {  
+    const masterDataDBService = new MasterDataDBService();
+    
+    setVisible(true);
+    let response = await masterDataDBService.sessionPing();
+    console.log("Appjs-sessionPing::", response);
+    if (response===true) {
+      await masterDataDBService.loadAllInitData();
+    }
+    setVisible(false);
+  }
+
   return (
+    <>
+    <Dialog header="Loading..." visible={visible} style={{ width: '50vw' }} onHide={()=>console.log("wait...")} >
+        <p className="m-0">
+        Please wait while we are loading the application...
+        </p>
+        <ProgressSpinner />
+    </Dialog>
       <div className={containerClassName}>
           <div className="flex flex-column align-items-center justify-content-center">
               <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)' }}>
@@ -60,6 +86,7 @@ const LoginPage = () => {
               </div>
           </div>
       </div>
+    </>
   );
 };
 
