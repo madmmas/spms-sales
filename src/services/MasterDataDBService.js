@@ -682,4 +682,42 @@ export class MasterDataDBService {
 
         return response.status === 200;
     }
+
+    async getAllProductStock() {
+        // get the brand and model name
+        let brands = window['__all_shortname_dtProductBrand'];
+        let models = window['__all_shortname_dtProductModel'];
+
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+
+        let result = await table.orderBy("name").toArray();
+
+        let finalResult = [];
+        for(let i=0; i<result.length; i++) {
+            let row = result[i];
+            let brand_name = brands[row.dtProductBrand_id+"-dtProductBrand"] || "";
+            let model_no = models[row.dtProductModel_id+"-dtProductModel"] || "";
+            finalResult.push({
+                id: row.id,
+                name: row.name,
+                code: row.code,
+                brand_name: brand_name,
+                model_no: model_no,
+                part_number: row.part_number,
+                unit: row.unit,
+                price: row.price,
+                cost: row.cost,
+                low_stock_qty: row.low_stock_qty,
+                current_stock: row.current_stock,
+                prev_stock: row.prev_stock,
+                total_stock_in: row.total_stock_in,
+                total_stock_out: row.total_stock_out,
+                total_damage_stock: row.total_damage_stock,
+            });
+        }
+
+        return finalResult;
+    }
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { classNames } from 'primereact/utils';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -8,11 +7,10 @@ import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 
-import { getFormattedNumber } from '../../../utils';
+import { getFormattedNumber, exportDataInExcel } from '../../../utils';
 
 import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
@@ -211,7 +209,8 @@ const StockStatus = () => {
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />
+                {/* <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
+                <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
             </React.Fragment>
         );
     };
@@ -373,7 +372,7 @@ const StockStatus = () => {
                     <i className="pi pi-search" />
                     <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                 </span> */}
-                <h5 className="m-0 ">Manage Products</h5>                
+                <h5 className="m-0 ">Stock Status</h5>                
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
             </div>
         );
@@ -401,6 +400,12 @@ const StockStatus = () => {
         </>
     );
 
+    const exportExcel = () => {
+        masterDataDBService.getAllProductStock().then(products => {
+            exportDataInExcel('products_stock', products);
+        });
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -422,7 +427,7 @@ const StockStatus = () => {
 
                         emptyMessage="No data found." header={renderHeader} 
                     >
-                        <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
+                        {/* <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column> */}
                         <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" filterElement={brandFilterTemplate} sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
