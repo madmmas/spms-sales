@@ -24,14 +24,19 @@ const AddStock = ({ packageData }) => {
     const fetchData = async (products) => {
         console.log("PRODUCTS-ALL:::",products);
         try {
-        //     const response = await Promise.all(
-        //         products.map(async (product) => {
-        //             let resp = await productService.getById(product.dtProduct_id);
-        //             product.current_stock = resp.current_stock;
-        //             return product;
-        //         })
-        //     )
-          setProducts(products);
+            const response = await Promise.all(
+                products.map(async (product) => {
+                    let resp = await productService.getById(product.dtProduct_id);
+                    product.current_stock = resp.current_stock;
+                    // get product details
+                    let productDetails = await masterDataDBService.getById('dtProduct', product.dtProduct_id);
+                    product.brand_name = masterDataDBService.getShortnameById('dtProductBrand', productDetails.dtProductBrand_id);
+                    product.model_no = masterDataDBService.getShortnameById('dtProductModel', productDetails.dtProductModel_id);
+                    return product;
+                })
+            )
+        //   console.log("PRODUCTS:::",response);
+          setProducts(response);
         } catch (error) {
         //   return products;
         }
@@ -101,7 +106,7 @@ const AddStock = ({ packageData }) => {
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>Warehouse:</div>
-                    <Chip label={masterDataDBService.getShortnameById(packageData.warehouse_type, packageData.warehouse_id)} />
+                    <Chip label={masterDataDBService.getShortnameById('dtWarehouse', packageData.warehouse_id)} />
                 </div>
                 <div className="field col-12 md:col-4">
                     <div className='field'>remarks:</div>
