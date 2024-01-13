@@ -28,22 +28,55 @@ export const PrintInvoice = () => {
     const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
+    const populateProductDetailsInItems = async (items) => {
+        for(let i = 0; i<items?.length; i++){
+            let productDetails = await masterDataDBService.getById('dtProduct', items[i].product_id);
+            items[i].product_name = productDetails.name;
+            items[i].product_part_number = productDetails.part_number;
+            items[i].product_model_id = productDetails.dtProductModel_id;
+            items[i].product_brand_id = productDetails.dtProductBrand_id;
+        }
+    }
+
+    const populateProductDetailsInReturnItems = async (return_items) => {
+        for(let i = 0; i<return_items?.length; i++){
+            let productDetails = await masterDataDBService.getById('dtProduct', return_items[i].product_id);
+            // console.log("productDetails::", productDetails)
+            return_items[i].product_name = productDetails.name;
+            return_items[i].trade_price = productDetails.price;
+            return_items[i].product_part_number = productDetails.part_number;
+            return_items[i].product_model_id = productDetails.dtProductModel_id;
+            return_items[i].product_brand_id = productDetails.dtProductBrand_id;
+            // return_items[i].product_model_no = masterDataDBService.getShortnameById("dtProductModel", productDetails.dtProductModel_id);
+            // console.log("productDetails::", masterDataDBService.getShortnameById("dtProductModel", productDetails.dtProductModel_id))
+            // return_items[i].product_brand_name = masterDataDBService.getShortnameById("dtProductBrand", productDetails.dtProductBrand_id);
+            // console.log("productDetails::", masterDataDBService.getShortnameById("dtProductBrand", productDetails.dtProductBrand_id))
+            // console.log("return-productDetails::", return_items)
+        }
+    }
+
     useEffect(() => {
         console.log("ID CHANGED::", id)
-        orderService.getById(SALES_MODEL, id).then(data => {
+        orderService.getById(SALES_MODEL, id).then(async (data) => {
             if(data && data.customer_category!=="WALKIN"){
-                masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
+                masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(async (party) => {
                     data.party = {
                         "line1": party.name,
                         "line2": party.address,
                         "line3": party.phone,
                     };
-                    orderService.getLedgerBalance("dtCustomer", data.party_id).then(party_balance => {
+                    orderService.getLedgerBalance("dtCustomer", data.party_id).then(async (party_balance) => {
                         let dr_amount = Number(party_balance.dr_amount)||0;
                         let cr_amount = Number(party_balance.cr_amount)||0;
                         let balance = dr_amount - cr_amount;
-                        console.log("balance::", party_balance);
+                        // console.log("balance::", party_balance);
                         data.balance = balance;
+
+                        // populate product details both for items and return_items
+                        await populateProductDetailsInItems(data.items);
+                        // populate the return items
+                        await populateProductDetailsInReturnItems(data.return_items);
+
                         setInvoice(data);
                         console.log(data)
                         console.log(data)
@@ -51,6 +84,11 @@ export const PrintInvoice = () => {
                 }); 
             }else{
                 data.balance = 0;
+                // populate product details both for items and return_items
+                await populateProductDetailsInItems(data.items);
+                // populate the return items
+                await populateProductDetailsInReturnItems(data.return_items);
+                console.log("WALKIN-data::", data)
                 setInvoice(data);
             }
         });  
@@ -58,16 +96,16 @@ export const PrintInvoice = () => {
 
     useEffect(() => {
         console.log("invoice::", invoice);
-        for(let i = 0; i<invoice?.items?.length; i++){
-            for(let j = 0; j<invoice?.return_items?.length; j++){
-                if(invoice.items[i].product_id === invoice.return_items[j].product_id){
-                       invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
-                       invoice.return_items[j].trade_price = invoice.items[i].trade_price;
-                       invoice.return_items[j].product_model_no = masterDataDBService.getShortnameById("dtProductModel", invoice.items[i].product_model_id);
-                       invoice.return_items[j].product_brand_name = masterDataDBService.getShortnameById("dtProductBrand", invoice.items[i].product_brand_id);
-               }
-            }
-        }
+        // for(let i = 0; i<invoice?.items?.length; i++){
+        //     for(let j = 0; j<invoice?.return_items?.length; j++){
+        //         if(invoice.items[i].product_id === invoice.return_items[j].product_id){
+        //             invoice.return_items[j].product_part_number = invoice.items[i].product_part_number;
+        //             invoice.return_items[j].trade_price = invoice.items[i].trade_price;
+        //             invoice.return_items[j].product_model_no = masterDataDBService.getShortnameById("dtProductModel", invoice.items[i].product_model_id);
+        //             invoice.return_items[j].product_brand_name = masterDataDBService.getShortnameById("dtProductBrand", invoice.items[i].product_brand_id);
+        //        }
+        //     }
+        // }
 
         let totalReturningAmountLocal = 0;
         for(let i = 0; i<invoice?.return_items?.length; i++){
@@ -394,9 +432,9 @@ export const PrintInvoice = () => {
                             <td className="left-align">{getDateFormatted(item.created_at)}</td>
                             <td className="left-align">{Number.parseFloat(item.return_qty).toFixed(0)}</td>
                             <td className="left-align">{item.product_name}</td>
-                            <td className="left-align">{item.product_brand_name}</td>
+                            <td className="left-align">{masterDataDBService.getShortnameById("dtProductBrand", item.product_brand_id)}</td>
                             <td className="left-align">{item.product_part_number}</td>
-                            <td className="left-align">{item.product_model_no}</td>
+                            <td className="left-align">{masterDataDBService.getShortnameById("dtProductModel", item.product_model_id)}</td>
                             <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
                             <td className="right-align">{Number.parseFloat(item.return_qty*item.trade_price).toFixed(2) }</td>
                         </tr>)}
