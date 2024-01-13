@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import React, { useState, useRef, Suspense } from 'react';
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { RadioButton } from "primereact/radiobutton";
@@ -9,7 +9,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
-import SelectMasterData from '../../components/SelectMasterData';
 import Customer from '../../components/master_data/Custmer';
 import Suppiler from '../../components/master_data/Supplier';
 
@@ -32,15 +31,14 @@ const Detail = () => {
         payment_no: null,
         payment_type: 'RECEIVE',   // dtCash, dtBank, dtMFS
         payment_method: 'CASH', // CASH, BANK, MFS
-        ref_type: '', // CUSTOMER, SUPPLIER, EMPLOYEE, OTHER
-        ref_id: null,
+        party_type: '', // CUSTOMER, SUPPLIER, EMPLOYEE, OTHER
+        party_id: null,
         bank_account_id: null,
         current_balance: 0,
         amount: 0,
     };
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -94,7 +92,7 @@ const Detail = () => {
 
     const onSelectPartyType = (value) => {
         setPartyType(value);
-        setValue("ref_id", null);
+        setValue("party_id", null);
         setValue("current_balance", 0);
     }
 
@@ -105,8 +103,8 @@ const Detail = () => {
             setSubmitted(false);
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Payment Created', life: 3000 });
             reset({
-                "ref_type": partyType,
-                "ref_id": null,
+                "party_type": partyType,
+                "party_id": null,
                 "current_balance": 0,
                 "payment_type": paymentType,
             })
@@ -153,7 +151,7 @@ const Detail = () => {
                 <div className="p-fluid formgrid grid">
                     <div className="field col-12 md:col-3">
                         <Controller
-                            name="ref_type"
+                            name="party_type"
                             control={control}
                             rules={{ required: 'Party Type is required.' }}
                             render={({ field, fieldState }) => (
@@ -178,7 +176,7 @@ const Detail = () => {
 
                     {partyType == "dtCustomer" && <div className="field col-12 md:col-3">
                         <Controller
-                            name="ref_id"
+                            name="party_id"
                             control={control}
                             rules={{ required: 'Party is required.' }}
                             render={({ field, fieldState }) => (
@@ -194,7 +192,7 @@ const Detail = () => {
                     </div>}
                     {partyType == "dtSupplier" && <div className="field col-12 md:col-3">
                         <Controller
-                            name="ref_id"
+                            name="party_id"
                             control={control}
                             rules={{ required: 'Party is required.' }}
                             render={({ field, fieldState }) => (

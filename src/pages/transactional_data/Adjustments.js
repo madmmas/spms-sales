@@ -37,7 +37,6 @@ const Adjustments = () => {
     };
 
     const {
-        register,
         control,
         formState: { errors },
         reset,
@@ -341,10 +340,14 @@ const Adjustments = () => {
                             control={control}
                             rules={{ 
                                 required: 'Value is required.',
-                                // min: { value: 1, message: 'Value must be greater than 0.' },
+                                // value must not equal to 0
+                                
                                 validate: {
                                     lessThanBalance: value => {
                                         return Number(value) <= Number(getValues('current_balance')) || 'Value must be less than or equal to current balance.';
+                                    },
+                                    lessOrgreaterThanZero: value => {
+                                        return Number(value) > 0 || Number(value) < 0 || 'Value must be greater than 0.';
                                     }
                                 }
                             }}
