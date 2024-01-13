@@ -57,11 +57,19 @@ const route_ui_config = {
     updateMsg: "Route updated successfully",
     deleteMsg: "Route deleted successfully",
 }
+
 const supplier_category_ui_config = {
     headerTitle: "Manage Supplier Categories",
     createMsg: "Supplier Category created successfully",
     updateMsg: "Supplier Category updated successfully",
     deleteMsg: "Supplier Category deleted successfully",
+}
+
+const courier_ui_config = {
+    headerTitle: "Manage Courier",
+    createMsg: "Courier created successfully",
+    updateMsg: "Courier updated successfully",
+    deleteMsg: "Courier deleted successfully",
 }
 
 const default_ui_config = {
@@ -95,6 +103,8 @@ export const getModelDef = (modelName) => {
             return route_ui_config;
         case "dtSupplierCategory":
             return supplier_category_ui_config;
+        case "dtCourier":
+            return courier_ui_config;
         default:
             return default_ui_config;
     }

@@ -1,5 +1,7 @@
 // dtBank
 export const banks_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
+// dtCourier
+export const courier_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtCustomerCategory
 export const customer_category_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtExpenseType

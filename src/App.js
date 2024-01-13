@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
 
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
+import { PrintPaymentInvoice } from "./pages/transactional_data/sales/components/PrintPaymentInvoice";
 import { PrintInvoiceSalesReturn } from "./pages/transactional_data/sales/components/PrintInvoiceSalesReturn";
 import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
@@ -106,6 +107,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
+      <Route path="/paymentinvoice" element={<PrintPaymentInvoice />} />
       <Route path="/invoice/">
         <Route path=":id/R" element={<PrintInvoiceSalesReturn />} />
       </Route>
@@ -224,6 +226,7 @@ function App() {
         <Route path="/product_model" element={<RouteAuth pageComponent={<Configuration modelName="dtProductModel" />} />} />
         <Route path="/route" element={<RouteAuth pageComponent={<Configuration modelName="dtRoute" />} />} />
         <Route path="/supplier_category" element={<RouteAuth pageComponent={<Configuration modelName="dtSupplierCategory" />} />} />
+        <Route path="/courier" element={<RouteAuth pageComponent={<Configuration modelName="dtCourier" />} />} />
 
       </Route>
     </Routes>

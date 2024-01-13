@@ -8,6 +8,8 @@ const getFields = function(modelName) {
             return masterDef.banks_fields;
         case "dtBankAccount":
             return masterDef.bank_accounts_fields;
+        case "dtCourier":
+            return masterDef.courier_fields;
         case "dtCustomer":
             return masterDef.customer_fields;
         case "dtCustomerCategory":

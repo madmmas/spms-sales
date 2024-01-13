@@ -4,9 +4,9 @@ import { FilterMatchMode } from 'primereact/api';
 
 import modelDef from './ModelDef';
 
-const DB_NAME = "spms_org_v2";
+const DB_NAME = "spms_org_v10";
 
-const DEL_DB_NAME = "spms_org_v1";
+const DEL_DB_NAME = "spms_org_v2";
 const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
 DBDeleteRequest.onerror = (event) => {
   console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);
@@ -53,6 +53,7 @@ export class MasterDataDBService {
         this.db.version(1).stores({
             dtBank: modelDef.getJoinedFields('dtBank'),
             dtBankAccount: modelDef.getJoinedFields('dtBankAccount'),
+            dtCourier: modelDef.getJoinedFields('dtCourier'),
             dtCustomer: modelDef.getJoinedFields('dtCustomer'),
             dtCustomerCategory: modelDef.getJoinedFields('dtCustomerCategory'),
             dtExpenseType: modelDef.getJoinedFields('dtExpenseType'),
@@ -120,7 +121,7 @@ export class MasterDataDBService {
     async populateAllShortnameInMemory() {
         this.openDB();
         let tables = [ 
-            "dtBank", "dtCustomerCategory", "dtExpenseType", "dtIncomeType", 
+            "dtBank", "dtCourier", "dtCustomerCategory", "dtExpenseType", "dtIncomeType", 
             "dtMFS", "dtPaymentType", "dtProductBrand", "dtProductCategory", 
             "dtProductModel", "dtSupplierCategory", "dtRoute", "dtWarehouse", 
             "dtBankAccount", "dtMFSAccount", "dtCustomer", "dtSupplier", 
@@ -405,6 +406,7 @@ export class MasterDataDBService {
         this.populateProductSearch();
 
         this.getAllMasterDataUpto("dtBank", true);
+        this.getAllMasterDataUpto("dtCourier", true);
         this.getAllMasterDataUpto("dtCustomerCategory", true);
         this.getAllMasterDataUpto("dtExpenseType", true);
         this.getAllMasterDataUpto("dtIncomeType", true);
@@ -458,6 +460,7 @@ export class MasterDataDBService {
 
         await this.openDB();
         await this.db.dtBank.clear();
+        await this.db.dtCourier.clear();
         await this.db.dtCustomerCategory.clear();
         await this.db.dtExpenseType.clear();
         await this.db.dtIncomeType.clear();
