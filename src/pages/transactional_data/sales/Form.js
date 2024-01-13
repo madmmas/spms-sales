@@ -483,11 +483,11 @@ const Form = React.memo(({ sales }) => {
         // need to reload lastTradePrice
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
 
-        if(value === "WALKIN") {
-            setShowOptions(false);
-        } else {
-            setShowOptions(true);
-        }
+        // if(value === "WALKIN") {
+        //     setShowOptions(false);
+        // } else {
+        //     setShowOptions(true);
+        // }
     };
 
     const getPartyBalance = (partyId) => {
@@ -937,11 +937,11 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                {showOptions && <div className="field col-12 md:col-6">
+                {customerCategory === "CONDITIONAL" && <div className="field col-12 md:col-6">
                     <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
                 </div>}
-                {(customerCategory === "REGISTERED" && showOptions) && 
+                {(customerCategory === "REGISTERED") && 
                 <div className="field col-12 md:col-6">
                     <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
