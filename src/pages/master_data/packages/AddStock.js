@@ -22,18 +22,18 @@ const AddStock = ({ packageData }) => {
     const masterDataDBService = new MasterDataDBService();
 
     const fetchData = async (products) => {
+        console.log("PRODUCTS-ALL:::",products);
         try {
-            const response = await Promise.all(
-                products.map(async (product) => {
-                    let resp = await productService.getById(product.dtProduct_id);
-                    product.current_stock = resp.current_stock;
-                    return product;
-                })
-            )
-          console.log("PRODUCTS:::",response);
-          setProducts(response);
+        //     const response = await Promise.all(
+        //         products.map(async (product) => {
+        //             let resp = await productService.getById(product.dtProduct_id);
+        //             product.current_stock = resp.current_stock;
+        //             return product;
+        //         })
+        //     )
+          setProducts(products);
         } catch (error) {
-          return products;
+        //   return products;
         }
     }
 
