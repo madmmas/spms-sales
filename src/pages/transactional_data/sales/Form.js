@@ -217,6 +217,7 @@ const Form = React.memo(({ sales }) => {
                         totalReturnedPrice = totalReturnedPrice + item.return_qty * sales.items[i].trade_price;
                         return {
                            ...item,
+                           code : sales.items[i].code,
                            brand_name : sales.items[i].brand_name,
                            model_no : sales.items[i].model_no,
                            part_number : sales.items[i].part_number,

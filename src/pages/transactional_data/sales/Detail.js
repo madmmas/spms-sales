@@ -7,6 +7,7 @@ import { lazyRetry } from '../../components/LazyWithRetry';
 
 import { SALES_MODEL } from '../../../constants/models';
 import { OrderService } from '../../../services/OrderService';
+import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const SalesForm = React.lazy(() => lazyRetry(() => import(/* webpackChunkName: "salesForm" */ './Form'), "salesForm"));
 
@@ -16,6 +17,7 @@ const Detail = () => {
     let navigate = useNavigate();
     
     const orderService = new OrderService();
+    const masterDataDBService = new MasterDataDBService();
     const [sales, setSales] = useState(null);
 
     const tabs = [
@@ -32,7 +34,17 @@ const Detail = () => {
         if(id=="new"){
             setSales(null);
         }else{
-            orderService.getById(SALES_MODEL, id).then(data => {
+            orderService.getById(SALES_MODEL, id).then(async (data) => {
+                // console.log("SALES-DETAIL:::",data);
+                // populate sales items
+                for(let i=0; i<data.items.length; i++){
+                    let product = await masterDataDBService.getById('dtProduct', data.items[i].product_id);
+                    // console.log("PRODUCT:::",product);
+                    data.items[i].code = product.code;
+                    data.items[i].part_number = product.part_number;
+                    data.items[i].brand_name = masterDataDBService.getShortnameById('dtProductBrand', product.dtProductBrand_id);
+                    data.items[i].model_no = masterDataDBService.getShortnameById('dtProductModel', product.dtProductModel_id);
+                }
                 setSales(data);
             });    
         }
