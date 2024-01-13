@@ -130,6 +130,13 @@ const Adjustments = () => {
         console.log("onPaymnetCallback", data);
         setSubmitted(true);
         console.log("adjustmentType::", adjustmentType)
+        // convert the amount in float and also check if it zero
+        data.amount = Number(data.amount);
+        if(data.amount == 0){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Adjustment Amount must be greater or less than 0.', life: 3000 });
+            setSubmitted(false);
+            return;
+        }
         transactionService.ledgerAdjustment(data).then(data => {
             console.log(data);
             setSubmitted(false);
