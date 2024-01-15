@@ -126,7 +126,8 @@ const Form = React.memo(({ sales }) => {
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
     }
 
