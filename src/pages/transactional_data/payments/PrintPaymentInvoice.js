@@ -39,8 +39,10 @@ export const PrintPaymentInvoice = () => {
                 // });
                 masterDataDBService.getById(data.party_type, data.party_id).then(partyInfo => {
                     setPartyInfo(partyInfo);
+                    console.log(partyInfo);
                 });
                 setPaymentData(data);
+                console.log(data);
             });
         }
     }, [id]);
@@ -99,7 +101,7 @@ export const PrintPaymentInvoice = () => {
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
             <p  class="line">Invoice Number : {paymentData.payment_no} </p>
-            <p>Invoice Date : {paymentData.payment_date}</p>
+            <p>Invoice Date : {getDateFormatted(paymentData.payment_date)} {getTimeFormatted(paymentData.payment_date)}</p>
             <table className="line">
                 <tbody>
                     <tr>
@@ -129,7 +131,9 @@ export const PrintPaymentInvoice = () => {
                </div>
                <div>
                          <div className="parentPayment">
-                            <div><b>[Bank/MFS/CASH] (-)Payment</b></div>
+                            {paymentData.payment_method === 'CASH' && <div><b>[CASH] (-)Payment</b></div>}
+                            {paymentData.payment_method === 'MFS' && <div><b>[MFS] (-)Payment</b></div>}
+                            {paymentData.payment_method === 'BANK' && <div><b>[BANK] (-)Payment</b></div>}
                             <div className="price"><b>{paymentData.amount}</b></div>
                          </div>
                </div>
@@ -169,7 +173,7 @@ export const PrintPaymentInvoice = () => {
                    </p>
 
                 <p> 
-                    <b>Remarks :</b> <span><b>notes</b></span>
+                    <b>Remarks :</b> <span><b>{paymentData.remarks}</b></span>
                 </p>
             </section>
             <footer style={{marginTop:"5rem"}}>
