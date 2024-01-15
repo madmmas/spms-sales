@@ -33,7 +33,7 @@ const List = ({ ledger = false }) => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
             'dtSupplierCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
             'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
             'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
