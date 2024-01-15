@@ -19,7 +19,7 @@ export default function Customer({
                 // field.onChange(e.id);                                
             }}
             defaultFilters={{
-                globalFilterFields: ['name', 'contact_name'],
+                globalFilterFields: ['name', 'contact_name', 'address', 'route', 'phone'],
                 fields: fields,
                 first: 0,
                 rows: 10,

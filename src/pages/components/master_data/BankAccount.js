@@ -22,7 +22,7 @@ export default function BankAccount({
             onSelect={(e) => onSelect(e)}
             className={classNames({ 'p-invalid': fieldState.error })} 
             defaultFilters={{
-                globalFilterFields: ["accNumber", "accName"],
+                globalFilterFields: ["accNumber", "accName", 'shortname'],
                 fields: fields,
                 first: 0,
                 rows: 10,
@@ -34,7 +34,7 @@ export default function BankAccount({
                 }
             }}
             columns={[
-                {field: 'dtBank_id_shortname', header: 'MFS Name'},
+                {field: 'dtBank_id_shortname', header: 'Bank Name'},
                 {field: 'accName', header: 'Account Name'},
                 {field: 'accNumber', header: 'Account Number'},
             ]} />
