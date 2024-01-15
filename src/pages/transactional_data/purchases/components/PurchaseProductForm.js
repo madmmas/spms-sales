@@ -288,7 +288,8 @@ export default function PurchaseProductForm({
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
             modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            code : { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
     }
     return (
