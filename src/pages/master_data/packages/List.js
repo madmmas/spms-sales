@@ -5,9 +5,11 @@ import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
+import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
+
 
 import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
@@ -33,10 +35,13 @@ const List = () => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             dtCategory_id: { value: 2, matchMode: FilterMatchMode.EQUALS },
+            dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            dtProductModel_id: { value: null, matchMode: FilterMatchMode.EQUALS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS },
             active: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
@@ -262,6 +267,13 @@ const List = () => {
         );
     }
 
+    const brandFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
 
     const renderHeader = () => {
         return (
@@ -318,8 +330,12 @@ const List = () => {
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" body={brandNameBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" body={modelNumberBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        {/* <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" body={brandNameBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" body={modelNumberBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column> */}
+
+                        <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" filterElement={brandFilterTemplate} sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" filterElement={modelFilterTemplate} sortable body={modelNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                     </DataTable>
 

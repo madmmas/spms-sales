@@ -114,6 +114,7 @@ const List = () => {
         masterDataDBService.getAll(modelName, lazyParams).then(data => {
             setTotalRecords(data.total);
             setProducts(data.rows);
+            console.log(data.rows);
             setLoading(false);
         });
     }
@@ -409,7 +410,7 @@ const List = () => {
                         <Column field="price" dataType="numeric" style={{textAlign: 'right'}} header="Trade Price" filter filterPlaceholder="Search by Trade Price" filterElement={tradePriceFilterTemplate} sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="min_trade_price" dataType="numeric" style={{textAlign: 'right'}} header="Minimum Trade Price" filter filterPlaceholder="Search by Minimum Trade Price" filterElement={minTradePriceFilterTemplate} sortable body={minTradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="low_stock_qty" dataType="numeric" style={{textAlign: 'center'}} header="Low Stock Qty" filter filterPlaceholder="Search by Low Stock Qty" filterElement={lowStockQtyFilterTemplate} sortable body={lowStockQtyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                                                    
-                        <Column field="warehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" filterElement={warehouseFilterTemplate} sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="dtWarehouse_id" header="Warehouse" filter filterPlaceholder="Search by Warehouse" filterElement={warehouseFilterTemplate} sortable body={dtWarehouse_idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="active" header="Status" filter filterPlaceholder="Search by Status" filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 

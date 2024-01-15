@@ -33,15 +33,15 @@ const List = ({ ledger = false }) => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'dtSupplierCategory_id': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'address': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'phone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'contactPersonName': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'contactPersonDesignation': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'contactPersonPhone': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-            'currency': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-            'status': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+            'name': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'dtSupplierCategory_id': { value: null, matchMode: FilterMatchMode.EQUALS },
+            'address': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'phone': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'contactPersonName': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'contactPersonDesignation': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'contactPersonPhone': { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+            'currency': { value: null, matchMode: FilterMatchMode.CONTAINS },
+            'status': { value: null, matchMode: FilterMatchMode.EQUALS }
         }
     };
 
