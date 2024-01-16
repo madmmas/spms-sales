@@ -489,19 +489,19 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="voucher_no" header="Voucher No" filter filterPlaceholder="Search by voucher no" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="status" header="Status" filter filterPlaceholder="Search by status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="created_at" header="Sales Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="" header="Customer/Shop Name" filter filterPlaceholder="Search by shop name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="net" header="Invoice Balance" filter filterPlaceholder="Search by gross" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="" header="Cash Payment" filter filterPlaceholder="Search by Cash" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="" header="Others Payment (Bank/MFS)" filter filterPlaceholder="Search by Others" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="due" header="Due Balance" filter filterPlaceholder="Search by Net Amount" sortable headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="customer_category" header="Customer Category" filter filterPlaceholder="Search by name" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="discount" header="Total Discount" filter filterPlaceholder="Search by discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="transport" header="Delivery Cost" filter filterPlaceholder="Search by transport" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="duty_vat" header="VAT" filter filterPlaceholder="Search by Vat Amount" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="net" header="Net Amount" filter filterPlaceholder="Search by Net Amount" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="voucher_no" header="Voucher No" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="status" header="Status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="created_at" header="Sales Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="" header="Customer/Shop Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="net" header="Invoice Balance" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="" header="Cash Payment" sortable body={cashBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="" header="Others Payment (Bank/MFS)" sortable body={othersBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="due" header="Due Balance" sortable headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="customer_category" header="Customer Category" sortable body={customerCategoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
+                        <Column field="discount" header="Total Discount" sortable body={totalDiscountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="transport" header="Delivery Cost" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="duty_vat" header="VAT" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="net" header="Net Amount" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
