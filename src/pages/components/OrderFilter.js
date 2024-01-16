@@ -224,6 +224,32 @@ const OrderFilter = ({ reloadData, isSales }) => {
                     </>
                 )}/>
                 </div>}
+                {isSales && <div className="field col-12 md:col-2">
+                <Controller
+                    name="courier_1"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Info 1</label>
+                            <InputText inputId={field.name} value={field.value} inputRef={field.ref}
+                                onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>}
+                {isSales && <div className="field col-12 md:col-2">
+                <Controller
+                    name="courier_2"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                        <>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Info 2</label>
+                            <InputText inputId={field.name} value={field.value} inputRef={field.ref}
+                                onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
+                            {getFormErrorMessage(field.name)}
+                        </>
+                    )}/>
+                </div>}
                 {isSales == false &&
                 <>
                 <div className="field col-12 md:col-2">
