@@ -15,16 +15,21 @@ export default function SelectLookupData( { field, className, model, onChangeIte
             first: 0,
             rows: 10000,
         }).then(data => {
+            console.log("SelectLookupData:useEffect:data", data)
             setData(data.rows);
-
+            // get the default value
+            if((field.value===null || field.value===undefined || field.value==="") && onChangeItem){
+                const item = data.rows.find(item => item._default === 1);
+                console.log("SelectLookupData:useEffect:onChangeItem", item)
+                if(item){
+                    onChangeItem(item.id);
+                }
+            }
         });
     }, []);
 
     const onChange = (e) => {
         field.onChange(e.value);
-        if(onChangeItem){
-            onChangeItem(e.value);
-        }
     }
 
     return (
@@ -33,4 +38,3 @@ export default function SelectLookupData( { field, className, model, onChangeIte
             className={className} />
     )
 }
-        

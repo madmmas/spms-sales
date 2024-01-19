@@ -639,7 +639,7 @@ export class MasterDataDBService {
     async getDefaultItem(modelName) {
         await this.openDB();
         let table = this.db.table(modelName);
-        let productIds = await table.filter(row => row['_default']===true).primaryKeys();
+        let productIds = await table.filter(row => row['_default']===1).primaryKeys();
         let result = await table.where('id').anyOf(productIds).first();
         console.log("getDefaultItem:::", modelName, result);
         return result;

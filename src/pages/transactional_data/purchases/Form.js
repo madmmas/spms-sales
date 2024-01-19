@@ -110,7 +110,7 @@ const Form = ({ purchase }) => {
         masterDataDBService.getDefaultItem(WAREHOUSE_MODEL).then(data => {
             if(data){
                 console.log("DEFAULT WAREHOUSE::", data);
-                setDefaultWarehouse(data.id);    
+                setDefaultWarehouse(data.id);
             }
         });
         if (purchase===null || purchase===undefined) {

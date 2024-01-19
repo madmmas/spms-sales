@@ -28,6 +28,7 @@ const Form = ({productData}) => {
         control,
         formState: { errors },
         reset,
+        setValue,
         handleSubmit
     } = useForm({
         defaultValues: productData
@@ -184,6 +185,11 @@ const Form = ({productData}) => {
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Warehouse*</label>
                                 <SelectLookupData field={field} model={WAREHOUSE_MODEL}
+                                    onChangeItem={(id) => {
+                                        console.log("SelectLookupData:onChangeItem", id)
+                                        // set the default value
+                                        setValue("warehouse_id", id);
+                                    }}                                
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
