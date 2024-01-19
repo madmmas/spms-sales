@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from 'react-router-dom';
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import 'primeflex/primeflex.css';
 import "primeicons/primeicons.css";
@@ -26,7 +26,7 @@ import { PrintReport } from "./pages/html_reports/PrintReport";
 import { HtmlLedger } from "./pages/html_reports/Ledger";
 import { CashFlow } from "./pages/html_reports/CashFlow";
 
-// import { MasterDataDBService } from './services/MasterDataDBService';
+import { MasterDataDBService } from './services/MasterDataDBService';
 
 function App() {
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
@@ -73,27 +73,27 @@ function App() {
 
   const PaymentDetail = React.lazy(() => import("./pages/transactional_data/payments/Detail"));
 
-  // const { user: currentUser } = useSelector((state) => state.auth);
+  const { user: currentUser } = useSelector((state) => state.auth);
   // const [visible, setVisible] = useState(false);
 
-  // const loadAllData = async () => {  
-  //   const masterDataDBService = new MasterDataDBService();
+  const loadAllData = async () => {  
+    const masterDataDBService = new MasterDataDBService();
     
-  //   setVisible(true);
-  //   let response = await masterDataDBService.sessionPing();
-  //   console.log("Appjs-sessionPing::", response);
-  //   if (response===true) {
-  //     await masterDataDBService.loadAllInitData();
-  //   }
-  //   setVisible(false);
-  // }
+    // setVisible(true);
+    // let response = await masterDataDBService.sessionPing();
+    // console.log("Appjs-sessionPing::", response);
+    // if (response===true) {
+    // }
+    await masterDataDBService.populateAllShortnameInMemory();
+    // setVisible(false);
+  }
 
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     console.log("currentUser::", currentUser);   
-  //     loadAllData();
-  //   }
-  // }, [currentUser]);
+  useEffect(() => {
+    if (currentUser) {
+      console.log("currentUser::", currentUser);   
+      loadAllData();
+    }
+  }, [currentUser]);
 
   return (
     <>

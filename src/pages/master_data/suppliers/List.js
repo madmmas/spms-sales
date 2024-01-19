@@ -204,7 +204,7 @@ const List = ({ ledger = false }) => {
     };
 
     const supplierCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtSupplierCategory} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" />;
     };
 
     const addressBodyTemplate = (rowData) => {
@@ -255,7 +255,7 @@ const List = ({ ledger = false }) => {
     };
 
     const currencyFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CURRENCY} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CURRENCY} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" />;
     };
 
     const statusBodyTemplate = (rowData) => {

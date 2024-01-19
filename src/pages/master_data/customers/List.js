@@ -181,7 +181,7 @@ const List = ({ ledger = false }) => {
         );
     };
     const customerCategoryFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={customerCategory} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={customerCategory} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" />;
     };
 
     const categoryBodyTemplate = (rowData) => {
@@ -234,7 +234,7 @@ const List = ({ ledger = false }) => {
     };
 
     const districtFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={DISTRICT} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={DISTRICT} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" />;
     };
 
     const districtBodyTemplate = (rowData) => {
@@ -246,7 +246,7 @@ const List = ({ ledger = false }) => {
     };
   
     const routeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CITIES} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CITIES} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" />;
     };
     const routeBodyTemplate = (rowData) => {
         return (

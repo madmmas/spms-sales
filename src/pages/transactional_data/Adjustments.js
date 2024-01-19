@@ -34,6 +34,7 @@ const Adjustments = () => {
         ref_id: null,
         current_balance: 0,
         amount: 0,
+        remarks: '',
     };
 
     const {
@@ -126,6 +127,11 @@ const Adjustments = () => {
         setValue("current_balance", 0);
     }
 
+    const onSelectParty = (value) => {
+        setValue("ref_id", value);
+        getPartyBalance(value);
+    }
+
     const onAdjustmentCallback = (data) => {
         console.log("onPaymnetCallback", data);
         setSubmitted(true);
@@ -141,12 +147,13 @@ const Adjustments = () => {
             console.log(data);
             setSubmitted(false);
             toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Adjustment Created', life: 3000 });
-            reset({
-                "ref_type": partyType,
-                "ref_id": null,
-                "current_balance": 0,
-                "adjustment_type": adjustmentType,
-            })
+            // reset({
+            //     "ref_type": partyType,
+            //     "ref_id": null,
+            //     "current_balance": 0,
+            //     "adjustment_type": adjustmentType,
+            // })
+            reset(emptyAdjustment);
             // reload data
             setLazyParams({ ...lazyParams });
         }).catch(error => {
@@ -157,10 +164,8 @@ const Adjustments = () => {
     }
 
     const onPaymnetSubmit = (formData) => {
-        setInitAdjustment({
-            ...emptyAdjustment,
-            ...formData,
-        });
+        console.log("onPaymnetSubmit", formData);
+        setInitAdjustment(formData);
         setDlgTrigger(dlgTrigger + 1);
     }
 
@@ -302,6 +307,7 @@ const Adjustments = () => {
                                 <Custmer field={field} fieldState={fieldState} 
                                     onSelect={(e) => {
                                         field.onChange(e.id);
+                                        onSelectParty(e.id);
                                     }}/>
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -318,6 +324,7 @@ const Adjustments = () => {
                                 <Supplier field={field} fieldState={fieldState}
                                     onSelect={(e) => {
                                         field.onChange(e.id);
+                                        onSelectParty(e.id);
                                     }}/>
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -364,6 +371,7 @@ const Adjustments = () => {
                                 <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                                     className={classNames({ 'p-invalid': fieldState.error })}
                                     onValueChange={(e) => field.onChange(e)}
+                                    maxFractionDigits={2}
                                     />                                
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -397,7 +405,7 @@ const Adjustments = () => {
     )}
 
     const expenseTypeFilterTemplate = (options) => {
-        // return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" showClear />;
+        // return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={expenseType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" />;
     };
 
     const partyNameBodyTemplate = (rowData) => {
@@ -431,6 +439,7 @@ const Adjustments = () => {
                         <Column field="ref_id" header="Party Name" filter filterElement={expenseTypeFilterTemplate} body={partyNameBodyTemplate}  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="adjustment_type" header="Adjustment Type" filter filterElement={expenseTypeFilterTemplate}  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="remarks" header="Remarks" filter filterElement={expenseTypeFilterTemplate}  sortable  headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="current_balance" header="Previous Balance" filter filterElement={expenseTypeFilterTemplate}  sortable  headerStyle={{ minWidth: '10rem' }}></Column>                        
                         <Column style={{fontWeight: 'bold', textAlign: 'right'}} field="amount" header="Adjustment Amount" filter filterElement={expenseTypeFilterTemplate}  sortable  headerStyle={{ minWidth: '10rem' }}></Column>                        
                     </DataTable>
                 </div>

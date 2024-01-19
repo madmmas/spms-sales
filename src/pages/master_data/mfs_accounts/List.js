@@ -258,7 +258,7 @@ const List = ({ ledger = false }) => {
     };    
 
     const mfsFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtMFS} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select MFS" className="p-column-filter" />;
     };
 
     const showLedger = (dtProfile) => {

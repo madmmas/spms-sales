@@ -281,7 +281,7 @@ const List = ({ ledger = false }) => {
     };    
 
     const bankFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtBank} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" showClear />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtBank} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Bank" className="p-column-filter" />;
     };
 
     const renderHeader = () => {
