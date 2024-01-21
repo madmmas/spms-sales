@@ -29,8 +29,8 @@ const Detail = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Edit', icon: 'pi pi-fw pi-home'},
-        {label: 'Purchases', icon: 'pi pi-fw pi-home'},
-        {label: 'AC Payables', icon: 'pi pi-fw pi-home'},
+        // {label: 'Purchases', icon: 'pi pi-fw pi-home'},
+        // {label: 'AC Payables', icon: 'pi pi-fw pi-home'},
     ];
 
     useEffect(() => {

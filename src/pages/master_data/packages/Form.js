@@ -348,9 +348,10 @@ const Form = ({ packageData }) => {
                         <Controller
                             name="brand_id"
                             control={control}
+                            rules={{ required: 'Brand is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Brand</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Brand*</label>
                                 <SelectLookupData field={field} model={PRODBRAND_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
@@ -361,9 +362,10 @@ const Form = ({ packageData }) => {
                         <Controller
                             name="model_id"
                             control={control}
+                            rules={{ required: 'Model is required.' }}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Model</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Product Model*</label>
                                 <SelectLookupData field={field} model={PRODMODEL_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
