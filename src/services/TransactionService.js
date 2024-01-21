@@ -56,7 +56,11 @@ export class TransactionService {
                 ttl: 1000 * 1 // 20 seconds.
             }
         });
-        console.log(resp.data);
+        console.log("LedgerReport::", resp.data);
+        // sort by id
+        resp.data.ledger.sort((a, b) => a.id - b.id);
+        // add serial no
+        resp.data.ledger.forEach((l, i) => l.sl = i + 1);
         return resp.data;
     }
 

@@ -16,10 +16,13 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import Custmer from '../components/master_data/Custmer';
 import Supplier from '../components/master_data/Supplier';
 
+import SelectConstData from '../components/SelectConstData';
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 import { RegisterService } from '../../services/RegisterService';
 import { OrderService } from '../../services/OrderService';
 import { TransactionService } from '../../services/TransactionService';
+
+import { ADJUSTMENT_TYPE } from '../../constants/lookupData';
 
 const Adjustments = () => {
 
@@ -30,6 +33,7 @@ const Adjustments = () => {
         adjustment_date: moment().format('YYYY-MM-DD'),
         adjustment_no: null,
         adjustment_type: 'RECEIVABLE', // RECEIVABLE, PAYABLE
+        adjust_amount: 'ADD', // ADD, REDUCE
         ref_type: '', // CUSTOMER, SUPPLIER, EMPLOYEE, OTHER
         ref_id: null,
         current_balance: 0,
@@ -42,14 +46,13 @@ const Adjustments = () => {
         formState: { errors },
         reset,
         setValue,
-        getValues,
         handleSubmit
     } = useForm({
         defaultValues: emptyAdjustment
     });
 
     let defaultFilters = {
-        fields: ["id", "register_date", "register_details", "address"],
+        fields: ['adjustment_date', 'ref_id', 'adjustment_type', 'adjust_amount', 'remarks', 'current_balance', 'amount'],
         first: 0,
         rows: 10,
         page: 1,
@@ -142,6 +145,12 @@ const Adjustments = () => {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Adjustment Amount must be greater or less than 0.', life: 3000 });
             setSubmitted(false);
             return;
+        }
+
+        if(data.adjust_amount == "ADD"){
+            data.amount = data.amount;
+        } else {
+            data.amount = -data.amount;
         }
         transactionService.ledgerAdjustment(data).then(data => {
             console.log(data);
@@ -331,7 +340,7 @@ const Adjustments = () => {
                         )}/>
                     </div>}
 
-                    <div className="field col-12 md:col-3">
+                    <div className="field col-12 md:col-2">
                         <Controller
                             name="current_balance"
                             control={control}
@@ -347,8 +356,21 @@ const Adjustments = () => {
                             </>
                         )}/>
                     </div>
-                    
-                    <div className="field col-12 md:col-3">
+                    <div className="field col-12 md:col-2">
+                        <Controller
+                            name="adjust_amount"
+                            control={control}
+                            rules={{ required: 'Adjustment Type is required.' }}
+                            render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Adjustment Type*</label>
+                                <SelectConstData field={field} data={ADJUSTMENT_TYPE}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-2">
                         <Controller
                             name="amount"
                             control={control}
@@ -357,11 +379,11 @@ const Adjustments = () => {
                                 // value must not equal to 0
                                 
                                 validate: {
-                                    lessThanBalance: value => {
-                                        return Number(value) <= Number(getValues('current_balance')) || 'Value must be less than or equal to current balance.';
-                                    },
-                                    lessOrgreaterThanZero: value => {
-                                        return Number(value) > 0 || Number(value) < 0 || 'Value must be greater than 0.';
+                                    // lessThanBalance: value => {
+                                    //     return Number(value) <= Number(getValues('current_balance')) || 'Value must be less than or equal to current balance.';
+                                    // },
+                                    greaterThanZero: value => {
+                                        return Number(value) > 0 || 'Value must be greater than 0.';
                                     }
                                 }
                             }}

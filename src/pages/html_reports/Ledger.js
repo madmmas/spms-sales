@@ -144,11 +144,12 @@ export const HtmlLedger = ({type, header}) => {
         });
         // console.log("DR TOTAL::=>>>", drTotal);
         // console.log("CR TOTAL::=>>>", crTotal);
-        // console.log("DATA MAP - 1::=>>>", dataMap);
+        // console.log("DATA::=>>>", data);
+        // console.log("DATAMAP::=>>>", dataMap);
         let balance = 0;
         for(let i=1; i<=data.length; i++){
             let dataItem = dataMap.get(i);
-            console.log("DATA ITEM::=>>>", i, dataItem);
+            // console.log("DATA ITEM::=>>>", i, dataItem);
             balance = Number.parseFloat(balance) + Number.parseFloat(dataItem.balance);
             dataMap.set(i, {balance: balance});
         }
