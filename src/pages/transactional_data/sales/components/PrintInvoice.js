@@ -226,11 +226,15 @@ export const PrintInvoice = () => {
                     {invoice.party && <tr>
                         <td  class="line"><span>{invoice.party.line1}</span><br/>
                             <span>{invoice.party.line2}</span><br/>
-                            <span>{invoice.party.line3}</span></td>
+                            <span>{invoice.party.line3}</span> 
+                            <span style={{marginLeft:'15rem'}}>Sales Created by (Logged In User)</span>
+                        </td>
                     </tr>}
                     {!invoice.party && <tr>
                         <td><span>{invoice.customer_name}</span><br/>
-                            <span>{invoice.customer_phone}</span></td>
+                            <span>{invoice.customer_phone}</span>
+                            <span style={{marginLeft:'15rem'}}>Sales Created by (Logged In User)</span>
+                        </td>
                     </tr>}
                     {printOnlySales && invoice.status !== 'draft' && <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE</span></th>
@@ -421,7 +425,7 @@ export const PrintInvoice = () => {
                 <table className="bill-details">
                     <tbody>
                         <tr>
-                            <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INFORMATION</span></th>
+                            <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INFORMATION</span> <span style={{fontWeight:"normal"}}>(Sales Returned By Logged In User)</span></th>
                         </tr>
                     </tbody>
                 </table>
