@@ -44,7 +44,8 @@ const getFields = function(modelName) {
             return productDef.product_search_fields;
         case "trxLedger":
             return transDef.ledger_fields;   
-
+        case "users":
+            return "id, username";
         default:
             return [];
     }
