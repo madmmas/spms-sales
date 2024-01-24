@@ -14,7 +14,8 @@ const Configuration = ({ modelName }) => {
 
     return (
         <CRUD 
-            modelName={modelName} 
+            modelName={modelName}
+            dialogTitle={modelDef.dialogTitle}
             headerTitle={modelDef.headerTitle}
             createMsg={modelDef.createMsg}
             updateMsg={modelDef.updateMsg}

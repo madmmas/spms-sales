@@ -266,7 +266,7 @@ const List = () => {
     const lowStockQtyBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.lowStockQty||0}
+                {rowData.low_stock_qty||0}
             </>
         );
     };

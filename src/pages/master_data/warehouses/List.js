@@ -216,7 +216,7 @@ const List = () => {
                 <label htmlFor="status-filter" className="font-bold">
                     Default Warehouse
                 </label>
-                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
+                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value?1:0)} />
             </div>
         );
     };

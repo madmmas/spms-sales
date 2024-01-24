@@ -14,6 +14,7 @@ import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 const CRUD = ({ 
     modelName,
+    dialogTitle="Data",
     headerTitle="Manage Data",
     createMsg="Data created successfully",
     updateMsg="Data updated successfully",
@@ -268,7 +269,7 @@ const CRUD = ({
                         <Column field="description" header="Description" body={descriptionBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                     </DataTable>
 
-                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} Profiles`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
+                    <Dialog visible={empProfileDialog} style={{ width: '450px' }} header={`${createEdit?"Create":"Edit"} ${dialogTitle}`} modal className="p-fluid" footer={empProfileDialogFooter} onHide={hideDialog}>                    
                         {profiles.image && <img src={`${contextPath}/demo/images/profiles/${profiles.image}`} alt={profiles.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
                         <div className="field">
                             <label htmlFor="name">Name</label>
