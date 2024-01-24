@@ -171,7 +171,7 @@ const StockAdjustment = () => {
         transactionService.stockAdjustment(_data).then(response => {
             // console.log(response);
             if (response.status) {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Damaged Stock Added', life: 3000 });
+                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Stock Adjustment Saved', life: 3000 });
                 resetForm();
                 setShowForm(false);
                 loadLazyData();
@@ -184,7 +184,7 @@ const StockAdjustment = () => {
     const leftToolbarTemplate = () => {
         return (
             <React.Fragment>
-                <Button onClick={() => openNew()} className="p-button p-button-primary mr-2" label="Add Damaged Stock" />
+                <Button onClick={() => openNew()} className="p-button p-button-primary mr-2" label="Adjust Stock" />
             </React.Fragment>
         );
     };
@@ -200,7 +200,7 @@ const StockAdjustment = () => {
     const renderHeader = () => {
         return (
             <div className="flex justify-content-between">
-                <h5 className="m-0">Damaged Stock</h5>
+                <h5 className="m-0">Stock Adjustment</h5>
                 <Button type="button" icon="pi pi-filter-slash" label="Refresh" className="p-button-outlined" onClick={clearFilter} />
             </div>
         )
@@ -209,7 +209,7 @@ const StockAdjustment = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDateFormatted(rowData.date)}
+                {getDateFormatted(rowData.register_date)}
             </>
         );
     };
@@ -300,7 +300,7 @@ const StockAdjustment = () => {
                         {/* <Column field="transferBy" header="Transfer by" filter filterPlaceholder="Search by name" sortable body={transferByBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                         */}
                     </DataTable>
 
-                    <Dialog visible={showForm} style={{ width: '450px' }} header={`Add Damaged Stock`} modal className="p-fluid" footer={footerDialog} onHide={hideForm}>                    
+                    <Dialog visible={showForm} style={{ width: '450px' }} header={`Adjust Stock`} modal className="p-fluid" footer={footerDialog} onHide={hideForm}>                    
                         <div className="p-fluid formgrid grid">
                             <div className="field col-12 md:col-6">
                             <Controller

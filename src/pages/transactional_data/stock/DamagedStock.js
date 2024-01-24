@@ -205,7 +205,7 @@ const DamagedStock = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {getDateFormatted(rowData.date)}
+                {getDateFormatted(rowData.register_date)}
             </>
         );
     };
