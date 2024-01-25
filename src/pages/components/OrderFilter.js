@@ -7,8 +7,11 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 import { Button } from 'primereact/button';
 
-import Custmer from '../components/master_data/Custmer';
+import Customer from './master_data/Customer';
 import Supplier from '../components/master_data/Supplier';
+
+import SelectLookupData from '../components/SelectLookupData';
+import { COURIER_MODEL } from '../../constants/models';
 
 const OrderFilter = ({ reloadData, isSales }) => {
 
@@ -90,6 +93,12 @@ const OrderFilter = ({ reloadData, isSales }) => {
         }
         if(data.lc_no !== null && data.lc_no !== undefined && data.lc_no !== '') {
             filters.lc_no = { value: data.lc_no, matchMode: 'contains' }
+        }
+        if(data.courier_id !== null && data.courier_id !== undefined && data.courier_id !== '') {
+            filters.courier_id = { value: data.courier_id, matchMode: 'equals' }
+        }
+        if(data.courier_memo_number !== null && data.courier_memo_number !== undefined && data.courier_memo_number !== '') {
+            filters.courier_memo_number = { value: data.courier_memo_number, matchMode: 'contains' }
         }
         console.log("FILTERS::=>>>", filters);
             
@@ -216,7 +225,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Customer</label>
-                        <Custmer field={field} fieldState={fieldState} 
+                        <Customer field={field} fieldState={fieldState} 
                             onSelect={(e) => {
                                 field.onChange(e.id);
                             }}/>
@@ -226,24 +235,26 @@ const OrderFilter = ({ reloadData, isSales }) => {
                 </div>}
                 {isSales && <div className="field col-12 md:col-2">
                 <Controller
-                    name="courier_1"
+                    name="courier_id"
                     control={control}
                     render={({ field, fieldState }) => (
                         <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Info 1</label>
-                            <InputText inputId={field.name} value={field.value} inputRef={field.ref}
-                                onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Name</label>
+                            <SelectLookupData field={field} model={COURIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                            {/* <InputText inputId={field.name} value={field.value} inputRef={field.ref}
+                                onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/> */}
                             {getFormErrorMessage(field.name)}
                         </>
                     )}/>
                 </div>}
                 {isSales && <div className="field col-12 md:col-2">
                 <Controller
-                    name="courier_2"
+                    name="courier_memo_number"
                     control={control}
                     render={({ field, fieldState }) => (
                         <>
-                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Info 2</label>
+                            <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Memo Number</label>
                             <InputText inputId={field.name} value={field.value} inputRef={field.ref}
                                 onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
                             {getFormErrorMessage(field.name)}

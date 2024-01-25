@@ -19,7 +19,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataTableList from '../../components/SelectMasterDataTableList';
 
-import Customer from '../../components/master_data/Custmer';
+import Customer from '../../components/master_data/Customer';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
 import { PRODUCT_MODEL, SALES_MODEL } from '../../../constants/models';
@@ -921,7 +921,7 @@ const Form = React.memo(({ sales }) => {
                 {!readOnly && <Controller
                     name="party_id"
                     control={control}
-                    rules={{ required: 'Custmer is required.' }}
+                    rules={{ required: 'Customer is required.' }}
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Customer*</label>

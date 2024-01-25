@@ -410,6 +410,26 @@ const List = () => {
         );
     };
 
+    const courierNameBodyTemplate = (rowData) => {
+        let courier_name = "";
+        if(rowData.courier_id !== null){
+            courier_name = masterDataDBService.getShortnameById("dtCourier", rowData.courier_id);
+        }
+        return (
+            <>
+                {courier_name}
+            </>
+        );
+    };
+
+    const courierMemoNumberBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.courier_memo_number}
+            </>
+        );
+    };
+
     const dueAmountBodyTemplate = (rowData) => {
         let obj = {
             cash_amount: 0,
@@ -502,6 +522,8 @@ const List = () => {
                         <Column field="transport" header="Delivery Cost" sortable body={deliveryCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="duty_vat" header="VAT" sortable body={vatBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Net Amount" sortable body={netAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="courier_id" header="Courier Name" sortable body={courierNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="courier_memo_number" header="Courier Memo-Number" body={courierMemoNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                     </DataTable>
 
                     <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>

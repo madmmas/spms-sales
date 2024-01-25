@@ -13,7 +13,7 @@ import { DataTable } from 'primereact/datatable';
 import { InputText } from 'primereact/inputtext';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-import Custmer from '../components/master_data/Custmer';
+import Customer from '../components/master_data/Customer';
 import Supplier from '../components/master_data/Supplier';
 
 import SelectConstData from '../components/SelectConstData';
@@ -313,7 +313,7 @@ const Adjustments = () => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Select Party*</label>
-                                <Custmer field={field} fieldState={fieldState} 
+                                <Customer field={field} fieldState={fieldState} 
                                     onSelect={(e) => {
                                         field.onChange(e.id);
                                         onSelectParty(e.id);

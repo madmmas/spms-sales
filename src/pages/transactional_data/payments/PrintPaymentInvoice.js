@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { RegisterService } from '../../../services/RegisterService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { OrderService } from '../../../services/OrderService';
+import AuthService from "../../../services/AuthService";
 
 import PaymentInvoiceCss from './PaymentInvoiceCss'
 
@@ -27,6 +28,7 @@ export const PrintPaymentInvoice = () => {
     const divPrint = useRef(null);
 
     const [paymentData, setPaymentData] = useState({});
+    const [salesMan, setSalesMan] = useState(""); // name
     const [partyInfo, setPartyInfo] = useState({});
 
     useEffect(() => {
@@ -37,11 +39,15 @@ export const PrintPaymentInvoice = () => {
                 //     let cr_amount = Number(party_balance.cr_amount)||0;
                 //     let balance = dr_amount - cr_amount;
                 // });
+
                 masterDataDBService.getById(data.party_type, data.party_id).then(partyInfo => {
                     setPartyInfo(partyInfo);
                     console.log(partyInfo);
                 });
-                setPaymentData(data);
+                AuthService.GetUsername(data.register_by).then(salesMan => {
+                    setSalesMan(salesMan.username)
+                });
+                setPaymentData(data.register_details);
                 console.log(data);
             });
         }
@@ -105,15 +111,15 @@ export const PrintPaymentInvoice = () => {
             <table className="line">
                 <tbody>
                     <tr>
-                        <td>
-                            <span>{partyInfo.name}</span><br/>
+                        {/* <td>
+                            {partyInfo && <><span>{partyInfo.name}</span><br/>
                             <span>{partyInfo.address}</span><br/>
-                            <span>{partyInfo.phone}</span>
-                        </td>
+                            <span>{partyInfo.phone}</span></>}
+                        </td> */}
                     </tr>
                     <tr>
                         <td className="line">
-                            <span>Payment via (Logged In User) </span><br/>
+                            <span>Payment via ({salesMan}) </span><br/>
                         </td>
                     </tr>
                     <tr>

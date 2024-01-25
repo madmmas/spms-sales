@@ -3,26 +3,24 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { classNames } from 'primereact/utils';
-import { useForm, Controller, set } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
+import SelectLookupData from '../components/SelectLookupData';
+import { COURIER_MODEL } from '../../constants/models';
 
 const CourierDialog = ({isCourierVisible, courierDialogFooter, hideDialog, onInputChange, control, getFormErrorMessage}) => {
     return (
-        <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>                    
-                            
-
+        <Dialog visible={isCourierVisible} style={{ width: '450px' }} header="Courier Information" modal className="p-fluid" footer={courierDialogFooter} onHide={hideDialog}>
                    <div className="field col-12 md:col-12">
                         <Controller
-                            name="courier_name"
+                            name="courier_id"
                             control={control}
                             rules={{ required: 'Courier Name is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor="Name">Courier Name*</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref} 
-                                    onChange={(e) => onInputChange(e, "courier_name")} 
-                                    className={classNames({ 'p-invalid': fieldState.error })} 
-                                    />
+                                <SelectLookupData field={field} model={COURIER_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}
                             </>
                     )}/>
@@ -45,7 +43,7 @@ const CourierDialog = ({isCourierVisible, courierDialogFooter, hideDialog, onInp
                     </div> 
                    <div className="field col-12 md:col-12">
                         <Controller
-                            name="date"
+                            name="courier_date"
                             control={control}
                             rules={{ required: 'Date is required.' }}
                             render={({ field, fieldState }) => (

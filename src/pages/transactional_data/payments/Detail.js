@@ -9,7 +9,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 import { Toast } from 'primereact/toast';
 
-import Customer from '../../components/master_data/Custmer';
+import Customer from '../../components/master_data/Customer';
 import Suppiler from '../../components/master_data/Supplier';
 
 import { OrderService } from '../../../services/OrderService';

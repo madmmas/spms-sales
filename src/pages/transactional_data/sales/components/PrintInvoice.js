@@ -5,6 +5,7 @@ import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
+import AuthService from "../../../../services/AuthService";
 
 import InvoiceCss from './InvoiceCss'
 
@@ -25,6 +26,7 @@ export const PrintInvoice = () => {
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
     const [render, setRender] = useState(false)
+    const [salesMan, setSalesMan] = useState(""); // name
     const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
@@ -63,6 +65,9 @@ export const PrintInvoice = () => {
         console.log("ID CHANGED::", id)
         orderService.getById(SALES_MODEL, id).then((data) => {
             console.log("data::", data)
+            AuthService.GetUsername(data.updated_by).then(salesMan => {
+                setSalesMan(salesMan.username)
+            });
             if(data && data.customer_category!=="WALKIN"){
                 masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then((party) => {
                     console.log("party::", party)
@@ -227,10 +232,12 @@ export const PrintInvoice = () => {
                         <td  class="line"><span>{invoice.party.line1}</span><br/>
                             <span>{invoice.party.line2}</span><br/>
                             <span>{invoice.party.line3}</span></td>
+                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     {!invoice.party && <tr>
                         <td><span>{invoice.customer_name}</span><br/>
                             <span>{invoice.customer_phone}</span></td>
+                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     {printOnlySales && invoice.status !== 'draft' && <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE</span></th>

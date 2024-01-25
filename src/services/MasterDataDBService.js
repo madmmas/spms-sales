@@ -4,9 +4,9 @@ import { FilterMatchMode } from 'primereact/api';
 
 import modelDef from './ModelDef';
 
-const DB_NAME = "spms_org_v2";
+const DB_NAME = "indx_spms_org_v1";
 
-const DEL_DB_NAME = "indx_spms_org_v1";
+const DEL_DB_NAME = "spms_org_v2";
 const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
 DBDeleteRequest.onerror = (event) => {
   console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);

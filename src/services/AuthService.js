@@ -21,7 +21,14 @@ const Logout = () => {
   clearLocalStorage()
 };
 
+const GetUsername = (id) => {
+  return axiosInstance.get(env.APP_API_URL + "/users/" + id).then((response) => {
+    return response.data;
+  });
+}
+
 export default {
   Login,
   Logout,
+  GetUsername,
 };
