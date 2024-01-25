@@ -106,7 +106,21 @@ const OrderFilter = ({ reloadData, isSales }) => {
     }
 
     const resetForm = () => {
-        reset();
+        reset({
+            voucher_no: "",
+            sales_status: null,
+            from_date: "",
+            to_date: "",
+            customer_category: null,
+            customer_name: "",
+            customer_phone: "",
+            party_id: "",
+            cnf: "",
+            be_no: "",
+            lc_no: "",
+            courier_id: null,
+            courier_memo_number: "",
+        });
         setCustomerCategory(null);
     }
     
@@ -240,7 +254,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
                     render={({ field, fieldState }) => (
                         <>
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Courier Name</label>
-                            <SelectLookupData field={field} model={COURIER_MODEL}
+                            <SelectLookupData field={field} model={COURIER_MODEL} showClear={true}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                             {/* <InputText inputId={field.name} value={field.value} inputRef={field.ref}
                                 onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/> */}

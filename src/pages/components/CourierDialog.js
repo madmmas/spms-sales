@@ -49,7 +49,7 @@ const CourierDialog = ({isCourierVisible, courierDialogFooter, hideDialog, onInp
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor="Date">Date*</label>
-                                <Calendar inputId={field.name} value={field.value} onChange={(e) => onInputChange(e, "date")} 
+                                <Calendar inputId={field.name} value={field.value} onChange={field.onChange} 
                                 dateFormat="dd/mm/yy" className={classNames({ 'p-invalid': fieldState.error })} />
                                 {getFormErrorMessage(field.name)}
                             </>

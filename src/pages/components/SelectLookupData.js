@@ -3,7 +3,7 @@ import { Dropdown } from 'primereact/dropdown';
 
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
-export default function SelectLookupData( { field, className, model, onChangeItem, placeholder = "" }) {
+export default function SelectLookupData( { field, className, model, onChangeItem, showClear=false, placeholder = "" }) {
 
     const [data, setData] = useState([]);
 
@@ -33,7 +33,7 @@ export default function SelectLookupData( { field, className, model, onChangeIte
     }
 
     return (
-        <Dropdown value={field.value} onChange={(e) => onChange(e)} filter
+        <Dropdown value={field.value} onChange={(e) => onChange(e)} filter showClear={showClear}
             options={data} optionValue="id" optionLabel="name" placeholder={placeholder}
             className={className} />
     )

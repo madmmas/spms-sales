@@ -154,16 +154,16 @@ const List = () => {
     const saveCourier = async (data) => {
         console.log(data)
         let valid = true;
-        if(!data.courier_name){
-            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Name is required.', life: 3000 });
-            valid = false;
-        }else if(!data.courier_memo_number){
-            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Memo Number is required.', life: 3000 });
-            valid = false;
-        }else if(!data.date){
-            toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Date is required.', life: 3000 });
-            valid = false;
-        }
+        // if(!data.courier_id){
+        //     toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier is required.', life: 3000 });
+        //     valid = false;
+        // }else if(!data.courier_memo_number){
+        //     toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Memo Number is required.', life: 3000 });
+        //     valid = false;
+        // }else if(!data.courier_date){
+        //     toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Courier Date is required.', life: 3000 });
+        //     valid = false;
+        // }
         if(!valid){
             return
         }
