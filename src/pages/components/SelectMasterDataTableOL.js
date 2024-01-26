@@ -117,7 +117,8 @@ export default function SelectMasterDataTableOL({ defaultFilters, fieldValue, on
                     <Column selectionMode="single" headerStyle={{ minWidth: '3rem' }}></Column>
                     {columns.map((col, index) => {
                         return (
-                            <Column key={index} field={col.field} header={col.header} body={col.body} filter filterPlaceholder={col.filterPlaceholder} sortable headerStyle={{ width: col.width }}></Column>
+                            // <Column key={index} field={col.field} header={col.header} body={col.body} filter filterPlaceholder={col.filterPlaceholder} sortable headerStyle={{ width: col.width }}></Column>
+                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} filterElement={col.filterElement} body={col.body} sortable headerStyle={{ minWidth: col.minWidth }}></Column>
                         )
                     })}
                 </DataTable>

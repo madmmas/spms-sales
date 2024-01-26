@@ -129,7 +129,7 @@ export default function SelectMasterDataTableList({
                     <Column selectionMode="single" headerStyle={{ minWidth: '3rem' }}></Column>
                     {columns.map((col, index) => {
                         return (
-                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} sortable headerStyle={{ minWidth: col.minWidth }}></Column>
+                            <Column key={index} field={col.field} header={col.header} filter filterPlaceholder={col.filterPlaceholder} filterElement={col.filterElement} body={col.body} sortable headerStyle={{ minWidth: col.minWidth }}></Column>
                         )
                     })}
                 </DataTable>

@@ -10,6 +10,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
 
 import Warehouse from '../../components/master_data/Warehouse';
 
@@ -54,6 +55,9 @@ const Form = ({ packageData }) => {
     const [submitted, setSubmitted] = useState(false);
     const [defaultWarehouse, setDefaultWarehouse] = useState(null);
 
+    const [dtProductBrands, setDtProductBrands] = useState(null);
+    const [dtProductModels, setDtProductModels] = useState(null);
+
     const productService = new ProductService();
     const masterDataDBService = new MasterDataDBService();
 
@@ -91,6 +95,12 @@ const Form = ({ packageData }) => {
                 console.log("DEFAULT WAREHOUSE::", data);
                 setDefaultWarehouse(data.id);    
             }
+        });
+        masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+            setDtProductBrands(data.rows);
+        });
+        masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+            setDtProductModels(data.rows);
         });
     },[])
 
@@ -255,9 +265,9 @@ const Form = ({ packageData }) => {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            dtProductModel_id: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     }
 
@@ -276,6 +286,30 @@ const Form = ({ packageData }) => {
         </>
     );
 
+    const brandFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
+
+    const brandNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductBrand_id_shortname}
+            </>
+        );
+    };
+
+    const modelNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductModel_id_shortname}
+            </>
+        );
+    };
+
     return (
 
     <div className="grid h-screen">    
@@ -292,8 +326,8 @@ const Form = ({ packageData }) => {
                 showFields={[]} onSelect={onSelection}
                 columns={[
                     {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', minWidth: '20rem'}, 
-                    {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', minWidth: '10rem'},
-                    {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', minWidth: '10rem'},
+                    {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
+                    {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
                     {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
                     {field: 'price', header: 'Trade Price', filterPlaceholder: 'Filter by Part Number', minWidth: '10rem'},
                 ]} 

@@ -12,6 +12,7 @@ import { classNames } from 'primereact/utils';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
         
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -22,7 +23,7 @@ import SelectMasterDataTableList from '../../components/SelectMasterDataTableLis
 import Customer from '../../components/master_data/Customer';
 
 import { CUSTOMER_CATEGORY } from '../../../constants/lookupData';
-import { PRODUCT_MODEL, SALES_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, SALES_MODEL } from '../../../constants/models';
 
 import PaymentDialog from '../../components/PaymentDialog';
 import ReturnItemDialog from '../../components/ReturnItemDialog';
@@ -71,6 +72,9 @@ const Form = React.memo(({ sales }) => {
     const [selectProductTableItem, setSelectProductTableItem] = useState({});
     const [selectedProductItem, setSelectedProductItem] = useState(null);
     const [selectedAddedProduct, setSelectedAddedProduct] = useState(null);
+
+    const [dtProductBrands, setDtProductBrands] = useState(null);
+    const [dtProductModels, setDtProductModels] = useState(null);
 
     const [lastTradePrice, setLastTradePrice] = useState(0.00);
     const [lastTradePriceTrigger, setLastTradePriceTrigger] = useState(0);
@@ -124,8 +128,9 @@ const Form = React.memo(({ sales }) => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            dtProductModel_id: { value: null, matchMode: FilterMatchMode.EQUALS },
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS }
         }
     }
@@ -192,6 +197,12 @@ const Form = React.memo(({ sales }) => {
 
     useEffect(() => {
         resetAll();
+        masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+            setDtProductBrands(data.rows);
+        });
+        masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+            setDtProductModels(data.rows);
+        });
     }, []);
 
     useEffect(() => {
@@ -763,6 +774,30 @@ const Form = React.memo(({ sales }) => {
 
     ///// View Parts -- START /////
 
+    const brandFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
+
+    const brandNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductBrand_id_shortname}
+            </>
+        );
+    };
+
+    const modelNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductModel_id_shortname}
+            </>
+        );
+    };
+
     const renderProductSelectionTable = () => {
         return (
             <>
@@ -779,8 +814,8 @@ const Form = React.memo(({ sales }) => {
                     columns={[
                         {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                         {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
-                        {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                        {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                        {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
+                        {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
                         {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                     ]} 
                     />
@@ -938,8 +973,8 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                {customerCategory === "CONDITIONAL" && <div className="field col-12 md:col-6">
-                    <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
+                {customerCategory !== "WALKIN" && <div className="field col-12 md:col-6">
+                    <InputSwitch inputId="withPayment" checked={customerCategory === "CONDITIONAL"} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
                 </div>}
                 {(customerCategory === "REGISTERED") && 

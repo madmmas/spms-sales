@@ -4,6 +4,7 @@ import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputNumber } from 'primereact/inputnumber';
+import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 
 import Warehouse from '../../../components/master_data/Warehouse';
@@ -11,8 +12,9 @@ import Warehouse from '../../../components/master_data/Warehouse';
 import SelectMasterDataOL from '../../../components/SelectMasterDataOL';
 
 import { OrderService } from '../../../../services/OrderService';
+import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
-import { PRODUCT_MODEL, WAREHOUSE_MODEL } from '../../../../constants/models';
+import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL } from '../../../../constants/models';
 
 export default function PurchaseProductForm({ 
     onAdd, onEdit, 
@@ -67,7 +69,20 @@ export default function PurchaseProductForm({
     const [isEdit, setIsEdit] = useState(false);
     const [selSupplierId, setSelSupplierId] = useState(null);
 
+    const [dtProductBrands, setDtProductBrands] = useState(null);
+    const [dtProductModels, setDtProductModels] = useState(null);
+
     const orderService = new OrderService();
+    const masterDataDBService = new MasterDataDBService();
+
+    useEffect(() => {
+        masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+            setDtProductBrands(data.rows);
+        });
+        masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+            setDtProductModels(data.rows);
+        });
+    }, []);
 
     useEffect(() => {
         console.log("SUPPLIER ID::", supplierId)
@@ -286,11 +301,37 @@ export default function PurchaseProductForm({
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            brandName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            modelNo: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            partNumber: { value: null, matchMode: FilterMatchMode.CONTAINS }
+            code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            dtProductModel_id: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     }
+
+    const brandFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
+
+    const brandNameBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductBrand_id_shortname}
+            </>
+        );
+    };
+
+    const modelNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.dtProductModel_id_shortname}
+            </>
+        );
+    };
+
     return (
         <div className="p-fluid formgrid grid">
             <div className="field col-12 md:col-2">
@@ -309,8 +350,10 @@ export default function PurchaseProductForm({
                             columns={[
                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                                 {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
-                                {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                // {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                                // {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
+                                {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
                                 {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                             ]} />
                         {getFormErrorMessage(field.name)}
