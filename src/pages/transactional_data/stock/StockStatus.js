@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilterMatchMode } from 'primereact/api';
+import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
@@ -10,7 +11,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { InputNumber } from 'primereact/inputnumber';
 import { Dropdown } from 'primereact/dropdown';
 
-import { getFormattedNumber, exportDataInExcel } from '../../../utils';
+import { getFormattedNumber, exportSheetDataInExcel } from '../../../utils';
 
 import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL, WAREHOUSE_MODEL } from '../../../constants/models';
 
@@ -61,6 +62,10 @@ const StockStatus = () => {
     const [dtProduct, setProduct] = useState({});
     const [selectedProducts, setSelectedProducts] = useState(null);
 
+    const [totalStock, setTotalStock] = useState(0);
+    const [totalStockCost, setTotalStockCost] = useState(0);
+    const [totalStockPrice, setTotalStockPrice] = useState(0);
+
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [loadCount, setLoadCount] = useState(0);
 
@@ -91,6 +96,13 @@ const StockStatus = () => {
             });
             reloadData();
             setLoadCount(loadCount+1);
+            console.log("getTotalStock");  
+            masterDataDBService.getTotalStock().then(data => {
+                console.log("getTotalStock", data);
+                setTotalStock(data.stock);
+                setTotalStockCost(data.total_cost);
+                setTotalStockPrice(data.total_price);
+            });
         }
     }, [loadCount]);
 
@@ -114,6 +126,8 @@ const StockStatus = () => {
             setProducts(data.rows);
             setLoading(false);
         });
+
+        
     }
 
     const reloadData = () => {
@@ -366,6 +380,9 @@ const StockStatus = () => {
     };
 
     const renderHeader = () => {
+        let stockStr1 = 'Total Stock: ' +  getFormattedNumber(totalStock);
+        let stockStr2 = 'Total Cost: ' + getFormattedNumber(totalStockCost);
+        let stockStr3 = 'Total Stock Price: ' + getFormattedNumber(totalStockPrice);
         return (
             <div className="flex justify-content-between">
                 {/* <span className="p-input-icon-left">
@@ -373,6 +390,9 @@ const StockStatus = () => {
                     <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
                 </span> */}
                 <h5 className="m-0 ">Stock Status</h5>                
+                <Badge severity="warning" value={stockStr1}></Badge>
+                <Badge value={stockStr2}></Badge>
+                <Badge value={stockStr3}></Badge>
                 <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
             </div>
         );
@@ -401,8 +421,12 @@ const StockStatus = () => {
     );
 
     const exportExcel = () => {
-        masterDataDBService.getAllProductStock().then(products => {
-            exportDataInExcel('products_stock', products);
+        masterDataDBService.getAllProductStockAndBrandStock().then(data => {
+            exportSheetDataInExcel('products_stock', [
+                {name: 'Product Stock', data: data.productStock},
+                {name: 'Brand Stock', data: data.brandStock}
+            ]);
+            
         });
     };
 

@@ -2,6 +2,8 @@ import Dexie from 'dexie';
 import axiosInstance from "./AxiosService";
 import { FilterMatchMode } from 'primereact/api';
 
+import { getFormattedNumber } from '../utils';
+
 import modelDef from './ModelDef';
 
 const DB_NAME = "indx_spms_org_v1";
@@ -696,7 +698,7 @@ export class MasterDataDBService {
         // get only fields
         let table = this.db.table('dtProduct');
 
-        let result = await table.orderBy("name").toArray();
+        let result = await table.orderBy("dtProductBrand_id").toArray();
 
         let finalResult = [];
         for(let i=0; i<result.length; i++) {
@@ -704,24 +706,204 @@ export class MasterDataDBService {
             let brand_name = brands[row.dtProductBrand_id+"-dtProductBrand"] || "";
             let model_no = models[row.dtProductModel_id+"-dtProductModel"] || "";
             finalResult.push({
-                id: row.id,
-                name: row.name,
-                code: row.code,
-                brand_name: brand_name,
-                model_no: model_no,
-                part_number: row.part_number,
-                unit: row.unit,
-                price: row.price,
-                cost: row.cost,
-                low_stock_qty: row.low_stock_qty,
-                current_stock: row.current_stock,
-                prev_stock: row.prev_stock,
-                total_stock_in: row.total_stock_in,
-                total_stock_out: row.total_stock_out,
-                total_damage_stock: row.total_damage_stock,
+                "Item Name": row.name,
+                "Item Code": row.code,
+                "Brand": brand_name,
+                "Model": model_no,
+                "Part Number": row.part_number,
+                "Closing Stock": row.current_stock,
+                "Unit": row.unit,
+                "Unit Sell Price": getFormattedNumber(row.price),
+                "Average Unit Cost": getFormattedNumber(row.cost),
+                "Total Cost": getFormattedNumber(row.cost*row.current_stock),
+                "Total Sell Price": getFormattedNumber(row.price*row.current_stock),
+                // id: row.id,
+                // low_stock_qty: row.low_stock_qty,
+                // prev_stock: row.prev_stock,
+                // total_stock_in: row.total_stock_in,
+                // total_stock_out: row.total_stock_out,
+                // total_damage_stock: row.total_damage_stock,
             });
         }
 
         return finalResult;
+    }
+
+    async getAllProductStockAndBrandStock() {
+        // get the brand and model name
+        let brands = window['__all_shortname_dtProductBrand'];
+        let models = window['__all_shortname_dtProductModel'];
+
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+
+        let result = await table.orderBy("dtProductBrand_id").toArray();
+
+        let productStock = [];
+        let brandStock = {};
+        for(let i=0; i<result.length; i++) {
+            let row = result[i];
+            let brand_name = brands[row.dtProductBrand_id+"-dtProductBrand"] || "";
+            let model_no = models[row.dtProductModel_id+"-dtProductModel"] || "";
+            productStock.push({
+                "Item Name": row.name,
+                "Item Code": row.code,
+                "Brand": brand_name,
+                "Model": model_no,
+                "Part Number": row.part_number,
+                "Closing Stock": row.current_stock,
+                "Unit": row.unit,
+                "Unit Sell Price": getFormattedNumber(row.price),
+                "Average Unit Cost": getFormattedNumber(row.cost),
+                "Total Cost": getFormattedNumber(row.cost*row.current_stock),
+                "Total Sell Price": getFormattedNumber(row.price*row.current_stock),
+                // id: row.id,
+                // low_stock_qty: row.low_stock_qty,
+                // prev_stock: row.prev_stock,
+                // total_stock_in: row.total_stock_in,
+                // total_stock_out: row.total_stock_out,
+                // total_damage_stock: row.total_damage_stock,
+            });
+            let brand_stock = brandStock[brand_name]?.stock || 0;
+            brandStock[brand_name] = {
+                stock: brand_stock + row.current_stock,
+                total_cost: brand_stock + (row.cost*row.current_stock),
+                total_price: brand_stock + (row.price*row.current_stock),
+            }
+        }
+        // convert brandStock map to array
+        let brandStockArr = [];
+        for (const key in brandStock) {
+            if (brandStock.hasOwnProperty(key)) {
+                const element = brandStock[key];
+                brandStockArr.push({
+                    "Brand": key,
+                    "Closing Stock": element.stock,
+                    "Total Cost": getFormattedNumber(element.total_cost),
+                    "Total Sell Price": getFormattedNumber(element.total_price),
+                });
+            }
+        }
+
+        return {
+            productStock: productStock,
+            brandStock: brandStockArr,
+        };
+    }
+
+    async getAllProductStockByFldId(fld, id) {
+        // get the brand and model name
+        let brands = window['__all_shortname_dtProductBrand'];
+        let models = window['__all_shortname_dtProductModel'];
+
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+
+        let result = await table.where(fld).equals(id).toArray();
+
+        let finalResult = [];
+        for(let i=0; i<result.length; i++) {
+            let row = result[i];
+            let brand_name = brands[row.dtProductBrand_id+"-dtProductBrand"] || "";
+            let model_no = models[row.dtProductModel_id+"-dtProductModel"] || "";
+            finalResult.push({
+                "Item Name": row.name,
+                "Item Code": row.code,
+                "Brand": brand_name,
+                "Model": model_no,
+                "Part Number": row.part_number,
+                "Closing Stock": row.current_stock,
+                "Unit": row.unit,
+                "Unit Sell Price": getFormattedNumber(row.price),
+                "Average Unit Cost": getFormattedNumber(row.cost),
+                "Total Cost": getFormattedNumber(row.cost*row.current_stock),
+                "Total Sell Price": getFormattedNumber(row.price*row.current_stock),
+                // id: row.id,
+                // low_stock_qty: row.low_stock_qty,
+                // prev_stock: row.prev_stock,
+                // total_stock_in: row.total_stock_in,
+                // total_stock_out: row.total_stock_out,
+                // total_damage_stock: row.total_damage_stock,
+            });
+        }
+
+        return finalResult;
+    }
+
+    async getTotalStock() {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = {
+            stock: 0,
+            total_cost: 0,
+            total_price: 0,
+        };
+        await table.each(row => {
+            totalStock.stock += row.current_stock;
+            totalStock.total_cost += row.current_stock * row.cost;
+            totalStock.total_price += row.current_stock * row.price;
+        });
+
+        return totalStock;
+    }
+
+    async getTotalStockByFldName(fld) {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = {};
+        await table.orderBy(fld).each(row => {
+            totalStock[row[fld]] = {
+                stock: (totalStock[row[fld]]?.stock || 0) + row.current_stock,
+                total_cost: (totalStock[row[fld]]?.stock || 0) + (row.current_stock * row.cost),
+                total_price: (totalStock[row[fld]]?.stock || 0) + (row.current_stock * row.price),
+            };
+        })
+
+        return totalStock;
+    }
+
+    async getTotalStockQty() {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = 0;
+        await table.each(row => {
+            totalStock += row.current_stock;
+        })
+
+        return totalStock;
+    }
+
+    async getTotalStockPrice() {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = 0;
+        await table.each(row => {
+            totalStock += row.current_stock * row.prce;
+        })
+
+        return totalStock;
+    }
+
+    async getTotalStockCost() {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = 0;
+        await table.each(row => {
+            totalStock += row.current_stock * row.cost;
+        })
+
+        return totalStock;
     }
 }

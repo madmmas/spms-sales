@@ -1,6 +1,4 @@
 import React, { useState, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import { lazyRetry } from '../../components/LazyWithRetry';
 
@@ -14,6 +12,7 @@ const Detail = () => {
 
     const tabs = [
         { component: StockStatus },
+        // { component: BrandStockStatus },
         { component: StockIn },
         { component: StockOut },
         { component: StockAdjustment },
@@ -23,6 +22,7 @@ const Detail = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const items = [
         {label: 'Current Stock', icon: 'pi pi-fw pi-home'},
+        // {label: 'Brand-Wiese Stock', icon: 'pi pi-fw pi-home'},
         {label: 'Stock In', icon: 'pi pi-fw pi-home'},
         {label: 'Stock Out', icon: 'pi pi-fw pi-home'},
         {label: 'Stock Adjustments', icon: 'pi pi-fw pi-home'},

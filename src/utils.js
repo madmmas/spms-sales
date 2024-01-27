@@ -91,7 +91,26 @@ export const roundNumber = (num) => {
 export const exportDataInExcel = (filename, data) => {
     import('xlsx').then((xlsx) => {
         const worksheet = xlsx.utils.json_to_sheet(data);
-        const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+        const workbook = { Sheets: { data: worksheet }, SheetNames: ["Product-Stock"] };
+        const excelBuffer = xlsx.write(workbook, {
+            bookType: 'xlsx',
+            type: 'array'
+        });
+
+        saveAsExcelFile(excelBuffer, filename);
+    });
+};
+
+export const exportSheetDataInExcel = (filename, sheetcontents) => {
+    import('xlsx').then((xlsx) => {
+        // const worksheet = xlsx.utils.json_to_sheet(data);
+        const workbook = xlsx.utils.book_new();
+
+        sheetcontents.forEach((sheetcontent) => {
+            const worksheet = xlsx.utils.json_to_sheet(sheetcontent.data);
+            xlsx.utils.book_append_sheet(workbook, worksheet, sheetcontent.name);
+        });
+
         const excelBuffer = xlsx.write(workbook, {
             bookType: 'xlsx',
             type: 'array'
