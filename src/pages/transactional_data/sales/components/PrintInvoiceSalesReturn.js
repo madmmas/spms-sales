@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
 import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
 
+import AuthService from "../../../../services/AuthService";
 import { OrderService } from '../../../../services/OrderService';
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
@@ -23,12 +24,16 @@ export const PrintInvoiceSalesReturn = () => {
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
     const [render, setRender] = useState(false)
+    const [salesMan, setSalesMan] = useState("");
     const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
     useEffect(() => {
         console.log("ID CHANGED::", id)
         orderService.getById(SALES_MODEL, id).then(data => {
+            AuthService.GetUsername(data.updated_by).then(salesMan => {
+                setSalesMan(salesMan.username)
+            });
             if(data && data.customer_category!=="WALKIN"){
                 masterDataDBService.getById(CUSTOMER_MODEL, data.party_id).then(party => {
                     data.party = {
@@ -153,10 +158,12 @@ export const PrintInvoiceSalesReturn = () => {
                         <td  class="line"><span>{invoice.party.line1}</span><br/>
                             <span>{invoice.party.line2}</span><br/>
                             <span>{invoice.party.line3}</span></td>
+                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     {!invoice.party && <tr>
                         <td><span>{invoice.customer_name}</span><br/>
                             <span>{invoice.customer_phone}</span></td>
+                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES RETURN INVOICE ({invoice.voucher_no + ".R"})</span></th>

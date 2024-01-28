@@ -26,7 +26,7 @@ export const PrintInvoice = () => {
     const [printmePos, setPrintmePos] = useState(false)
     const [trigger, setTrigger] = useState(0)
     const [render, setRender] = useState(false)
-    const [salesMan, setSalesMan] = useState(""); // name
+    const [salesMan, setSalesMan] = useState("");
     const [totalReturningAmount,setTotalReturningAmount] = useState('');
     const divPrint = useRef(null);
 
