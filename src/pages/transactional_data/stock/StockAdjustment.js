@@ -10,6 +10,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { Dropdown } from 'primereact/dropdown';
 
 import SelectConstData from '../../components/SelectConstData';
 import SelectMasterDataOL from '../../components/SelectMasterDataOL';
@@ -18,7 +19,7 @@ import { TransactionService } from '../../../services/TransactionService';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 import { RegisterService } from '../../../services/RegisterService';
 
-import { PRODUCT_MODEL, STOCK_ADJUSTMENT_MODEL } from '../../../constants/models';
+import { PRODUCT_MODEL, STOCK_ADJUSTMENT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL } from '../../../constants/models';
 import { ADJUSTMENT_TYPE } from '../../../constants/lookupData';
 
 import { getDateFormatted } from '../../../utils';
@@ -51,8 +52,8 @@ const StockAdjustment = () => {
         filters: {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            brand_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            model_no: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },
+            dtProductModel_id: { value: null, matchMode: FilterMatchMode.EQUALS },
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },   
             code: { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
@@ -64,6 +65,9 @@ const StockAdjustment = () => {
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    const [dtProductBrands, setDtProductBrands] = useState(null);
+    const [dtProductModels, setDtProductModels] = useState(null);
 
     const transactionService = new TransactionService();
     const masterDataDBService = new MasterDataDBService();
@@ -77,6 +81,15 @@ const StockAdjustment = () => {
     } = useForm({
         defaultValues: defaultValue
     });
+
+    useEffect(() => {
+        masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+            setDtProductBrands(data.rows);
+        });
+        masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+            setDtProductModels(data.rows);
+        });
+    }, []);
 
     useEffect(() => {
         initFilters();
@@ -238,6 +251,14 @@ const StockAdjustment = () => {
         );
     };
 
+    const brandFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
+
     const brandNameBodyTemplate = (rowData) => {
         return (
             <>
@@ -331,8 +352,8 @@ const StockAdjustment = () => {
                                             defaultFilters={defaultFilters}
                                             columns={[
                                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
-                                                {field: 'brand_name', header: 'Brand Name', body:brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                                {field: 'model_no', header: 'Model No', body:modelNumberBodyTemplate, filterPlaceholder: 'Filter by Model No', width: '15rem'},
+                                                {field: 'dtProductBrand_id', header: 'Brand Name', body:brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
+                                                {field: 'dtProductModel_id', header: 'Model No', body:modelNumberBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
                                                 {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                                                 {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'}
                                             ]} />
