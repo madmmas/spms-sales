@@ -83,7 +83,6 @@ const StockStatus = () => {
             });
             reloadData();
             setLoadCount(loadCount+1);
-            console.log("getTotalStock");  
         }
     }, [loadCount]);
 
@@ -107,18 +106,18 @@ const StockStatus = () => {
             setProducts(data.rows);
             console.log(data.rows)
             setLoading(false);
+            masterDataDBService.getTotalStockByParams(lazyParams).then(data => {
+                console.log("getTotalStock", data);
+                setTotalStock(data.stock);
+                setTotalStockCost(data.total_cost);
+                setTotalStockPrice(data.total_price);
+            });
         });
     }
 
     const reloadData = () => {
         masterDataDBService.getAllUpto(modelName).then(()=> {
             loadLazyData();
-            masterDataDBService.getTotalStock().then(data => {
-                console.log("getTotalStock", data);
-                setTotalStock(data.stock);
-                setTotalStockCost(data.total_cost);
-                setTotalStockPrice(data.total_price);
-            });
         });
     };
 

@@ -196,6 +196,7 @@ const List = () => {
     };
   
     const statusFilterTemplate = (options) => {
+        console.log("WarehouseStatus", options)
         return (
             <div className="flex align-items-center gap-2">
                 <label htmlFor="status-filter" className="font-bold">
@@ -210,13 +211,23 @@ const List = () => {
         return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData._default==true, 'text-red-500 pi-times-circle': rowData._default==false })}></i>;
     };
 
+    const getTriStateVal = (val) => {
+        if(val==1){
+            return true;
+        } else if(val==0){
+            return false;
+        }
+        return null
+    }
+
     const defaultFilterTemplate = (options) => {
         return (
             <div className="flex align-items-center gap-2">
                 <label htmlFor="status-filter" className="font-bold">
                     Default Warehouse
                 </label>
-                <TriStateCheckbox inputId="default-filter" value={options.value} onChange={(e) => options.filterApplyCallback(e.value?1:0)} />
+                <TriStateCheckbox inputId="default-filter" value={getTriStateVal(options.value)} 
+                    onChange={(e) => options.filterApplyCallback(getTriStateVal(e.value))} />
             </div>
         );
     };

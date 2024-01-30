@@ -851,6 +851,31 @@ export class MasterDataDBService {
         return totalStock;
     }
 
+    async getTotalStockByParams(params) {
+        await this.openDB();
+        // get only fields
+        let table = this.db.table('dtProduct');
+        
+        let totalStock = {
+            stock: 0,
+            total_cost: 0,
+            total_price: 0,
+        };
+
+        // apply filter on the table
+        if (params && params.filters) {
+            table = await this.applyFilter(table, params.filters);
+        }
+
+        await table.each(row => {
+            totalStock.stock += row.current_stock;
+            totalStock.total_cost += row.current_stock * row.cost;
+            totalStock.total_price += row.current_stock * row.price;
+        });
+
+        return totalStock;
+    }
+
     async getTotalStockByFldName(fld) {
         await this.openDB();
         // get only fields

@@ -979,7 +979,7 @@ const Form = React.memo(({ sales }) => {
                 </div>}
                 {(customerCategory === "REGISTERED") && 
                 <div className="field col-12 md:col-6">
-                    <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
+                    <InputSwitch inputId="includeDueAmount" checked={true} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>}
                 </div>)}
