@@ -489,12 +489,21 @@ const Form = React.memo(({ sales }) => {
         setCustomerCategory(value);
         setCustomerLastOrder(null);
         setCustomerBalance(0.00);
-        setIncludeDueAmount(false);
         setValue("customer_category", value);
-
+        
         // need to reload lastTradePrice
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
-
+        
+        if(value === "REGISTERED") {
+            setIncludeDueAmount(true);
+        } else {
+            setIncludeDueAmount(false);
+        }
+        if(value === "CONDITIONAL") {
+            setWithPayment(true);
+        } else {
+            setWithPayment(false);
+        }
         // if(value === "WALKIN") {
         //     setShowOptions(false);
         // } else {
@@ -878,7 +887,7 @@ const Form = React.memo(({ sales }) => {
     
     const [withPayment, setWithPayment] = useState(true);
 
-    const [includeDueAmount, setIncludeDueAmount] = useState(false);
+    const [includeDueAmount, setIncludeDueAmount] = useState(true);
 
     const renderForm = () => {
         let readOnly = false;
@@ -974,12 +983,12 @@ const Form = React.memo(({ sales }) => {
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
                 {customerCategory !== "WALKIN" && <div className="field col-12 md:col-6">
-                    <InputSwitch inputId="withPayment" checked={customerCategory === "CONDITIONAL"} onChange={(e) => setWithPayment(e.value)} />
+                    <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
                 </div>}
                 {(customerCategory === "REGISTERED") && 
                 <div className="field col-12 md:col-6">
-                    <InputSwitch inputId="includeDueAmount" checked={true} onChange={(e) => setIncludeDueAmount(e.value)} />
+                    <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>}
                 </div>)}

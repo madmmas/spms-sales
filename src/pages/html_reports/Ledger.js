@@ -115,16 +115,17 @@ export const HtmlLedger = ({type, header}) => {
             let ledgerData = data.ledger
             let openingDr = Number.parseFloat(data.opening.dr_amount?data.opening.dr_amount:0);
             let openingCr = Number.parseFloat(data.opening.cr_amount?data.opening.cr_amount:0);
-            setOpeningData({
+            let _openingData = {
                 "dr_amount": openingDr,
                 "cr_amount": openingCr,
                 "balance": openingDr-openingCr,
-            });
+            }
+            setOpeningData(_openingData);
             setDatesData({
                 "from_date": data.dates.from_date,
                 "to_date": data.dates.to_date,
             });
-            let dataWithBalance = calculateBalance(openingData, ledgerData);
+            let dataWithBalance = calculateBalance(_openingData, ledgerData);
             setLedgerData(dataWithBalance);
             // console.log("LEDGER DATA::=>>>", openingData, dataWithBalance);
         });
@@ -134,11 +135,12 @@ export const HtmlLedger = ({type, header}) => {
         let dataMap = new Map();
         let drTotal = 0;
         let crTotal = 0;
+        dataMap.set(0, {balance: Number.parseFloat(opening.balance)});
         data.forEach(item => {
-            // console.log("ITEM::=>>>", item);
+            console.log("ITEM::=>>>", item);
             drTotal = drTotal + Number.parseFloat(item.dr_amount);
             crTotal = crTotal + Number.parseFloat(item.cr_amount);
-            let balance = Number.parseFloat(item.dr_amount) - Number.parseFloat(item.cr_amount);
+            let balance = Number.parseFloat(item.dr_amount) - Number.parseFloat(item.cr_amount); // + openingBalance;
             item.balance = balance;
             dataMap.set(item.sl, {balance: balance});
         });
@@ -147,13 +149,13 @@ export const HtmlLedger = ({type, header}) => {
         // console.log("DATA::=>>>", data);
         // console.log("DATAMAP::=>>>", dataMap);
         let balance = 0;
-        for(let i=1; i<=data.length; i++){
+        for(let i=0; i<=data.length; i++){
             let dataItem = dataMap.get(i);
             // console.log("DATA ITEM::=>>>", i, dataItem);
             balance = Number.parseFloat(balance) + Number.parseFloat(dataItem.balance);
             dataMap.set(i, {balance: balance});
         }
-        // console.log("DATA MAP - 2 ::=>>>", dataMap);
+        console.log("DATA MAP - 2 ::=>>>", dataMap);
         for(let i=0; i<data.length; i++){
             let dataItem = dataMap.get(i+1);
             for(let j=0; j<data.length; j++){
@@ -163,7 +165,7 @@ export const HtmlLedger = ({type, header}) => {
                 }
             }
         }
-        // console.log("DATA MAP - 3 ::=>>>", data);
+        console.log("DATA MAP - 3 ::=>>>", data);
         setDrTotal(drTotal);
         setCrTotal(crTotal);
         setClosingBalance(balance);
@@ -341,8 +343,8 @@ export const HtmlLedger = ({type, header}) => {
 
                     <tr>
                         <th colSpan="4" className="text right-align line">Closing Balance:</th>
-                        <th className="total price right-align line">{ getFormattedNumber(drTotal)}</th>
-                        <th className="total price right-align line">{ getFormattedNumber(crTotal)}</th>
+                        <th className="total price right-align line">{ getFormattedNumber(drTotal + openingData.dr_amount)}</th>
+                        <th className="total price right-align line">{ getFormattedNumber(crTotal + openingData.cr_amount)}</th>
                         <th className="total price right-align line">{ getLedgerFormattedNumber(closingBalance)}</th>
                     </tr>
                 </tbody>
