@@ -75,10 +75,18 @@ const StockStatus = () => {
 
     useEffect(() => {
         if(loadCount==1){
-            masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+            masterDataDBService.getAll(PRODBRAND_MODEL, {
+                rows: 1000,
+            }).then(data => {
+                // sort data.rows by name
+                data.rows.sort((a, b) => a.name.localeCompare(b.name));
                 setDtProductBrands(data.rows);
             });
-            masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+            masterDataDBService.getAll(PRODMODEL_MODEL, {
+                rows: 1000,
+            }).then(data => {
+                // sort data.rows by name
+                data.rows.sort((a, b) => a.name.localeCompare(b.name));
                 setDtProductModels(data.rows);
             });
             reloadData();
@@ -281,11 +289,11 @@ const StockStatus = () => {
     };
 
     const brandFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
     };
 
     const modelFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
     };
 
     const renderHeader = () => {

@@ -197,10 +197,16 @@ const Form = React.memo(({ sales }) => {
 
     useEffect(() => {
         resetAll();
-        masterDataDBService.getAll(PRODBRAND_MODEL).then(data => {
+        masterDataDBService.getAll(PRODBRAND_MODEL, {
+            rows: 1000,
+        }).then(data => {
+            data.rows.sort((a, b) => a.name.localeCompare(b.name));
             setDtProductBrands(data.rows);
         });
-        masterDataDBService.getAll(PRODMODEL_MODEL).then(data => {
+        masterDataDBService.getAll(PRODMODEL_MODEL, {
+            rows: 1000,
+        }).then(data => {
+            data.rows.sort((a, b) => a.name.localeCompare(b.name));
             setDtProductModels(data.rows);
         });
     }, []);
@@ -784,11 +790,11 @@ const Form = React.memo(({ sales }) => {
     ///// View Parts -- START /////
 
     const brandFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
     };
 
     const modelFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
     };
 
     const brandNameBodyTemplate = (rowData) => {
@@ -839,10 +845,12 @@ const Form = React.memo(({ sales }) => {
                     onSelect={onSelectProductFromTable}
                     columns={[
                         {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
-                        {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
+                        {field: 'part_number', header: 'Part Number', body: partNumberBodyTemplate, filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                        // {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
+                        // {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                         {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
                         {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
-                        {field: 'part_number', header: 'Part Number', body: partNumberBodyTemplate, filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                        {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
                     ]} 
                     />
                 </div>}
