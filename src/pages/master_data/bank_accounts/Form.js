@@ -39,6 +39,7 @@ const Form = ({bankAccountProfile}) => {
         if(bankAccountProfile===undefined){
             setValue("status", true);
         }
+        setValue("initBalance", null)
     }, []);
 
     const onSubmit = (formData) => {
