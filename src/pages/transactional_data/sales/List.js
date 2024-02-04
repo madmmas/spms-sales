@@ -280,14 +280,17 @@ const List = () => {
 
     const nameBodyTemplate = (rowData) => {
         let name = "";
+        let phone = "";
         if(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL"){
             name = masterDataDBService.getShortnameById("dtCustomer", rowData.party_id);
         } else {
             name = rowData.customer_name;
+            phone = rowData.customer_phone;
         }
         return (
             <>
-                {name}
+              {(rowData.customer_category === "REGISTERED" || rowData.customer_category === "CONDITIONAL") && <>{name}</>}
+              {(rowData.customer_category === "WALKIN") && <>{name} ({phone})</>}
             </>
         );
     };

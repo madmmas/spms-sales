@@ -807,6 +807,23 @@ const Form = React.memo(({ sales }) => {
         );
     };
 
+    const partNumberBodyTemplate = (rowData) => {
+        let num = Number(rowData.part_number);
+        if(!num){
+            return (
+                <>
+                    {rowData.part_number}
+                </>
+            )
+        }else{
+            return (
+                <>
+                    {num}
+                </>
+            )
+        }   
+    };
+
     const renderProductSelectionTable = () => {
         return (
             <>
@@ -825,7 +842,7 @@ const Form = React.memo(({ sales }) => {
                         {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},
                         {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
                         {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
-                        {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
+                        {field: 'part_number', header: 'Part Number', body: partNumberBodyTemplate, filterPlaceholder: 'Filter by Part Number', width: '15rem'},
                     ]} 
                     />
                 </div>}
