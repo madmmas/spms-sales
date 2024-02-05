@@ -36,10 +36,14 @@ const Form = ({bankAccountProfile}) => {
     });
 
     useEffect(() => {
-        if(bankAccountProfile===undefined){
+        console.log(bankAccountProfile)
+        if(!bankAccountProfile){
             setValue("status", true);
+            setValue("initBalance", null);
+        }else{
+            setValue("initBalance", bankAccountProfile?.initBalance)
         }
-        setValue("initBalance", null)
+        
     }, []);
 
     const onSubmit = (formData) => {
