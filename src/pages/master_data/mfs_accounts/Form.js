@@ -35,8 +35,12 @@ const Form = ({mfsAccountProfile}) => {
     });
 
     useEffect(() => {
-        if(mfsAccountProfile===undefined){
+        console.log(mfsAccountProfile)
+        if(!mfsAccountProfile){
             setValue("status", true);
+            setValue("initBalance", null);
+        }else{
+            setValue("initBalance", mfsAccountProfile.initBalance);
         }
     }, []);
 
