@@ -28,7 +28,7 @@ import { RegisterService } from '../../services/RegisterService';
 import { BANK_CASH } from '../../constants/lookupData';
 import { EXPENSE_MODEL, EXPENSE_TYPE_MODEL } from '../../constants/models';
 
-import { getFormattedNumber } from '../../utils';
+import { getFormattedNumber, getDateFormatted } from '../../utils';
 
 const Expenses = () => {
 
@@ -238,7 +238,7 @@ const Expenses = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {moment(rowData.date).format('DD/MM/YYYY')}
+                {getDateFormatted(rowData.register_date)}
             </>
         );
     };

@@ -29,7 +29,7 @@ import { INCOME_MODEL, INCOME_TYPE_MODEL } from '../../constants/models';
 
 import { MasterDataDBService } from '../../services/MasterDataDBService';
 
-import { getFormattedNumber } from '../../utils';
+import { getFormattedNumber, getDateFormatted } from '../../utils';
 
 const Income = () => {
 
@@ -237,7 +237,7 @@ const Income = () => {
     const dateBodyTemplate = (rowData) => {
         return (
             <>
-                {moment(rowData.date).format('DD/MM/YYYY')}
+                {getDateFormatted(rowData.register_date)}
             </>
         );
     };
