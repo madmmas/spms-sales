@@ -116,6 +116,9 @@ export const PrintPaymentInvoice = () => {
                             <span>{partyInfo.address}</span><br/>
                             <span>{partyInfo.phone}</span></>}
                         </td> */}
+                        <td>
+                            {<span>{masterDataDBService.getShortnameById(paymentData.party_type, paymentData.party_id)}</span>}
+                        </td>
                     </tr>
                     <tr>
                         <td className="line">
