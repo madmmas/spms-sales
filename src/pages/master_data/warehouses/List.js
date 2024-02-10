@@ -220,14 +220,26 @@ const List = () => {
         return null
     }
 
+    const getTriStateVal2 = (val) => {
+        if(val){
+            return 1;
+        } else if(val==false){
+            return 0;
+        }
+        return null
+    }
+
     const defaultFilterTemplate = (options) => {
+        console.log("WarehouseDefault", options.value)
         return (
             <div className="flex align-items-center gap-2">
                 <label htmlFor="status-filter" className="font-bold">
                     Default Warehouse
                 </label>
                 <TriStateCheckbox inputId="default-filter" value={getTriStateVal(options.value)} 
-                    onChange={(e) => options.filterApplyCallback(getTriStateVal(e.value))} />
+                    onChange={(e) => {
+                        console.log("WarehouseDefault-e-value", e.value)
+                        options.filterApplyCallback(getTriStateVal2(e.value))}} />
             </div>
         );
     };
