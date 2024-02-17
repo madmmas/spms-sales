@@ -28,6 +28,7 @@ const AddStock = ({ packageData }) => {
                 products.map(async (product) => {
                     let resp = await productService.getById(product.dtProduct_id);
                     product.current_stock = resp.current_stock;
+                    product.on_hold_stock = resp.on_hold_stock;
                     // get product details
                     let productDetails = await masterDataDBService.getById('dtProduct', product.dtProduct_id);
                     product.brand_name = masterDataDBService.getShortnameById('dtProductBrand', productDetails.dtProductBrand_id);
@@ -68,8 +69,7 @@ const AddStock = ({ packageData }) => {
             // valid each product quantity
             console.log("DATA:::",products);
             for(let i=0; i<products.length; i++){
-                console.log("ITEM::",products[i].quantity * pgkQty > products[i].current_stock);
-                if((products[i].quantity * pgkQty) > products[i].current_stock){
+                if((products[i].quantity * pgkQty) > (products[i].current_stock-products[i].on_hold_stock)){
                     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product quantity must be greater than 0', life: 3000 });
                     return;
                 }
