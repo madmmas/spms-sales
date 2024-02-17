@@ -217,6 +217,14 @@ const StockStatus = () => {
         );
     };
 
+    const onHoldStockBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.on_hold_stock}
+            </>
+        );
+    };
+
     const prevStockBodyTemplate = (rowData) => {
         return (
             <>
@@ -349,6 +357,7 @@ const StockStatus = () => {
                         <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" filterElement={modelFilterTemplate} sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="current_stock" dataType="numeric" style={{textAlign: 'center'}}  header="Current Stock" filter filterPlaceholder="Search by Current Stock" sortable body={currentStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="on_hold_stock" dataType="numeric" style={{textAlign: 'center'}}  header="On Hold Stock" filter filterPlaceholder="Search by On Hold Stock" sortable body={onHoldStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="prev_stock" dataType="numeric" style={{textAlign: 'center'}}  header="Closing/Previous Stock" filter filterPlaceholder="Search by Previous Stock" sortable body={prevStockBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="unit" style={{textAlign: 'center'}}  header="Unit" filter filterPlaceholder="Search by Unit" sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="price" dataType="numeric" style={{textAlign: 'right'}} header="Unit Trade Price" filter filterPlaceholder="Search by Trade Price" filterElement={tradePriceFilterTemplate} sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

@@ -36,6 +36,7 @@ export default function SalesProductForm({
     const [productName, setProductName] = useState('');
     const [min_trade_price, setMinPrice] = useState(0);
     const [current_stock, setCurrentStock] = useState(0);
+    const [on_hold_stock, setOnHoldStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
     const [selectedItemIndex, setSelectedItemIndex] = useState(null);
@@ -56,13 +57,14 @@ export default function SalesProductForm({
          });
         setSalesProduct(null);
         setMinPrice(0);
-        setProductAndItsStock('', 0);
+        setProductAndItsStock('', 0, 0);
     };
 
-    const setProductAndItsStock = (name, stock) => {
+    const setProductAndItsStock = (name, stock, on_hold_stock) => {
         console.log('setProductAndItsStock', name, stock)
         setProductName(name);
         setCurrentStock(stock);
+        setOnHoldStock(on_hold_stock);
     };
 
     useEffect(() => {
@@ -120,6 +122,7 @@ export default function SalesProductForm({
         console.log("selectProduct::", item)
         // get product current stock
         let _productStock = item.current_stock;
+        let _onHoldStock = item.on_hold_stock;
 
         // set focus to qty
         let _saleProduct = { ...salesProduct };
@@ -128,6 +131,7 @@ export default function SalesProductForm({
         _saleProduct['min_trade_price'] = item.min_trade_price;
         _saleProduct['trade_price'] = item.trade_price;
         _saleProduct['current_stock'] = _productStock;
+        _saleProduct['on_hold_stock'] = _onHoldStock;
         _saleProduct['qty'] = item.qty || 1;
         _saleProduct['discount_profit'] = item.discount_profit || 0.00;
         _saleProduct['remarks'] = item.remarks || '';
@@ -138,7 +142,7 @@ export default function SalesProductForm({
 
         reset({ ..._saleProduct });
         setMinPrice(item.min_trade_price);
-        setProductAndItsStock(item["name"], _productStock);
+        setProductAndItsStock(item["name"], _productStock, _onHoldStock);
 
         quantityRef.current.focus();
         
@@ -181,6 +185,7 @@ export default function SalesProductForm({
             "min_trade_price": item.min_trade_price,
             "trade_price": item.trade_price,
             "current_stock": item.current_stock,
+            "on_hold_stock": item.on_hold_stock,
             "qty": item.qty,
             "discount_profit": item.discount_profit,
             "remarks": item.remarks,
@@ -246,7 +251,7 @@ export default function SalesProductForm({
             </div>
             <div className="field col-12 md:col-2">
                 <label>Current Stock</label>
-                <InputText readonly="true" value={current_stock} placeholder="Current Stock" />
+                <InputText readonly="true" value={(current_stock-on_hold_stock) + " (" + on_hold_stock + ")"} placeholder="Current Stock" />
             </div>
             <div className="field col-12 md:col-2">
             <Controller
@@ -254,7 +259,7 @@ export default function SalesProductForm({
                 control={control}
                 rules={{ 
                     required: 'Quantity is required.', 
-                    max: { value: current_stock, message: 'Must be less than or equal to current stock.' } 
+                    max: { value: current_stock-on_hold_stock, message: 'Must be less than or equal to current stock.' } 
                 }}
                 render={({ field, fieldState }) => (
                     <>

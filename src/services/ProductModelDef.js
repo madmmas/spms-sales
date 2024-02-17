@@ -6,7 +6,7 @@ export const product_fields = [
     "part_number", "unit", "low_stock_qty",
     "remarks", "active", 
     "items", 
-    "current_stock", "prev_stock", "total_stock_in", "total_stock_out", "total_damage_stock",
+    "current_stock", "prev_stock", "on_hold_stock", "total_stock_in", "total_stock_out", "total_damage_stock",
     "created_at", "updated_at", "created_by", "updated_by"
 ];
 

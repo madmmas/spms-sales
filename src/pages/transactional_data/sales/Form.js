@@ -119,7 +119,7 @@ const Form = React.memo(({ sales }) => {
     
     ///// Default Values -- Start /////
     let defaultProductFilters = {
-        fields: ['id', 'name', 'code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'min_trade_price', 'price'],
+        fields: ['id', 'name', 'code', 'brand_name', 'model_no', 'part_number', 'current_stock', 'on_hold_stock', 'min_trade_price', 'price'],
         first: 0,
         rows: 10,
         page: 1,
@@ -455,6 +455,7 @@ const Form = React.memo(({ sales }) => {
         // fetch current stock
         let data = await masterDataDBService.getById("dtProduct", _productSelected.id);
         _productSelected['current_stock'] = data.current_stock;
+        _productSelected['on_hold_stock'] = data.on_hold_stock;
         _productSelected['price'] = data.price;
         _productSelected['min_trade_price'] = data.min_trade_price;
         console.log("productSelected::", _productSelected);
@@ -480,6 +481,7 @@ const Form = React.memo(({ sales }) => {
                 ..._productSelected,
                 "trade_price": Number(_productSelected.price),
                 "current_stock": Number(_productSelected.current_stock),
+                "on_hold_stock": Number(_productSelected.on_hold_stock),
                 "min_trade_price": Number(_productSelected.min_trade_price),
             };
             console.log("setSelectedProductItem::", _product)
