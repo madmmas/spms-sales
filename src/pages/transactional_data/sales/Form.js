@@ -614,6 +614,15 @@ const Form = React.memo(({ sales }) => {
         setSelFormData(formData);
         if(action === 'save'){
             setStatus('draft');
+            if(customerCategory === "WALKIN" && withPayment) {
+                showPaymentDialog(formData);
+            } else {
+                setConfirmDialogMessage("Are you sure you want to save this order?");
+                setTriggerConfirmDialog(triggerConfirmDialog+1);    
+            }
+        } else if(action === 'draft_with_payment'){
+            setStatus('draft');
+            setTrxStatus("pending");
             setConfirmDialogMessage("Are you sure you want to save this order?");
             setTriggerConfirmDialog(triggerConfirmDialog+1);
         } else if(action === 'cancel'){
@@ -669,19 +678,30 @@ const Form = React.memo(({ sales }) => {
             let _customerBalance = 0;
             if(includeDueAmount) {
                 _customerBalance = customerBalance;
-            }    
-            setInitPayment({
-                ...emptyPayment,
-                ...{
-                    "previous_balance": _customerBalance,
-                    "invoice_amount": data.net,
-                    "current_balance": data.net + _customerBalance,
-                    "cash_amount": 0,
-                    "bank_amount": 0,
-                    "mfs_amount": 0,
-                    "amount": 0,
-                }
-            });
+            }
+            if(sales.payment) {
+                setInitPayment({
+                    ...sales.payment,
+                    ...{
+                        "previous_balance": _customerBalance,
+                        "invoice_amount": data.net,
+                        "current_balance": data.net + _customerBalance,
+                    }
+                });
+            } else {
+                setInitPayment({
+                    ...emptyPayment,
+                    ...{
+                        "previous_balance": _customerBalance,
+                        "invoice_amount": data.net,
+                        "current_balance": data.net + _customerBalance,
+                        "cash_amount": 0,
+                        "bank_amount": 0,
+                        "mfs_amount": 0,
+                        "amount": 0,
+                    }
+                });
+            }
         
             console.log("InitPayment::", initPayment);
             setPaymentDlgTrigger(paymentDlgTrigger + 1);
@@ -695,7 +715,9 @@ const Form = React.memo(({ sales }) => {
         setSalesDue(Number(data.current_balance))
         setSalesPaid(Number(data.amount))
         setPaymentData(data);
-        if(customerCategory === "CONDITIONAL") {
+        if(customerCategory === "WALKIN" && withPayment) {
+            onSubmit('draft_with_payment', salesData);
+        }else if(customerCategory === "CONDITIONAL") {
             onSubmit('confirm_payment', salesData);
         } else {
             onSubmit('approve', salesData);
@@ -1009,15 +1031,21 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                {customerCategory !== "WALKIN" && <div className="field col-12 md:col-6">
+                <div className="field col-12 md:col-6">
                     <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
-                </div>}
+                </div>
                 {(customerCategory === "REGISTERED") && 
                 <div className="field col-12 md:col-6">
                     <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>}
+                </div>)}
+                {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-12">
+                    <div className="field col-12 md:col-6">
+                        <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
+                        <label htmlFor="withPayment">With Payment</label>
+                    </div>
                 </div>)}
             </>
         )
