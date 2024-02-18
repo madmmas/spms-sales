@@ -679,7 +679,8 @@ const Form = React.memo(({ sales }) => {
             if(includeDueAmount) {
                 _customerBalance = customerBalance;
             }
-            if(sales && sales.payment) {
+            // this not the right checking
+            if(sales && sales.status==="draft" && sales.trx_status === "pending" && sales.payment) {
                 setInitPayment({
                     ...sales.payment,
                     ...{
@@ -1041,10 +1042,10 @@ const Form = React.memo(({ sales }) => {
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>}
                 </div>)}
-                {(customerCategory === "WALKIN") && (<div className="grid col-12 md:col-12">
+                {(customerCategory === "WALKIN" && status === "draft") && (<div className="grid col-12 md:col-12">
                     <div className="field col-12 md:col-6">
                         <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
-                        <label htmlFor="withPayment">With Payment</label>
+                        <label htmlFor="withPayment">With Payment (for draft)</label>
                     </div>
                 </div>)}
             </>
@@ -1185,6 +1186,7 @@ const Form = React.memo(({ sales }) => {
             trigger={paymentDlgTrigger}
             initPayment={initPayment}
             readOnly={customerCategory==="WALKIN"}
+            // readOnly={false}
             onPaymnetCallback={onPaymnetCallback}
             />
 

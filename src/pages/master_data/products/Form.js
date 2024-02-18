@@ -91,10 +91,18 @@ const Form = ({productData}) => {
         console.log("validateData:::", data);
         let valid = true;
         // check if product name exist
-        let isExist = await productService.isProductNameExist(data.id, data.name);
-        if(isExist){
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Name already exist', life: 3000 });
-            valid = false;
+        if(productData==null){
+            let isExist = await productService.isProductNameExist(data.id, data.name);
+            if(isExist){
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Name already exist', life: 3000 });
+                valid = false;
+            }
+            // // check if product part number exist
+            isExist = await productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
+            if(isExist){
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
+                valid = false;
+            }
         }
         // check if product code exist
         // isExist = await productService.isProductCodeExist(data.id, data.code);
@@ -103,20 +111,18 @@ const Form = ({productData}) => {
         //     valid = false;
         // }
 
-        // // check if product part number exist
-        isExist = await productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
-        if(isExist){
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
-            valid = false;
-        }
-
-        if(data.price< data.cost){
+        if(data.price < data.cost){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Price cannot be less than Cost', life: 3000 });
             valid = false;
         }
 
         if(data.min_trade_price < data.cost){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Minimum Trade Price cannot be less than Cost', life: 3000 });
+            valid = false;
+        }
+
+        if(data.min_trade_price > data.price){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Minimum Trade Price must be greater then Trade price', life: 3000 });
             valid = false;
         }
 
@@ -128,23 +134,25 @@ const Form = ({productData}) => {
         let data = buildFormData(formData);
 
         setSubmitted(true);
-        if(productData==null){
-            validateData(data).then(valid => {
-                if(valid){
+        validateData(data).then(valid => {
+            if(valid){
+                if(productData==null){
                     productService.create(data).then(data => {
                         toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
                         // navigate("/products/" + data.ID);
                         navigate("/products");
                     });
+                }else{
+                    productService.update(data.id, data).then(data => {
+                        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                        // navigate("/products/" + data.ID);
+                        navigate("/products");
+                    });
                 }
-            });
-        }else{
-            productService.update(data.id, data).then(data => {
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-                // navigate("/products/" + data.ID);
-                navigate("/products");
-            });
-        }
+            } else {
+                setSubmitted(false);
+            }
+        });
     };
 
     const gotoList = () => {
