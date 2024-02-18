@@ -22,14 +22,15 @@ export default function SelectMasterDataTableList({
 
     const masterDataDBService = new MasterDataDBService();
 
-    
     const loadLazyData = () => {
         setLoading(true);
-        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
-            console.log(data)
-            setTotalRecords(data.total);
-            setTmpData(data.rows);
-            setLoading(false);
+        masterDataDBService.getAllUpto(modelName).then(()=> {
+            masterDataDBService.getAll(modelName, lazyParams).then(async data => {
+                console.log(data)
+                setTotalRecords(data.total);
+                setTmpData(data.rows);
+                setLoading(false);
+            });
         });
     }
 

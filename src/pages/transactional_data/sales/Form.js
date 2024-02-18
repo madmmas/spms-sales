@@ -679,7 +679,7 @@ const Form = React.memo(({ sales }) => {
             if(includeDueAmount) {
                 _customerBalance = customerBalance;
             }
-            if(sales.payment) {
+            if(sales && sales.payment) {
                 setInitPayment({
                     ...sales.payment,
                     ...{
@@ -934,7 +934,7 @@ const Form = React.memo(({ sales }) => {
         )
     }
     
-    const [withPayment, setWithPayment] = useState(true);
+    const [withPayment, setWithPayment] = useState(false);
 
     const [includeDueAmount, setIncludeDueAmount] = useState(true);
 
