@@ -103,6 +103,11 @@ const Form = React.memo(({ sales }) => {
     const [selFormData, setSelFormData] = useState(null);
     const [showOptions, setShowOptions] = useState(false);
 
+    // STATES FOR WITH PAYMENT && DUE AMOUNT
+    const [withPaymentOpt, setWithPaymentOpt] = useState(false);
+    const [withDraftPaymentOpt, setWithDraftPaymentOpt] = useState(true);
+    const [includeDueAmountOpt, setIncludeDueAmountOpt] = useState(false);
+
     // STATES FOR FORM RETURN
     const [returnMode, setReturnMode] = useState(false);
     const [selectedReturnItem, setSelectedReturnItem] = useState({});
@@ -222,6 +227,8 @@ const Form = React.memo(({ sales }) => {
         } else {
             console.log("FETCHED-SALES::", sales);
             setStatus(sales.status);
+            setTrxStatus(sales.trx_status);
+            setWithDraftPaymentOpt(sales.customer_category === "WALKIN" && sales.status === 'draft');
             setTrxNo(sales.voucher_no);
             sales.items.forEach((item, index) => {
                 item['index'] = index;
@@ -502,6 +509,13 @@ const Form = React.memo(({ sales }) => {
         // need to reload lastTradePrice
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
         
+        // set WithPaymentOpt
+        setWithPaymentOpt(value !== "WALKIN");
+        // set WithDraftPaymentOpt
+        setWithDraftPaymentOpt(value === "WALKIN");
+        // set IncludeDueAmountOpt
+        setIncludeDueAmountOpt(value === "REGISTERED");
+
         if(value === "REGISTERED") {
             setIncludeDueAmount(true);
         } else {
@@ -1032,17 +1046,17 @@ const Form = React.memo(({ sales }) => {
                     <label>Balance</label>
                     <InputText value={customerBalance} readOnly={true}/>
                 </div>
-                <div className="field col-12 md:col-6">
+                {withPaymentOpt && <div className="field col-12 md:col-6">
                     <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                     <label htmlFor="withPayment">With Payment</label>
-                </div>
-                {(customerCategory === "REGISTERED") && 
+                </div>}
+                {includeDueAmountOpt && 
                 <div className="field col-12 md:col-6">
                     <InputSwitch inputId="includeDueAmount" checked={includeDueAmount} onChange={(e) => setIncludeDueAmount(e.value)} />
                     <label htmlFor="includeDueAmount">Include Due Amount</label>
                 </div>}
                 </div>)}
-                {(customerCategory === "WALKIN" && status === "draft") && (<div className="grid col-12 md:col-12">
+                {withDraftPaymentOpt && (<div className="grid col-12 md:col-12">
                     <div className="field col-12 md:col-6">
                         <InputSwitch inputId="withPayment" checked={withPayment} onChange={(e) => setWithPayment(e.value)} />
                         <label htmlFor="withPayment">With Payment (for draft)</label>
