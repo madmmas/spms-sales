@@ -224,20 +224,19 @@ export const PrintInvoice = () => {
             </header>
             <p  class="line">Invoice Number : {invoice.voucher_no}</p>
             <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
+            <p>Invoice Created By : {salesMan}</p>
             <table className="bill-details">
                 <tbody>
                     {invoice.customer_category === "CONDITIONAL" && <tr><td class="line">Bill To <b>{getBillTo(invoice.customer_category)}</b>:</td></tr>}
                     {invoice.customer_category !== "CONDITIONAL" && <tr><td class="line">Bill To {getBillTo(invoice.customer_category)}:</td></tr>}
                     {invoice.party && <tr>
-                        <td  class="line"><span>{invoice.party.line1}</span><br/>
+                        <td  class="line"><b><span>{invoice.party.line1}</span></b><br/>
                             <span>{invoice.party.line2}</span><br/>
                             <span>{invoice.party.line3}</span></td>
-                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     {!invoice.party && <tr>
-                        <td><span>{invoice.customer_name}</span><br/>
+                        <td><b><span>{invoice.customer_name}</span></b><br/>
                             <span>{invoice.customer_phone}</span></td>
-                            <span style={{marginLeft:'15rem'}}>Sales Created by ({salesMan})</span>
                     </tr>}
                     {printOnlySales && invoice.status !== 'draft' && <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">SALES INVOICE</span></th>
@@ -250,7 +249,7 @@ export const PrintInvoice = () => {
             {printme && printOnlySales && <table className="lineitems">
                 <thead>
                     <tr>
-                        {/* <th className="heading name">Sl</th> */}
+                        <th className="heading qty">Sl</th>
                         <th className="heading qty left-align">Qty</th>
                         <th className="heading name left-align">Product Name</th>
                         <th className="heading brand left-align">Brand</th>
@@ -263,44 +262,45 @@ export const PrintInvoice = () => {
                 </thead>
             
                 <tbody>
-                {invoice.items.map( item => 
+                {invoice.items.map( (item, i) => 
                     <tr>
-                        <td className="left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
-                        <td className="left-align">{item.product_name}</td>
-                        <td className="left-align">{item.product_brand_name}</td>
-                        <td className="left-align">{item.product_part_number}</td>
-                        <td className="left-align">{item.product_model_no}</td>
-                        <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
-                        <td className="center-align">{item.discount_profit}</td>
-                        <td className="right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                        <td className="line left-align">{i+1}</td>
+                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
+                        <td className="line left-align">{item.product_name}</td>
+                        <td className="line left-align">{item.product_brand_name}</td>
+                        <td className="line left-align">{item.product_part_number}</td>
+                        <td className="line left-align">{item.product_model_no}</td>
+                        <td className="line right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
+                        <td className="line center-align">{item.discount_profit}</td>
+                        <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
                     </tr>)}
 
                     <tr>
-                        <td colSpan="7" className="sum-up line">Total Amount</td>
+                        <td colSpan="8" className="sum-up line">Total Amount</td>
                         <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td colSpan="7" className="sum-up">(-) Discount</td>
+                        <td colSpan="8" className="sum-up">(-) Discount</td>
                         <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <th colSpan="7" className="total text line">Net Amount</th>
+                        <th colSpan="8" className="total text line">Net Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
                     {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) B/F Balance</th>
+                        <th colSpan="8" className="total text line">(+) B/F Balance</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2)}</th>
                     </tr>}
                     {invoice.customer_category === "REGISTERED" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Amount</th>
+                       <th colSpan="8" className="total text line">Total Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2))}</th>
                     </tr>}
                     {invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Amount</th>
+                       <th colSpan="8" className="total text line">Total Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2) }</th>
                     </tr>}
                     {invoice.payment && <tr>
-                        <td colSpan="7" className="sum-up">
+                        <td colSpan="8" className="sum-up">
                               {invoice.customer_category !== "CONDITIONAL" && <span>
                                 [
                                     Bank : <span className="price">{invoice.payment.bank_amount} </span>
@@ -325,28 +325,28 @@ export const PrintInvoice = () => {
                     </tr>}
                     
                     {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
+                       <th colSpan="8" className="total text line">Receivable (Conditional)</th>
                         <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
                     </tr>}
                     {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward === -99999999 && <tr>
-                       <th colSpan="7" className="total text line">Receivable (Conditional)</th>
+                       <th colSpan="8" className="total text line">Receivable (Conditional)</th>
                         <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))}</th>
                     </tr>}
                     {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">B/F Balance</th>
+                       <th colSpan="8" className="total text line">B/F Balance</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.balance_forward).toFixed(2) }</th>
                     </tr>}
                     {invoice.customer_category === "CONDITIONAL" && invoice.balance_forward!==-99999999 && <tr>
-                       <th colSpan="7" className="total text line">Total Receivable (Ledger)</th>
+                       <th colSpan="8" className="total text line">Total Receivable (Ledger)</th>
                         <th className="total price right-align line">{ Number.parseFloat((Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.paid).toFixed(2))) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) }</th>
                     </tr>}
 
                     {invoice.payment && invoice.customer_category === "REGISTERED" && invoice.balance_forward ===-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) Balance</th>
+                        <th colSpan="8" className="total text line">(+) Balance</th>
                         <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) - Number.parseFloat(Number.parseFloat(invoice.payment.cash_amount + invoice.payment.bank_amount + invoice.payment.mfs_amount).toFixed(2)) }</th>
                     </tr>}
                     {invoice.payment && invoice.customer_category === "REGISTERED" && invoice.balance_forward !==-99999999 && <tr>
-                        <th colSpan="7" className="total text line">(+) Balance</th>
+                        <th colSpan="8" className="total text line">(+) Balance</th>
                         <th className="total price right-align line">{ Number.parseFloat(Number.parseFloat(invoice.net).toFixed(2)) + Number.parseFloat(Number.parseFloat(invoice.balance_forward).toFixed(2)) -  Number.parseFloat(Number.parseFloat(invoice.payment.cash_amount + invoice.payment.bank_amount + invoice.payment.mfs_amount).toFixed(2))}</th>
                     </tr>}
                    

@@ -30,6 +30,8 @@ export const PrintPaymentInvoice = () => {
     const [paymentData, setPaymentData] = useState({});
     const [salesMan, setSalesMan] = useState(""); // name
     const [partyInfo, setPartyInfo] = useState({});
+    const [partyBalance, setPartyBalance] = useState(0);
+    const [paymentSign, setPaymentSign] = useState("(-)");
 
     useEffect(() => {
         if(id){
@@ -52,11 +54,24 @@ export const PrintPaymentInvoice = () => {
             });
         }
     }, [id]);
+
     useEffect(() => {
         if(trigger>0){
             window.print();
         }
     }, [trigger]);
+
+    useEffect(() => {
+        if(paymentData){
+            if(paymentData.payment_type==="DISPATCH"){
+                setPaymentSign("(+)");
+                setPartyBalance(Number(paymentData.current_balance+paymentData.amount));
+            } else {
+                setPaymentSign("(-)");
+                setPartyBalance(Number(paymentData.current_balance-paymentData.amount));
+            }
+        }
+    }, [paymentData]);
 
     const PrintElem = (elem) => {
         // window.print();
@@ -126,7 +141,7 @@ export const PrintPaymentInvoice = () => {
                         </td>
                     </tr>
                     <tr>
-                        <th className="center-align line" colSpan="2"><span className="receipt">PAYMENT INVOICE</span></th>
+                        <th className="center-align line" colSpan="2"><span className="receipt">PAYMENT INVOICE ({paymentData?.payment_type})</span></th>
                     </tr>
                 </tbody>
             </table>
@@ -135,21 +150,21 @@ export const PrintPaymentInvoice = () => {
                <div className="line">
                          <div className="parentPayment">
                             <div><b>Ledger Balance</b></div>
-                            <div className="price"><b>{paymentData.current_balance}</b></div>
+                            <div className="price"><b>{Number(paymentData.current_balance)}</b></div>
                          </div>
                </div>
                <div>
                          <div className="parentPayment">
-                            {paymentData.payment_method === 'CASH' && <div><b>[CASH] (-)Payment</b></div>}
-                            {paymentData.payment_method === 'MFS' && <div><b>[MFS] (-)Payment</b></div>}
-                            {paymentData.payment_method === 'BANK' && <div><b>[BANK] (-)Payment</b></div>}
-                            <div className="price"><b>{paymentData.amount}</b></div>
+                            {paymentData.payment_method === 'CASH' && <div><b>[CASH] {paymentSign}Payment</b></div>}
+                            {paymentData.payment_method === 'MFS' && <div><b>[MFS] {paymentSign}Payment</b></div>}
+                            {paymentData.payment_method === 'BANK' && <div><b>[BANK] {paymentSign}Payment</b></div>}
+                            <div className="price"><b>{Number(paymentData.amount)}</b></div>
                          </div>
                </div>
                <div className="line">
                          <div className="parentPayment">
                             <div><b>Balance After Payment</b></div>
-                            <div className="price"><b>{Number(paymentData.current_balance) - Number(paymentData.amount)}</b></div>
+                            <div className="price"><b>{partyBalance}</b></div>
                          </div>
                </div>
             </table>}
@@ -170,7 +185,7 @@ export const PrintPaymentInvoice = () => {
                <div className="line">
                          <div className="parentPayment">
                             <div><b>Balance After Payment</b></div>
-                            <div className="price"><b>{Number(paymentData.current_balance) - Number(paymentData.amount)}</b></div>
+                            <div className="price"><b>{partyBalance}</b></div>
                          </div>
                </div>
             </table>}
