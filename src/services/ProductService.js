@@ -42,7 +42,7 @@ export class ProductService {
         console.log("name:::", name);
         if(products.length > 0) {
             for (var i = 0; i < products.length; i++) {
-                if (products[i].id !== id && products[i].name == name) {
+                if (products[i].id !== id && products[i].name === name) {
                     console.log("found product-name ::: ", products[i].name, name);
                     return true;
                 }
@@ -55,7 +55,7 @@ export class ProductService {
         let products = await this.masterDataDBService.getByFieldName("dtProduct", "code", code);
         console.log("code:::", code);
         for (var i = 0; i < products.length; i++) {
-            if (products[i].id !== id && products[i].code == code) {
+            if (products[i].id !== id && products[i].code === code) {
                 console.log("found product-code ::: ", products[i].code, code);
                 return true;
             }
@@ -68,7 +68,7 @@ export class ProductService {
         let products = await this.masterDataDBService.getByFieldName("dtProduct", "dtProductBrand_id", brandId);   
         let found = false;
         for (var i = 0; i < products.length; i++) {
-            if (products[i].id !== id && products[i].part_number == partNumber) {
+            if (products[i].id !== id && products[i].part_number === partNumber) {
                 found = true;
                 break;
             }

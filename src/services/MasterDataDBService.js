@@ -220,7 +220,7 @@ export class MasterDataDBService {
             table.bulkPut(result.rows);
             let total = result.total;
 
-            while(result && result.rows && result.rows.length > 0 && result.rows.length == limit && offset < total) {
+            while(result && result.rows && result.rows.length > 0 && result.rows.length === limit && offset < total) {
                 offset += limit;
                 result = await axiosInstance.get(uri + "/" + limit + "/" + offset, {
                     timeout: 30000,
@@ -293,7 +293,7 @@ export class MasterDataDBService {
         //
         if(result && result.rows) {
             await this.addToModelTable(modelName, result);
-            if(init==false){
+            if(init===false){
                 await this.populateShortnameInMemory(modelName, result.rows);
             }          
         }
@@ -663,8 +663,8 @@ export class MasterDataDBService {
         console.log("populateFieldData:::", modelName, fieldName, rows);
         for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
-            if (row[fieldName] != undefined && row[fieldName] != null) {
-                if(row[fieldName] != prevId) {
+            if (row[fieldName] !== undefined && row[fieldName] !== null) {
+                if(row[fieldName] !== prevId) {
                     shortname = this.getShortnameById(modelName, row[fieldName]);
                     if(shortname === "") {
                         shortname = await this.getShortnameByIdFromDB(modelName, row[fieldName]);

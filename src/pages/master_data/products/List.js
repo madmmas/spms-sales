@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { classNames } from 'primereact/utils';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { DataTable } from 'primereact/datatable';
+import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
+import { classNames } from 'primereact/utils';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { InputNumber } from 'primereact/inputnumber';
-import { Dropdown } from 'primereact/dropdown';
 
 import { getFormattedNumber } from '../../../utils';
 
@@ -28,14 +28,14 @@ const List = () => {
     const dt = useRef(null);
 
     let defaultFilters = {
-        fields: ['id', 'name', 'dtCategory_id', 'dtWarehouse_id', 'code', 'dtProductBrand_id', 'dtProductModel_id', 'part_number', 'unit', 'cost', 'price', 'active'],
+        globalFilterFields: ['name', 'brand_name', 'model_no', 'part_number'],
+        fields: ['id', 'name', 'warehouse_id', 'code', 'price', 'active'],
         first: 0,
         rows: 10,
         page: 1,
         sortField: null,
         sortOrder: null,
         filters: {
-            // global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
             dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS },
             dtWarehouse_id: { value: null, matchMode: FilterMatchMode.EQUALS },
@@ -45,28 +45,33 @@ const List = () => {
             part_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
             unit: { value: null, matchMode: FilterMatchMode.CONTAINS },
             cost: { value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
-            price: { value: null, matchMode: FilterMatchMode.EQUALS },
-            low_stock_qty: { value: null, matchMode: FilterMatchMode.EQUALS },
-            min_trade_price: { value: null, matchMode: FilterMatchMode.EQUALS },
+            price: { value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
+            low_stock_qty: { value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
+            min_trade_price: { value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO },
             active: { value: null, matchMode: FilterMatchMode.EQUALS },
         }
     };
 
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [dtProducts, setProducts] = useState(null);
+    const [dtProfiles, setProducts] = useState(null);
+    const [deleteProfileDialog, setDeleteProfileDialog] = useState(false);
+    const [deleteProfilesDialog, setDeleteProfilesDialog] = useState(false);
+    const [dtProfile, setProfile] = useState({});
+    const [selectedProfiles, setSelectedProfiles] = useState(null);
+
     const [dtWarehouses, setDtWarehouses] = useState(null);
     const [dtProductBrands, setDtProductBrands] = useState(null);
     const [dtProductModels, setDtProductModels] = useState(null);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [dtProduct, setProduct] = useState({});
-    const [selectedProducts, setSelectedProducts] = useState(null);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [loadCount, setLoadCount] = useState(0);
 
-    const masterDataDBService = new MasterDataDBService();
+    const masterDataDBService = new MasterDataDBService();    
+
+    useEffect(() => {
+        loadLazyData();
+    }, [lazyParams]);
 
     const clearFilter = () => {
         initFilters();
@@ -81,23 +86,23 @@ const List = () => {
     }, []);
 
     useEffect(() => {
-        masterDataDBService.getAll(PRODBRAND_MODEL, {
-            rows: 1000,
-        }).then(data => {
-            data.rows.sort((a, b) => a.name.localeCompare(b.name));
-            setDtProductBrands(data.rows);
-        });
-        masterDataDBService.getAll(PRODMODEL_MODEL, {
-            rows: 1000,
-        }).then(data => {
-            data.rows.sort((a, b) => a.name.localeCompare(b.name));
-            setDtProductModels(data.rows);
-        });
-        masterDataDBService.getAll(WAREHOUSE_MODEL).then(data => {
-            setDtWarehouses(data.rows);
-        });
-        reloadData();
-    }, []);
+            masterDataDBService.getAll(PRODBRAND_MODEL, {
+                rows: 1000,
+            }).then(data => {
+                data.rows.sort((a, b) => a.name.localeCompare(b.name));
+                setDtProductBrands(data.rows);
+            });
+            masterDataDBService.getAll(PRODMODEL_MODEL, {
+                rows: 1000,
+            }).then(data => {
+                data.rows.sort((a, b) => a.name.localeCompare(b.name));
+                setDtProductModels(data.rows);
+            });
+            masterDataDBService.getAll(WAREHOUSE_MODEL).then(data => {
+                setDtWarehouses(data.rows);
+            });
+            reloadData();
+    }, [loadCount]);
 
     useEffect(() => {
         if(loadCount>1){
@@ -114,10 +119,9 @@ const List = () => {
             lazyParams.filters.active.value = 0;
         }
 
-        masterDataDBService.getAll(modelName, lazyParams).then(data => {
+        masterDataDBService.getAll(modelName, lazyParams).then(async data => {
             setTotalRecords(data.total);
             setProducts(data.rows);
-            console.log(data.rows);
             setLoading(false);
         });
     }
@@ -148,59 +152,43 @@ const List = () => {
         setLazyParams(_lazyParams);
     }
 
-    // const onGlobalFilterChange = (e) => {
-    //     let _lazyParams = { ...lazyParams};
-    //     console.log(_lazyParams);
-
-    //     const value = e.target.value;
-
-    //     setGlobalFilterValue(value);
-
-    //     if(value === null || value === undefined) {
-    //         return;
-    //     }
-
-    //     _lazyParams['filters']['global'].value = value;
-    //     _lazyParams['first'] = 0;
-    //     setLazyParams(_lazyParams);
-    // };
-
     const openNew = () => {
         navigate("/products/new");
     };
 
-    const editProduct = (dtProduct) => {
-        navigate("/products/" + dtProduct.id);
+    const editProfile = (dtProfile) => {
+        navigate("/products/" + dtProfile.id);
     };
 
-    const confirmDeleteProduct = (dtProduct) => {
-        setProduct(dtProduct);
-        setDeleteProductDialog(true);
+    const confirmDeleteProfile = (dtProfile) => {
+        setProfile(dtProfile);
+        setDeleteProfileDialog(true);
     };
 
-    const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
+    const hideDeleteProfileDialog = () => {
+        setDeleteProfileDialog(false);
     };
 
-    const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+    const hideDeleteProfilesDialog = () => {
+        setDeleteProfilesDialog(false);
     };
 
-    const deleteSelectedProducts = () => {
-        let _dtProducts = dtProducts.filter((val) => !selectedProducts.includes(val));
-        setProducts(_dtProducts);
-        setDeleteProductsDialog(false);
-        setSelectedProducts(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+    const deleteSelectedProfiles = () => {
+        let _dtProfiles = dtProfiles.filter((val) => !selectedProfiles.includes(val));
+        setProducts(_dtProfiles);
+        setDeleteProfilesDialog(false);
+        setSelectedProfiles(null);
+        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Profiles Deleted', life: 3000 });
     };
 
-    const deleteProduct = () => {
-        masterDataDBService.delete(modelName, dtProduct.id).then(() => {
-            reloadData();
-            toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Product Product Deleted', life: 3000 });
-        });
-        setDeleteProductDialog(false);
-        setProduct(null);
+    const deleteProfile = () => {
+        // productService.delete(dtProfile.id).then(data => {
+        //     console.log(data);
+        //     loadLazyData();
+        //     toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Package Profile Deleted', life: 3000 });
+        // });
+        // setDeleteProfileDialog(false);
+        // setProfile(null);
     };
 
     const leftToolbarTemplate = () => {
@@ -212,6 +200,7 @@ const List = () => {
             </React.Fragment>
         );
     };
+
     const rightToolbarTemplate = () => {
         return (
             <React.Fragment>
@@ -219,49 +208,11 @@ const List = () => {
             </React.Fragment>
         );
     };
-    const codeBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.code}
-            </>
-        );
-    };
-    const nameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.name}
-            </>
-        );
-    };
 
     const dtWarehouse_idBodyTemplate = (rowData) => {
         return (
             <>
                 {rowData.dtWarehouse_id_shortname}
-            </>
-        );
-    };
-
-    const brandNameBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtProductBrand_id_shortname}
-            </>
-        );
-    };
-
-    const modelNoBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.dtProductModel_id_shortname}
-            </>
-        );
-    };
-
-    const partNumberBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.part_number}
             </>
         );
     };
@@ -274,33 +225,84 @@ const List = () => {
         );
     };
 
-    const unitCostBodyTemplate = (rowData) => {
-        return (
-            <>
-                {getFormattedNumber(rowData.cost||0)}
-            </>
-        );
-    };
-
-    const tradePriceBodyTemplate = (rowData) => {
-        return (
-            <>
-                {getFormattedNumber(rowData.price||0)}
-            </>
-        );
-    };
-
-    const minTradePriceBodyTemplate = (rowData) => {
-        return (
-            <>
-                {getFormattedNumber(rowData.min_trade_price||0)}
-            </>
-        );
-    };
-
     const statusBodyTemplate = (rowData) => {
         return <i className={classNames('pi', { 'text-green-500 pi-check-circle': rowData.active==1, 'text-red-500 pi-times-circle': rowData.active==0 })}></i>;
     };
+
+    const nameBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Name</span>
+                {rowData.name}
+            </>
+        );
+    };
+
+    const codeBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Code</span>
+                {rowData.code}
+            </>
+        );
+    };
+
+    const brandNameBodyTemplate = (rowData) =>{
+        return (
+            <>
+                <span className="p-column-title">Brand Name</span>
+                {masterDataDBService.getShortnameById('dtProductBrand', rowData.dtProductBrand_id)}
+            </>
+        );
+    }
+
+    const modelNumberBodyTemplate = (rowData) =>{
+        return (
+            <>
+                <span className="p-column-title">Model Number</span>
+                {masterDataDBService.getShortnameById('dtProductModel', rowData.dtProductModel_id)}
+            </>
+        );
+    }
+
+    const brandFilterTemplate = (options) => {
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
+    };
+
+    const modelFilterTemplate = (options) => {
+        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
+    };
+
+    const renderHeader = () => {
+        return (
+            <div className="flex justify-content-between">
+                <h5 className="m-0">Manage Packages</h5>
+                <Button type="button" icon="pi pi-filter-slash" label="Clear" className="p-button-outlined" onClick={clearFilter} />
+            </div>
+        )
+    }
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <>
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProfile(rowData)} />
+            </>
+        );
+    };
+
+    const deleteProfileDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfileDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProfile} />
+        </>
+    );
+    const deleteProfilesDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProfilesDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProfiles} />
+        </>
+    );
 
     const statusFilterTemplate = (options) => {
         return (
@@ -334,52 +336,33 @@ const List = () => {
         return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} />;
     };
 
-    const brandFilterTemplate = (options) => {
-        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductBrands} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Brand" className="p-column-filter" />;
-    };
-
-    const modelFilterTemplate = (options) => {
-        return <Dropdown filter value={options.value} optionValue="id" optionLabel="name" options={dtProductModels} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Model" className="p-column-filter" />;
-    };
-
     const warehouseFilterTemplate = (options) => {
         return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={dtWarehouses} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select Warehouse" className="p-column-filter" />;
     };
 
-    const renderHeader = () => {
-        return (
-            <div className="flex justify-content-between">
-                {/* <span className="p-input-icon-left">
-                    <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
-                </span> */}
-                <h5 className="m-0 ">Manage Products</h5>                
-                <Button type="button" icon="pi pi-filter-slash" label="Clear" outlined onClick={clearFilter} />
-            </div>
-        );
-    };
-
-    const actionBodyTemplate = (rowData) => {
+    const unitCostBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />                
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDeleteProduct(rowData)} />                
+                {getFormattedNumber(rowData.cost||0)}
             </>
         );
     };
 
-    const deleteProductDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
-        </>
-    );
-    const deleteProductsDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
-        </>
-    );
+    const tradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getFormattedNumber(rowData.price||0)}
+            </>
+        );
+    };
+
+    const minTradePriceBodyTemplate = (rowData) => {
+        return (
+            <>
+                {getFormattedNumber(rowData.min_trade_price||0)}
+            </>
+        );
+    };
 
     return (
         <div className="grid crud-demo">
@@ -389,12 +372,12 @@ const List = () => {
                     <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
 
                     <DataTable
-                        ref={dt} value={dtProducts} dataKey="id" 
+                        ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
                         lazy loading={loading} rows={lazyParams.rows}
                         onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder}
                         onFilter={onFilter} filters={lazyParams.filters} filterDisplay="row"
-                        scrollable columnResizeMode="expand" resizableColumns showGridlines
+
                         paginator totalRecords={totalRecords} onPage={onPage} first={lazyParams.first}
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" 
                         rowsPerPageOptions={[5,10,25,50]}
@@ -403,11 +386,11 @@ const List = () => {
                         emptyMessage="No data found." header={renderHeader} 
                     >
                         <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="name" header="Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="name" header="Name" filter filterPlaceholder="Search by Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="code" header="Code" filter filterPlaceholder="Search by Code" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtProductBrand_id" header="Brand Name" filter filterPlaceholder="Search by Brand Name" filterElement={brandFilterTemplate} sortable body={brandNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" filterElement={modelFilterTemplate} sortable body={modelNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>  
+                        <Column field="dtProductModel_id" header="Model No" filter filterPlaceholder="Search by Model No" filterElement={modelFilterTemplate} sortable body={modelNumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="part_number" header="Part Number" filter filterPlaceholder="Search by Numebr" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                         <Column field="unit" header="Unit" filter filterPlaceholder="Search by Unit" sortable headerStyle={{ minWidth: '10rem' }}></Column>  
                         <Column field="cost" dataType="numeric" style={{textAlign: 'right'}}  header="Unit Cost" filter filterPlaceholder="Search by Purchase Price" filterElement={costFilterTemplate} sortable body={unitCostBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="price" dataType="numeric" style={{textAlign: 'right'}} header="Trade Price" filter filterPlaceholder="Search by Trade Price" filterElement={tradePriceFilterTemplate} sortable body={tradePriceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -417,23 +400,24 @@ const List = () => {
                         <Column field="active" header="Status" filter filterPlaceholder="Search by Status" filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                                              
                     </DataTable>
 
-                    <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+                    <Dialog visible={deleteProfileDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileDialogFooter} onHide={hideDeleteProfileDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {dtProduct && (
+                            {dtProfile && (
                                 <span>
-                                    Are you sure you want to delete <b>{dtProduct.id}</b>?
+                                    Are you sure you want to delete <b>{dtProfile.id}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+                    <Dialog visible={deleteProfilesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesDialogFooter} onHide={hideDeleteProfilesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {dtProduct && <span>Are you sure you want to delete the selected items?</span>}
+                            {dtProfile && <span>Are you sure you want to delete the selected items?</span>}
                         </div>
                     </Dialog>
+
                 </div>
             </div>
         </div>
