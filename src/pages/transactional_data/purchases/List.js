@@ -176,7 +176,8 @@ const List = () => {
     const voucherNoBodyTemplate = (rowData) => {
         return (
             <>
-                <a href={"#/purchases/"+rowData.id}>{rowData.voucher_no}</a>
+                {/* <a href={"#/purchases/"+rowData.id}>{rowData.voucher_no}</a> */}
+                <a href={"#/purchaseinvoice/"+rowData.id} target="_blank" rel="noopener noreferrer" >{rowData.voucher_no}</a>
             </>
         );
     };
