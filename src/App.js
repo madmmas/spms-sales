@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import RouteAuth from "./auth/RouteAuth";
 
 import { PrintInvoice } from "./pages/transactional_data/sales/components/PrintInvoice";
+import { PrintPurchaseInvoice } from "./pages/transactional_data/purchases/components/PrintPurchaseInvoice";
 import { PrintPaymentInvoice } from "./pages/transactional_data/payments/PrintPaymentInvoice";
 import { PrintInvoiceSalesReturn } from "./pages/transactional_data/sales/components/PrintInvoiceSalesReturn";
 import { PrintReport } from "./pages/html_reports/PrintReport";
@@ -107,6 +108,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
+      <Route path="/purchaseinvoice" element={<PrintPurchaseInvoice />} />
       <Route path="/paymentinvoice/:id" element={<PrintPaymentInvoice />} />
       <Route path="/invoice/">
         <Route path=":id/R" element={<PrintInvoiceSalesReturn />} />
