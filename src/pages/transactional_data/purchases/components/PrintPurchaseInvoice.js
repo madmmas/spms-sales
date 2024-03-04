@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import { useParams } from 'react-router-dom';
 import { getNumToWords, getDateFormatted, getTimeFormatted } from '../../../../utils';
-import { SALES_MODEL, CUSTOMER_MODEL } from '../../../../constants/models';
+import { SALES_MODEL, CUSTOMER_MODEL, PURCHASE_MODEL, SUPPLIER_MODEL } from '../../../../constants/models';
 import { OrderService } from '../../../../services/OrderService';
 
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
@@ -61,7 +61,41 @@ export const PrintPurchaseInvoice = () => {
         return return_items;
     }
 
-    
+    useEffect(() => {
+        console.log("ID CHANGED::", id)
+        orderService.getById(PURCHASE_MODEL, id).then((data) => {
+            console.log("purchase-data::", data)
+            AuthService.GetUsername(data.updated_by).then(salesMan => {
+                setSalesMan(salesMan.username)
+            });
+            masterDataDBService.getById(SUPPLIER_MODEL, data.party_id).then((party) => {
+                console.log("supplier-party::", party)
+                data.party = {
+                    "line1": party.name,
+                    "line2": party.address,
+                    "line3": party.phone,
+                };
+                // orderService.getLedgerBalance("dtCustomer", data.party_id).then((party_balance) => {
+                //     let dr_amount = Number(party_balance.dr_amount)||0;
+                //     let cr_amount = Number(party_balance.cr_amount)||0;
+                //     let balance = dr_amount - cr_amount;
+                //     // console.log("balance::", party_balance);
+                //     data.balance = balance;
+
+                populateProductDetailsInItems(data.items).then((items) => {
+                    console.log("SUPPLIER-data::items", items)
+                    data.items = items;
+                    populateProductDetailsInReturnItems(data.return_items).then((return_items) => {
+                        console.log("SUPPLIER-data::return_items", return_items)
+                        data.return_items = return_items;
+                        setInvoice(data);
+                    });
+                });
+                //     // setInvoice(data);
+                // });
+            });
+        });  
+    }, [id]);
 
     useEffect(() => {
         console.log("invoice::", invoice);
@@ -157,23 +191,23 @@ export const PrintPurchaseInvoice = () => {
         {printmePos && <PrintPOS />}
         {printme && <ComponentToPrint />}
         
-        <div className='printme' id='printme' ref={divPrint}>
+        {invoice && <div className='printme' id='printme' ref={divPrint}>
             <header>
                 <p>M/S JONONI MOTORS</p>
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
-            <p  class="line">Invoice Number : Voucher No.</p>
-            <p>Invoice Date : Date & Time</p>
-            <p>Invoice Created By : Salesman</p>
+            <p  class="line">Invoice Number : {invoice.voucher_no}</p>
+            <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
+            <p>Invoice Created By : {salesMan}</p>
             <table className="bill-details">
                 <tbody>
                     
-                    <tr>
-                        <td  class="line"><b><span>Supplier name</span></b><br/>
-                            <span>Supplier address</span><br/>
-                            <span>Supplier phone</span></td>
-                    </tr>
+                    {invoice.party && <tr>
+                        <td  class="line"><b><span>{invoice.party.line1}</span></b><br/>
+                            <span>{invoice.party.line2}</span><br/>
+                            <span>{invoice.party.line3}</span></td>
+                    </tr>}
                 
                     <tr>
                         <th className="center-align line" colSpan="2"><span className="receipt">PURCHASE INVOICE</span></th>
@@ -305,7 +339,7 @@ export const PrintPurchaseInvoice = () => {
                     </tbody>
                 </table>
             </footer>
-        </div>
+        </div>}
       </div>
     )
 }

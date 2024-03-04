@@ -108,7 +108,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/invoice/:id" element={<PrintInvoice />} />
-      <Route path="/purchaseinvoice" element={<PrintPurchaseInvoice />} />
+      <Route path="/purchaseinvoice/:id" element={<PrintPurchaseInvoice />} />
       <Route path="/paymentinvoice/:id" element={<PrintPaymentInvoice />} />
       <Route path="/invoice/">
         <Route path=":id/R" element={<PrintInvoiceSalesReturn />} />
