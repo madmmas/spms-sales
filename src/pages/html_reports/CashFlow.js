@@ -112,6 +112,12 @@ export const CashFlow = () => {
                 total += parseFloat(item.amount);
             });
         }
+        if(data['sales_return_walkin']){
+            total += parseFloat(data['sales_return_walkin']);
+        }
+        // if(data['sales_return_reg_cus']){
+        //     total += parseFloat(data['sales_return_reg_cus']);
+        // }
 
         return total;
     }
@@ -410,6 +416,23 @@ export const CashFlow = () => {
                                     </tr>}
                                 </tbody>
                             </table>
+                            <table className="lineitems">
+                                <thead>
+                                    <tr>
+                                        <th colSpan="2" className="bottom-line left-align">Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td className="left-align">Sales Return (Walkin)</td>
+                                        <td className="right-align qty">{getFormattedNumber(cashFlowData["sales_return_walkin"] || "0")}</td>
+                                    </tr>
+                                    {/* <tr>
+                                        <td className="left-align">Sales Return (Register Customer)</td>
+                                        <td className="right-align qty">{getFormattedNumber(cashFlowData["sales_return_reg_cus"] || "0")}</td>
+                                    </tr> */}
+                                </tbody>
+                            </table> 
                             <table className="lineitems box">
                                 <tbody>
                                     <tr>

@@ -466,7 +466,7 @@ const List = () => {
         return (
             <>
                 <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProfile(rowData)} />
-                <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} />
+                {/* <Button icon="pi pi-list" className="p-button-rounded p-button-info mr-2" onClick={() => showInvoice(rowData)} /> */}
                 {rowData.customer_category==="CONDITIONAL" && rowData.trx_status==="pending" && <Button icon="pi pi-pencil" className="p-button-rounded p-button-secondary mr-2" onClick={()=> openCourier(rowData)} />}
             </>
         );

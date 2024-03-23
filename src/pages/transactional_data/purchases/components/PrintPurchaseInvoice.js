@@ -163,7 +163,7 @@ export const PrintPurchaseInvoice = () => {
 
     const handlePrintPOS = () => {
         let elHeight = document.getElementById('printme').clientHeight
-        alert(elHeight);
+        // alert(elHeight);
         setPrintme(false);
         setPrintmePos(true);
         setTrigger(trigger+1);
@@ -229,38 +229,32 @@ export const PrintPurchaseInvoice = () => {
                         <th className="heading amount right-align">Amount</th>
                     </tr>
                 </thead>
-
-                <tr>
-                        <td className="line left-align">1</td>
-                        <td className="line left-align">1</td>
-                        <td className="line left-align">product1</td>
-                        <td className="line left-align">brand1</td>
-                        <td className="line left-align">part1</td>
-                        <td className="line left-align">model1</td>
-                        <td className="line right-align">100</td>
-                        <td className="line center-align">0</td>
-                        <td className="line right-align">100</td>
-                </tr>
-            
                 <tbody>
-                
+                    {invoice.items.map( (item, i) => 
+                    <tr>
+                        <td className="line left-align">{i+1}</td>
+                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
+                        <td className="line left-align">{item.product_name}</td>
+                        <td className="line left-align">{item.product_brand_name}</td>
+                        <td className="line left-align">{item.product_part_number}</td>
+                        <td className="line left-align">{item.product_model_no}</td>
+                        <td className="line right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
+                        <td className="line center-align">{item.discount_profit}</td>
+                        <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                    </tr>)}
 
                     <tr>
-                        <td colSpan="8" className="sum-up line">Total Amount</td>
-                        <td className="line price right-align">100</td>
+                        <td colSpan="8" className="sum-up line">Gross Amount</td>
+                        <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <td colSpan="8" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">0</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <th colSpan="8" className="total text line">Net Amount</th>
-                        <th className="total price right-align line">100</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
-                    <tr>
-                        <th colSpan="8" className="total text line">Total Amount</th>
-                        <th className="total price right-align line">100</th>
-                    </tr>  
                 </tbody>
             </table>}
             {printmePos && <table className="lineitems">            
@@ -272,43 +266,39 @@ export const PrintPurchaseInvoice = () => {
                         <th className="heading brand left-align">Brand</th>
                         <th className="heading brand left-align">Part No</th>
                         <th className="heading brand left-align">Model</th>
-                        <th className="heading brand right-align">Unit Price</th>
-                        <th className="heading qty center-align">D %</th>
+                        <th className="heading brand right-align">Unit Sell Price</th>
+                        <th className="heading qty center-align">Unit Profit %</th>
                         <th className="heading amount right-align">Amount</th>
                     </tr>
                 </thead>
-
-                <tr>
-                        <td className="line left-align">1</td>
-                        <td className="line left-align">1</td>
-                        <td className="line left-align">product1</td>
-                        <td className="line left-align">brand1</td>
-                        <td className="line left-align">part1</td>
-                        <td className="line left-align">model1</td>
-                        <td className="line right-align">100</td>
-                        <td className="line center-align">0</td>
-                        <td className="line right-align">100</td>
-                </tr>
             
                 <tbody>
                 
+                {invoice.items.map( (item, i) => 
+                    <tr>
+                        <td className="left-align">{i+1}</td>
+                        <td className="left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
+                        <td className="left-align">{item.product_name}</td>
+                        <td className="left-align">{item.product_brand_name}</td>
+                        <td className="left-align">{item.product_part_number}</td>
+                        <td className="left-align">{item.product_model_no}</td>
+                        <td className="right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
+                        <td className="center-align">{item.discount_profit}</td>
+                        <td className="right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                    </tr>)}
 
                     <tr>
-                        <td colSpan="8" className="sum-up line">Total Amount</td>
-                        <td className="line price right-align">100</td>
+                        <td colSpan="8" className="sum-up line">Gross Amount</td>
+                        <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <td colSpan="8" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">0</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <th colSpan="8" className="total text line">Net Amount</th>
-                        <th className="total price right-align line">100</th>
+                        <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
                     </tr>
-                    <tr>
-                        <th colSpan="8" className="total text line">Total Amount</th>
-                        <th className="total price right-align line">100</th>
-                    </tr>  
                 </tbody>
             </table>}
             <section>
@@ -317,14 +307,14 @@ export const PrintPurchaseInvoice = () => {
                 { printOnlySales &&
                     <p>
                       <b>In Words : <br></br>
-                      Total Amount : <i>100 Taka only</i> </b>
+                      Total Amount : <i>{getNumToWords((Number.parseFloat(invoice.net) - Number.parseFloat(invoice.paid)).toFixed(2))} Taka only</i> </b>
                    </p>
                 }
                 {/* <p>
                     Paid by : <span>CASH</span>
                 </p> */}
                 {printOnlySales && <p> 
-                    <b>Remarks :</b> <span>notes</span>
+                    <b>Remarks :</b> <span>{invoice.notes}</span>
                 </p>}
             </section>
             

@@ -117,7 +117,7 @@ export const PrintInvoiceSalesReturn = () => {
 
     const handlePrintPOS = () => {
         let elHeight = document.getElementById('printme').clientHeight
-        alert(elHeight);
+        // alert(elHeight);
         setPrintme(false);
         setPrintmePos(true);
         setTrigger(trigger+1);

@@ -22,7 +22,7 @@ export class PrintPOS extends React.PureComponent {
         
                 @page {
                     // size: 2.8in 11in;
-                    size: 58mm 200mm;
+                    size: 70mm 160mm;
                     margin-top: 0cm;
                     margin-left: 0cm;
                     margin-right: 0cm;
