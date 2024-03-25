@@ -276,6 +276,13 @@ const Form = React.memo(({ sales }) => {
                 "customer_phone": sales.customer_phone,
                 "customer_category": sales.customer_category,
             });
+            setSelectedCustomer({
+                "id": sales.party_id,
+                "name": sales.customer_name,
+                "phone": sales.customer_phone,
+                "last_trx_id": sales.last_trx_id,
+            });
+            changePaymentOption(sales.customer_category);
         }
     }, [sales]);
     ///// SIDE-EFFECTS -- End /////
@@ -498,17 +505,8 @@ const Form = React.memo(({ sales }) => {
         }
     }
     ///// Events -- CUSTOMER /////
-    const onCustomerCategoryChange = value => {
-        resetForm();
-        setSelectedCustomer(null);
-        setCustomerCategory(value);
-        setCustomerLastOrder(null);
-        setCustomerBalance(0.00);
-        setValue("customer_category", value);
-        
-        // need to reload lastTradePrice
-        setLastTradePriceTrigger(lastTradePriceTrigger+1);
-        
+    const changePaymentOption = value => {
+        console.log("changePaymentOption::", value)
         // set WithPaymentOpt
         setWithPaymentOpt(value !== "WALKIN");
         // set WithDraftPaymentOpt
@@ -526,6 +524,19 @@ const Form = React.memo(({ sales }) => {
         } else {
             setWithPayment(false);
         }
+    };
+    const onCustomerCategoryChange = value => {
+        resetForm();
+        setSelectedCustomer(null);
+        setCustomerCategory(value);
+        setCustomerLastOrder(null);
+        setCustomerBalance(0.00);
+        setValue("customer_category", value);
+        
+        // need to reload lastTradePrice
+        setLastTradePriceTrigger(lastTradePriceTrigger+1);
+        
+        changePaymentOption(value);
         // if(value === "WALKIN") {
         //     setShowOptions(false);
         // } else {

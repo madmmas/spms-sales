@@ -442,6 +442,7 @@ export class MasterDataDBService {
         localStorage.removeItem("dtSupplierCategory_last_updated");
         localStorage.removeItem("dtRoute_last_updated");
         localStorage.removeItem("dtWarehouse_last_updated");
+        localStorage.removeItem("dtCourier_last_updated");
 
         localStorage.removeItem("dtBankAccount_last_updated");
         localStorage.removeItem("dtMFSAccount_last_updated");

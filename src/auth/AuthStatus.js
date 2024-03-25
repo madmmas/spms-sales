@@ -30,7 +30,7 @@ export default function AuthStatus() {
     // session ping
     let sessionPing = await masterDataDBService.sessionPing();
     if (sessionPing===true) {
-      // await masterDataDBService.clearCache();
+      await masterDataDBService.clearCache();
       await loadAllData();
     }
   }
