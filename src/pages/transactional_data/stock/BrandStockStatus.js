@@ -35,7 +35,7 @@ const BrandStockStatus = () => {
         filters: {
             // global: { value: null, matchMode: FilterMatchMode.CONTAINS },
             name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-            dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS },
+            // dtCategory_id: { value: 1, matchMode: FilterMatchMode.EQUALS },
             dtWarehouse_id: { value: null, matchMode: FilterMatchMode.EQUALS },
             code: { value: null, matchMode: FilterMatchMode.CONTAINS },
             dtProductBrand_id: { value: null, matchMode: FilterMatchMode.EQUALS },

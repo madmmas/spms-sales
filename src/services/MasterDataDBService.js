@@ -6,9 +6,9 @@ import { getFormattedNumber } from '../utils';
 
 import modelDef from './ModelDef';
 
-const DB_NAME = "indx_spms_org_v2";
+const DB_NAME = "indx_spms_org_final_v2";
 
-const DEL_DB_NAME = "indx_spms_org_v1";
+const DEL_DB_NAME = "indx_spms_org_v2";
 const DBDeleteRequest = window.indexedDB.deleteDatabase(DEL_DB_NAME);
 DBDeleteRequest.onerror = (event) => {
   console.error("Error deleting database. May be it doesn't exist named: " + DB_NAME);
