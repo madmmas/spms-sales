@@ -21,7 +21,8 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(function(config) {
    config.headers = {
       ...config.headers,
-      Authorization: getAuthToken()
+      Authorization: getAuthToken(),
+      "Accept-content": "gzip, deflate, br",
    };
    return config;
 }, function(error) {
