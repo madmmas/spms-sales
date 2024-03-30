@@ -208,7 +208,7 @@ export class MasterDataDBService {
         }
 
         let uri = `/all_products/${upto}`;
-        let limit = 500;
+        let limit = 1000;
         let offset = 0;
         let result = await axiosInstance.get(uri + "/" + limit + "/" + offset, {
             timeout: 30000,
