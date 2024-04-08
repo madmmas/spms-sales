@@ -285,7 +285,8 @@ export default function SalesProductForm({
                 <InputNumber
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
-                    onValueChange={(e) => onInputChange(e, 'trade_price')} min={min_trade_price} max={10000000} />
+                    onValueChange={(e) => onInputChange(e, 'trade_price')} 
+                    minFractionDigits={2} min={min_trade_price} max={10000000} />
                     </>
                 )}/>
             </div>
