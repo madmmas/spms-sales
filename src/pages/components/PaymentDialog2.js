@@ -199,6 +199,7 @@ const PaymentDialog2 = ( { trigger, initPayment, onPaymnetCallback, readOnly = f
                         <label htmlFor="current_balance">Current Balance</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
+                            maxFractionDigits={2}
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
                     </>

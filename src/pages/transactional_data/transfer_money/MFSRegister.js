@@ -373,7 +373,8 @@ const MFSRegister = () => {
                                 <>
                                     <label htmlFor="amount">Amount</label>
                                     <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
-                                        onValueChange={(e) => field.onChange(e)} 
+                                        onValueChange={(e) => field.onChange(e)}
+                                        maxFractionDigits={2}
                                         className={classNames({ 'p-invalid': fieldState.error })} />
                                     {getFormErrorMessage(field.name)}
                                 </>

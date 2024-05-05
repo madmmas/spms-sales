@@ -183,7 +183,7 @@ export default function SalesReturnProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
-                <InputNumber
+                <InputNumber maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })}
                     disabled={true} />
@@ -197,7 +197,7 @@ export default function SalesReturnProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Qunatity</label>
-                <InputNumber 
+                <InputNumber  maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -210,7 +210,7 @@ export default function SalesReturnProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Price</label>
-                <InputNumber 
+                <InputNumber  maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -223,7 +223,7 @@ export default function SalesReturnProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Discount</label>
-                <InputNumber 
+                <InputNumber  maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -237,7 +237,7 @@ export default function SalesReturnProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Net Price</label>
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -270,6 +270,7 @@ export default function SalesReturnProductForm({
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Return Quantity</label>
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
+                    maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'returnQuantity')} min={1} max={10000000} />
                     </>

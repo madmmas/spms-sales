@@ -140,6 +140,7 @@ const Form = ({ purchase }) => {
             // calculateTotals(purchase.items);
             setConversionRate(conversionRate);
             setTrxNo(purchase.voucher_no);
+            setSupplierId(purchase.party_id);
             setEditMode(purchase.status === 'draft');
             setReturnMode(purchase.status === 'approved');
             console.log("EDIT MODE:::=>", purchase.status, purchase.status === 'draft');
@@ -165,6 +166,11 @@ const Form = ({ purchase }) => {
     };
 
     const onSubmit = (action, formData) => {
+        // check if trxNo is not empty
+        if(trxNo === 'XXXXX'){
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Please wait for the system to generate the transaction number', life: 3000 });
+            return;
+        }
         if(action === 'save'){
             setStatus('draft');
             submitForm(formData);

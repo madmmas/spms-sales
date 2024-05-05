@@ -371,6 +371,12 @@ const Form = React.memo(({ sales }) => {
     const submitSalesData = formData => {
         console.log("submitSalesData::", formData);
 
+        // check if trxNo is null
+        if(trxNo === null) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Transaction No is not generated!', life: 3000 });
+            return;
+        }
+
         let _sales = prepareSalesData(formData);   
         
         console.log("_sales::", _sales);

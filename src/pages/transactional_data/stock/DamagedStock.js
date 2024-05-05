@@ -357,6 +357,7 @@ const DamagedStock = () => {
                                 <>
                                     <label htmlFor="quantity">Quantity*</label>
                                     <InputNumber ref={quantityRef}
+                                        maxFractionDigits={2}
                                         inputId={field.name} value={field.value} inputRef={field.ref} 
                                         onValueChange={(e) => field.onChange(e)} 
                                         className={classNames({ 'p-invalid': fieldState.error })} />

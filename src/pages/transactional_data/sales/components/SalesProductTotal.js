@@ -19,7 +19,7 @@ const SalesProductTotal = ({sales, totalPrice, netAmount, totalDiscount, vat, on
                 <td class="vatInput"><b>Vat %</b>
                     <InputNumber value="0" 
                         placeholder="VAT %"
-                        max={100} min={0}
+                        max={100} min={0} maxFractionDigits={2}
                         className="mx-2"
                         style={{"width": "fit-content(20em)"}}
                         onValueChange={(e) => onVATChange(e.value)} 
@@ -34,7 +34,7 @@ const SalesProductTotal = ({sales, totalPrice, netAmount, totalDiscount, vat, on
                 <td class="vatInput">
                     <InputNumber value="0" 
                         placeholder="Delivery Cost %"
-                        max={100} min={0}
+                        max={100} min={0} maxFractionDigits={2}
                         className="mx-2"
                         style={{"width": "fit-content(20em)"}}
                         onValueChange={(e) => onDeliveryCostChange(e.value)} 
@@ -45,7 +45,7 @@ const SalesProductTotal = ({sales, totalPrice, netAmount, totalDiscount, vat, on
                 <td class="vatInput">
                     <InputNumber value="0" 
                         placeholder="Additional"
-                        max={100} min={0}
+                        max={100} min={0} maxFractionDigits={2}
                         className="mx-2"
                         style={{"width": "fit-content(20em)"}}
                         // onValueChange={(e) => onDeliveryCostChange(e.value)} 

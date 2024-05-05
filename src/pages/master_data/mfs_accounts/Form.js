@@ -154,6 +154,7 @@ const Form = ({mfsAccountProfile}) => {
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Initial Balance*</label>
                                 <InputNumber disabled={isEdit} inputId={field.name} value={field.value} inputRef={field.ref} 
                                     className={classNames({ 'p-invalid': fieldState.error })} 
+                                    maxFractionDigits={2}
                                     onValueChange={(e) => {setValue("balance",e.value); field.onChange(e)}} 
                                     />                                
                                 {getFormErrorMessage(field.name)}

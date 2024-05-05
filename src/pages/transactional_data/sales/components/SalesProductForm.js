@@ -224,7 +224,7 @@ export default function SalesProductForm({
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Trade Price</label>
                 {/* <a href={"#/invoice/"+Id} target="_blank"></a> */}
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })} 
                     onClick={(e) => {
@@ -264,7 +264,7 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Quantity</label>
-                <InputNumber ref={quantityRef}
+                <InputNumber ref={quantityRef} maxFractionDigits={2}
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'qty')} min={1} max={10000000} />
@@ -297,7 +297,7 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Price</label>
-                <InputNumber 
+                <InputNumber  maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -311,7 +311,7 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Discount %</label>
-                <InputNumber
+                <InputNumber 
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'discount_profit')} min={0.00} maxFractionDigits={2} />
@@ -326,7 +326,7 @@ export default function SalesProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Net Price</label>
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>

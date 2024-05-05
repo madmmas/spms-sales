@@ -288,11 +288,11 @@ const StockStatus = () => {
     };
 
     const costFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} />;
+        return <InputNumber maxFractionDigits={2} value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} />;
     };
 
     const lowStockQtyFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} />;
+        return <InputNumber maxFractionDigits={2} value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} />;
     };
 
     const brandFilterTemplate = (options) => {

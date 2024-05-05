@@ -350,6 +350,7 @@ const Adjustments = () => {
                                 <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} 
                                     className={classNames({ 'p-invalid': fieldState.error })}
                                     onValueChange={(e) => field.onChange(e)}
+                                    maxFractionDigits={2}
                                     readOnly={true}
                                     />                                
                                 {getFormErrorMessage(field.name)}

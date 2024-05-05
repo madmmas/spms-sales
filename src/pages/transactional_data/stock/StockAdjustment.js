@@ -377,7 +377,7 @@ const StockAdjustment = () => {
                                 render={({ field, fieldState }) => (
                                 <>
                                     <label htmlFor="quantity">Quantity*</label>
-                                    <InputNumber ref={quantityRef}
+                                    <InputNumber ref={quantityRef} maxFractionDigits={2}
                                         inputId={field.name} value={field.value} inputRef={field.ref} 
                                         onValueChange={(e) => field.onChange(e)} 
                                         className={classNames({ 'p-invalid': fieldState.error })} />

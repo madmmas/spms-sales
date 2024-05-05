@@ -27,7 +27,7 @@ export const supplier_category_fields = ["id", "name", "description", "status", 
 // dtBankAccount
 export const bank_accounts_fields = ["id", "dtBank_id", "branch", "accNumber", "accName", "initBalance", "balance", "phone", "address", "note", "status", "last_trx_id", "shortname", "_default", "updated_at"];
 // dtCustomer
-export const customer_fields = ["id", "dtCustomerCategory_id", "name", "contact_name", "phone", "address", "description", "email", "district", "route", "documents", "status", "last_trx_id", "shortname", "_default", "updated_at"];
+export const customer_fields = ["id", "dtCustomerCategory_id", "dtRoute_id", "name", "contact_name", "phone", "address", "description", "email", "district", "route", "documents", "status", "last_trx_id", "shortname", "_default", "updated_at"];
 // dtSupplier
 export const supplier_fields = ["id", "dtSupplierCategory_id", "name", "address", "phone", "contactPersonName", "contactPersonDesignation", "contactPersonPhone", "currency", "status", "last_trx_id", "shortname", "_default", "updated_at"];
 // dtWarehouse

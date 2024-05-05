@@ -95,6 +95,7 @@ const ReturnItemDialog = ({ selectedReturnItem, trigger, onAddReturnItem }) => {
                         <label htmlFor="return_qty">Return Quantity*</label>
                         <InputNumber inputId={field.name} value={field.value} inputRef={field.payRef} 
                             onValueChange={(e) => field.onChange(e)} 
+                            maxFractionDigits={2}
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
                     </>

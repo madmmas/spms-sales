@@ -273,11 +273,11 @@ const List = ({ ledger = false }) => {
     };
 
     const initBalanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber maxFractionDigits={2} value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const balanceFilterTemplate = (options) => {
-        return <InputNumber value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
+        return <InputNumber maxFractionDigits={2} value={options.value} onChange={(e) => options.filterApplyCallback(e.value, options.index)} mode="currency" currency="USD" locale="en-US" />;
     };    
 
     const bankFilterTemplate = (options) => {

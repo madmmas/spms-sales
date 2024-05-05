@@ -398,7 +398,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Last Purchase Price</label>
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} 
                     className={classNames({ 'p-invalid': fieldState.error })} 
                     disabled={true} />
@@ -415,6 +415,7 @@ export default function PurchaseProductForm({
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Quantity</label>
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
+                    maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'qty')} min={1} max={10000000} />
                     </>
@@ -441,7 +442,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Cost ({currency})</label>
-                <InputNumber
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -454,7 +455,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Conversion Rate</label>
-                <InputNumber
+                <InputNumber 
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'conversion_rate')} min={1} maxFractionDigits={2} 
@@ -471,7 +472,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Unit Cost</label>
-                <InputNumber
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -484,7 +485,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Cost</label>
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -527,7 +528,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Net Unit Cost</label>
-                <InputNumber 
+                <InputNumber  maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -540,7 +541,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Net Cost</label>
-                <InputNumber 
+                <InputNumber maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
@@ -554,7 +555,7 @@ export default function PurchaseProductForm({
                 render={({ field, fieldState }) => (
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Profit (%)</label>
-                <InputNumber
+                <InputNumber maxFractionDigits={2}
                     onFocus={(e) => e.target.select()}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onProfitPercentageChange(e.value)} />

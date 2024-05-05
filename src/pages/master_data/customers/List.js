@@ -13,7 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 
 import { CITIES } from '../../../constants/lookupData';
 import { DISTRICT } from '../../../constants/districts';
-import { CUSTOMER_MODEL, CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { CUSTOMER_MODEL, CUSTOMER_CATEGORY_MODEL, ROUTE_MODEL } from '../../../constants/models';
 
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
@@ -21,6 +21,7 @@ const List = ({ ledger = false }) => {
 
     const modelName = CUSTOMER_MODEL;
     const [customerCategory, setCustomerCategory] = useState([]);
+    const [customerRoute, setCustomerRoute] = useState([]);
 
     let navigate = useNavigate();
     const toast = useRef(null);
@@ -66,6 +67,9 @@ const List = ({ ledger = false }) => {
         if(loadCount==1){
             masterDataDBService.getAll(CUSTOMER_CATEGORY_MODEL).then(data => {
                 setCustomerCategory(data.rows);
+            });
+            masterDataDBService.getAll(ROUTE_MODEL).then(data => {
+                setCustomerRoute(data.rows);
             });
             reloadData();
             setLoadCount(loadCount+1);
@@ -246,12 +250,13 @@ const List = ({ ledger = false }) => {
     };
   
     const routeFilterTemplate = (options) => {
-        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={CITIES} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" />;
+        return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={customerRoute} onChange={(e) => options.filterApplyCallback(e.value)} placeholder="Select One" className="p-column-filter" />;
     };
+
     const routeBodyTemplate = (rowData) => {
         return (
             <>
-                {rowData.route}
+                {rowData.dtRoute_id_shortname}
             </>
         );
     };
@@ -332,11 +337,11 @@ const List = ({ ledger = false }) => {
                         
                         {!ledger && <Column field="dtCustomerCategory_id" header="Customer Category" filter filterElement={customerCategoryFilterTemplate} sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="contact_name" header="Contact Name" filter filterField="contact_name" filterPlaceholder="Search by contact name" sortable body={contactnameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="phone" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        <Column field="phone" header="Phone Number" filter filterPlaceholder="Search by Number" sortable body={phonenumberBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         {!ledger && <Column field="email" header="Email" filter filterPlaceholder="Search by Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        <Column field="address" header="Customer Address" filter filterPlaceholder="Search by Address" body={addressBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         {!ledger && <Column field="district" header="District" filter filterElement={districtFilterTemplate} sortable body={districtBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
-                        {!ledger && <Column field="route" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
+                        {!ledger && <Column field="dtRoute_id" header="Route" filter filterElement={routeFilterTemplate} sortable body={routeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         {!ledger && <Column field="status" header="Status" filter filterElement={statusFilterTemplate} sortable body={statusBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>}
                         
                     </DataTable>

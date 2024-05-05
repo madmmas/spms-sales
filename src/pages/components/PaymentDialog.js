@@ -163,7 +163,8 @@ const PaymentDialog = ( {
                     render={({ field, fieldState }) => (
                     <>
                         <label htmlFor="previous_balance">Previous Balance</label>
-                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                        <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref}
+                            maxFractionDigits={2}
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
@@ -178,6 +179,7 @@ const PaymentDialog = ( {
                     <>
                         <label htmlFor="invoice_amount">Invoice Amount</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
+                            maxFractionDigits={2}
                             onValueChange={(e) => field.onChange(e)} 
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
@@ -293,6 +295,7 @@ const PaymentDialog = ( {
                         <label htmlFor="amount">Pay Amount</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
+                            maxFractionDigits={2}
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
                     </>
@@ -307,6 +310,7 @@ const PaymentDialog = ( {
                         <label htmlFor="current_balance">Current Balance</label>
                         <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                             onValueChange={(e) => field.onChange(e)} 
+                            maxFractionDigits={2}
                             className={classNames({ 'p-invalid': fieldState.error })} />
                         {getFormErrorMessage(field.name)}
                     </>

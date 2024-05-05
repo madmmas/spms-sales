@@ -7,12 +7,11 @@ import { Toast } from 'primereact/toast';
 import { InputSwitch } from 'primereact/inputswitch';
 import { classNames } from 'primereact/utils';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { CITIES } from '../../../constants/lookupData';
 import { DISTRICT } from '../../../constants/districts';
 import SelectConstData from '../../components/SelectConstData';
 import SelectLookupData from '../../components/SelectLookupData';
 import { MasterDataDBService } from '../../../services/MasterDataDBService';
-import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL } from '../../../constants/models';
+import { CUSTOMER_MODEL,CUSTOMER_CATEGORY_MODEL, ROUTE_MODEL } from '../../../constants/models';
 
 const Form = ({customerProfile}) => {
 
@@ -178,14 +177,14 @@ const Form = ({customerProfile}) => {
                     </div>
                     <div className="field col-12 md:col-6">
                         <Controller
-                            name="route"
+                            name="dtRoute_id"
                             control={control}
                             rules={{ required: 'Route is required.' }}
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Route*</label>
-                                <SelectConstData field={field} data={CITIES}
-                                    className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                <SelectLookupData field={field} model={ROUTE_MODEL}
+                                    className={classNames({ 'p-invalid': fieldState.error })} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>

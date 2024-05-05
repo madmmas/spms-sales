@@ -177,6 +177,7 @@ export default function PackageProductForm({
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Trade Price</label>
                 <InputNumber
                     inputId={field.name} value={field.value} inputRef={field.ref} 
+                    maxFractionDigits={2}
                     className={classNames({ 'p-invalid': fieldState.error })}
                     disabled={true} />
                     </>
@@ -195,6 +196,7 @@ export default function PackageProductForm({
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Quantity</label>
                 <InputNumber ref={quantityRef}
                     onFocus={(e) => e.target.select()}
+                    maxFractionDigits={2}
                     inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                     onValueChange={(e) => onInputChange(e, 'quantity')} min={1} max={10000000} />
                     </>
@@ -208,6 +210,7 @@ export default function PackageProductForm({
                     <>
                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Total Price</label>
                 <InputNumber 
+                maxFractionDigits={2}
                 inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })}
                 disabled={true} />
                     </>
