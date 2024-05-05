@@ -177,7 +177,6 @@ const Form = React.memo(({ sales }) => {
         console.log("lastTradePriceTrigger => selectedProductItem::", selectedProductItem);
         if(selectedProductItem!==null) {
             if(selectedCustomer===null){
-                // lastTradePrice = await orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id);
                 orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
@@ -186,7 +185,6 @@ const Form = React.memo(({ sales }) => {
                     }
                 });
             }else{
-                // lastTradePrice = await orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer.id);
                 orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
@@ -230,9 +228,6 @@ const Form = React.memo(({ sales }) => {
             setTrxStatus(sales.trx_status);
             setWithDraftPaymentOpt(sales.customer_category === "WALKIN" && sales.status === 'draft');
             setTrxNo(sales.voucher_no);
-            sales.items.forEach((item, index) => {
-                item['index'] = index;
-            });
             setSalesItems(sales.items);
             let totalReturnedPrice = 0;
             let arrayOfSalesReturnItems = sales?.return_items?.map((item)=>{
@@ -543,11 +538,6 @@ const Form = React.memo(({ sales }) => {
         setLastTradePriceTrigger(lastTradePriceTrigger+1);
         
         changePaymentOption(value);
-        // if(value === "WALKIN") {
-        //     setShowOptions(false);
-        // } else {
-        //     setShowOptions(true);
-        // }
     };
 
     const getPartyBalance = (partyId) => {
@@ -578,25 +568,21 @@ const Form = React.memo(({ sales }) => {
     ///// Events -- PRODUCT-FORM /////
     const addSalesItem = item => {
         let _newSales = [...salesItems];
-        item['index'] = salesItems.length;
         _newSales.unshift(item);
         setSalesItems(_newSales);
     };
 
-    const updateSalesItem = (item, selectedItemIndex) => {
+    const updateSalesItem = (item) => {
         let _newSales = [...salesItems];
-        item['index'] = selectedItemIndex;
-        _newSales[selectedItemIndex] = item;
+        let index = _newSales.findIndex(sale => sale.product_id === item.product_id);
+        _newSales[index] = item;
         setSalesItems(_newSales);
     };
 
-    const removeSalesItem = (index) => {
+    const removeSalesItem = (item) => {
         let _newSales = [...salesItems];
-        _newSales.splice(index, 1);    
-        // recalculate index
-        _newSales.forEach((item, index) => {
-            item['index'] = index;
-        });
+        let index = _newSales.findIndex(sale => sale.product_id === item.product_id);
+        _newSales.splice(index, 1);
         setSalesItems(_newSales);
     };
 
@@ -804,8 +790,6 @@ const Form = React.memo(({ sales }) => {
 
     const onAddReturnItem = (returnItem) => {
         console.log("SELECTED RETURN ITEM::", returnItem);
-        // add index to return item
-        returnItem['index'] = selectedReturnItems.length;
         // add timestamp
         returnItem['created_at'] = moment();
         // check if already added
@@ -825,7 +809,8 @@ const Form = React.memo(({ sales }) => {
     const onDeleteFromReturnList = (rowData) => {
         console.log("DELETE RETURN ITEM::", rowData);
         let newReturnItems = [...selectedReturnItems];
-        newReturnItems.splice(rowData.index, 1);
+        let index = newReturnItems.findIndex(item => item.product_id === rowData.product_id);
+        newReturnItems.splice(index, 1);
         setSelectedReturnItems(newReturnItems);
     };
 
@@ -1181,13 +1166,13 @@ const Form = React.memo(({ sales }) => {
         </div>
     </div>
     <div className="card col-7" >
-        <SalesProductForm 
+        <SalesProductForm
             salesItems={salesItems}
             editMode={editMode} 
             returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}
             addSalesItem={(item) => addSalesItem(item)}
-            updateSalesItem={(item, index) => updateSalesItem(item, index)}
-            removeSalesItem={(index) => removeSalesItem(index)}
+            updateSalesItem={(item) => updateSalesItem(item)}
+            removeSalesItem={(item) => removeSalesItem(item)}
             deselectProductFromList={() => deselectProductFromList()}
             selectProductFromList={(id) => selectProductFromList(id)}
             selectedItem={selectedProductItem}
@@ -1205,7 +1190,7 @@ const Form = React.memo(({ sales }) => {
             discount={sales===undefined?0:sales.discount}
             lastTradePrice={lastTradePrice}
             Id={Id}
-            />
+        />
 
         <ConfirmDialog 
             message={confirmDialogMessage}

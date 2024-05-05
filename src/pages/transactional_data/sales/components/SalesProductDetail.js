@@ -4,7 +4,6 @@ import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
 import { Badge } from 'primereact/badge';
-import { Dialog } from 'primereact/dialog';
 
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
@@ -14,8 +13,7 @@ const SalesProductDetail = ({
     onEdit, onDelete,
     onChangeVat, onChangeDeliveryCost, onChangeAdditionalDiscount,
     vat, deliveryCost, addDiscount, 
-    onChangeGross, onChangeDiscount, onChangeNet,
-    gross, net, discount
+    onChangeGross, onChangeDiscount, onChangeNet
 }) => {
 
     const [totalPrice, setTotalPrice] = useState(0.00);
@@ -29,12 +27,6 @@ const SalesProductDetail = ({
     const [netAmount, setNetAmount] = useState(0.00);
 
     const [salesRows, setSalesRows] = useState([]);
-
-    const [selectedProductIndex, setSelectedProductIndex] = useState(null);
-
-    //// STATE DeleteProductDialog ////
-    const [deleteProductDialog, setDeleteSalesProductDialog] = useState(false);
-
     const masterDataDBService = new MasterDataDBService();
 
     useEffect(() => {
@@ -121,15 +113,6 @@ const SalesProductDetail = ({
         }
         setSalesRows(allsales);
     };
-    const hideDeleteSalesProductDialog = () => {
-        setSelectedProductIndex(null);
-        setDeleteSalesProductDialog(false);
-    };
-
-    const removeItem = () => {
-        onDelete(selectedProductIndex);
-        setDeleteSalesProductDialog(false);
-    };
 
     const actionBodyTemplate = (rowData) => {
         let returnFlg = returnMode? (Number(rowData.qty) - Number(rowData.return_qty)) > 0 : false;
@@ -141,14 +124,6 @@ const SalesProductDetail = ({
             </>
         );
     };
-    
-    const serialBodyTemplate = (rowData) =>{
-        return(
-            <>
-               {salesRows.length - rowData.index}
-            </>
-        )
-    } 
 
     const brandNameBodyTemplate = (rowData) =>{
         console.log("BRAND::",rowData);
@@ -175,26 +150,12 @@ const SalesProductDetail = ({
         )
     }
 
-    const confirmDeleteSalesProduct = item => {
-        setSelectedProductIndex(item.index);
-        setDeleteSalesProductDialog(true);
-    };
-
-    const deleteProductDialogFooter = (
-        <>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteSalesProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={removeItem} />
-        </>
-    );
-
     const getProductName = async (product_id) => {
-
         let product = await masterDataDBService.getById("dtProduct", product_id);
         let brand_name = await masterDataDBService.getShortnameById("dtProductBrand", product.dtProductBrand_id);
         let model_no = await masterDataDBService.getShortnameById("dtProductModel", product.dtProductModel_id);
         product.brand_name = brand_name;
         product.model_no = model_no;
-        // return product ? product.name : "";
         return product;
     }
 
@@ -252,7 +213,6 @@ const SalesProductDetail = ({
                 stripedRows showGridlines scrollable scrollHeight="25rem" 
             >
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
-                <Column field="" frozen header="SI" body={serialBodyTemplate} headerStyle={{ minWidth: '3rem' }}></Column>
                 <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '18rem' }}></Column>
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '3rem' }}></Column>
                 <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
@@ -266,16 +226,6 @@ const SalesProductDetail = ({
                 <Column field="lastTradePrice" header="Last Sale Price" headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="remarks" header="Remarks" headerStyle={{ minWidth: '10rem' }}></Column>
             </DataTable>
-
-            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteSalesProductDialog}>
-                <div className="flex align-items-center justify-content-center">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    <span>
-                        Are you sure you want to delete?
-                    </span>
-                </div>
-            </Dialog>
-
         </>
     );
 }

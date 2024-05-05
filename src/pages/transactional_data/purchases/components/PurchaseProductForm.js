@@ -17,9 +17,10 @@ import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 import { PRODUCT_MODEL, PRODBRAND_MODEL, PRODMODEL_MODEL } from '../../../../constants/models';
 
 export default function PurchaseProductForm({ 
-    onAdd, onEdit, 
+    onAdd, onEdit, cancelEdit,
     currency, conversionRate, supplierId,
-    selectedProduct, defaultPurchaseProduct, defaultWarehouse }) {
+    selectedProduct, defaultPurchaseProduct, defaultWarehouse 
+}) {
 
     let emptyPurchaseProduct = {
         product_id: "", // select product
@@ -65,7 +66,6 @@ export default function PurchaseProductForm({
     const quantityRef = useRef(null);
 
     const [purchaseProduct, setPurchaseProduct] = useState(defaultPurchaseProduct);
-    const [submitted, setSubmitted] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [selSupplierId, setSelSupplierId] = useState(null);
 
@@ -109,8 +109,7 @@ export default function PurchaseProductForm({
     }, [conversionRate]);
 
     useEffect(() => {
-        if (selectedProduct.product_id) {    
-            // showDialog();
+        if (selectedProduct.product_id) {
             reset({ ...selectedProduct });
             setPurchaseProduct(selectedProduct);
             console.log("Selected Product :::: ", selectedProduct);
@@ -118,37 +117,17 @@ export default function PurchaseProductForm({
         }
     }, [selectedProduct]);
 
+    useEffect(() => {
+        if (cancelEdit) {
+            reset({ ...emptyPurchaseProduct });
+            setIsEdit(false);
+        }
+    }, [cancelEdit]);
+
     const roundNumber = (num) => {
         return Math.round((num + Number.EPSILON) * 100) / 100;
     };
 
-    const resetForm = () => {
-        reset({
-            'product_id': '',
-            'warehouse_id': defaultWarehouse,
-            'code': '',
-            'brand_name': '',
-            'model_no': '',
-            'part_number': '',
-            'last_purchase_price': 0.00,
-            'qty': 1,
-            'unit_cost_f': 0.00,
-            'totalCostF': 0.00,
-            'conversion_rate': conversionRate,
-            'unit_cost': 0.00,
-            'totalCostBDT': 0.00,
-            'transport': 0.00,
-            'duty_vat': 0.00,
-            'netUnitCostBDT': 0.00,
-            'netCostBDT': 0.00,
-            'discount_profit': 0,
-            'profit': 0.00,
-            'trade_price': 0.00,
-            'min_trade_price': 0.00,
-        });
-        setIsEdit(false);
-        calculateCost(emptyPurchaseProduct);
-    };
     const calculateCost = (_purchaseProduct) => {
         console.log("CALCULATING COST:::=>>", purchaseProduct.conversion_rate);
         _purchaseProduct.totalCostF = roundNumber(_purchaseProduct.unit_cost_f * _purchaseProduct.qty);
@@ -226,7 +205,6 @@ export default function PurchaseProductForm({
         let lastTradePrice = 0
         if(selSupplierId===null){
             alert("Select a supplier first.")
-            // toast.current.show({ severity: 'error', summary: 'Error Message', detail: 'Please select a supplier first.', life: 3000 });
             return;
         }
 
@@ -234,7 +212,6 @@ export default function PurchaseProductForm({
             // crash here
             let resp = await orderService.getOrderProductLastPriceByParty("trxPurchase", selectedRow.id, selSupplierId);
             lastTradePrice = resp.prev_price;
-            // lastOrderId = resp.order_id;
         }
         console.log("LAST TRADE PRICE::", lastTradePrice);
 
@@ -243,8 +220,6 @@ export default function PurchaseProductForm({
         console.log("PRODUCT SELECTED::", selectedRow);
         console.log("DEFAULT PURCHASE PRODUCT:::=>>", defaultPurchaseProduct);
         let _purchaseProduct = { ...defaultPurchaseProduct };
-        // console.log(selectedRow.code)
-        // console.log(selectedRow.last_purchase_price)
         _purchaseProduct['product_id'] = selectedRow.id;
         _purchaseProduct['product_name'] = selectedRow.name;
         _purchaseProduct['code'] = selectedRow.code;
@@ -272,12 +247,9 @@ export default function PurchaseProductForm({
     };
 
     const onAddItem = (dt) => {
-        // calculateCost();
         console.log("PRODUCT-GOING-TOBE-ADDED",dt);
-        // resetForm();
         reset({ ...emptyPurchaseProduct });
         onAdd(dt);
-        // setPurchaseProduct(emptyPurchaseProduct);
     };
 
     const onEditItem = (dt) => {
@@ -356,8 +328,6 @@ export default function PurchaseProductForm({
                             columns={[
                                 {field: 'name', header: 'Product Name', filterPlaceholder: 'Filter by Product Name', width: '50rem'}, 
                                 {field: 'part_number', header: 'Part Number', filterPlaceholder: 'Filter by Part Number', width: '15rem'},
-                                // {field: 'dtProductBrand_id_shortname', header: 'Brand Name', filterPlaceholder: 'Filter by Barnd Name', width: '15rem'},
-                                // {field: 'dtProductModel_id_shortname', header: 'Model No', filterPlaceholder: 'Filter by Model No', width: '15rem'},
                                 {field: 'dtProductBrand_id', header: 'Brand Name', body: brandNameBodyTemplate, filterPlaceholder: 'Filter by Barnd Name', filterElement: brandFilterTemplate, width: '15rem'},
                                 {field: 'dtProductModel_id', header: 'Model No', body: modelNoBodyTemplate, filterPlaceholder: 'Filter by Model No', filterElement: modelFilterTemplate, width: '15rem'},
                                 {field: 'code', header: 'Product Code', filterPlaceholder: 'Filter by Product Code', width: '15rem'},

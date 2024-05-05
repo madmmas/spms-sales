@@ -39,8 +39,6 @@ export default function SalesProductForm({
     const [on_hold_stock, setOnHoldStock] = useState(0);
     const [isEdit, setIsEdit] = useState(false);
 
-    const [selectedItemIndex, setSelectedItemIndex] = useState(null);
-
     const resetForm = () => {
         reset({ 
             "product_id": "",
@@ -75,7 +73,6 @@ export default function SalesProductForm({
                 _total += Number(item.netPrice);
             });
             console.log("_total::", _total)
-            // setTotalAmount(_total);
         }
     }, [salesItems]);
 
@@ -136,7 +133,6 @@ export default function SalesProductForm({
         _saleProduct['discount_profit'] = item.discount_profit || 0.00;
         _saleProduct['remarks'] = item.remarks || '';
         _saleProduct['brand_name'] = item.dtProductBrand_id_shortname || '';
-        // _saleProduct['lastTradePrice'] = item.lastTradePrice;
 
         setSalesProduct(_saleProduct);
 
@@ -160,11 +156,11 @@ export default function SalesProductForm({
         setIsEdit(false);
         resetForm();
 
-        updateSalesItem(item, selectedItemIndex);
+        updateSalesItem(item);
     };
 
-    const removeItem = (index) => {
-        removeSalesItem(index);
+    const removeItem = (item) => {
+        removeSalesItem(item);
     };
 
     const onCancelEditItem = () => {
@@ -177,7 +173,6 @@ export default function SalesProductForm({
     const editSalesProduct = item => {
         console.log("editSalesProduct::", item)
         setIsEdit(true);
-        setSelectedItemIndex(item.index);
 
         selectProduct({
             "id": item.product_id,
@@ -189,7 +184,6 @@ export default function SalesProductForm({
             "qty": item.qty,
             "discount_profit": item.discount_profit,
             "remarks": item.remarks,
-            // "lastTradePrice": item.lastTradePrice,
         });
 
         selectProductFromList(item.product_id);
@@ -365,7 +359,7 @@ export default function SalesProductForm({
                     editMode={editMode} 
                     returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}        
                     onEdit={(dt) => editSalesProduct(dt)}
-                    onDelete={(index) => removeItem(index)}
+                    onDelete={(dt) => removeItem(dt)}
                     onChangeVat={(e) => onChangeVat(e)}
                     onChangeDeliveryCost={(e) => onChangeDeliveryCost(e)}
                     onChangeAdditionalDiscount={(e) => onChangeAdditionalDiscount(e)}

@@ -71,6 +71,8 @@ const Form = ({ purchase }) => {
     const [purchases, setPurchases] = useState([]);
     const [purchaseData, setPurchaseData] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(defaultPurchaseProduct);
+    const [selectedProductToDelete, setSelectedProductToDelete] = useState(defaultPurchaseProduct);
+    const [cancelEdit, setCancelEdit] = useState(0);
     const [returnDialog, setReturnDialog] = useState(false);
     const [statusChangeDialog, setStatusChangeDialogFooter] = useState(false);
     const [supplierId, setSupplierId] = useState(null);
@@ -270,27 +272,26 @@ const Form = ({ purchase }) => {
         }
 
         let newPurchases = [...purchases];
-        addedItem['index'] = purchases.length;
         newPurchases.push(addedItem);
         console.log("NEWPURCHASE::", newPurchases);
         setPurchases(newPurchases);
         console.log("PURCHASES::", purchases);
-        // calculateTotals(newPurchases);
     };
 
     const updatePurchaselist = (dtPurchaseProduct) => {
         let newPurchases = [...purchases];
-        newPurchases[selectedProduct.index] = dtPurchaseProduct;
+        let index = newPurchases.findIndex((item) => item.product_id === dtPurchaseProduct.product_id);
+        newPurchases[index] = dtPurchaseProduct;
         console.log("EDIT::", dtPurchaseProduct);
         setPurchases(newPurchases);
-        // calculateTotals(newPurchases);
     };
 
     const removeItem = () => {
         let newPurchases = [...purchases];
-        newPurchases.splice(selectedProduct.index, 1);
+        let index = newPurchases.findIndex((item) => item.product_id === selectedProductToDelete.product_id);
+        newPurchases.splice(index, 1);
         setPurchases(newPurchases);
-        // setDeletePurchaseProductDialog(false);
+        setCancelEdit(cancelEdit + 1);
     };
 
     const editPurchaseProduct = (dtPurchaseProduct) => {
@@ -336,9 +337,6 @@ const Form = ({ purchase }) => {
 
     const onAddReturnItem = (returnItem) => {
         console.log("SELECTED RETURN ITEM::", returnItem);
-        // add index to return item
-        returnItem['index'] = selectedReturnItems.length;
-        // add timestamp
         returnItem['created_at'] = moment();
         // check if already added
         for(let i=0; i<selectedReturnItems.length; i++) {
@@ -354,7 +352,8 @@ const Form = ({ purchase }) => {
     const onDeleteFromReturnList = (rowData) => {
         console.log("DELETE RETURN ITEM::", rowData);
         let newReturnItems = [...selectedReturnItems];
-        newReturnItems.splice(rowData.index, 1);
+        let index = newReturnItems.findIndex((item) => item.product_id === rowData.product_id);
+        newReturnItems.splice(index, 1);
         setSelectedReturnItems(newReturnItems);
     };
 
@@ -497,6 +496,7 @@ const Form = ({ purchase }) => {
                 defaultWarehouse={defaultWarehouse}
                 onAdd={(dt) => addToPurchaseList(dt)} 
                 onEdit={(dt) => updatePurchaselist(dt)}
+                cancelEdit={cancelEdit}
                 currency={selectedSupplier_currency}
                 conversionRate={conversionRate}
                 supplierId={supplierId}
@@ -511,7 +511,10 @@ const Form = ({ purchase }) => {
                 purchases={purchases} 
                 supplierCurrency={selectedSupplier_currency} conversion_rate={conversionRate}
                 onEdit={(dt) => editPurchaseProduct(dt)} 
-                onDelete={() => showConfirmDialog('removeItem')}
+                onDelete={(dt) => {                    
+                    setSelectedProductToDelete(dt);
+                    showConfirmDialog('removeItem')
+                }}
             />}
         </div>
 

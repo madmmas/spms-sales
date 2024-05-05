@@ -434,6 +434,7 @@ const Form = ({ packageData }) => {
                             <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Package Price</label>
                             <InputNumber readOnly={true} inputId={field.name} value={field.value} inputRef={field.ref} 
                                 className={classNames({ 'p-invalid': fieldState.error })} 
+                                maxFractionDigits={2}
                                 onValueChange={(e) => field.onChange(e.target.value)} 
                                 />
                             {getFormErrorMessage(field.name)}
@@ -468,7 +469,7 @@ const Form = ({ packageData }) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Low Stock Quatity</label>
-                                <InputNumber inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} />
+                                <InputNumber maxFractionDigits={2} inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onValueChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
