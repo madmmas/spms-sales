@@ -320,13 +320,13 @@ const List = () => {
     };
 
     const  cashBodyTemplate = (rowData) => {
-        if(rowData.customer_category === "REGISTERED"){
-            return (
-                <>
-                    0
-                </>
-            );
-        }
+        // if(rowData.customer_category === "REGISTERED"){
+        //     return (
+        //         <>
+        //             0
+        //         </>
+        //     );
+        // }
 
         let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
@@ -354,13 +354,13 @@ const List = () => {
     };
 
     const  othersBodyTemplate = (rowData) => {
-        if(rowData.customer_category === "REGISTERED"){
-            return (
-                <>
-                    0
-                </>
-            );
-        }
+        // if(rowData.customer_category === "REGISTERED"){
+        //     return (
+        //         <>
+        //             0
+        //         </>
+        //     );
+        // }
         
         let amount = 0;
         if(rowData.customer_category === "CONDITIONAL"){
