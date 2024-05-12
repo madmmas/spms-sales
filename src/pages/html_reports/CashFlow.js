@@ -34,14 +34,19 @@ export const CashFlow = () => {
         transactionService.getReport('cashflow', {
             "ondate": ondate,
         }).then(data => {
-            setCashFlowData(data);
             calculateCashflowTotal(data);
-            console.log("CashFlowData::", data);
-        });
-        transactionService.getLedgerBalanceUpto('dtCash', ondate).then(data => {
-            console.log("dtCash::", data);
-            setCashFlowData(prevState => {
-                return {...prevState, opening_cash_balance: data.balance}
+            // console.log("CashFlowData-1::", data);
+            transactionService.getLedgerBalanceUpto('dtCash', ondate).then(c_data => {
+                // console.log("dtCash::", c_data);
+                let cr_amount = parseFloat(c_data['cr_amount']) || 0;
+                let dr_amount = parseFloat(c_data['dr_amount']) || 0;
+                let balance = cr_amount - dr_amount;
+                // console.log("balance::", balance);
+                let opening_cash_balance = parseFloat(data['opening_cash_balance'] || 0);
+                // console.log("opening_cash_balance::", opening_cash_balance);
+                data['opening_cash_balance'] = opening_cash_balance + balance;
+                setCashFlowData(data);
+                // console.log("CashFlowData-2::", data);
             });
         });
     }
