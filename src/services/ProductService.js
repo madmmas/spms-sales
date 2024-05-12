@@ -37,6 +37,17 @@ export class ProductService {
         }).then(res => res.data);
     }
 
+    async isProductNameBrandAndPartNumberExist(name, brandId, partNumber) {
+        let products = await this.masterDataDBService.getByFields("dtProduct", { name: name, dtProductBrand_id: brandId, part_number: partNumber });
+        console.log("name:::", name);
+        console.log("brandId:::", brandId);
+        console.log("partNumber:::", partNumber);
+        if(products.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
     async isProductNameExist(id, name) {
         let products = await this.masterDataDBService.getByFieldName("dtProduct", "name", name);
         console.log("name:::", name);

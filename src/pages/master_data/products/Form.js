@@ -92,24 +92,13 @@ const Form = ({productData}) => {
         let valid = true;
         // check if product name exist
         if(productData==null){
-            let isExist = await productService.isProductNameExist(data.id, data.name);
+            // product name, brand name and part number must be unique
+            let isExist = await productService.isProductNameBrandAndPartNumberExist(data.name, data.brand_id, data.part_number);
             if(isExist){
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Name already exist', life: 3000 });
-                valid = false;
-            }
-            // // check if product part number exist
-            isExist = await productService.isProductPartNumberExist(data.id, data.part_number, data.brand_id);
-            if(isExist){
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Part Number already exist for the Brand', life: 3000 });
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product already exist with same name, brand and part0number.', life: 3000 });
                 valid = false;
             }
         }
-        // check if product code exist
-        // isExist = await productService.isProductCodeExist(data.id, data.code);
-        // if(isExist){
-        //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Product Code already exist', life: 3000 });
-        //     valid = false;
-        // }
 
         if(data.price < data.cost){
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Price cannot be less than Cost', life: 3000 });
