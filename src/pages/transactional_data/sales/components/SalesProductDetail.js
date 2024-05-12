@@ -96,8 +96,9 @@ const SalesProductDetail = ({
         if(allsales && allsales.length > 0) {
             for(let i=0; i<allsales.length; i++) {
                 console.log("ALLSALES::",i,allsales[i]);
-                let product = await getProductName(allsales[i].product_id);
+                let product = await getProductName(allsales[i].product_id);                
                 allsales[i].product_name = product.name;
+                allsales[i].unit = product.unit;
                 allsales[i].brand_name = product.brand_name;
                 allsales[i].model_no = product.model_no;
                 allsales[i].part_number = product.part_number;
@@ -130,6 +131,15 @@ const SalesProductDetail = ({
         return(
             <>
                {rowData.brand_name}
+            </>
+        )
+    }
+
+    const unitBodyTemplate = (rowData) =>{
+        console.log("UNIT::",rowData);
+        return(
+            <>
+               {rowData.unit}
             </>
         )
     }
@@ -215,6 +225,7 @@ const SalesProductDetail = ({
                 <Column body={actionBodyTemplate} frozen headerStyle={{ minWidth: '6.4rem' }}></Column>
                 <Column field="product_name" frozen header="Product Name"  headerStyle={{ minWidth: '18rem' }}></Column>
                 <Column field="qty" header="Quantity" headerStyle={{ minWidth: '3rem' }}></Column>
+                <Column field="unit" header="Unit" body={unitBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="brand_name" header="Brand Name" body={brandNameBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                 <Column field="model_no" header="Model No." body={modelNumberBodyTemplate} headerStyle={{ minWidth: '6rem' }}></Column>
                 <Column field="part_number" header="Part Number" body={partNumberBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
