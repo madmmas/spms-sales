@@ -34,8 +34,6 @@ export const CashFlow = () => {
         transactionService.getReport('cashflow', {
             "ondate": ondate,
         }).then(data => {
-            calculateCashflowTotal(data);
-            // console.log("CashFlowData-1::", data);
             transactionService.getLedgerBalanceUpto('dtCash', ondate).then(c_data => {
                 // console.log("dtCash::", c_data);
                 let cr_amount = parseFloat(c_data['cr_amount']) || 0;
@@ -47,15 +45,24 @@ export const CashFlow = () => {
                 data['opening_cash_balance'] = opening_cash_balance + balance;
                 setCashFlowData(data);
                 // console.log("CashFlowData-2::", data);
+                // console.log("CashFlowData-#::", cashFlowData);
+                calculateCashflowTotal(data);
+                // console.log("CashFlowData-1::", data);                
             });
         });
     }
 
     const calculateCashflowTotal = (data) => {
+        console.log("calculateCashflowTotal::", data);
         let total = 0;
+        let opening_cash_balance = parseFloat(data['opening_cash_balance'] || 0);
+        console.log("opening_cash_balance::", opening_cash_balance);
         let inflow = calculateCashInflowTotal(data);
         let outflow = calculateCashOutflowTotal(data);
-        total = inflow - outflow;
+        console.log("inflow::", inflow);
+        console.log("outflow::", outflow);
+        total = parseFloat(opening_cash_balance) + inflow - outflow;
+        console.log("total::", total);
         setCashInflowTotal(inflow);
         setCashOutflowTotal(outflow);
         setCashflowTotal(total);
