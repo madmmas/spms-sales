@@ -14,6 +14,7 @@ import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
+import { InputMask } from 'primereact/inputmask';
         
 import ConfirmDialog from '../../components/ConfirmDialog';
 
@@ -994,7 +995,8 @@ const Form = React.memo(({ sales }) => {
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Mobile Number</label>
-                    <InputText readOnly={readOnly} inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/>
+                    {/* <InputText readOnly={readOnly} inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/> */}
+                    <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+880 9999 999999" />
                     {getFormErrorMessage(field.name)}
                         </>
                     )}/>
