@@ -224,9 +224,15 @@ export const PrintPurchaseInvoice = () => {
                         <th className="heading brand left-align">Brand</th>
                         <th className="heading brand left-align">Part No</th>
                         <th className="heading brand left-align">Model</th>
-                        <th className="heading brand right-align">Unit Price</th>
-                        <th className="heading qty center-align">D %</th>
-                        <th className="heading amount right-align">Amount</th>
+                        <th className="heading brand right-align">Unit C (F)</th>
+                        <th className="heading brand right-align">Total C (F)</th>
+                        <th className="heading brand right-align">CR</th>
+                        <th className="heading brand right-align">Transport</th>
+                        <th className="heading brand right-align">Duty</th>
+                        <th className="heading brand right-align">Unit Cost</th>
+                        <th className="heading brand right-align">Total Cost</th>
+                        <th className="heading brand center-align">Profit %</th>
+                        <th className="heading brand right-align">Unit S. Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -238,22 +244,31 @@ export const PrintPurchaseInvoice = () => {
                         <td className="line left-align">{item.product_brand_name}</td>
                         <td className="line left-align">{item.product_part_number}</td>
                         <td className="line left-align">{item.product_model_no}</td>
-                        <td className="line right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.unit_cost_f).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.unit_cost_f*item.qty).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.conversion_rate).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.transport).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.duty_vat).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.unit_cost).toFixed(2)}</td>
+                        <td className="line right-align">{Number.parseFloat(item.unit_cost*item.qty).toFixed(2)}</td>
                         <td className="line center-align">{item.discount_profit}</td>
-                        <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                        <td className="line right-align">{Number.parseFloat(item.trade_price).toFixed(2) }</td>
                     </tr>)}
 
                     <tr>
-                        <td colSpan="8" className="sum-up line">Gross Amount</td>
+                        <td colSpan="12" className="sum-up line">Gross Amount</td>
                         <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
+                        <td colSpan="2" className="sum-up line"></td>
                     </tr>
                     <tr>
-                        <td colSpan="8" className="sum-up">(-) Discount</td>
+                        <td colSpan="12" className="sum-up">(-) Discount</td>
                         <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
+                        <td colSpan="2" className="sum-up"></td>
                     </tr>
                     <tr>
-                        <th colSpan="8" className="total text line">Net Amount</th>
+                        <th colSpan="12" className="total text line">Net Amount</th>
                         <th className="total price right-align line">{ Number.parseFloat(invoice.net).toFixed(2)}</th>
+                        <td colSpan="2" className="sum-up line"></td>
                     </tr>
                 </tbody>
             </table>}

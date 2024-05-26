@@ -3,12 +3,13 @@ import { roundNumber } from '../../../../utils.js';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
+import { InputNumber } from 'primereact/inputnumber';
 
 import { MasterDataDBService } from '../../../../services/MasterDataDBService';
 
 const PurchaseProductDetail = ({
-    purchases, supplierCurrency, conversion_rate,
-    onEdit, onDelete, onReturnItem, 
+    purchases, supplierCurrency, discount,
+    onEdit, onDelete, onReturnItem, onDiscountChange,
     editMode = true, returnMode = false
 }) => {
 
@@ -17,13 +18,14 @@ const PurchaseProductDetail = ({
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [totalTransport, setTotalTransport] = useState(0.00);
     const [totalDuty, setTotalDuty] = useState(0.00);
+    const [purchaseDiscount, setPurchaseDiscount] = useState(0.00);
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
 
     const [purchaseRows, setPurchaseRows] = useState([]);
 
     const [displayProducts, setDisplayProducts] = useState([]);
 
-    const calculateTotals = (allpurchases) => {
+    const calculateTotals = (allpurchases, _discount = 0) => {
         console.log("CALCULATE-PURCHASES::", allpurchases)
         let totalCostAmountF = 0;
         let totalCostAmountBDT = 0;
@@ -40,15 +42,31 @@ const PurchaseProductDetail = ({
                 netCostAmountBDT += Number(allpurchases[i].netCostBDT);
             }
         }
+        // apply discount
         setTotalQuantity(purchases.length);
         setTotalAmountBDT(totalCostAmountBDT);
         setTotalAmountF(totalCostAmountF);
         setTotalTransport(totalTransport);
         setTotalDuty(totalDuty);
+        setPurchaseDiscount(_discount);
+        console.log("DISCOUNT-AMOUNT::", _discount);
+        let discountAmount = totalCostAmountBDT * _discount / 100;
+        console.log("DISCOUNT-AMOUNT-2::", discountAmount);
+        netCostAmountBDT = totalCostAmountBDT - discountAmount;
+        console.log("NET-COST-AMOUNT::", netCostAmountBDT);
         setNetAmountBDT(netCostAmountBDT);
         console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
     };
     
+    const onPurDiscountChange = (value) => {
+        console.log("DISCOUNT-CHANGE::", value);
+        if(Number(value) >= 0) {
+            console.log("DISCOUNT-CHANGE-2::", value);
+            calculateTotals(purchases, value);
+            onDiscountChange(value);
+        }
+    };
+
     const recalculateAllRows = (allpurchases) => {
         if(allpurchases && allpurchases.length > 0) {
             for(let i=0; i<allpurchases.length; i++) {
@@ -90,17 +108,32 @@ const PurchaseProductDetail = ({
     }, [purchases]);
 
     const footer = (
-        <table  className="col-12"><tbody>
-            <tr>
-                <td><b>Total Cost ({supplierCurrency}):</b></td><td>{totalCostAmountF}</td>
-                <td><b>Conversion Rate ({supplierCurrency} to BDT):</b></td><td>{conversion_rate}</td>
-                <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
-            </tr><tr>
-                <td><b>Total Transport Cost:</b></td><td>{totalTransport}</td>
-                <td><b>Total Duty:</b></td><td>{totalDuty}</td>
-                <td><b>Total Net Cost:</b></td><td>{netCostAmountBDT}</td>
-            </tr>
-        </tbody></table>
+        <>
+            <table  className="col-12"><tbody>
+                <tr>
+                    <td><b>Total Cost ({supplierCurrency}):</b></td><td>{totalCostAmountF}</td>
+                    {/* <td><b>Conversion Rate ({supplierCurrency} to BDT):</b></td><td>{conversion_rate}</td> */}
+                    <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
+                    <td><b>Discount</b></td><td>
+                        {!editMode && <>
+                            <InputNumber readonly="true" value={discount} placeholder="empty" />
+                        </>}
+                        {editMode && <InputNumber value={discount}
+                            placeholder=""
+                            min={0} maxFractionDigits={2}
+                            className="mx-2"
+                            style={{"width": "fit-content(20em)"}}
+                            onValueChange={(e) => onPurDiscountChange(e.value)} 
+                            />}
+                    </td>
+                </tr><tr>
+                    <td><b>Total Transport Cost:</b></td><td>{totalTransport}</td>
+                    <td><b>Total Duty:</b></td><td>{totalDuty}</td>
+                    <td><b>Total Net Cost:</b></td><td>{netCostAmountBDT}</td>
+                </tr>
+            </tbody></table>
+        </>
+        
     );
 
     const actionBodyTemplate = (rowData) => {

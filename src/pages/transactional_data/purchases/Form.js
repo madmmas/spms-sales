@@ -34,8 +34,8 @@ const Form = ({ purchase }) => {
         party_type: 'dtSupplier',
         party_id: null,
         currency: null,
-        cnf: null,
-        be_no: null,
+        discount: null,
+        invoice_no: null,
         lc_no: null,
         notes: null,
     };
@@ -83,6 +83,7 @@ const Form = ({ purchase }) => {
     const [editMode, setEditMode] = useState(true);
 
     const [conversionRate, setConversionRate] = useState(1);
+    const [discount, setDiscount] = useState(0);
 
     const [returnMode, setReturnMode] = useState(false);
     const [selectedReturnItem, setSelectedReturnItem] = useState({});
@@ -131,8 +132,8 @@ const Form = ({ purchase }) => {
                 party_id: purchase.party_id,
                 currency: purchase.currency,
                 conversion_rate: conversionRate,
-                cnf: purchase.cnf,
-                be_no: purchase.be_no,
+                discount: purchase.discount,
+                invoice_no: purchase.invoice_no,
                 lc_no: purchase.lc_no,
                 notes: purchase.notes,
             });
@@ -221,7 +222,8 @@ const Form = ({ purchase }) => {
         formData.gross = totalCostAmountBDT;
         formData.transport = totalTransport;
         formData.duty_vat = totalDuty;
-        formData.net = netCostAmountBDT;
+        formData.discount = discount;
+        formData.net = netCostAmountBDT - discount;
 
         console.log("FORMDATA::", formData);
 
@@ -412,35 +414,35 @@ const Form = ({ purchase }) => {
                         <label htmlFor="fldSupplierCurrency">Supplier Currency</label>
                         <InputText readonly="true" value={selectedSupplier_currency} placeholder="Currency" />
                     </div>  
-                    <div className="field col-12">
+                    {/* <div className="field col-12">
                         {!editMode && <>
-                            <label>CnF</label>
-                            <InputText readonly="true" value={purchase.cnf} placeholder="empty" />
+                            <label>Discount</label>
+                            <InputText readonly="true" value={purchase.discount} placeholder="empty" />
                         </>}
                         {editMode && <Controller
 
-                            name="cnf"
+                            name="discount"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Discount (%) on Net Cost</label>
                                 <InputText inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>}
-                    </div>
+                    </div> */}
                     <div className="field col-12">
                         {!editMode && <>
-                            <label>B/E No.</label>
-                            <InputText readonly="true" value={purchase.be_no} placeholder="empty" />
+                            <label>Invoice Number</label>
+                            <InputText readonly="true" value={purchase.invoice_no} placeholder="empty" />
                         </>}
                         {editMode && <Controller
 
-                            name="be_no"
+                            name="invoice_no"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>B/E No.</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Invoice No.</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>
@@ -510,7 +512,9 @@ const Form = ({ purchase }) => {
                 returnMode={returnMode} onReturnItem={(dt) => onReturnItem(dt)}
                 purchases={purchases} 
                 supplierCurrency={selectedSupplier_currency} conversion_rate={conversionRate}
-                onEdit={(dt) => editPurchaseProduct(dt)} 
+                onEdit={(dt) => editPurchaseProduct(dt)}
+                discount={discount}
+                onDiscountChange={(value) => setDiscount(value)}
                 onDelete={(dt) => {                    
                     setSelectedProductToDelete(dt);
                     showConfirmDialog('removeItem')
