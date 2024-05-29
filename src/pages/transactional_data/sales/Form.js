@@ -995,8 +995,7 @@ const Form = React.memo(({ sales }) => {
                     render={({ field, fieldState }) => (
                         <>
                     <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Mobile Number</label>
-                    {/* <InputText readOnly={readOnly} inputId={field.name} value={field.value} inputRef={field.ref}  onChange={(e) => field.onChange(e.target.value)} className={classNames({ 'p-invalid': fieldState.error })}/> */}
-                    <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+880 9999 999999" />
+                    <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="012 3456 7890" onChange={(e) => field.onChange(e.target.value)} mask="019 9999 9999" />
                     {getFormErrorMessage(field.name)}
                         </>
                     )}/>

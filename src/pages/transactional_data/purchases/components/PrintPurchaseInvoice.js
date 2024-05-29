@@ -36,6 +36,7 @@ export const PrintPurchaseInvoice = () => {
             let productDetails = await masterDataDBService.getById('dtProduct', items[i].product_id);
             console.log("productDetails::", productDetails)
             items[i].product_name = productDetails.name;
+            items[i].product_unit = productDetails.unit;
             items[i].product_part_number = productDetails.part_number;
             items[i].product_model_id = productDetails.dtProductModel_id;
             items[i].product_brand_id = productDetails.dtProductBrand_id;
@@ -197,9 +198,24 @@ export const PrintPurchaseInvoice = () => {
                 <p>R.N ROAD,JASHORE,BANGLADESH</p>
                 <p>MOBILE NO - 01712202310, 01913959501</p>
             </header>
-            <p  class="line">Invoice Number : {invoice.voucher_no}</p>
+            <table className="bill-details">
+                <tbody>
+                    <tr>
+                        <td className="line heading name15"><b>Invoice Number :</b></td><td className="line name35">{invoice.voucher_no}</td>
+                        <td className="line heading name15"><b>Invoice Date :</b></td><td className="line name35">{getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</td>
+                    </tr>
+                    <tr>
+                        <td className="heading name15"><b>Invoice Created By :</b></td><td>{salesMan}</td>
+                    </tr>
+                    <tr>
+                        <td className="heading name15"><b>Party Invoice No :</b></td><td>{invoice.cnf}</td>
+                        <td className="heading name15"><b>Party LC No :</b></td><td>{invoice.lc_no}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {/* <p  class="line"> {invoice.voucher_no}</p>
             <p>Invoice Date : {getDateFormatted(invoice.created_at)} {getTimeFormatted(invoice.created_at)}</p>
-            <p>Invoice Created By : {salesMan}</p>
+            <p>Invoice Created By : {salesMan}</p> */}
             <table className="bill-details">
                 <tbody>
                     
@@ -239,7 +255,7 @@ export const PrintPurchaseInvoice = () => {
                     {invoice.items.map( (item, i) => 
                     <tr>
                         <td className="line left-align">{i+1}</td>
-                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
+                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)} {item.product_unit}</td>
                         <td className="line left-align">{item.product_name}</td>
                         <td className="line left-align">{item.product_brand_name}</td>
                         <td className="line left-align">{item.product_part_number}</td>

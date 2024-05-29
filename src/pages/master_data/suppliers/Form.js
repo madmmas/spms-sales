@@ -136,8 +136,7 @@ const Form = ({supplierProfile}) => {
                             render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Phone</label>
-                                {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+8801453656754" onChange={(e) => field.onChange(e.target.value)} /> */}
-                                <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+880 9999 999999" />
+                                <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+999 9999 999999" />
                                 {getFormErrorMessage(field.name)}
                             </>
                         )}/>
@@ -177,8 +176,7 @@ const Form = ({supplierProfile}) => {
                                     render={({ field, fieldState }) => (
                                     <>
                                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Contact Person Mobile Number</label>
-                                        {/* <InputText  inputId={field.name} value={field.value} inputRef={field.ref} placeholder="+8801453656754" className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} /> */}
-                                        <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+880 9999 999999" />
+                                        <InputMask  inputId={field.name} value={field.value} inputRef={field.ref} className={classNames({ 'p-invalid': fieldState.error })} placeholder="+880 1234 567890" onChange={(e) => field.onChange(e.target.value)} mask="+999 9999 999999" />
                                         {getFormErrorMessage(field.name)}
                                     </>
                                 )}/>

@@ -36,6 +36,7 @@ export const PrintInvoice = () => {
             let productDetails = await masterDataDBService.getById('dtProduct', items[i].product_id);
             console.log("productDetails::", productDetails)
             items[i].product_name = productDetails.name;
+            items[i].product_unit = productDetails.unit;
             items[i].product_part_number = productDetails.part_number;
             items[i].product_model_id = productDetails.dtProductModel_id;
             items[i].product_brand_id = productDetails.dtProductBrand_id;
@@ -266,24 +267,29 @@ export const PrintInvoice = () => {
                 {invoice.items.map( (item, i) => 
                     <tr>
                         <td className="line left-align">{i+1}</td>
-                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)}</td>
+                        <td className="line left-align">{Number.parseFloat(item.qty).toFixed(0)} {item.product_unit}</td>
                         <td className="line left-align">{item.product_name}</td>
                         <td className="line left-align">{item.product_brand_name}</td>
                         <td className="line left-align">{item.product_part_number}</td>
                         <td className="line left-align">{item.product_model_no}</td>
                         <td className="line right-align">{Number.parseFloat(item.trade_price).toFixed(2)}</td>
                         <td className="line center-align">{item.discount_profit}</td>
-                        <td className="line center-align">{Number.parseFloat(item.trade_price)*Number.parseFloat(item.discount_profit)/100}</td>
-                        <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td>
+                        <td className="line center-align">{Number.parseFloat(item.qty*item.trade_price*item.discount_profit/100).toFixed(2)}</td>
+                        {/* <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td> */}
+                        <td className="line right-align">{Number.parseFloat(item.qty*item.trade_price).toFixed(2) }</td>
                     </tr>)}
 
                     <tr>
-                        <td colSpan="9" className="sum-up line">Total Amount</td>
+                        <td colSpan="9" className="sum-up line">Gross Amount</td>
                         <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
                     </tr>
                     <tr>
-                        <td colSpan="9" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
+                        <td colSpan="9" className="sum-up">(-) Product Discount</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.discount - invoice.additional_discount).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                        <td colSpan="9" className="sum-up">(-) Invoice Discount</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.additional_discount).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <th colSpan="9" className="total text line">Net Amount</th>

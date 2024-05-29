@@ -124,6 +124,18 @@ const InvoiceCss = () => {
             .heading.qty {
                 width: 5% !important;
             }
+            .heading.name40 {
+                width: 40%;
+            }
+            .heading.name35 {
+                width: 35%;
+            }
+            .heading.name20 {
+                width: 20%;
+            }
+            .heading.name15 {
+                width: 15%;
+            }
             .heading.name {
                 width: 30%;
             }

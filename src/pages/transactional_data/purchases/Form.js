@@ -35,7 +35,7 @@ const Form = ({ purchase }) => {
         party_id: null,
         currency: null,
         discount: null,
-        invoice_no: null,
+        cnf: null,
         lc_no: null,
         notes: null,
     };
@@ -133,7 +133,7 @@ const Form = ({ purchase }) => {
                 currency: purchase.currency,
                 conversion_rate: conversionRate,
                 discount: purchase.discount,
-                invoice_no: purchase.invoice_no,
+                cnf: purchase.cnf,
                 lc_no: purchase.lc_no,
                 notes: purchase.notes,
             });
@@ -434,11 +434,11 @@ const Form = ({ purchase }) => {
                     <div className="field col-12">
                         {!editMode && <>
                             <label>Invoice Number</label>
-                            <InputText readonly="true" value={purchase.invoice_no} placeholder="empty" />
+                            <InputText readonly="true" value={purchase.cnf} placeholder="empty" />
                         </>}
                         {editMode && <Controller
 
-                            name="invoice_no"
+                            name="cnf"
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
