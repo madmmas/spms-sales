@@ -5,9 +5,9 @@ export const courier_fields = ["id", "name", "description", "status", "shortname
 // dtCustomerCategory
 export const customer_category_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtExpenseType
-export const expense_type_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
+export const expense_type_fields = ["id", "trx_no", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtIncomeType
-export const extra_income_type_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
+export const extra_income_type_fields = ["id", "trx_no", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtPaymentType
 export const payment_type_fields = ["id", "name", "description", "status", "shortname", "_default", "updated_at"];
 // dtProductBrand

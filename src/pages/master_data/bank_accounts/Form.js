@@ -43,7 +43,6 @@ const Form = ({bankAccountProfile}) => {
         }else{
             setValue("initBalance", bankAccountProfile?.initBalance)
         }
-        
     }, []);
 
     const onSubmit = (formData) => {
@@ -105,7 +104,8 @@ const Form = ({bankAccountProfile}) => {
                             control={control}
                             rules={{ required: 'Bank Account is required.' }}
                             render={({ field, fieldState }) => (
-                            <>                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
+                            <>                                
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Bank Name*</label>
                                 <SelectLookupData field={field} model={BANK_MODEL}
                                     className={classNames({ 'p-invalid': fieldState.error })} /> 
                                 {getFormErrorMessage(field.name)}

@@ -40,7 +40,7 @@ const Expenses = () => {
         dtMFSAccount_id: null,
         dtExpenseType_id: null,
         expensePeriod: null,
-        date: moment().format('YYYY-MM-DD'),
+        date: new Date(),
         amount: 0,
         remarks: '',
         expense_from: 'CASH',
@@ -296,6 +296,47 @@ const Expenses = () => {
         </>
     );
 
+    const editData = (rowData) => {
+        setCreateEdit(false);
+        setSubmitted(false);
+        setBankCash(rowData.expense_from);
+        setExpensesDialog(true);
+
+        console.log("rowData::", rowData);
+
+        setValue('trx_no', rowData.trx_no);
+        setValue('dtExpenseType_id', parseInt(rowData.dtExpenseType_id));
+        setValue('expensePeriod', rowData.expensePeriod);
+
+        moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+        // Parse the input date using moment
+        const formattedDate = moment(rowData.register_date).toDate();
+        setValue("date", formattedDate);
+
+        setValue('amount', rowData.amount);
+        setValue('remarks', rowData.remarks);
+        setValue('expense_from', rowData.expense_from);
+        setValue('dtBankAccount_id', rowData.dtBankAccount_id);
+        setValue('dtMFSAccount_id', rowData.dtMFSAccount_id);
+    };
+
+    const trxNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trx_no}
+            </>
+        );
+    };
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <>
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
+            </>
+        );
+    };
+
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -316,6 +357,8 @@ const Expenses = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="trx_no" header="Trx NO" filter sortable body={trxNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtExpenseType_id" header="Expense Type" filter filterElement={expenseTypeFilterTemplate} sortable body={expenseBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="expensePeriod" header="Expense Period" filter filterPlaceholder="Search by Expense Period" sortable body={expensePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

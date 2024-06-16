@@ -41,7 +41,7 @@ const Income = () => {
         dtMFSAccount_id : null,
         dtIncomeType_id: null,
         incomePeriod: null,
-        date: moment().format('YYYY-MM-DD'),
+        date: new Date(),
         amount: 0,
         remarks: '',
         income_to: 'CASH',
@@ -50,6 +50,7 @@ const Income = () => {
     const {
         control,
         formState: { errors },
+        setValue,
         reset,
         handleSubmit
     } = useForm({
@@ -147,7 +148,6 @@ const Income = () => {
 
     const saveIncome = (formData) => {
         setSubmitted(true);
-        console.debug(formData);
         transactionService.generaleIncome(formData).then(data => {
             setIncomeDialog(false);
             loadLazyData();
@@ -192,9 +192,31 @@ const Income = () => {
         _lazyParams['filters']['global'].value = value;
         _lazyParams['first'] = 0;
         setLazyParams(_lazyParams);
-
     };
 
+    const editData = (rowData) => {
+        setCreateEdit(false);
+        setBankCash(rowData.income_to);
+        setSubmitted(false);
+        setIncomeDialog(true);
+        console.log("rowData::", rowData);
+
+        setValue("dtIncomeType_id", parseInt(rowData.dtIncomeType_id));
+        setValue("incomePeriod", rowData.incomePeriod);
+        
+        moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+        // Parse the input date using moment
+        const formattedDate = moment(rowData.register_date).toDate();
+        setValue("date", formattedDate);
+        setValue("amount", rowData.amount);
+        setValue("remarks", rowData.remarks);
+        setValue("income_to", rowData.income_to);
+        if(rowData.income_to === "BANK") {
+            setValue("dtBankAccount_id", rowData.dtBankAccount_id);
+        } else if(rowData.income_to === "MFS") {
+            setValue("dtMFSAccount_id", rowData.dtMFSAccount_id);
+        }
+    };
 
     const leftToolbarTemplate = () => {
         return (
@@ -216,6 +238,14 @@ const Income = () => {
 
     const incomeTypeFilterTemplate = (options) => {
         return <Dropdown value={options.value} optionValue="id" optionLabel="name" options={incomeType} onChange={(e) => options.filterApplyCallback(e.value, options.index)} placeholder="Select One" className="p-column-filter" />;
+    };
+
+    const trxNoBodyTemplate = (rowData) => {
+        return (
+            <>
+                {rowData.trx_no}
+            </>
+        );
     };
 
     const incomeBodyTemplate = (rowData) => {
@@ -295,6 +325,14 @@ const Income = () => {
         </>
     );
 
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <>
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
+            </>
+        );
+    };
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
@@ -315,6 +353,8 @@ const Income = () => {
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
                     >
+                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="trx_no" header="Trx NO" filter sortable body={trxNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="dtIncomeType_id" header="Income Type" filter filterElement={incomeTypeFilterTemplate} sortable body={incomeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="incomePeriod" header="Income Period" filter filterPlaceholder="Search by Income Period" sortable body={incomePeriodBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="date" header="Date" filter filterPlaceholder="Search by Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -329,12 +369,12 @@ const Income = () => {
                                 <Controller
                                     name="dtIncomeType_id"
                                     control={control}
-                                    rules={{ required: 'Income Type_id is required.' }}
+                                    rules={{ required: 'Income Type is required.' }}
                                     render={({ field, fieldState }) => (
                                     <>
                                         <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Income Type*</label>
                                         <SelectLookupData field={field} model={INCOME_TYPE_MODEL}
-                                            className={classNames({ 'p-invalid': fieldState.error })} /> 
+                                            className={classNames({ 'p-invalid': fieldState.error })} />
                                         {getFormErrorMessage(field.name)}
                                     </>
                                 )}/>

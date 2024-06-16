@@ -24,19 +24,25 @@ const LoginPage = () => {
   
     let from = location.state?.from?.pathname || "/";
 
-  const handleLogin = (event) => {  
+  const handleLogin = (event) => {
     event.preventDefault()
+    if (username === '' || password === '') {
+        setError('* Username and password are required');
+        return;
+    }
     dispatch(login(username, password))
         .then(async () => {
+            setError('');
             await loadAllData();
             navigate(from);
         })
         .catch(() => {
-            // setLoading(false);
+            setError('* Invalid username or password');
         });
     }
 
     const [visible, setVisible] = useState(false);
+    const [error, setError] = useState('');
 
   const loadAllData = async () => {  
     const masterDataDBService = new MasterDataDBService();
@@ -70,7 +76,7 @@ const LoginPage = () => {
 
                       <div>
                           <label htmlFor="username" className="block text-900 text-xl font-medium mb-2">
-                              Email
+                              Username
                           </label>
                           <InputText inputid="username" value={username} onChange={(e) => setUsername(e.target.value)} type="text" placeholder="Username" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
 
@@ -78,6 +84,7 @@ const LoginPage = () => {
                               Password
                           </label>
                           <Password inputid="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" toggleMask className="w-full mb-5" inputClassName='w-full p-3 md:w-30rem'></Password>
+                          <div class="p-error" id="error_msg">{error}</div>
 
                           <div className="flex align-items-center justify-content-between mb-5 gap-5"></div>
                           <Button label="Sign In" className="w-full p-3 text-xl" onClick={(e) => handleLogin(e)}></Button>

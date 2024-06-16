@@ -146,13 +146,23 @@ export class TransactionService {
     }
 
     async generaleExpenses(data) {
-        const resp = await axiosInstance.post(`/expenses`, data);
+        const resp = {}
+        if(data.trx_no === null || data.trx_no === undefined || data.trx_no === "") {
+            resp = await axiosInstance.post(`/expenses`, data);
+        } else {
+            resp = await axiosInstance.put(`/expenses/` + data.trx_no, data);
+        }
         console.log(resp.data);
         return resp.data;
     }
 
     async generaleIncome(data) {
-        const resp = await axiosInstance.post(`/income`, data);
+        const resp = {}
+        if(data.trx_no === null || data.trx_no === undefined || data.trx_no === "") {
+            resp = await axiosInstance.post(`/income`, data);
+        } else {
+            resp = await axiosInstance.put(`/income/` + data.trx_no, data);
+        }
         console.log(resp.data);
         return resp.data;
     }

@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import React, { useEffect, useState } from "react";
 import { Route, Routes } from 'react-router-dom';
 import { useSelector } from "react-redux";
@@ -30,6 +31,7 @@ import { CashFlow } from "./pages/html_reports/CashFlow";
 import { MasterDataDBService } from './services/MasterDataDBService';
 
 function App() {
+  // moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
   const BankAccountList = React.lazy(() => import("./pages/master_data/bank_accounts/List"));
   const BankAccountDetail = React.lazy(() => import("./pages/master_data/bank_accounts/Detail"));
   const BankAccountForm = React.lazy(() => import("./pages/master_data/bank_accounts/Form"));
