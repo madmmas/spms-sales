@@ -95,6 +95,8 @@ const Expenses = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [loadCount, setLoadCount] = useState(0);
+    const [trxId, setTrxId] = useState(0);
+    const [trxNo, setTrxNo] = useState("");
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
@@ -136,8 +138,9 @@ const Expenses = () => {
     const openNew = () => {
         setCreateEdit(true);
         reset({ ...emptyExpenses });
+        setTrxId(0);
+        setTrxNo("");
         setBankCash("CASH");
-        setValue('date', moment().format('YYYY-MM-DD'));
         setSubmitted(false);
         setExpensesDialog(true);
     };
@@ -149,6 +152,8 @@ const Expenses = () => {
 
     const saveExpenses = (formData) => {
         setSubmitted(true);
+        formData.id = trxId;
+        formData.trx_no = trxNo;
         transactionService.generaleExpenses(formData).then(data => {
             setExpensesDialog(false);
             loadLazyData();
@@ -303,6 +308,8 @@ const Expenses = () => {
         setExpensesDialog(true);
 
         console.log("rowData::", rowData);
+        setTrxId(rowData.id);
+        setTrxNo(rowData.trx_no);
 
         setValue('trx_no', rowData.trx_no);
         setValue('dtExpenseType_id', parseInt(rowData.dtExpenseType_id));

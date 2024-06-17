@@ -96,6 +96,8 @@ const Income = () => {
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
     const [loadCount, setLoadCount] = useState(0);
+    const [trxId, setTrxId] = useState(0);
+    const [trxNo, setTrxNo] = useState("");
 
     const transactionService = new TransactionService();
     const registerService = new RegisterService();
@@ -135,6 +137,8 @@ const Income = () => {
 
     const openNew = () => {
         setCreateEdit(true);
+        setTrxId(0);
+        setTrxNo("");
         reset({ ...emptyIncome });
         setBankCash("CASH");
         setSubmitted(false);
@@ -148,6 +152,8 @@ const Income = () => {
 
     const saveIncome = (formData) => {
         setSubmitted(true);
+        formData.id = trxId;
+        formData.trx_no = trxNo;
         transactionService.generaleIncome(formData).then(data => {
             setIncomeDialog(false);
             loadLazyData();
@@ -200,10 +206,11 @@ const Income = () => {
         setSubmitted(false);
         setIncomeDialog(true);
         console.log("rowData::", rowData);
-
+        setTrxId(rowData.id);
+        setTrxNo(rowData.trx_no);
         setValue("dtIncomeType_id", parseInt(rowData.dtIncomeType_id));
         setValue("incomePeriod", rowData.incomePeriod);
-        
+
         moment.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
         // Parse the input date using moment
         const formattedDate = moment(rowData.register_date).toDate();

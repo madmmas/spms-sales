@@ -146,7 +146,7 @@ export class TransactionService {
     }
 
     async generaleExpenses(data) {
-        const resp = {}
+        let resp = {}
         if(data.trx_no === null || data.trx_no === undefined || data.trx_no === "") {
             resp = await axiosInstance.post(`/expenses`, data);
         } else {
@@ -157,7 +157,7 @@ export class TransactionService {
     }
 
     async generaleIncome(data) {
-        const resp = {}
+        let resp = {}
         if(data.trx_no === null || data.trx_no === undefined || data.trx_no === "") {
             resp = await axiosInstance.post(`/income`, data);
         } else {
