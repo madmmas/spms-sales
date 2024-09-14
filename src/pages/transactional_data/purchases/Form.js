@@ -146,6 +146,7 @@ const Form = ({ purchase }) => {
             setSupplierId(purchase.party_id);
             setEditMode(purchase.status === 'draft');
             setReturnMode(purchase.status === 'approved');
+            setDiscount(purchase.discount);
             console.log("EDIT MODE:::=>", purchase.status, purchase.status === 'draft');
         }
 

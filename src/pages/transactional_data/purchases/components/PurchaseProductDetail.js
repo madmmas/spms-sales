@@ -92,7 +92,13 @@ const PurchaseProductDetail = ({
     useEffect(() => {
         console.log("ALL-ROWS-PURCHASES::", purchases)
         recalculateAllRows(purchases);
-        calculateTotals(purchases);
+
+        if (discount !== undefined) {
+            calculateTotals(purchases, discount);
+        } else {
+            calculateTotals(purchases);
+        }
+
         // get all products ids from purchases
         let productIds = [];
         if(purchases && purchases.length > 0) {
@@ -107,6 +113,7 @@ const PurchaseProductDetail = ({
         });
     }, [purchases]);
 
+
     const footer = (
         <>
             <table  className="col-12"><tbody>
@@ -114,9 +121,9 @@ const PurchaseProductDetail = ({
                     <td><b>Total Cost ({supplierCurrency}):</b></td><td>{totalCostAmountF}</td>
                     {/* <td><b>Conversion Rate ({supplierCurrency} to BDT):</b></td><td>{conversion_rate}</td> */}
                     <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
-                    <td><b>Discount</b></td><td>
+                    <td><b>Discount (%)</b></td><td>
                         {!editMode && <>
-                            <InputNumber readonly="true" value={discount} placeholder="empty" />
+                            <InputNumber readonly="false" value={discount} placeholder="empty" />
                         </>}
                         {editMode && <InputNumber value={discount}
                             placeholder=""

@@ -276,17 +276,17 @@ export const PrintInvoice = () => {
                         <td className="line center-align">{item.discount_profit}</td>
                         <td className="line center-align">{Number.parseFloat(item.qty*item.trade_price*item.discount_profit/100).toFixed(2)}</td>
                         {/* <td className="line right-align">{Number.parseFloat(item.qty*(item.trade_price-(item.trade_price*item.discount_profit/100))).toFixed(2) }</td> */}
-                        <td className="line right-align">{Number.parseFloat(item.qty*item.trade_price).toFixed(2) }</td>
+                        <td className="line right-align">{Number.parseFloat(item.qty*item.trade_price-(item.qty*item.trade_price*item.discount_profit/100)).toFixed(2) }</td>
                     </tr>)}
 
                     <tr>
                         <td colSpan="9" className="sum-up line">Gross Amount</td>
-                        <td className="line price right-align">{ Number.parseFloat(invoice.gross).toFixed(2)}</td>
+                        <td className="line price right-align">{ Number.parseFloat(invoice.gross - invoice.discount).toFixed(2)}</td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <td colSpan="9" className="sum-up">(-) Product Discount</td>
                         <td className="price right-align">{ Number.parseFloat(invoice.discount - invoice.additional_discount).toFixed(2)}</td>
-                    </tr>
+                    </tr> */}
                     <tr>
                         <td colSpan="9" className="sum-up">(-) Invoice Discount</td>
                         <td className="price right-align">{ Number.parseFloat(invoice.additional_discount).toFixed(2)}</td>

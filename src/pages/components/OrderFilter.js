@@ -85,12 +85,6 @@ const OrderFilter = ({ reloadData, isSales }) => {
             // as string
             filters.party_id = { value: data.party_id.toString(), matchMode: 'equals' }
         }
-        if(data.cnf !== null && data.cnf !== undefined && data.cnf !== '') {
-            filters.cnf = { value: data.cnf, matchMode: 'contains' }
-        }
-        if(data.be_no !== null && data.be_no !== undefined && data.be_no !== '') {
-            filters.be_no = { value: data.be_no, matchMode: 'contains' }
-        }
         if(data.lc_no !== null && data.lc_no !== undefined && data.lc_no !== '') {
             filters.lc_no = { value: data.lc_no, matchMode: 'contains' }
         }
@@ -115,8 +109,6 @@ const OrderFilter = ({ reloadData, isSales }) => {
             customer_name: "",
             customer_phone: "",
             party_id: "",
-            cnf: "",
-            be_no: "",
             lc_no: "",
             courier_id: null,
             courier_memo_number: "",
@@ -290,32 +282,6 @@ const OrderFilter = ({ reloadData, isSales }) => {
                             }}/>
                         {getFormErrorMessage(field.name)}
                     </>)}/>
-                    </div>
-                    <div className="field col-12 md:col-2">
-                    <Controller
-                        name="cnf"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>CnF</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref}
-                                    onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
-                    </div>
-                    <div className="field col-12 md:col-2">
-                    <Controller
-                        name="be_no"
-                        control={control}
-                        render={({ field, fieldState }) => (
-                            <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>BE No</label>
-                                <InputText inputId={field.name} value={field.value} inputRef={field.ref}
-                                    onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
-                                {getFormErrorMessage(field.name)}
-                            </>
-                        )}/>
                     </div>
                     <div className="field col-12 md:col-2">
                     <Controller

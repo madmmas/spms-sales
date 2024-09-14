@@ -190,14 +190,6 @@ const List = () => {
         );
     };
 
-    const trxStatusNoBodyTemplate = (rowData) => {
-        return (
-            <>
-                {<Tag severity="info" value={rowData.trx_status}></Tag>}
-            </>
-        );
-    };
-
     const dateBodyTemplate = (rowData) => {
         return (
             <>
@@ -214,22 +206,6 @@ const List = () => {
         );
     };
 
-    const cnfBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.cnf}                
-            </>
-        );
-    };
-
-    const beNoBodyTemplate = (rowData) => {
-        return (
-            <>                
-                {rowData.be_no}
-            </>
-        );
-    };
-
     const lcNOBodyTemplate = (rowData) => {
         return (
             <>                
@@ -238,10 +214,10 @@ const List = () => {
         );
     };
 
-    const totalAmountBodyTemplate = (rowData) => {
+    const discountBodyTemplate = (rowData) => {
         return (
-            <>
-                {rowData.gross}
+            <>                
+                {rowData.discount}
             </>
         );
     };
@@ -250,14 +226,6 @@ const List = () => {
         return (
             <>
                 {rowData.gross}
-            </>
-        );
-    };
-
-    const totalQuantityBodyTemplate = (rowData) => {
-        return (
-            <>
-                {rowData.totalQuantity}
             </>
         );
     };
@@ -328,7 +296,7 @@ const List = () => {
                     <OrderFilter reloadData={reloadLazyData} isSales={false} />
 
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
                     <DataTable
                         ref={dt} value={dtProfiles} dataKey="id" 
@@ -350,12 +318,10 @@ const List = () => {
                         {/* <Column field="trx_status" header="Transaction Status" filter filterPlaceholder="Search by status" sortable body={trxStatusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column> */}
                         <Column field="created_at" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="party_it" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="CnF" header="CnF" filter filterPlaceholder="Search by CnF" sortable body={cnfBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
-                        <Column field="BENo" header="B/E No" filter filterPlaceholder="Search by B/E No" sortable body={beNoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="LCNo" header="LC No" filter filterPlaceholder="Search by LC No" sortable body={lcNOBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         {/* <Column field="totalAmountF" header="Total Amount F" filter filterPlaceholder="Search by ID" sortable body={totalAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
                         <Column field="gross" header="Total Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={totalAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        {/* <Column field="totalQuantity" header="Total Quantity" filter filterPlaceholder="Search by Quantity" sortable body={totalQuantityBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
+                        <Column field="discount" header="Discount" filter filterPlaceholder="Search by Discount" sortable body={discountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="transport" header="Total Transport" filter filterPlaceholder="Search by Transport" sortable body={totalTransportBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="duty_vat" header="Total Duty" filter filterPlaceholder="Search by Duty" sortable body={totalDutyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="net" header="Net Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={netAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
