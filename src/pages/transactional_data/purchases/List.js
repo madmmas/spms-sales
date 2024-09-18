@@ -214,6 +214,14 @@ const List = () => {
         );
     };
 
+    const partyInvoiceBodyTemplate = (rowData) => {
+        return (
+            <>                
+                {rowData.cnf}
+            </>
+        );
+    };
+
     const discountBodyTemplate = (rowData) => {
         return (
             <>                
@@ -319,6 +327,7 @@ const List = () => {
                         <Column field="created_at" header="Purchase Date" filter filterPlaceholder="Search by ID" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="party_it" header="Supplier Name" filter filterPlaceholder="Search by name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>                        
                         <Column field="LCNo" header="LC No" filter filterPlaceholder="Search by LC No" sortable body={lcNOBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="cnf" header="Party Invoice" filter filterPlaceholder="Search by Party Invoice" sortable body={partyInvoiceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         {/* <Column field="totalAmountF" header="Total Amount F" filter filterPlaceholder="Search by ID" sortable body={totalAmountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column> */}
                         <Column field="gross" header="Total Amount BDT" filter filterPlaceholder="Search by Amount" sortable body={totalAmountBDTBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="discount" header="Discount" filter filterPlaceholder="Search by Discount" sortable body={discountBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

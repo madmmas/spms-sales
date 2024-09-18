@@ -224,7 +224,9 @@ const Form = ({ purchase }) => {
         formData.transport = totalTransport;
         formData.duty_vat = totalDuty;
         formData.discount = discount;
-        formData.net = netCostAmountBDT - discount;
+        // discount in percentage
+        // formData.net = totalCostAmountBDT - discount;
+        formData.net = netCostAmountBDT - (totalCostAmountBDT * discount / 100);
 
         console.log("FORMDATA::", formData);
 
@@ -443,7 +445,7 @@ const Form = ({ purchase }) => {
                             control={control}
                             render={({ field, fieldState }) => (
                             <>
-                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Invoice No.</label>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Party Invoice No.</label>
                                 <InputText  inputId={field.name} value={field.value} inputRef={field.ref}  className={classNames({ 'p-invalid': fieldState.error })} onChange={(e) => field.onChange(e.target.value)} />
                                 {getFormErrorMessage(field.name)}
                             </>

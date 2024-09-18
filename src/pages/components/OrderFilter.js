@@ -88,6 +88,9 @@ const OrderFilter = ({ reloadData, isSales }) => {
         if(data.lc_no !== null && data.lc_no !== undefined && data.lc_no !== '') {
             filters.lc_no = { value: data.lc_no, matchMode: 'contains' }
         }
+        if(data.cnf !== null && data.cnf !== undefined && data.cnf !== '') {
+            filters.cnf = { value: data.cnf, matchMode: 'contains' }
+        }
         if(data.courier_id !== null && data.courier_id !== undefined && data.courier_id !== '') {
             filters.courier_id = { value: data.courier_id, matchMode: 'equals' }
         }
@@ -110,6 +113,7 @@ const OrderFilter = ({ reloadData, isSales }) => {
             customer_phone: "",
             party_id: "",
             lc_no: "",
+            cnf: "",
             courier_id: null,
             courier_memo_number: "",
         });
@@ -290,6 +294,19 @@ const OrderFilter = ({ reloadData, isSales }) => {
                         render={({ field, fieldState }) => (
                             <>
                                 <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>LC No</label>
+                                <InputText inputId={field.name} value={field.value} inputRef={field.ref}
+                                    onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
+                                {getFormErrorMessage(field.name)}
+                            </>
+                        )}/>
+                    </div>
+                    <div className="field col-12 md:col-2">
+                    <Controller
+                        name="cnf"
+                        control={control}
+                        render={({ field, fieldState }) => (
+                            <>
+                                <label htmlFor={field.name} className={classNames({ 'p-error': errors.value })}>Party Invoice</label>
                                 <InputText inputId={field.name} value={field.value} inputRef={field.ref}
                                     onChange={field.onChange} className={classNames({ 'p-invalid': fieldState.error })}/>
                                 {getFormErrorMessage(field.name)}
