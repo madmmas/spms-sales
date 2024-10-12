@@ -1,5 +1,5 @@
 
-// create,draft,edit,cancel,confirm,approve,delete,view => coded as bits
+// view,create,edit,delete,draft,cancel,confirm,approve => coded as bits
 // superadmin,admin,manager,sales => represent in array index
 // format: "transactionType": [superadmin, admin, manager, sales]
 const trx_perm = {
@@ -38,33 +38,32 @@ const hasPermission = function(transactionType, roleName, action) {
     let permission = getPermission(transactionType, roleName);
     let actionBit = 0;
     switch (action) {
-        case "create":
-            actionBit = 0x80;
-            break;
-        case "draft":
-            actionBit = 0x40;
-            break;
-        case "edit":
-            actionBit = 0x20;
-            break;
-        case "cancel":
-            actionBit = 0x10;
-            break;
-        case "confirm":
-            actionBit = 0x08;
-            break;
-        case "approve":
-            actionBit = 0x04;
-            break;
-        case "delete":
-            actionBit = 0x02;
-            break;
         case "view":
             actionBit = 0x01;
             break;
-        default:
-            actionBit = 0x00;
+        case "create":
+            actionBit = 0x02;
             break;
+        case "edit":
+            actionBit = 0x04;
+            break;
+        case "delete":
+            actionBit = 0x08;
+            break;
+        case "draft":
+            actionBit = 0x10;
+            break;
+        case "cancel":
+            actionBit = 0x20;
+            break;
+        case "confirm":
+            actionBit = 0x40;
+            break;
+        case "approve":
+            actionBit = 0x80;
+            break;
+        default:
+            actionBit = 0;
     }
 
     return (permission & actionBit) == actionBit;
