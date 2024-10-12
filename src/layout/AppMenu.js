@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import AppMenuitem from './AppMenuitem';
 import { MenuProvider } from './context/menucontext';
 import systemadmin from './menu/systemadmin';
+import admin from './menu/admin';
 import manager from './menu/manager';
 import sales from './menu/sales';
 
@@ -19,6 +20,8 @@ const AppMenu = () => {
             if(currentUser.user.role==="ROOT"){
                 setModel(systemadmin);
             } else if(currentUser.user.role==="ADMIN"){
+                setModel(admin);
+            } else if(currentUser.user.role==="MANAGER"){
                 setModel(manager);
             } else if(currentUser.user.role==="USER"){
                 setModel(sales);
