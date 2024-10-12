@@ -1,4 +1,3 @@
-
 // view,create,edit,delete,draft,cancel,confirm,approve => coded as bits
 // superadmin,admin,manager,sales => represent in array index
 // format: "transactionType": [superadmin, admin, manager, sales]
@@ -31,7 +30,6 @@ const getPermission = function(transactionType, roleName) {
 
     let permission = trx_perm[transactionType][roleIndex];
     return permission;
-    
 }
 
 const hasPermission = function(transactionType, roleName, action) {
