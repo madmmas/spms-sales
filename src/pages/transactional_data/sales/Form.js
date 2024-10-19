@@ -36,9 +36,13 @@ import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { OrderService } from '../../../services/OrderService';
 
+import PermissionButton from '../../components/PermissionButton';
+
 import CancellationFeeDialog from '../../components/CancellationFeeDialog';
 
 const Form = React.memo(({ sales }) => {
+
+    const trxName = SALES_MODEL;
 
     const toast = useRef(null);
     let navigate = useNavigate();
@@ -178,7 +182,7 @@ const Form = React.memo(({ sales }) => {
         console.log("lastTradePriceTrigger => selectedProductItem::", selectedProductItem);
         if(selectedProductItem!==null) {
             if(selectedCustomer===null){
-                orderService.getOrderProductLastPrice("trxSales", selectedProductItem.id).then(data => {
+                orderService.getOrderProductLastPrice(trxName, selectedProductItem.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
                         setLastTradePrice(data.prev_price);
@@ -186,7 +190,7 @@ const Form = React.memo(({ sales }) => {
                     }
                 });
             }else{
-                orderService.getOrderProductLastPriceByParty("trxSales", selectedProductItem.id, selectedCustomer.id).then(data => {
+                orderService.getOrderProductLastPriceByParty(trxName, selectedProductItem.id, selectedCustomer.id).then(data => {
                     if(data){
                         console.log("lastTradePrice::", data);
                         setLastTradePrice(data.prev_price);
@@ -924,29 +928,34 @@ const Form = React.memo(({ sales }) => {
                 />
             </div>}
             {(isDraft || isConditionalPending) && <div className="field col-12 md:col-3">
+                <PermissionButton transactionType={trxName} action="cancel" children={
                 <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-danger" 
                     onClick={handleSubmit((d) => onSubmit('cancel', d))}
-                />
+                />} />
             </div>}
             {(isNew || isDraft) && <div className="field col-12 md:col-3">
+                <PermissionButton transactionType={trxName} action="create" children={
                 <Button type="submit" label="Save Order" className="p-button p-button-success" 
                     onClick={handleSubmit((d) => onSubmit('save', d))}
-                />
+                />} />
             </div>}
             {(isNew || isDraft) && <div className="field col-12 md:col-4">
-                <Button type="submit" label="Confirm Order" className="p-button p-button-info" 
+                <PermissionButton transactionType={trxName} action="confirm" children={
+                    <Button type="submit" label="Confirm Order" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => showPaymentDialog(d) )}
-                />
+                />} />
             </div>}
             {isConditionalPending && <div className="field col-12 md:col-4">
-                <Button type="submit" label="Confirm Sales" className="p-button p-button-info" 
+                <PermissionButton transactionType={trxName} action="confirm" children={
+                    <Button type="submit" label="Confirm Sales" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => confirmPayment(d) )}
-                />
+                />} />
             </div>}
             {isReturn && <div className="field col-12 md:col-4">
+                <PermissionButton transactionType={trxName} action="confirm" children={
                 <Button type="submit" label="Confirm Return" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => confirmReturnItems() )}
-                />
+                />} />
             </div>}
         </>
         )

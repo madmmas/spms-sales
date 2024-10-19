@@ -1,13 +1,24 @@
+
 // view,create,edit,delete,draft,cancel,confirm,approve => coded as bits
 // superadmin,admin,manager,sales => represent in array index
 // format: "transactionType": [superadmin, admin, manager, sales]
 const trx_perm = {
-    "sales": [0xff, 0xff, 0x0f, 0x0f],
-    "purchase": [0xff, 0xff, 0x0f, 0x0f],
-    "stock": [0xff, 0xff, 0x0f, 0x0f],
-    "account": [0xff, 0xff, 0x0f, 0x0f],
-    "transfer_money": [0xff, 0xff, 0x0f, 0x0f],
-    "payments": [0xff, 0xff, 0x0f, 0x0f],
+    "trxSales": [0x00, 0xff, 0x0f, 0x0f],
+    "trxPurchase": [0xff, 0xff, 0x0f, 0x0f],
+    "trxStockAdjustment": [0xff, 0xff, 0x0f, 0x0f],
+    "trxStockDamage": [0xff, 0xff, 0x0f, 0x0f],
+    "trxGeneralExpenses": [0xff, 0xff, 0x0f, 0x0f],
+    "trxGeneralIncome": [0xff, 0xff, 0x0f, 0x0f],
+    "trxLedgerAdjustment": [0xff, 0xff, 0x0f, 0x0f],
+    "trxTransferCash": [0xff, 0xff, 0x0f, 0x0f],
+    "trxTransferBank": [0xff, 0xff, 0x0f, 0x0f],
+}
+
+const getRole = () => {
+    let role = localStorage.getItem("user")
+                ? JSON.parse(localStorage.getItem("user")).user.role
+                : "";
+    return role;
 }
 
 const getPermission = function(transactionType, roleName) {
@@ -32,7 +43,8 @@ const getPermission = function(transactionType, roleName) {
     return permission;
 }
 
-const hasPermission = function(transactionType, roleName, action) {
+export const hasPermission = function(transactionType, action) {
+    let roleName = getRole();
     let permission = getPermission(transactionType, roleName);
     let actionBit = 0;
     switch (action) {
@@ -64,10 +76,8 @@ const hasPermission = function(transactionType, roleName, action) {
             actionBit = 0;
     }
 
+    console.log("RoleName:", roleName, "Permission:", permission, "Action:", action, "ActionBit:", actionBit);
+
     return (permission & actionBit) == actionBit;
 }
 
-export default {
-    getPermission,
-    hasPermission,
-}
