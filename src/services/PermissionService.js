@@ -3,18 +3,25 @@
 // superadmin,admin,manager,sales => represent in array index
 // format: "transactionType": [superadmin, admin, manager, sales]
 const trx_perm = {
-    "trxSales": [0x00, 0xff, 0x0f, 0x0f],
-    "trxPurchase": [0xff, 0xff, 0x0f, 0x0f],
-    "trxStockAdjustment": [0xff, 0xff, 0x0f, 0x0f],
-    "trxStockDamage": [0xff, 0xff, 0x0f, 0x0f],
-    "trxGeneralExpenses": [0xff, 0xff, 0x0f, 0x0f],
-    "trxGeneralIncome": [0xff, 0xff, 0x0f, 0x0f],
-    "trxLedgerAdjustment": [0xff, 0xff, 0x0f, 0x0f],
-    "trxTransferCash": [0xff, 0xff, 0x0f, 0x0f],
-    "trxTransferBank": [0xff, 0xff, 0x0f, 0x0f],
+    "trxSales": [0xff, 0xff, 0xff, 0xff],
+    "trxPurchase": [0xff, 0xff, 0x0f, 0xff],
+    "trxStockAdjustment": [0xff, 0xff, 0xff, 0xff],
+    "trxStockDamage": [0xff, 0xff, 0xff, 0xff],
+    "trxGeneralExpenses": [0xff, 0xff, 0x0f, 0xff],
+    "trxGeneralIncome": [0xff, 0xff, 0xff, 0xff],
+    "trxLedgerAdjustment": [0xff, 0xff, 0xff, 0xff],
+    "trxTransferCash": [0xff, 0xff, 0xff, 0xff],
+    "trxTransferBank": [0xff, 0xff, 0xff, 0xff],
 }
 
-const getRole = () => {
+export const getUserId = () => {
+    let userid = localStorage.getItem("user")
+                ? JSON.parse(localStorage.getItem("user")).user.user_id
+                : "";
+    return userid;
+}
+
+export const getRole = () => {
     let role = localStorage.getItem("user")
                 ? JSON.parse(localStorage.getItem("user")).user.role
                 : "";
@@ -81,3 +88,8 @@ export const hasPermission = function(transactionType, action) {
     return (permission & actionBit) == actionBit;
 }
 
+export const isInAdminRole = function() {
+    let roleNames = ["SUPERADMIN", "ADMIN"];
+    let roleName = getRole();
+    return roleNames.includes(roleName);
+}

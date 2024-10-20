@@ -36,6 +36,8 @@ import { MasterDataDBService } from '../../../services/MasterDataDBService';
 
 import { OrderService } from '../../../services/OrderService';
 
+import { getUserId, isInAdminRole } from "../../../services/PermissionService";
+
 import PermissionButton from '../../components/PermissionButton';
 
 import CancellationFeeDialog from '../../components/CancellationFeeDialog';
@@ -228,6 +230,7 @@ const Form = React.memo(({ sales }) => {
             }
             setEditMode(true);
         } else {
+
             console.log("FETCHED-SALES::", sales);
             setStatus(sales.status);
             setTrxStatus(sales.trx_status);
@@ -252,7 +255,17 @@ const Form = React.memo(({ sales }) => {
             })
             setTotalReturnedAmount(totalReturnedPrice)
             setReturnItems(arrayOfSalesReturnItems);
-            setEditMode(sales.status === 'draft');
+
+            if(sales.status === 'draft' || (sales.status === 'done' && isInAdminRole())) {
+                setEditMode(true); 
+            } else {
+                setEditMode(false);
+            }
+            
+            if(sales.payment) {
+                setPaymentData(sales.payment);
+            }
+
             setCustomerCategory(sales.customer_category);
             setCustomerLastOrder(sales.last_trx_id);
             
@@ -642,12 +655,21 @@ const Form = React.memo(({ sales }) => {
                 setConfirmDialogMessage("Are you sure you want to save this order?");
                 setTriggerConfirmDialog(triggerConfirmDialog+1);    
             }
-        } else if(action === 'draft_with_payment'){
-            setStatus('draft');
+        } else if(action === 'save-confirm') {
+            setStatus('done');
+            if(customerCategory === "WALKIN") {
+                setWithPayment(true);
+                showPaymentDialog(formData);
+            } else {
+                setConfirmDialogMessage("Are you sure you want to save this order?");
+                setTriggerConfirmDialog(triggerConfirmDialog+1);
+            }
+        } else if(action === 'draft_with_payment') {
+            // setStatus('draft');
             setTrxStatus("pending");
             setConfirmDialogMessage("Are you sure you want to save this order?");
             setTriggerConfirmDialog(triggerConfirmDialog+1);
-        } else if(action === 'cancel'){
+        } else if(action === 'cancel') {
             setStatus('cancelled');
             setTrxStatus("cancelled");
             setConfirmDialogMessage("Are you sure you want to cancel this order?");
@@ -656,7 +678,7 @@ const Form = React.memo(({ sales }) => {
             }else{
                 setTriggerConfirmDialog(triggerConfirmDialog+1);
             }
-        } else if(action === 'approve'){
+        } else if(action === 'approve') {
             setStatus('approved');
             if (customerCategory === "CONDITIONAL") {
                 setTrxStatus("pending");
@@ -691,6 +713,7 @@ const Form = React.memo(({ sales }) => {
     }
 
     const showPaymentDialog = formData => {
+        // check if payment already exists
         console.log("customerCategory::", customerCategory);
         setSalesData(formData);
 
@@ -702,8 +725,21 @@ const Form = React.memo(({ sales }) => {
                 _customerBalance = customerBalance;
             }
             // this not the right checking
-            if(sales && sales.status==="draft" && sales.trx_status === "pending" && sales.payment) {
-                setInitPayment({
+            let _payment = {
+                ...emptyPayment,
+                ...{
+                    "previous_balance": _customerBalance,
+                    "invoice_amount": data.net,
+                    "current_balance": data.net + _customerBalance,
+                    "cash_amount": 0,
+                    "bank_amount": 0,
+                    "mfs_amount": 0,
+                    "amount": 0,
+                }
+            };
+
+            if(sales && (sales.status==="draft" || sales.status==="done") && sales.trx_status === "pending" && sales.payment) {
+                _payment = Object.assign({}, {
                     ...sales.payment,
                     ...{
                         "previous_balance": _customerBalance,
@@ -711,22 +747,9 @@ const Form = React.memo(({ sales }) => {
                         "current_balance": data.net + _customerBalance,
                     }
                 });
-            } else {
-                setInitPayment({
-                    ...emptyPayment,
-                    ...{
-                        "previous_balance": _customerBalance,
-                        "invoice_amount": data.net,
-                        "current_balance": data.net + _customerBalance,
-                        "cash_amount": 0,
-                        "bank_amount": 0,
-                        "mfs_amount": 0,
-                        "amount": 0,
-                    }
-                });
-            }
-        
-            console.log("InitPayment::", initPayment);
+            } 
+            setInitPayment(_payment)
+            console.log("InitPayment::", _payment);
             setPaymentDlgTrigger(paymentDlgTrigger + 1);
         } else {
             onSubmit('approve', formData)
@@ -904,14 +927,26 @@ const Form = React.memo(({ sales }) => {
         )
     }
     const renderFormButtons = () => {
+        if(sales) {
+            let showButtons = getUserId() === sales.created_by;
+            if (showButtons == false && !isInAdminRole() ) {
+                return;
+            }
+        }
+
+        let isAdmin = isInAdminRole(); // only for superadmin and admin
+        
         let isNew = true;
         let isDraft = false;
+        let isDone = false;
         let isReturn = false;
         let isConditionalPending = false;
         if(sales) {
             isNew = false;
-            if(sales.status === 'draft') {
+            if(sales.status === 'draft'){
                 isDraft = true;
+            }else if (sales.status === 'done') {
+                isDone = true;
             } else if(sales.status === 'approved') {
                 if(customerCategory==='CONDITIONAL' && sales.trx_status === 'pending') {
                     isConditionalPending = true;
@@ -919,7 +954,7 @@ const Form = React.memo(({ sales }) => {
                     isReturn = true;
                 }
             }
-        } 
+        }
         return (
         <>
             {(isNew || isDraft) && <div className="field col-12 md:col-2">
@@ -927,27 +962,33 @@ const Form = React.memo(({ sales }) => {
                     onClick={() => resetAll()}
                 />
             </div>}
-            {(isDraft || isConditionalPending) && <div className="field col-12 md:col-3">
+            {(isDraft || isConditionalPending || (isAdmin && isDone)) && <div className="field col-12 md:col-3">
                 <PermissionButton transactionType={trxName} action="cancel" children={
-                <Button type="submit" label="Cancel Order" className="p-button-outlined p-button-danger" 
+                <Button type="submit" label="Cancel" className="p-button-outlined p-button-danger" 
                     onClick={handleSubmit((d) => onSubmit('cancel', d))}
                 />} />
             </div>}
             {(isNew || isDraft) && <div className="field col-12 md:col-3">
                 <PermissionButton transactionType={trxName} action="create" children={
-                <Button type="submit" label="Save Order" className="p-button p-button-success" 
+                <Button type="submit" label="Draft" className="p-button p-button-success" 
                     onClick={handleSubmit((d) => onSubmit('save', d))}
                 />} />
             </div>}
-            {(isNew || isDraft) && <div className="field col-12 md:col-4">
+            {(isNew || isDraft) && <div className="field col-12 md:col-3">
+                <PermissionButton transactionType={trxName} action="create" children={
+                <Button type="submit" label="Confirm" className="p-button p-button-info" 
+                    onClick={handleSubmit((d) => onSubmit('save-confirm', d))}
+                />} />
+            </div>}
+            {isAdmin && (isNew || isDraft || isDone) && <div className="field col-12 md:col-4">
                 <PermissionButton transactionType={trxName} action="confirm" children={
-                    <Button type="submit" label="Confirm Order" className="p-button p-button-info" 
+                    <Button type="submit" label="Approve" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => showPaymentDialog(d) )}
                 />} />
             </div>}
-            {isConditionalPending && <div className="field col-12 md:col-4">
+            {isAdmin && isConditionalPending && <div className="field col-12 md:col-4">
                 <PermissionButton transactionType={trxName} action="confirm" children={
-                    <Button type="submit" label="Confirm Sales" className="p-button p-button-info" 
+                    <Button type="submit" label="Approve Sales" className="p-button p-button-info" 
                     onClick={handleSubmit((d) => confirmPayment(d) )}
                 />} />
             </div>}

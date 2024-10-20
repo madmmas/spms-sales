@@ -2,7 +2,6 @@ const menu = [
     {
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
-            { label: 'New Purchase', icon: 'pi pi-fw pi-home', to: '/purchases/new' },
             { label: 'New Sales Order', icon: 'pi pi-fw pi-home', to: '/sales/new' },
         ]
     },
@@ -10,58 +9,26 @@ const menu = [
         label: 'Data',
         items: [
             {
-                label: 'Master Data',
-                icon: 'pi pi-fw pi-list',
-                items: [
-                    // { label: 'Bank Accounts', icon: 'pi pi-fw pi-list', to: '/bank_accounts' },
-                    // { label: 'MFS Accounts', icon: 'pi pi-fw pi-list', to: '/mfs_accounts' },
-                    // { label: 'Customers', icon: 'pi pi-fw pi-list', to: '/customers' },
-                    // { label: 'Employees', icon: 'pi pi-fw pi-list', to: '/employees' },
-                    { label: 'Package-Products', icon: 'pi pi-fw pi-list', to: '/packages' },
-                    { label: 'Products', icon: 'pi pi-fw pi-list', to: '/products' },
-                    // { label: 'Suppliers', icon: 'pi pi-fw pi-list', to: '/suppliers' },
-                    // { label: 'Warehouses', icon: 'pi pi-fw pi-list', to: '/warehouses' },
-                ]
-            },
-            {
                 label: 'Transactions',
                 icon: 'pi pi-fw pi-list',
                 items: [
-                    // { label: 'Adjustments', icon: 'pi pi-fw pi-list', to: '/adjustments' },
-                    // { label: 'Attendance', icon: 'pi pi-fw pi-list', to: '/attendance' },
-                    // { label: 'Expenses', icon: 'pi pi-fw pi-list', to: '/expenses' },
-                    // { label: 'Extra Income', icon: 'pi pi-fw pi-list', to: '/extra_income' },
-                    // { label: 'Payments', icon: 'pi pi-fw pi-list', to: '/payments' },
-                    // { label: 'Payroll', icon: 'pi pi-fw pi-list', to: '/payroll' },
-                    { label: 'Purchases', icon: 'pi pi-fw pi-list', to: '/purchases' },
                     { label: 'Sales', icon: 'pi pi-fw pi-list', to: '/sales' },
-                    { label: 'Stock', icon: 'pi pi-fw pi-list', to: '/stocks' },
-                    // { label: 'Transfer Money', icon: 'pi pi-fw pi-list', to: '/transfer' },
                 ]
             },
         ]
     },
-    // {
-    //     label: 'Reports',
-    //     items: [
-    //         { label: 'Cash flow', icon: 'pi pi-fw pi-list', to: '/report/cashflow' },
-    //         {
-    //             label: 'Ledger',
-    //             icon: 'pi pi-fw pi-list',
-    //             items: [
-    //                 // { label: 'Purchase Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/purchase' },
-    //                 // { label: 'Sales Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/sales' },
-    //                 // { label: 'Supplier Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/supplier' },
-    //                 // { label: 'Customer Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/customer' },
-    //                 // { label: 'A/C Payable', icon: 'pi pi-fw pi-list', to: '/ledger/accpayable' },
-    //                 // { label: 'A/C Receiveable', icon: 'pi pi-fw pi-list', to: '/ledger/accreceivable' },
-    //                 // { label: 'Bank Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/bank' },
-    //                 // { label: 'MFS Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/mfs' },
-    //                 // { label: 'Cash Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/cash' },
-    //             ]
-    //         }
-    //     ]
-    // },      
+    {
+        label: 'Reports',
+        items: [
+            {
+                label: 'Ledger',
+                icon: 'pi pi-fw pi-list',
+                items: [
+                    { label: 'Customer Ledger', icon: 'pi pi-fw pi-list', to: '/ledger/customer' },
+                ]
+            }
+        ]
+    },      
     // {
     //     label: 'Setup',
     //     items: [

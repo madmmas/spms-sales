@@ -4,6 +4,7 @@ const menu = [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' },
             { label: 'New Purchase', icon: 'pi pi-fw pi-home', to: '/purchases/new' },
             { label: 'New Sales Order', icon: 'pi pi-fw pi-home', to: '/sales/new' },
+            { label: 'Final Approval', icon: 'pi pi-fw pi-home', to: '/sales/final_approve' },
         ]
     },
     {

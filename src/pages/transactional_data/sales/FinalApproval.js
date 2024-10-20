@@ -44,7 +44,7 @@ const List = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            'name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
+            'status': { operator: FilterOperator.OR, constraints: [{ value: "approved", matchMode: FilterMatchMode.EQUALS }] },
         }
     };
 
@@ -59,6 +59,9 @@ const List = () => {
     const [selectedProfiles, setSelectedProfiles] = useState(null);
     const [isCourierVisible, setIsCourierVisible] = useState(false);
     const [id, setID] = useState('');
+
+    const [selectedProducts, setSelectedProducts] = useState(null);
+    const [rowClick, setRowClick] = useState(true);
 
     const [lazyParams, setLazyParams] = useState(defaultFilters);
 
@@ -138,11 +141,28 @@ const List = () => {
     }
 
    
-        const onInputChange = (e, name) => {
-            const val = e.target.value;
-            setValue(`${name}`, val);
-        };
+    const onInputChange = (e, name) => {
+        const val = e.target.value;
+        setValue(`${name}`, val);
+    };
     
+    const approveAllSelected = () => {
+        console.log("selectedProducts::",selectedProducts)
+        // get id and put it in an array
+        let selectedIds = [];
+        selectedProducts.map((item) => {
+            selectedIds.push(item.id);
+        });
+        console.log("selectedProducts-ids::",selectedIds)
+        orderService.approveAllSelected(SALES_MODEL, "final-approved", selectedIds).then(result => {
+            if(result){
+                // reloadLazyData();
+                loadLazyData();
+                // clear selected products
+                setSelectedProducts(null);
+            }
+        });
+    }
 
     const hideDialog = () => {
         setIsCourierVisible(false);
@@ -219,16 +239,8 @@ const List = () => {
         return (
             <React.Fragment>
                 <div className="flex justify-content-between">
-                    <Button label="New" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
+                    <Button label="Approve" icon="pi pi-plus" className="p-button-success mr-2" onClick={approveAllSelected} />
                 </div>
-            </React.Fragment>
-        );
-    };
-
-    const rightToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                {/* <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
             </React.Fragment>
         );
     };
@@ -490,15 +502,15 @@ const List = () => {
         </>
     );
 
+
     return (
         <div className="grid crud-demo">
             <div className="col-12">
                 <div className="card">
 
-                    <OrderFilter reloadData={reloadLazyData} isSales={true} />
-
+            
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                    <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
                     <DataTable
                         ref={dt} value={dtProfiles} dataKey="id" 
                         className="datatable-responsive" responsiveLayout="scroll"
@@ -510,8 +522,11 @@ const List = () => {
                         rowsPerPageOptions={[5,10,25,50]}
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         emptyMessage="No data found." header={renderHeader} 
+
+                        selectionMode={rowClick ? null : 'checkbox'} 
+                        selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                     >
-                        <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                         <Column field="voucher_no" header="Voucher No" sortable body={voucherNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="status" header="Status" sortable body={statusNoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="created_at" header="Sales Date" sortable body={dateBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>

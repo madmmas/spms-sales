@@ -60,6 +60,7 @@ function App() {
   const SaleList = React.lazy(() => import("./pages/transactional_data/sales/List"));
   const SaleDetail = React.lazy(() => import("./pages/transactional_data/sales/Detail"));
   const SaleForm = React.lazy(() => import("./pages/transactional_data/sales/Form"));
+  const SalesFinalApprove = React.lazy(() => import("./pages/transactional_data/sales/FinalApproval"));
   const PurchaseList = React.lazy(() => import("./pages/transactional_data/purchases/List"));
   const PurchaseDetail = React.lazy(() => import("./pages/transactional_data/purchases/Detail"));
   const PurchaseForm = React.lazy(() => import("./pages/transactional_data/purchases/Form"));
@@ -200,6 +201,7 @@ function App() {
         <Route path="/sales">
           <Route index element={<RouteAuth pageComponent={<SaleList />} />} />
           <Route path="invoice/:id" element={<RouteAuth pageComponent={<Invoice />} />} />
+          <Route path="final_approve" element={<RouteAuth pageComponent={<SalesFinalApprove />} />} />
         </Route>
         <Route path="/purchases">
           <Route index element={<RouteAuth pageComponent={<PurchaseList />} />} />

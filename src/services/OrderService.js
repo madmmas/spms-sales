@@ -60,6 +60,12 @@ export class OrderService {
         return resp.data;
     }
 
+    async approveAllSelected(orderType, status, data) {
+        const resp = await axiosInstance.put(`/orders/${orderType}/status/${status}`, data);
+        console.log(resp.data);
+        return resp.data;
+    }
+
     async commit(orderType, id, data) {
         const resp = await axiosInstance.patch(`/orders/${orderType}/` + id, data);
         console.log(resp.data);
