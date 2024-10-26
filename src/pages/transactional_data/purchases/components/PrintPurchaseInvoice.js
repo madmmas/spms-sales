@@ -278,7 +278,7 @@ export const PrintPurchaseInvoice = () => {
                     </tr>
                     <tr>
                         <td colSpan="12" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.gross*invoice.discount/100).toFixed(2)}</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                         <td colSpan="2" className="sum-up"></td>
                     </tr>
                     <tr>
@@ -324,7 +324,7 @@ export const PrintPurchaseInvoice = () => {
                     </tr>
                     <tr>
                         <td colSpan="8" className="sum-up">(-) Discount</td>
-                        <td className="price right-align">{ Number.parseFloat(invoice.gross*invoice.discount/100).toFixed(2)}</td>
+                        <td className="price right-align">{ Number.parseFloat(invoice.discount).toFixed(2)}</td>
                     </tr>
                     <tr>
                         <th colSpan="8" className="total text line">Net Amount</th>

@@ -88,7 +88,7 @@ const SalesProductDetail = ({
         setNetAmount(netAmount);
         setVatVal(vat);
         onChangeGross(total);
-        onChangeDiscount(discountedAmount + additionalDiscount);
+        onChangeDiscount(discountedAmount);
         onChangeNet(netAmount);
     };
 

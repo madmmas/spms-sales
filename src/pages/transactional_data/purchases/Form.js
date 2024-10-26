@@ -225,8 +225,8 @@ const Form = ({ purchase }) => {
         formData.duty_vat = totalDuty;
         formData.discount = discount;
         // discount in percentage
-        // formData.net = totalCostAmountBDT - discount;
-        formData.net = netCostAmountBDT - (totalCostAmountBDT * discount / 100);
+        formData.net = totalCostAmountBDT - discount;
+        // formData.net = netCostAmountBDT - (totalCostAmountBDT * discount / 100);
 
         console.log("FORMDATA::", formData);
 

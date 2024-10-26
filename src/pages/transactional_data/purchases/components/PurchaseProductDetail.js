@@ -18,8 +18,10 @@ const PurchaseProductDetail = ({
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [totalTransport, setTotalTransport] = useState(0.00);
     const [totalDuty, setTotalDuty] = useState(0.00);
-    const [purchaseDiscount, setPurchaseDiscount] = useState(0.00);
     const [netCostAmountBDT, setNetAmountBDT] = useState(0.00);
+    
+    const [discountAmount, setDiscountAmount] = useState(0.00);
+    const [discountPercentage, setDiscountPercentage] = useState(0.00);
 
     const [purchaseRows, setPurchaseRows] = useState([]);
 
@@ -48,22 +50,42 @@ const PurchaseProductDetail = ({
         setTotalAmountF(totalCostAmountF);
         setTotalTransport(totalTransport);
         setTotalDuty(totalDuty);
-        setPurchaseDiscount(_discount);
+
         console.log("DISCOUNT-AMOUNT::", _discount);
-        let discountAmount = totalCostAmountBDT * _discount / 100;
-        console.log("DISCOUNT-AMOUNT-2::", discountAmount);
-        netCostAmountBDT = totalCostAmountBDT - discountAmount;
+        let discountAmount = Number(_discount) * 100 / Number(totalCostAmountBDT);
+        setDiscountPercentage(discountAmount);
+
+        netCostAmountBDT = totalCostAmountBDT - _discount;
         console.log("NET-COST-AMOUNT::", netCostAmountBDT);
         setNetAmountBDT(netCostAmountBDT);
         console.log("ALL-TOTAL::", totalQuantity, totalCostAmountF, totalCostAmountBDT, totalTransport, totalDuty, netCostAmountBDT);
     };
     
     const onPurDiscountChange = (value) => {
+        let amount = totalCostAmountBDT
         console.log("DISCOUNT-CHANGE::", value);
         if(Number(value) >= 0) {
             console.log("DISCOUNT-CHANGE-2::", value);
+            let discountAmount = Number(value) * 100 / Number(amount);
+            console.log("DISCOUNT-CHANGE-3::", discountAmount);
+            setDiscountPercentage(discountAmount);
+            
             calculateTotals(purchases, value);
             onDiscountChange(value);
+        }
+    };
+
+    const onPercentageDiscountChange = (value) => {
+        let amount = totalCostAmountBDT;
+        console.log("Percentage-DISCOUNT-CHANGE::", value);
+        if(Number(value) >= 0) {
+            console.log("Percentage-DISCOUNT-CHANGE-2::", value);
+            let discountAmount = Number(amount) * Number(value) / 100;
+            console.log("Percentage-DISCOUNT-CHANGE-3::", discountAmount);
+            setDiscountAmount(discountAmount);
+            
+            calculateTotals(purchases, discountAmount);
+            onDiscountChange(discountAmount);
         }
     };
 
@@ -93,8 +115,13 @@ const PurchaseProductDetail = ({
         console.log("ALL-ROWS-PURCHASES::", purchases)
         recalculateAllRows(purchases);
 
-        if (discount !== undefined) {
+        if (discount !== undefined && Number(discount) > 0) {
+            
+            setDiscountAmount(discount);
+
             calculateTotals(purchases, discount);
+            
+            
         } else {
             calculateTotals(purchases);
         }
@@ -121,17 +148,27 @@ const PurchaseProductDetail = ({
                     <td><b>Total Cost ({supplierCurrency}):</b></td><td>{totalCostAmountF}</td>
                     {/* <td><b>Conversion Rate ({supplierCurrency} to BDT):</b></td><td>{conversion_rate}</td> */}
                     <td><b>Total Cost (BDT):</b></td><td>{totalCostAmountBDT}</td>
-                    <td><b>Discount (%)</b></td><td>
+                    <td><b>Discount</b></td><td>
                         {!editMode && <>
-                            <InputNumber readonly="false" value={discount} placeholder="empty" />
+                            <InputNumber readonly="false" value={discountAmount} placeholder="empty" />
+                            <InputNumber readonly="false" value={discountPercentage} placeholder="empty" /> %
                         </>}
-                        {editMode && <InputNumber value={discount}
-                            placeholder=""
-                            min={0} maxFractionDigits={2}
-                            className="mx-2"
-                            style={{"width": "fit-content(20em)"}}
-                            onValueChange={(e) => onPurDiscountChange(e.value)} 
-                            />}
+                        {editMode && <>
+                            <InputNumber value={discountAmount}
+                                placeholder="amount"
+                                min={0} maxFractionDigits={2}
+                                className="mx-2"
+                                style={{"width": "fit-content(20em)"}}
+                                onValueChange={(e) => onPurDiscountChange(e.value)} 
+                                />
+                            %<InputNumber value={discountPercentage}
+                                placeholder="%"
+                                min={0} maxFractionDigits={2}
+                                className="mx-1"
+                                style={{"width": "fit-content(10em)"}}
+                                onValueChange={(e) => onPercentageDiscountChange(e.value)}
+                                />
+                        </>}
                     </td>
                 </tr><tr>
                     <td><b>Total Transport Cost:</b></td><td>{totalTransport}</td>
