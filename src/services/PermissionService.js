@@ -89,7 +89,8 @@ export const hasPermission = function(transactionType, action) {
 }
 
 export const isInAdminRole = function() {
-    let roleNames = ["SUPERADMIN", "ADMIN"];
+    let roleNames = ["ROOT", "ADMIN"];
     let roleName = getRole();
+    console.log("isAdmin::", roleName);
     return roleNames.includes(roleName);
 }

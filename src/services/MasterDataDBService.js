@@ -277,6 +277,41 @@ export class MasterDataDBService {
         productSearchTable.bulkPut(productSearch);
     }
 
+    async getAllUsers() {
+        // get all the users and save in indexedDB
+        let uri = `/users`;
+        let result = await axiosInstance.get(uri, {
+            timeout: 30000,
+            cache: false,
+        }).then(res => res.data);
+
+        // save the result in indexedDB
+
+        this.openDB();
+        let table = this.db.table('users');
+
+        if(result) {
+            table.bulkPut(result);
+        }
+
+        // save result in memory
+        let users = {};
+        for(let i=0; i<result.length; i++) {
+            users[result[i].id] = result[i].username;
+        }
+        window['__all_shortname_users'] = users;
+
+        return result;
+    }
+
+    getUsernameById(id) {
+        let users = window['__all_shortname_users'];
+        if(users) {
+            return users[id] || "";
+        }
+        return "";
+    }
+
     async getAllMasterDataUpto(modelName, init=false) {
         let upto = this.getModelLastUpdated(modelName);
         if (upto === null || !upto) {
@@ -425,6 +460,7 @@ export class MasterDataDBService {
         this.getAllMasterDataUpto("dtCustomer", true);
         this.getAllMasterDataUpto("dtSupplier", true);
         
+        this.getAllUsers();
         // this.populateAllShortnameInMemory();
     }
 

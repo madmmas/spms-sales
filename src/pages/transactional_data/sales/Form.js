@@ -927,13 +927,14 @@ const Form = React.memo(({ sales }) => {
         )
     }
     const renderFormButtons = () => {
+        console.log("isAdmin::", isInAdminRole());
         if(sales) {
             let showButtons = getUserId() === sales.created_by;
             if (showButtons == false && !isInAdminRole() ) {
                 return;
             }
         }
-
+        
         let isAdmin = isInAdminRole(); // only for superadmin and admin
         
         let isNew = true;
