@@ -942,18 +942,22 @@ const Form = React.memo(({ sales }) => {
         let isDone = false;
         let isReturn = false;
         let isConditionalPending = false;
+        let isCancel = true; 
+
         if(sales) {
             isNew = false;
             if(sales.status === 'draft'){
                 isDraft = true;
             }else if (sales.status === 'done') {
                 isDone = true;
+                isCancel = isAdmin;
             } else if(sales.status === 'approved') {
                 if(customerCategory==='CONDITIONAL' && sales.trx_status === 'pending') {
                     isConditionalPending = true;
                 } else {
                     isReturn = true;
                 }
+                isCancel = isAdmin;
             }
         }
         return (
@@ -963,7 +967,7 @@ const Form = React.memo(({ sales }) => {
                     onClick={() => resetAll()}
                 />
             </div>}
-            {(isDraft || isConditionalPending || (isAdmin && isDone)) && <div className="field col-12 md:col-3">
+            {isCancel && <div className="field col-12 md:col-3">
                 <PermissionButton transactionType={trxName} action="cancel" children={
                 <Button type="submit" label="Cancel" className="p-button-outlined p-button-danger" 
                     onClick={handleSubmit((d) => onSubmit('cancel', d))}
